@@ -1,4 +1,7 @@
 import { PrismaClient } from '@prisma/client';
+import { resolveDatabaseUrls } from '@/config/database-url';
+
+resolveDatabaseUrls();
 
 // Global reference declaration to prevent multiple client instances during HMR / serverless warm invocations
 const globalForPrisma = globalThis as unknown as {

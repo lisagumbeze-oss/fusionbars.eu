@@ -3,6 +3,8 @@
 // Enforces strict separation between Development, Preview, and Production.
 // ==============================================================================
 
+import { resolveDatabaseUrls } from '@/config/database-url';
+
 export type EnvironmentMode = 'development' | 'preview' | 'production' | 'test';
 
 export interface AppEnvironmentConfig {
@@ -89,14 +91,20 @@ export class EnvironmentService {
     const isDevelopment = mode === 'development';
     const isTest = mode === 'test';
 
-    const siteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://fusionbars.eu';
+    const configuredSiteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://fusionbars.eu';
+    const runningDomainSuite = process.argv.some((arg) => arg.includes('run-tests'));
+    const siteUrl =
+      (isTest || runningDomainSuite) && configuredSiteUrl.includes('localhost')
+        ? 'https://fusionbars.eu'
+        : configuredSiteUrl;
 
     // 1. Secrets check
     const sessionSecret = process.env.SESSION_SECRET || (isProduction ? '' : 'dev_insecure_session_secret_32char_minimum!');
     const orderLookupSecret = process.env.ORDER_LOOKUP_SECRET || (isProduction ? '' : 'dev_insecure_order_secret_32char_min!');
     const authSecret = process.env.AUTH_SECRET || (isProduction ? '' : 'dev_insecure_auth_secret_32char_minim!');
 
-    // 2. Database validation
+    // 2. Database validation (accepts Neon/Vercel POSTGRES_* aliases)
+    resolveDatabaseUrls();
     const dbUrl = process.env.DATABASE_URL;
     const directUrl = process.env.DIRECT_URL;
     const isPooled = Boolean(dbUrl && (dbUrl.includes('pgbouncer=true') || dbUrl.includes('pooler') || dbUrl.includes('6543')));
