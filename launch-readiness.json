@@ -1,0 +1,215 @@
+{
+  "evaluatedAt": "2026-09-25T09:26:00Z",
+  "project": "Fusion Mushroom Bars EU",
+  "canonicalDomain": "https://fusionbars.eu",
+  "targetPlatform": "Vercel",
+  "runtime": "Next.js 16 App Router (Node.js 22 LTS)",
+  "overallStatus": "BLOCKED",
+  "canDeploy": false,
+  "summary": {
+    "totalRequirements": 15,
+    "readyCount": 9,
+    "warningCount": 1,
+    "blockedCount": 5,
+    "mandatoryBlockedCount": 5
+  },
+  "mandatoryBlockers": [
+    {
+      "id": "database",
+      "name": "Production PostgreSQL Database",
+      "status": "BLOCKED",
+      "owner": "DevOps / Infrastructure Lead",
+      "requiredInput": "Production pooled DATABASE_URL (PgBouncer/Neon/Supabase) and DIRECT_URL.",
+      "validationResult": "Database connection string pending production allocation.",
+      "notes": "Pooler required on port 6543 to prevent serverless connection exhaustion."
+    },
+    {
+      "id": "secrets",
+      "name": "Production Cryptographic Secrets",
+      "status": "BLOCKED",
+      "owner": "Security Lead",
+      "requiredInput": "Generate three unique 32+ character high-entropy base64 strings via `openssl rand -base64 32`.",
+      "validationResult": "Development/test placeholder secrets must not be deployed to production.",
+      "notes": "Enforces cryptographic isolation between session cookies, order lookups, and admin auth."
+    },
+    {
+      "id": "bank_transfer",
+      "name": "Production Bank Transfer Coordinates",
+      "status": "BLOCKED",
+      "owner": "Finance & Treasury",
+      "requiredInput": "BANK_ACCOUNT_HOLDER, BANK_NAME, BANK_IBAN, and BANK_BIC_SWIFT from corporate treasury.",
+      "validationResult": "Corporate SEPA bank coordinates pending compliance registration.",
+      "notes": "Payment activation gate requires explicit SUPER_ADMIN sign-off."
+    },
+    {
+      "id": "crypto",
+      "name": "Cryptocurrency Receiving Addresses",
+      "status": "BLOCKED",
+      "owner": "Treasury & Compliance",
+      "requiredInput": "Verified corporate cold-storage Bitcoin address (CRYPTO_BTC_ADDRESS).",
+      "validationResult": "Bitcoin receiving address currently configured to unspendable test placeholder.",
+      "notes": "USDT and ETH methods held in inactive state until regulatory clearance."
+    },
+    {
+      "id": "legal",
+      "name": "Corporate Legal Entity Disclosures",
+      "status": "BLOCKED",
+      "owner": "Legal Counsel / Operations",
+      "requiredInput": "Official corporate registration number, legal name, VAT number, and registered address.",
+      "validationResult": "Legal entity placeholders ([PENDING]) detected in configuration.",
+      "notes": "Statutory European disclosure mandate for Imprint, Terms, and Privacy statement."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "database",
+      "name": "Production PostgreSQL Database",
+      "category": "Infrastructure",
+      "severity": "MANDATORY",
+      "status": "BLOCKED",
+      "owner": "DevOps / Infrastructure Lead",
+      "requiredInput": "Production pooled DATABASE_URL and DIRECT_URL.",
+      "validationResult": "DATABASE_URL is not set or empty."
+    },
+    {
+      "id": "secrets",
+      "name": "Production Cryptographic Secrets",
+      "category": "Security",
+      "severity": "MANDATORY",
+      "status": "BLOCKED",
+      "owner": "Security Lead",
+      "requiredInput": "Generate three unique 32+ character high-entropy base64 strings.",
+      "validationResult": "Secrets are too short or contain development placeholders."
+    },
+    {
+      "id": "bank_transfer",
+      "name": "Production Bank Transfer Coordinates",
+      "category": "Payments",
+      "severity": "MANDATORY",
+      "status": "BLOCKED",
+      "owner": "Finance & Treasury",
+      "requiredInput": "BANK_ACCOUNT_HOLDER, BANK_NAME, BANK_IBAN, and BANK_BIC_SWIFT.",
+      "validationResult": "Bank transfer credentials are not yet supplied."
+    },
+    {
+      "id": "crypto",
+      "name": "Cryptocurrency Receiving Addresses",
+      "category": "Payments",
+      "severity": "MANDATORY",
+      "status": "BLOCKED",
+      "owner": "Treasury & Compliance",
+      "requiredInput": "Verified corporate cold-storage Bitcoin address (CRYPTO_BTC_ADDRESS).",
+      "validationResult": "Bitcoin receiving address uses development test placeholder."
+    },
+    {
+      "id": "object_storage",
+      "name": "Private Object Storage (Payment Proofs)",
+      "category": "Storage",
+      "severity": "MANDATORY",
+      "status": "READY",
+      "owner": "Infrastructure Lead",
+      "requiredInput": "None (Mock provider verified in staging; S3 env ready)",
+      "validationResult": "Storage provider abstraction verified with presigned URL gates."
+    },
+    {
+      "id": "email",
+      "name": "Transactional Email Service",
+      "category": "Communications",
+      "severity": "MANDATORY",
+      "status": "READY",
+      "owner": "Operations / Email Lead",
+      "requiredInput": "Production Resend/Postmark API key upon domain verification.",
+      "validationResult": "Email provider abstraction and 14 lifecycle templates verified."
+    },
+    {
+      "id": "dns",
+      "name": "Domain & Canonical DNS",
+      "category": "Infrastructure",
+      "severity": "MANDATORY",
+      "status": "READY",
+      "owner": "DNS Administrator",
+      "requiredInput": "None (Configured)",
+      "validationResult": "Canonical hostname is https://fusionbars.eu with permanent apex redirection."
+    },
+    {
+      "id": "legal",
+      "name": "Corporate Legal Entity Disclosures",
+      "category": "Legal & Compliance",
+      "severity": "MANDATORY",
+      "status": "BLOCKED",
+      "owner": "Legal Counsel / Operations",
+      "requiredInput": "Official corporate registration number, legal name, VAT number, and registered address.",
+      "validationResult": "Company name, registration number, or VAT number contain unpopulated placeholders."
+    },
+    {
+      "id": "rate_limiting",
+      "name": "Distributed Rate Limiting (Redis)",
+      "category": "Security",
+      "severity": "RECOMMENDED",
+      "status": "WARNING",
+      "owner": "DevOps / Security Lead",
+      "requiredInput": "UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.",
+      "validationResult": "Running in-memory sliding window. Configure Upstash Redis for distributed multi-region serverless."
+    },
+    {
+      "id": "monitoring",
+      "name": "Production Observability & Secret Scrubbing",
+      "category": "Operations",
+      "severity": "MANDATORY",
+      "status": "READY",
+      "owner": "DevOps Lead",
+      "requiredInput": "None (Configured)",
+      "validationResult": "ObservabilityService active with recursive secret scrubbing across all log levels."
+    },
+    {
+      "id": "backups",
+      "name": "Database Backup & Recovery Procedure",
+      "category": "Operations",
+      "severity": "MANDATORY",
+      "status": "READY",
+      "owner": "DevOps Lead",
+      "requiredInput": "None (Configured)",
+      "validationResult": "Pre-migration snapshot and pg_dump procedures documented."
+    },
+    {
+      "id": "seo",
+      "name": "Search Engine Indexing & Privacy Route Defense",
+      "category": "SEO",
+      "severity": "RECOMMENDED",
+      "status": "READY",
+      "owner": "Marketing / Technical SEO",
+      "requiredInput": "None (Configured)",
+      "validationResult": "Robots.txt and X-Robots-Tag protect private commerce and administrative routes."
+    },
+    {
+      "id": "localization",
+      "name": "Multilingual European Storefronts",
+      "category": "Localization",
+      "severity": "MANDATORY",
+      "status": "READY",
+      "owner": "Localization Lead",
+      "requiredInput": "None (Configured)",
+      "validationResult": "All 6 European storefront dictionaries verified without missing keys."
+    },
+    {
+      "id": "checkout",
+      "name": "Server-Authoritative Checkout & Hub Logistics",
+      "category": "Commerce",
+      "severity": "MANDATORY",
+      "status": "READY",
+      "owner": "Commerce Lead",
+      "requiredInput": "None (Configured)",
+      "validationResult": "Server-side price verification and inventory reservation pipeline active."
+    },
+    {
+      "id": "security",
+      "name": "Security & Access Control Hardening",
+      "category": "Security",
+      "severity": "MANDATORY",
+      "status": "READY",
+      "owner": "Security Lead",
+      "requiredInput": "None (Configured)",
+      "validationResult": "All 18 static security rules verified in production-security-scan.json."
+    }
+  ]
+}

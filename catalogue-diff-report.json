@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-09-25T11:22:02.774Z",
+  "backupStatus": {
+    "backedUp": true,
+    "backupPath": "/app/applet/src/data/backups/catalogue-backup-pre-import-2026-09-25T11-22-02-774Z.json",
+    "originalProductCount": 10,
+    "originalVariantCount": 61
+  },
+  "existingCataloguePreserved": true,
+  "unmatchedExternalProducts": 34,
+  "matchedProductsCount": 84,
+  "conflictsDetected": 155
+}

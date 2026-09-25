@@ -1,0 +1,13 @@
+{
+  "generatedAt": "2026-09-25T03:55:14.543Z",
+  "referenceSiteUrl": "https://fusionbarshop.com/",
+  "referenceProductCount": 50,
+  "internalNormalizedProductCount": 10,
+  "internalTotalVariants": 61,
+  "conclusions": {
+    "coreCoverage": "100% of reference site chocolate flavors (26/26) and gummies (11/11) are mapped to structured variants.",
+    "pricingDifference": "Reference site uses unverified USD amounts ($20-$1500). Fusion EU enforces authoritative EUR minor units (€20.00-€1100.00) with secondary GBP conversion.",
+    "complianceDifference": "Reference site contains unverified medical/efficacy statements. Fusion EU replaces them with strictly culinary, allergen, and botanical origin disclosures.",
+    "packagingDifference": "Fusion EU specifies discreet unmarked packaging shipped from 4 EU hubs (NL, ES, DE, FR)."
+  }
+}

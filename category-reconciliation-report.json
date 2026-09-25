@@ -1,0 +1,86 @@
+{
+  "generatedAt": "2026-09-25T11:22:02.774Z",
+  "categoryReconciliation": [
+    {
+      "sourceCategoryName": "FUSION COLABORATION",
+      "sourceCategorySlug": "fusion-colaboration",
+      "sourceType": "REFERENCE_WEBSITE",
+      "normalizedCategoryName": "Artisan Couverture Chocolate Bars",
+      "normalizedCategorySlug": "artisan-chocolate-bars",
+      "mappingStatus": "MAPPED",
+      "productCount": 0
+    },
+    {
+      "sourceCategoryName": "FUSION GUMMIES",
+      "sourceCategorySlug": "fusion-gummies",
+      "sourceType": "REFERENCE_WEBSITE",
+      "normalizedCategoryName": "Botanical Fruit Pectin Gummies",
+      "normalizedCategorySlug": "botanical-gummies",
+      "mappingStatus": "MAPPED",
+      "productCount": 0
+    },
+    {
+      "sourceCategoryName": "FUSION MUSHROOM BARS",
+      "sourceCategorySlug": "fusion-mushroom-bars",
+      "sourceType": "REFERENCE_WEBSITE",
+      "normalizedCategoryName": "Artisan Couverture Chocolate Bars",
+      "normalizedCategorySlug": "artisan-chocolate-bars",
+      "mappingStatus": "MAPPED",
+      "productCount": 0
+    },
+    {
+      "sourceCategoryName": "Uncategorized",
+      "sourceCategorySlug": "uncategorized",
+      "sourceType": "REFERENCE_WEBSITE",
+      "normalizedCategoryName": "Artisan Couverture Chocolate Bars",
+      "normalizedCategorySlug": "artisan-chocolate-bars",
+      "mappingStatus": "MAPPED",
+      "productCount": 50
+    },
+    {
+      "sourceCategoryName": "Chocolate Bars",
+      "sourceCategorySlug": "chocolate-bars",
+      "sourceType": "GITHUB_REPOSITORY_A",
+      "normalizedCategoryName": "Artisan Couverture Chocolate Bars",
+      "normalizedCategorySlug": "artisan-chocolate-bars",
+      "mappingStatus": "MAPPED",
+      "productCount": 0
+    },
+    {
+      "sourceCategoryName": "Gummies",
+      "sourceCategorySlug": "gummies",
+      "sourceType": "GITHUB_REPOSITORY_A",
+      "normalizedCategoryName": "Botanical Fruit Pectin Gummies",
+      "normalizedCategorySlug": "botanical-gummies",
+      "mappingStatus": "MAPPED",
+      "productCount": 0
+    },
+    {
+      "sourceCategoryName": "Vapes",
+      "sourceCategorySlug": "vapes",
+      "sourceType": "GITHUB_REPOSITORY_A",
+      "normalizedCategoryName": "Botanical Vaporizers & Extracts",
+      "normalizedCategorySlug": "botanical-vaporizers",
+      "mappingStatus": "MAPPED",
+      "productCount": 0
+    },
+    {
+      "sourceCategoryName": "Wholesale",
+      "sourceCategorySlug": "wholesale",
+      "sourceType": "GITHUB_REPOSITORY_A",
+      "normalizedCategoryName": "Curator Tasting & Collective Boxes",
+      "normalizedCategorySlug": "curator-tasting-boxes",
+      "mappingStatus": "MAPPED",
+      "productCount": 0
+    },
+    {
+      "sourceCategoryName": "Uncategorized",
+      "sourceCategorySlug": "uncategorized",
+      "sourceType": "GITHUB_REPOSITORY_A",
+      "normalizedCategoryName": "Artisan Couverture Chocolate Bars",
+      "normalizedCategorySlug": "artisan-chocolate-bars",
+      "mappingStatus": "MAPPED",
+      "productCount": 0
+    }
+  ]
+}

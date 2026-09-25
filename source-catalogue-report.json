@@ -1,0 +1,2173 @@
+{
+  "generatedAt": "2026-09-25T11:22:02.774Z",
+  "sources": [
+    {
+      "id": "SRC-REFERENCE-WEBSITE",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Live Reference Website (fusionbarshop.com)",
+      "sourceUrl": "https://fusionbarshop.com/",
+      "capturedAt": "2026-09-25T11:22:02.774Z",
+      "description": "Live production WooCommerce storefront crawled across 5 paginated shop pages and product category pages."
+    },
+    {
+      "id": "SRC-REPO-A",
+      "sourceType": "GITHUB_REPOSITORY_A",
+      "sourceName": "GitHub Repository A (officialfusionshroombar.com)",
+      "sourceUrl": "https://github.com/lisagumbeze-oss/officialfusionshroombar.com",
+      "gitCommitSha": "851d397dc0cd22cd8639e8c80343c868b76ef956",
+      "gitBranch": "main",
+      "capturedAt": "2026-09-25T11:22:02.774Z",
+      "description": "Complete codebase inspection of Prisma schema, seed data, local JSON product manifests, and public image assets."
+    },
+    {
+      "id": "SRC-REPO-B",
+      "sourceType": "GITHUB_REPOSITORY_B",
+      "sourceName": "GitHub Repository B (officialfusionshroombars.com)",
+      "sourceUrl": "https://github.com/lisagumbeze-oss/officialfusionshroombars.com",
+      "gitCommitSha": "0e946065a46e98e4520bd7617576574ba4bc93a9",
+      "gitBranch": "main",
+      "capturedAt": "2026-09-25T11:22:02.774Z",
+      "description": "Full repository audit including broken_images.json, patch_images.js, themes, and multi-file product exports."
+    }
+  ],
+  "counts": {
+    "referenceWebsite": {
+      "categories": 4,
+      "products": 50,
+      "pagesCrawled": 5,
+      "variants": 0,
+      "images": 450,
+      "reviews": 64,
+      "seoRecords": 50
+    },
+    "repositoryA": {
+      "productRecords": 84,
+      "categories": 4,
+      "images": 83,
+      "catalogueFiles": 6,
+      "distinctProducts": 84
+    },
+    "repositoryB": {
+      "productRecords": 84,
+      "categories": 4,
+      "images": 83,
+      "catalogueFiles": 9,
+      "distinctProducts": 84
+    },
+    "combined": {
+      "rawRecords": 218,
+      "uniqueProducts": 118,
+      "matchedProducts": 84,
+      "highConfidenceMatches": 0,
+      "possibleMatches": 4,
+      "unresolvedDuplicates": 4,
+      "normalizedProducts": 10,
+      "variants": 61,
+      "categories": 9,
+      "images": 616,
+      "reviews": 64,
+      "conflicts": 155,
+      "missingFields": 715,
+      "productsRequiringReview": 118
+    }
+  },
+  "rawCategories": [
+    {
+      "id": "RAW-CAT-REF-fusion-colaboration",
+      "recordCode": "RAW-CAT-REF-fusion-colaboration",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Reference Website",
+      "sourceSlug": "fusion-colaboration",
+      "sourceDescription": null,
+      "sourceUrl": "https://fusionbarshop.com/product-category/fusion-colaboration/",
+      "sourceImageUrl": null,
+      "sourceParentSlug": null,
+      "sourceOrder": 0,
+      "sourceHash": "07ac5dfafd256563d620dac3038ffdcb3e62118a412bdc1238060491c1fd90a2",
+      "rawPayload": {
+        "id": "RAW-CAT-REF-fusion-colaboration",
+        "name": "FUSION COLABORATION",
+        "slug": "fusion-colaboration",
+        "description": "",
+        "url": "https://fusionbarshop.com/product-category/fusion-colaboration/",
+        "imageUrl": null,
+        "parentSlug": null,
+        "productCount": 0,
+        "rawPayload": {
+          "name": "FUSION COLABORATION",
+          "slug": "fusion-colaboration",
+          "url": "https://fusionbarshop.com/product-category/fusion-colaboration/",
+          "description": "",
+          "ogImage": null
+        },
+        "hash": "07ac5dfafd256563d620dac3038ffdcb3e62118a412bdc1238060491c1fd90a2"
+      },
+      "normalizationStatus": "NORMALIZED",
+      "normalizedCategoryId": "artisan-chocolate-bars",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-CAT-REF-fusion-gummies",
+      "recordCode": "RAW-CAT-REF-fusion-gummies",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Reference Website",
+      "sourceSlug": "fusion-gummies",
+      "sourceDescription": "Fusion Gummies are a line of infused gummy edibles sold online in many different flavors, formulas, and potency levels. Depending on the seller, they may contain: Functional mushroom blends Hemp-derived cannabinoids (Delta-8, Delta-9, HHC, THC-P, etc.) “Psychedelic-style” mushroom extracts Wellness/nootropic ingredients Because the Fusion name is used across multiple unofficial websites and resellers, there is no single standardized product formula.",
+      "sourceUrl": "https://fusionbarshop.com/product-category/fusion-gummies/",
+      "sourceImageUrl": null,
+      "sourceParentSlug": null,
+      "sourceOrder": 0,
+      "sourceHash": "20991fc3ec415dd555ea4d1b1cec2110d759e2ff3959c66a6012327794a2ae20",
+      "rawPayload": {
+        "id": "RAW-CAT-REF-fusion-gummies",
+        "name": "FUSION GUMMIES",
+        "slug": "fusion-gummies",
+        "description": "Fusion Gummies are a line of infused gummy edibles sold online in many different flavors, formulas, and potency levels. Depending on the seller, they may contain: Functional mushroom blends Hemp-derived cannabinoids (Delta-8, Delta-9, HHC, THC-P, etc.) “Psychedelic-style” mushroom extracts Wellness/nootropic ingredients Because the Fusion name is used across multiple unofficial websites and resellers, there is no single standardized product formula.",
+        "url": "https://fusionbarshop.com/product-category/fusion-gummies/",
+        "imageUrl": null,
+        "parentSlug": null,
+        "productCount": 0,
+        "rawPayload": {
+          "name": "FUSION GUMMIES",
+          "slug": "fusion-gummies",
+          "url": "https://fusionbarshop.com/product-category/fusion-gummies/",
+          "description": "Fusion Gummies are a line of infused gummy edibles sold online in many different flavors, formulas, and potency levels. Depending on the seller, they may contain: Functional mushroom blends Hemp-derived cannabinoids (Delta-8, Delta-9, HHC, THC-P, etc.) “Psychedelic-style” mushroom extracts Wellness/nootropic ingredients Because the Fusion name is used across multiple unofficial websites and resellers, there is no single standardized product formula.",
+          "ogImage": null
+        },
+        "hash": "20991fc3ec415dd555ea4d1b1cec2110d759e2ff3959c66a6012327794a2ae20"
+      },
+      "normalizationStatus": "NORMALIZED",
+      "normalizedCategoryId": "botanical-gummies",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-CAT-REF-fusion-mushroom-bars",
+      "recordCode": "RAW-CAT-REF-fusion-mushroom-bars",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Reference Website",
+      "sourceSlug": "fusion-mushroom-bars",
+      "sourceDescription": "Fusion Mushroom Bars are infused chocolate bars sold online in many dessert-inspired flavors and marketed as mushroom, hemp, or psychoactive edible products depending on the version and seller. These bars are commonly associated with: Functional mushroom blends (Lion’s Mane, Reishi, Cordyceps) Psychedelic-style mushroom branding Hemp-derived cannabinoid blends Dessert-style gourmet chocolate flavors Because the “Fusion” name is used across many unofficial websites, there is no single standardized manufacturer or formula . Potency and ingredients can vary significantly between sellers. 🍫 Popular Fusion Mushroom Bar Flavors Some commonly listed flavors include: Thin Mint Twixy Almond Crush Cookies & Cream Peanut Butter Cup Strawberries & Cream Rocky Rodeo Key Lime Pie Matcha Milk Chocolate Raspberry Dark Chocolate Lemon Blueberry M&Ms Pretzel Sea Salt Mocha Chocolate 🍬 What They Taste Like Fusion bars are designed to taste more like gourmet candy bars than earthy mushroom products. Typical flavor profiles include: Sweet creamy chocolate Cookie and caramel flavors Fruity dessert combinations Mint-chocolate blends Nutty and crunchy textures This helps mask the stronger taste of mushroom or cannabinoid ingredients. 🧠 Marketed Effects Depending on formulation, sellers commonly advertise: Relaxation Mood elevation Creativity Euphoria Calm focus Stress relief “Mind-expanding” experiences Some versions are marketed as: Microdose-friendly Fast-acting High-potency edible bars 💰 Typical Price Most Fusion mushroom bars online range from: $15–$40 per bar depending on: potency claims ingredients packaging style seller reputation ⚠️ Important Reality Check Fusion mushroom bars are part of a loosely regulated online market. Community discussions and investigations have raised concerns about: counterfeit packaging inconsistent potency undisclosed synthetic compounds inaccurate labeling different ingredients between batches Some Reddit users report strong effects, while others say : “we didn’t feel anything” Others warn: “there are a lot of fake Fusion bars online.” 🧪 Functional Mushroom Versions vs Psychoactive Versions Some Fusion-style bars contain only functional mushrooms like: Lion’s Mane Reishi Cordyceps Others may contain: Amanita muscaria extracts Hemp-derived cannabinoids Synthetic psychoactive compounds Unknown infused blends This is why experiences vary so much. ⚠️ Safety Tips If considering any infused chocolate product : start with a very low amount avoid mixing with alcohol or drugs verify lab testing check packaging carefully buy only from transparent sellers keep away from children and pets 🔥 Most Popular Fusion Flavors Online discussions often mention these as the most popular: Thin Mint Cookies & Cream Almond Crush Twixy Peanut Butter Cup Strawberries & Cream Rocky Rodeo Key Lime Pie",
+      "sourceUrl": "https://fusionbarshop.com/product-category/fusion-mushroom-bars/",
+      "sourceImageUrl": null,
+      "sourceParentSlug": null,
+      "sourceOrder": 0,
+      "sourceHash": "7efe2f66ca60da0ba5a6d7e90cbcca63b40761af4ef9e2cc9d9687cf5d138c8b",
+      "rawPayload": {
+        "id": "RAW-CAT-REF-fusion-mushroom-bars",
+        "name": "FUSION MUSHROOM BARS",
+        "slug": "fusion-mushroom-bars",
+        "description": "Fusion Mushroom Bars are infused chocolate bars sold online in many dessert-inspired flavors and marketed as mushroom, hemp, or psychoactive edible products depending on the version and seller. These bars are commonly associated with: Functional mushroom blends (Lion’s Mane, Reishi, Cordyceps) Psychedelic-style mushroom branding Hemp-derived cannabinoid blends Dessert-style gourmet chocolate flavors Because the “Fusion” name is used across many unofficial websites, there is no single standardized manufacturer or formula . Potency and ingredients can vary significantly between sellers. 🍫 Popular Fusion Mushroom Bar Flavors Some commonly listed flavors include: Thin Mint Twixy Almond Crush Cookies & Cream Peanut Butter Cup Strawberries & Cream Rocky Rodeo Key Lime Pie Matcha Milk Chocolate Raspberry Dark Chocolate Lemon Blueberry M&Ms Pretzel Sea Salt Mocha Chocolate 🍬 What They Taste Like Fusion bars are designed to taste more like gourmet candy bars than earthy mushroom products. Typical flavor profiles include: Sweet creamy chocolate Cookie and caramel flavors Fruity dessert combinations Mint-chocolate blends Nutty and crunchy textures This helps mask the stronger taste of mushroom or cannabinoid ingredients. 🧠 Marketed Effects Depending on formulation, sellers commonly advertise: Relaxation Mood elevation Creativity Euphoria Calm focus Stress relief “Mind-expanding” experiences Some versions are marketed as: Microdose-friendly Fast-acting High-potency edible bars 💰 Typical Price Most Fusion mushroom bars online range from: $15–$40 per bar depending on: potency claims ingredients packaging style seller reputation ⚠️ Important Reality Check Fusion mushroom bars are part of a loosely regulated online market. Community discussions and investigations have raised concerns about: counterfeit packaging inconsistent potency undisclosed synthetic compounds inaccurate labeling different ingredients between batches Some Reddit users report strong effects, while others say : “we didn’t feel anything” Others warn: “there are a lot of fake Fusion bars online.” 🧪 Functional Mushroom Versions vs Psychoactive Versions Some Fusion-style bars contain only functional mushrooms like: Lion’s Mane Reishi Cordyceps Others may contain: Amanita muscaria extracts Hemp-derived cannabinoids Synthetic psychoactive compounds Unknown infused blends This is why experiences vary so much. ⚠️ Safety Tips If considering any infused chocolate product : start with a very low amount avoid mixing with alcohol or drugs verify lab testing check packaging carefully buy only from transparent sellers keep away from children and pets 🔥 Most Popular Fusion Flavors Online discussions often mention these as the most popular: Thin Mint Cookies & Cream Almond Crush Twixy Peanut Butter Cup Strawberries & Cream Rocky Rodeo Key Lime Pie",
+        "url": "https://fusionbarshop.com/product-category/fusion-mushroom-bars/",
+        "imageUrl": null,
+        "parentSlug": null,
+        "productCount": 0,
+        "rawPayload": {
+          "name": "FUSION MUSHROOM BARS",
+          "slug": "fusion-mushroom-bars",
+          "url": "https://fusionbarshop.com/product-category/fusion-mushroom-bars/",
+          "description": "Fusion Mushroom Bars are infused chocolate bars sold online in many dessert-inspired flavors and marketed as mushroom, hemp, or psychoactive edible products depending on the version and seller. These bars are commonly associated with: Functional mushroom blends (Lion’s Mane, Reishi, Cordyceps) Psychedelic-style mushroom branding Hemp-derived cannabinoid blends Dessert-style gourmet chocolate flavors Because the “Fusion” name is used across many unofficial websites, there is no single standardized manufacturer or formula . Potency and ingredients can vary significantly between sellers. 🍫 Popular Fusion Mushroom Bar Flavors Some commonly listed flavors include: Thin Mint Twixy Almond Crush Cookies & Cream Peanut Butter Cup Strawberries & Cream Rocky Rodeo Key Lime Pie Matcha Milk Chocolate Raspberry Dark Chocolate Lemon Blueberry M&Ms Pretzel Sea Salt Mocha Chocolate 🍬 What They Taste Like Fusion bars are designed to taste more like gourmet candy bars than earthy mushroom products. Typical flavor profiles include: Sweet creamy chocolate Cookie and caramel flavors Fruity dessert combinations Mint-chocolate blends Nutty and crunchy textures This helps mask the stronger taste of mushroom or cannabinoid ingredients. 🧠 Marketed Effects Depending on formulation, sellers commonly advertise: Relaxation Mood elevation Creativity Euphoria Calm focus Stress relief “Mind-expanding” experiences Some versions are marketed as: Microdose-friendly Fast-acting High-potency edible bars 💰 Typical Price Most Fusion mushroom bars online range from: $15–$40 per bar depending on: potency claims ingredients packaging style seller reputation ⚠️ Important Reality Check Fusion mushroom bars are part of a loosely regulated online market. Community discussions and investigations have raised concerns about: counterfeit packaging inconsistent potency undisclosed synthetic compounds inaccurate labeling different ingredients between batches Some Reddit users report strong effects, while others say : “we didn’t feel anything” Others warn: “there are a lot of fake Fusion bars online.” 🧪 Functional Mushroom Versions vs Psychoactive Versions Some Fusion-style bars contain only functional mushrooms like: Lion’s Mane Reishi Cordyceps Others may contain: Amanita muscaria extracts Hemp-derived cannabinoids Synthetic psychoactive compounds Unknown infused blends This is why experiences vary so much. ⚠️ Safety Tips If considering any infused chocolate product : start with a very low amount avoid mixing with alcohol or drugs verify lab testing check packaging carefully buy only from transparent sellers keep away from children and pets 🔥 Most Popular Fusion Flavors Online discussions often mention these as the most popular: Thin Mint Cookies & Cream Almond Crush Twixy Peanut Butter Cup Strawberries & Cream Rocky Rodeo Key Lime Pie",
+          "ogImage": null
+        },
+        "hash": "7efe2f66ca60da0ba5a6d7e90cbcca63b40761af4ef9e2cc9d9687cf5d138c8b"
+      },
+      "normalizationStatus": "NORMALIZED",
+      "normalizedCategoryId": "artisan-chocolate-bars",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-CAT-REF-uncategorized",
+      "recordCode": "RAW-CAT-REF-uncategorized",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Reference Website",
+      "sourceSlug": "uncategorized",
+      "sourceDescription": null,
+      "sourceUrl": "https://fusionbarshop.com/product-category/uncategorized/",
+      "sourceImageUrl": null,
+      "sourceParentSlug": null,
+      "sourceOrder": 0,
+      "sourceHash": "de3b2b0116255da2f2a8cf13bd2f4ab61ed34cd06ca1c327cbc28da752650bd2",
+      "rawPayload": {
+        "id": "RAW-CAT-REF-uncategorized",
+        "name": "Uncategorized",
+        "slug": "uncategorized",
+        "description": "",
+        "url": "https://fusionbarshop.com/product-category/uncategorized/",
+        "imageUrl": null,
+        "parentSlug": null,
+        "productCount": 50,
+        "rawPayload": {
+          "name": "Uncategorized",
+          "slug": "uncategorized",
+          "url": "https://fusionbarshop.com/product-category/uncategorized/",
+          "description": "",
+          "ogImage": null
+        },
+        "hash": "de3b2b0116255da2f2a8cf13bd2f4ab61ed34cd06ca1c327cbc28da752650bd2"
+      },
+      "normalizationStatus": "NORMALIZED",
+      "normalizedCategoryId": "artisan-chocolate-bars",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-CAT-REPO-chocolate-bars",
+      "recordCode": "RAW-CAT-REPO-chocolate-bars",
+      "sourceType": "GITHUB_REPOSITORY_A",
+      "sourceName": "Repository A & B Taxonomy",
+      "sourceSlug": "chocolate-bars",
+      "sourceDescription": "Source category from GitHub repository exports: Chocolate Bars",
+      "sourceUrl": null,
+      "sourceImageUrl": null,
+      "sourceParentSlug": null,
+      "sourceOrder": 0,
+      "sourceHash": "39ecde3a6dbc926b41b5be3796f71809e449169cd2ea0f2e6eb1220c5800e222",
+      "rawPayload": {
+        "name": "Chocolate Bars",
+        "slug": "chocolate-bars"
+      },
+      "normalizationStatus": "NORMALIZED",
+      "normalizedCategoryId": "artisan-chocolate-bars",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-CAT-REPO-gummies",
+      "recordCode": "RAW-CAT-REPO-gummies",
+      "sourceType": "GITHUB_REPOSITORY_A",
+      "sourceName": "Repository A & B Taxonomy",
+      "sourceSlug": "gummies",
+      "sourceDescription": "Source category from GitHub repository exports: Gummies",
+      "sourceUrl": null,
+      "sourceImageUrl": null,
+      "sourceParentSlug": null,
+      "sourceOrder": 0,
+      "sourceHash": "82707edaa82126e872bcbed8b57234f1fe2ee85071f9c065a50f9b14ce88248a",
+      "rawPayload": {
+        "name": "Gummies",
+        "slug": "gummies"
+      },
+      "normalizationStatus": "NORMALIZED",
+      "normalizedCategoryId": "botanical-gummies",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-CAT-REPO-vapes",
+      "recordCode": "RAW-CAT-REPO-vapes",
+      "sourceType": "GITHUB_REPOSITORY_A",
+      "sourceName": "Repository A & B Taxonomy",
+      "sourceSlug": "vapes",
+      "sourceDescription": "Source category from GitHub repository exports: Vapes",
+      "sourceUrl": null,
+      "sourceImageUrl": null,
+      "sourceParentSlug": null,
+      "sourceOrder": 0,
+      "sourceHash": "10ec52ceff80bcee8b94600823c212d9a2f5e025240e734760789c886188d72b",
+      "rawPayload": {
+        "name": "Vapes",
+        "slug": "vapes"
+      },
+      "normalizationStatus": "NORMALIZED",
+      "normalizedCategoryId": "botanical-vaporizers",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-CAT-REPO-wholesale",
+      "recordCode": "RAW-CAT-REPO-wholesale",
+      "sourceType": "GITHUB_REPOSITORY_A",
+      "sourceName": "Repository A & B Taxonomy",
+      "sourceSlug": "wholesale",
+      "sourceDescription": "Source category from GitHub repository exports: Wholesale",
+      "sourceUrl": null,
+      "sourceImageUrl": null,
+      "sourceParentSlug": null,
+      "sourceOrder": 0,
+      "sourceHash": "09513d0ed97381c5ce2f54bb4c921ec46b17c4d1f003af62f6ef8a8ec040f085",
+      "rawPayload": {
+        "name": "Wholesale",
+        "slug": "wholesale"
+      },
+      "normalizationStatus": "NORMALIZED",
+      "normalizedCategoryId": "curator-tasting-boxes",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-CAT-REPO-uncategorized",
+      "recordCode": "RAW-CAT-REPO-uncategorized",
+      "sourceType": "GITHUB_REPOSITORY_A",
+      "sourceName": "Repository A & B Taxonomy",
+      "sourceSlug": "uncategorized",
+      "sourceDescription": "Source category from GitHub repository exports: Uncategorized",
+      "sourceUrl": null,
+      "sourceImageUrl": null,
+      "sourceParentSlug": null,
+      "sourceOrder": 0,
+      "sourceHash": "8d40d123b2e1e296abdb30fe018ab76c8ec3d7fad9d1837db1410b1601ce9b28",
+      "rawPayload": {
+        "name": "Uncategorized",
+        "slug": "uncategorized"
+      },
+      "normalizationStatus": "NORMALIZED",
+      "normalizedCategoryId": "artisan-chocolate-bars",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    }
+  ],
+  "rawProductsSample": [
+    {
+      "id": "RAW-REF-0001",
+      "recordCode": "RAW-REF-0001",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Live Reference Website",
+      "sourceRecordId": "426",
+      "sourceSlug": "fusion-10-bars-boutique-box",
+      "sourcePermalink": "https://fusionbarshop.com/product/fusion-10-bars-boutique-box/",
+      "sourceSku": 426,
+      "sourceCategoryName": "FUSION MUSHROOM BARS",
+      "sourceBrand": "Fusion",
+      "sourceShortDescription": null,
+      "sourceFullDescription": "Fusion 10 Bars Boutique Box The Fusion 10 Bars Boutique Box is a curated collection of gourmet chocolate bars that combines high-quality chocolate with psilocybin mushrooms, offering a unique indulgence for adventurous chocolate lovers. Each box contains 10 bars, featuring 10 different flavors, with each bar infused with either 4 grams or 6 grams of psilocybin mushrooms, depending on the specific product line. The flavors include popular options such as Cookies and Cream, Birthday Cake, Almond Crush, and more exotic choices like Lemon Blueberry. The bars are crafted in Los Angeles and are marketed as both a delightful treat and a means to elevate mood and enhance experiences through the effects of psilocybin. Product Details of Fusion 10 Bars Boutique Box Flavors : The Fusion 10 Bars Boutique Box offers a variety of flavors designed to cater to diverse taste preferences. Some of the flavors mentioned include: Cookies and Cream Birthday Cake Almond Crush Banana Chocolate Ferrero Rocher Strawberries and Cream Milk Chocolate Twix Thin Mint Lemon Blueberry Psilocybin Content : Each bar is infused with either 4 grams or 6 grams of psilocybin mushrooms, which are known for their mind-altering properties. This infusion aims to provide not just a flavorful experience but also potential mood-enhancing effects. Packaging : The bars come in boutique boxes containing a total of 100 bars divided into packs of 10 different flavors. This packaging is designed for both individual enjoyment and wholesale distribution. Pricing : The price for the boutique box is set at $15 per box containing the assortment of flavors, making it an attractive option for both retailers and consumers looking for quality chocolate infused with psilocybin. Wholesale Options : There are significant discounts available for bulk purchases, appealing to wholesalers who wish to stock these innovative products in their stores. Quality Assurance : The bars are made with high-quality ingredients sourced responsibly, ensuring that customers receive a product that meets both taste and safety standards. Target Audience : These chocolate bars are aimed at individuals looking for unique culinary experiences that combine gourmet chocolate with the psychoactive properties of psilocybin mushrooms. In summary, the Fusion 100 Bars Boutique Box represents an innovative approach to combining gourmet chocolate with psychedelic elements, catering to those interested in exploring new flavor profiles while potentially enhancing their mood through the effects of psilocybin mushrooms .",
+      "sourcePrice": 150,
+      "sourceRegularPrice": null,
+      "sourceSalePrice": null,
+      "sourceCurrency": "USD",
+      "sourceStockStatus": "instock",
+      "sourceStockQuantity": null,
+      "sourceWeight": "4 grams",
+      "sourceDimensions": null,
+      "sourceAttributes": {},
+      "sourceVariations": [],
+      "sourceFlavor": "10 bars boutique box",
+      "sourceSize": null,
+      "sourcePackSize": "10 Bars",
+      "sourceNetContent": "4 grams",
+      "sourceIngredients": null,
+      "sourceAllergens": null,
+      "sourceEffects": null,
+      "sourceServingInfo": null,
+      "sourceDosageInfo": null,
+      "sourceWarnings": null,
+      "sourceUsageInfo": null,
+      "sourceTags": [
+        "best mushroom chocolate UK"
+      ],
+      "sourceIsFeatured": false,
+      "sourceReviewCount": 3,
+      "sourceAverageRating": 4.33,
+      "sourcePublishedDate": null,
+      "sourceModifiedDate": null,
+      "sourceCanonicalUrl": "https://fusionbarshop.com/product/fusion-10-bars-boutique-box/",
+      "sourceSeoTitle": "Fusion 10 Bars Boutique Box - fusionbarshop.com",
+      "sourceSeoDescription": "The Fusion 10 Bars Boutique Box is a curated collection of gourmet chocolate bars that combines high-quality chocolate with psilocybin mushrooms.",
+      "sourceOgImage": "https://fusionbarshop.com/wp-content/uploads/2026/05/fusion2.jpg",
+      "sourcePrimaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/05/fusion2.jpg",
+      "sourceGalleryImages": [
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/birthday-Cake-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Almond-Crush-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cotton-Candy-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-M-and-Ms-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-key-Lime-Pie-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Gummies-Berry-Citrus-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Rocky-Rodeo-300x300-1-247x296.jpg"
+      ],
+      "sourceFilePath": "snapshots/reference/product-fusion-10-bars-boutique-box.html",
+      "sourceHash": "789e9bf4bcc89f141729368d19d0cd5831bea47cdfb4804e6837a8ce586f3547",
+      "rawPayload": {
+        "sourceRecordId": "426",
+        "name": "Fusion 10 Bars Boutique Box",
+        "slug": "fusion-10-bars-boutique-box",
+        "permalink": "https://fusionbarshop.com/product/fusion-10-bars-boutique-box/",
+        "price": 150,
+        "category": "FUSION MUSHROOM BARS",
+        "tags": [
+          "best mushroom chocolate UK"
+        ],
+        "primaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/05/fusion2.jpg",
+        "galleryImages": [
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/birthday-Cake-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Almond-Crush-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cotton-Candy-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-M-and-Ms-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-key-Lime-Pie-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Gummies-Berry-Citrus-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Rocky-Rodeo-300x300-1-247x296.jpg"
+        ],
+        "fullDescription": "Fusion 10 Bars Boutique Box The Fusion 10 Bars Boutique Box is a curated collection of gourmet chocolate bars that combines high-quality chocolate with psilocybin mushrooms, offering a unique indulgence for adventurous chocolate lovers. Each box contains 10 bars, featuring 10 different flavors, with each bar infused with either 4 grams or 6 grams of psilocybin mushrooms, depending on the specific product line. The flavors include popular options such as Cookies and Cream, Birthday Cake, Almond Crush, and more exotic choices like Lemon Blueberry. The bars are crafted in Los Angeles and are marketed as both a delightful treat and a means to elevate mood and enhance experiences through the effects of psilocybin. Product Details of Fusion 10 Bars Boutique Box Flavors : The Fusion 10 Bars Boutique Box offers a variety of flavors designed to cater to diverse taste preferences. Some of the flavors mentioned include: Cookies and Cream Birthday Cake Almond Crush Banana Chocolate Ferrero Rocher Strawberries and Cream Milk Chocolate Twix Thin Mint Lemon Blueberry Psilocybin Content : Each bar is infused with either 4 grams or 6 grams of psilocybin mushrooms, which are known for their mind-altering properties. This infusion aims to provide not just a flavorful experience but also potential mood-enhancing effects. Packaging : The bars come in boutique boxes containing a total of 100 bars divided into packs of 10 different flavors. This packaging is designed for both individual enjoyment and wholesale distribution. Pricing : The price for the boutique box is set at $15 per box containing the assortment of flavors, making it an attractive option for both retailers and consumers looking for quality chocolate infused with psilocybin. Wholesale Options : There are significant discounts available for bulk purchases, appealing to wholesalers who wish to stock these innovative products in their stores. Quality Assurance : The bars are made with high-quality ingredients sourced responsibly, ensuring that customers receive a product that meets both taste and safety standards. Target Audience : These chocolate bars are aimed at individuals looking for unique culinary experiences that combine gourmet chocolate with the psychoactive properties of psilocybin mushrooms. In summary, the Fusion 100 Bars Boutique Box represents an innovative approach to combining gourmet chocolate with psychedelic elements, catering to those interested in exploring new flavor profiles while potentially enhancing their mood through the effects of psilocybin mushrooms .",
+        "shortDescription": null,
+        "sku": 426,
+        "averageRating": 4.33,
+        "reviewCount": 3,
+        "reviews": [
+          {
+            "sourceReviewId": "68",
+            "authorName": "Shayne",
+            "rating": 4,
+            "body": "Definitely one of the most talked-about mushroom chocolate brands in 2026.",
+            "reviewDate": "October 26, 2025",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "67",
+            "authorName": "Aron Cartes",
+            "rating": 5,
+            "body": "Really enjoyed the premium unboxing experience. The chocolate quality was surprisingly good and the flavor selection felt unique compared to regular mushroom bars.",
+            "reviewDate": "January 12, 2026",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "66",
+            "authorName": "Aidan Donnelly",
+            "rating": 4,
+            "body": "Fusion Bars Boutique Box definitely stands out because of the packaging and flavor variety. Great option for anyone wanting to sample multiple Fusion flavors at once.",
+            "reviewDate": "May 10, 2026",
+            "isVerifiedBuyer": false
+          }
+        ],
+        "seoTitle": "Fusion 10 Bars Boutique Box - fusionbarshop.com",
+        "seoDescription": "The Fusion 10 Bars Boutique Box is a curated collection of gourmet chocolate bars that combines high-quality chocolate with psilocybin mushrooms.",
+        "canonical": "https://fusionbarshop.com/product/fusion-10-bars-boutique-box/",
+        "jsonLd": {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "@id": "https://fusionbarshop.com/product/fusion-10-bars-boutique-box/#product",
+          "name": "Fusion 10 Bars Boutique Box",
+          "url": "https://fusionbarshop.com/product/fusion-10-bars-boutique-box/",
+          "description": "The Fusion 10 Bars Boutique Box is a curated collection of gourmet chocolate bars that combines high-quality chocolate with psilocybin mushrooms, offering a unique indulgence for adventurous chocolate lovers. Each box contains 10 bars, featuring 10 different flavors, with each bar infused with either 4 grams or 6 grams of psilocybin mushrooms, depending on the specific product line. The flavors include popular options such as Cookies and Cream, Birthday Cake, Almond Crush, and more exotic choices like Lemon Blueberry. The bars are crafted in Los Angeles and are marketed as both a delightful treat and a means to elevate mood and enhance experiences through the effects of psilocybin.",
+          "image": "https://fusionbarshop.com/wp-content/uploads/2026/05/fusion2.jpg",
+          "sku": 426,
+          "offers": [
+            {
+              "@type": "Offer",
+              "priceSpecification": [
+                {
+                  "@type": "UnitPriceSpecification",
+                  "price": "150.00",
+                  "priceCurrency": "USD",
+                  "validThrough": "2027-12-31"
+                }
+              ],
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock",
+              "url": "https://fusionbarshop.com/product/fusion-10-bars-boutique-box/",
+              "seller": {
+                "@type": "Organization",
+                "name": "fusionbarshop.com",
+                "url": "https://fusionbarshop.com"
+              },
+              "price": "150.00",
+              "priceCurrency": "USD"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.33",
+            "reviewCount": 3
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Aidan Donnelly"
+              },
+              "reviewBody": "Fusion Bars Boutique Box definitely stands out because of the packaging and flavor variety. Great option for anyone wanting to sample multiple Fusion flavors at once.",
+              "datePublished": "2026-05-10T12:03:19+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "5",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Aron Cartes"
+              },
+              "reviewBody": "Really enjoyed the premium unboxing experience. The chocolate quality was surprisingly good and the flavor selection felt unique compared to regular mushroom bars.",
+              "datePublished": "2026-01-12T12:03:42+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Shayne"
+              },
+              "reviewBody": "Definitely one of the most talked-about mushroom chocolate brands in 2026.",
+              "datePublished": "2025-10-26T12:04:01+00:00"
+            }
+          ]
+        }
+      },
+      "normalizationStatus": "PENDING",
+      "reviewStatus": "PENDING_REVIEW",
+      "publicationStatus": "PENDING_REVIEW",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-REF-0002",
+      "recordCode": "RAW-REF-0002",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Live Reference Website",
+      "sourceRecordId": "390",
+      "sourceSlug": "fusion-apple-strudel-vape",
+      "sourcePermalink": "https://fusionbarshop.com/product/fusion-apple-strudel-vape/",
+      "sourceSku": 390,
+      "sourceCategoryName": "FUSION COLABORATION",
+      "sourceBrand": "Fusion",
+      "sourceShortDescription": null,
+      "sourceFullDescription": "Fusion Apple Strudel Vape is one of the dessert-style flavors gaining attention in the disposable vape and infused vape market because of its sweet pastry-inspired profile. Users commonly describe the flavor as: baked apple, cinnamon sugar, flaky pastry, and creamy dessert undertones. The “Apple Strudel” flavor profile itself has become very popular in vaping because it balances: sweet fruit, warm bakery notes, and smooth vapor production. Flavor Profile Fusion Apple Strudel Vape Most Apple Strudel-style vapes are described as: sweet but not overly candy-like, warm cinnamon pastry on inhale, tart apple finish on exhale, with buttery bakery undertones. Reviewers comparing Apple Strudel vape flavors often mention: “tastes like an actual apple strudel.” Another reviewer described the profile as: “sweet baked apple” with pastry notes. Reported Effects Fusion Apple Strudel Vape If this Fusion vape is cannabis-infused or live-resin based, users generally report: relaxing body effects, euphoric mood, mild uplift, and smooth daytime-to-evening use. The Apple Strudel cannabis strain itself is commonly associated with: euphoric, uplifted, relaxed, and energetic effects. Users also frequently mention: dessert aroma, sour apple candy notes, and smooth creamy vapor. What Users Like Pros Smooth dessert flavor Good apple/cinnamon balance Less harsh than fruity ice flavors Strong aroma Sweet exhale without excessive cooling Cons Can become very sweet after long sessions Dessert flavors may clog coils faster Some batches reportedly taste artificial Authenticity concerns depending on seller Best For Is usually recommended for people who enjoy: bakery-style vape flavors, warm cinnamon dessert profiles, apple pastry flavors, and smoother sweet vapor rather than icy mint styles. Flavor Comparison Flavor Element Strength Apple Strong Cinnamon Medium Pastry/Bakery Strong Sweetness Medium-High Cooling/Ice Low Creaminess Medium",
+      "sourcePrice": 25,
+      "sourceRegularPrice": null,
+      "sourceSalePrice": null,
+      "sourceCurrency": "USD",
+      "sourceStockStatus": "instock",
+      "sourceStockQuantity": null,
+      "sourceWeight": null,
+      "sourceDimensions": null,
+      "sourceAttributes": {},
+      "sourceVariations": [],
+      "sourceFlavor": "apple strudel vape",
+      "sourceSize": null,
+      "sourcePackSize": "Single",
+      "sourceNetContent": null,
+      "sourceIngredients": null,
+      "sourceAllergens": null,
+      "sourceEffects": "Effects Fusion Apple Strudel Vape If this Fusion vape is cannabis-infused or live-resin based, users generally report: relaxing body effects, euphoric mood, mild uplift, and smooth daytime-to-evening ",
+      "sourceServingInfo": null,
+      "sourceDosageInfo": null,
+      "sourceWarnings": null,
+      "sourceUsageInfo": null,
+      "sourceTags": [
+        "best mushroom chocolate UK"
+      ],
+      "sourceIsFeatured": false,
+      "sourceReviewCount": 0,
+      "sourceAverageRating": null,
+      "sourcePublishedDate": null,
+      "sourceModifiedDate": null,
+      "sourceCanonicalUrl": "https://fusionbarshop.com/product/fusion-apple-strudel-vape/",
+      "sourceSeoTitle": "Fusion Apple Strudel Vape - fusionbarshop.com",
+      "sourceSeoDescription": "Fusion Apple Strudel Vape is one of the dessert-style flavors gaining attention in the disposable vape and infused vape market because of its sweet.",
+      "sourceOgImage": "https://fusionbarshop.com/wp-content/uploads/2026/05/Apple-Strudel-600x600-1.webp",
+      "sourcePrimaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/05/Apple-Strudel-600x600-1.webp",
+      "sourceGalleryImages": [
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Almond-Crush-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Matcha-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Lemon-Blueberry-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Cherry-Lime-Gummies-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Thin-Mint-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Gummies-Berry-Citrus-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Pretzel-Sea-Salt-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-mocha-300x300-1-247x296.jpg"
+      ],
+      "sourceFilePath": "snapshots/reference/product-fusion-apple-strudel-vape.html",
+      "sourceHash": "8e7748c68618e23b1906ff3b73d592351eebc40cca8ede6ff1ac8adc5a138279",
+      "rawPayload": {
+        "sourceRecordId": "390",
+        "name": "Fusion Apple Strudel Vape",
+        "slug": "fusion-apple-strudel-vape",
+        "permalink": "https://fusionbarshop.com/product/fusion-apple-strudel-vape/",
+        "price": 25,
+        "category": "FUSION COLABORATION",
+        "tags": [
+          "best mushroom chocolate UK"
+        ],
+        "primaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/05/Apple-Strudel-600x600-1.webp",
+        "galleryImages": [
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Almond-Crush-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Matcha-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Lemon-Blueberry-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Cherry-Lime-Gummies-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Thin-Mint-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Gummies-Berry-Citrus-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Pretzel-Sea-Salt-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-mocha-300x300-1-247x296.jpg"
+        ],
+        "fullDescription": "Fusion Apple Strudel Vape is one of the dessert-style flavors gaining attention in the disposable vape and infused vape market because of its sweet pastry-inspired profile. Users commonly describe the flavor as: baked apple, cinnamon sugar, flaky pastry, and creamy dessert undertones. The “Apple Strudel” flavor profile itself has become very popular in vaping because it balances: sweet fruit, warm bakery notes, and smooth vapor production. Flavor Profile Fusion Apple Strudel Vape Most Apple Strudel-style vapes are described as: sweet but not overly candy-like, warm cinnamon pastry on inhale, tart apple finish on exhale, with buttery bakery undertones. Reviewers comparing Apple Strudel vape flavors often mention: “tastes like an actual apple strudel.” Another reviewer described the profile as: “sweet baked apple” with pastry notes. Reported Effects Fusion Apple Strudel Vape If this Fusion vape is cannabis-infused or live-resin based, users generally report: relaxing body effects, euphoric mood, mild uplift, and smooth daytime-to-evening use. The Apple Strudel cannabis strain itself is commonly associated with: euphoric, uplifted, relaxed, and energetic effects. Users also frequently mention: dessert aroma, sour apple candy notes, and smooth creamy vapor. What Users Like Pros Smooth dessert flavor Good apple/cinnamon balance Less harsh than fruity ice flavors Strong aroma Sweet exhale without excessive cooling Cons Can become very sweet after long sessions Dessert flavors may clog coils faster Some batches reportedly taste artificial Authenticity concerns depending on seller Best For Is usually recommended for people who enjoy: bakery-style vape flavors, warm cinnamon dessert profiles, apple pastry flavors, and smoother sweet vapor rather than icy mint styles. Flavor Comparison Flavor Element Strength Apple Strong Cinnamon Medium Pastry/Bakery Strong Sweetness Medium-High Cooling/Ice Low Creaminess Medium",
+        "shortDescription": null,
+        "sku": 390,
+        "averageRating": null,
+        "reviewCount": 0,
+        "reviews": [],
+        "seoTitle": "Fusion Apple Strudel Vape - fusionbarshop.com",
+        "seoDescription": "Fusion Apple Strudel Vape is one of the dessert-style flavors gaining attention in the disposable vape and infused vape market because of its sweet.",
+        "canonical": "https://fusionbarshop.com/product/fusion-apple-strudel-vape/",
+        "jsonLd": {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "@id": "https://fusionbarshop.com/product/fusion-apple-strudel-vape/#product",
+          "name": "Fusion Apple Strudel Vape",
+          "url": "https://fusionbarshop.com/product/fusion-apple-strudel-vape/",
+          "description": "Fusion Apple Strudel Vape is one of the dessert-style flavors gaining attention in the disposable vape and infused vape market because of its sweet pastry-inspired profile. Users commonly describe the flavor as:\r\n\r\n\r\n \tbaked apple,\r\n \tcinnamon sugar,\r\n \tflaky pastry,\r\n \tand creamy dessert undertones.",
+          "image": "https://fusionbarshop.com/wp-content/uploads/2026/05/Apple-Strudel-600x600-1.webp",
+          "sku": 390,
+          "offers": [
+            {
+              "@type": "Offer",
+              "priceSpecification": [
+                {
+                  "@type": "UnitPriceSpecification",
+                  "price": "25.00",
+                  "priceCurrency": "USD",
+                  "validThrough": "2027-12-31"
+                }
+              ],
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock",
+              "url": "https://fusionbarshop.com/product/fusion-apple-strudel-vape/",
+              "seller": {
+                "@type": "Organization",
+                "name": "fusionbarshop.com",
+                "url": "https://fusionbarshop.com"
+              },
+              "price": "25.00",
+              "priceCurrency": "USD"
+            }
+          ]
+        }
+      },
+      "normalizationStatus": "PENDING",
+      "reviewStatus": "PENDING_REVIEW",
+      "publicationStatus": "PENDING_REVIEW",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-REF-0003",
+      "recordCode": "RAW-REF-0003",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Live Reference Website",
+      "sourceRecordId": "247",
+      "sourceSlug": "fusion-bar-almond-crush",
+      "sourcePermalink": "https://fusionbarshop.com/product/fusion-bar-almond-crush/",
+      "sourceSku": 247,
+      "sourceCategoryName": "FUSION MUSHROOM BARS",
+      "sourceBrand": "Fusion",
+      "sourceShortDescription": null,
+      "sourceFullDescription": "Fusion Bar Almond Crush Fusion Bar Almond Crush (from Fusion Mushroom Bars ) is a chocolate-based edible infused with mushroom extract or similar compounds , combined with crunchy roasted almonds for texture and flavor. 🍫 Key Features Chocolate base (milk or dark options) Roasted almond pieces for crunch Segmented squares for easier dosing Infused formula designed for gradual effects Often comes in resealable premium packaging 👉 It’s positioned as a mix between a gourmet chocolate bar and an infused edible 🌰 Flavor Profile Fusion Bar Almond Crush The Almond Crush version stands out for its sweet + nutty combo : Buttery roasted almond taste Smooth, creamy chocolate Slight earthy undertone from the infusion 👉 Many describe it as tasting more like a dessert chocolate bar than a typical edible ⚡ Effects (Important) Effects depend on what’s actually inside the bar: If functional (non-psychoactive): Mild relaxation Focus or mood support No “high” If psychoactive (psilocybin or similar): Euphoria Altered perception Relaxation or introspection 👉 Effects can take 30–90 minutes to start and may last several hours 📊 Dosing Most bars are divided into squares for control: Beginner: 1–2 pieces Moderate: 2–4 pieces Strong: 5+ pieces 👉 Full bar is not recommended for beginners ⚠️ Reality Check (Very Important) This is where you need to be careful: ❌ Unregulated Market Many Fusion bars are not officially regulated Ingredients may not always match labels ❌ Counterfeit Risk Reddit users often warn: “Anyone can buy the packaging… you don’t know what’s inside” ❌ Mixed Experiences Some users report good experiences , while others say effects felt different from real mushrooms or inconsistent ⚖️ Legal Status Functional versions: Usually legal Psychedelic versions: Illegal in most countries (including much of EU & UK) 👉 Always check your local laws before buying or using 🧠 Final Verdict Fusion Bar Almond Crush 👍 Why People Like It ✔ Great chocolate taste ✔ Crunchy almond texture ✔ Easy to dose ✔ Convenient edible format ⚠️ Downsides ❌ Quality varies a lot ❌ Risk of fake or unknown ingredients ❌ Legal concerns depending on type ✅ Bottom Line Fusion Bar Almond Crush Almond Crush is popular because it combines good flavor + convenience + effects , but it’s not something to buy blindly .",
+      "sourcePrice": 20,
+      "sourceRegularPrice": null,
+      "sourceSalePrice": null,
+      "sourceCurrency": "USD",
+      "sourceStockStatus": "instock",
+      "sourceStockQuantity": null,
+      "sourceWeight": null,
+      "sourceDimensions": null,
+      "sourceAttributes": {},
+      "sourceVariations": [],
+      "sourceFlavor": "almond crush",
+      "sourceSize": null,
+      "sourcePackSize": "Single",
+      "sourceNetContent": "6g",
+      "sourceIngredients": "Ingredients may not always match labels ❌ Counterfeit Risk Reddit users often warn: “Anyone can buy the packaging… you don’t know what’s inside” ❌ Mixed Experiences Some users report good experiences ",
+      "sourceAllergens": null,
+      "sourceEffects": "Effects (Important) Effects depend on what’s actually inside the bar: If functional (non-psychoactive): Mild relaxation Focus or mood support No “high” If psychoactive (psilocybin or similar): Euphori",
+      "sourceServingInfo": null,
+      "sourceDosageInfo": null,
+      "sourceWarnings": null,
+      "sourceUsageInfo": null,
+      "sourceTags": [
+        "cosmic fusion thc gummy sativa or indica"
+      ],
+      "sourceIsFeatured": false,
+      "sourceReviewCount": 3,
+      "sourceAverageRating": 4,
+      "sourcePublishedDate": null,
+      "sourceModifiedDate": null,
+      "sourceCanonicalUrl": "https://fusionbarshop.com/product/fusion-bar-almond-crush/",
+      "sourceSeoTitle": "Fusion Bar Almond Crush - fusionbarshop.com",
+      "sourceSeoDescription": "Fusion Bar Almond Crush (from Fusion Mushroom Bars) is a chocolate-based edible infused with mushroom extract or similar compounds, combined with crunchy.",
+      "sourceOgImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Almond-Crush.jpg",
+      "sourcePrimaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Almond-Crush.jpg",
+      "sourceGalleryImages": [
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-KitCat-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/birthday-Cake-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/fuison-bar-Milk-Chocolate-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/fusion2-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cinnamon-Toast-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-mocha-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Lemon-Blueberry-300x300-1-247x296.jpg"
+      ],
+      "sourceFilePath": "snapshots/reference/product-fusion-bar-almond-crush.html",
+      "sourceHash": "66af7d6c08dcf5fdd156c1a80aa75452b001bb6cc7e8ae2913a5a7b078a97181",
+      "rawPayload": {
+        "sourceRecordId": "247",
+        "name": "Fusion Bar Almond Crush",
+        "slug": "fusion-bar-almond-crush",
+        "permalink": "https://fusionbarshop.com/product/fusion-bar-almond-crush/",
+        "price": 20,
+        "category": "FUSION MUSHROOM BARS",
+        "tags": [
+          "cosmic fusion thc gummy sativa or indica"
+        ],
+        "primaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Almond-Crush.jpg",
+        "galleryImages": [
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-KitCat-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/birthday-Cake-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/fuison-bar-Milk-Chocolate-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/fusion2-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cinnamon-Toast-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-mocha-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Lemon-Blueberry-300x300-1-247x296.jpg"
+        ],
+        "fullDescription": "Fusion Bar Almond Crush Fusion Bar Almond Crush (from Fusion Mushroom Bars ) is a chocolate-based edible infused with mushroom extract or similar compounds , combined with crunchy roasted almonds for texture and flavor. 🍫 Key Features Chocolate base (milk or dark options) Roasted almond pieces for crunch Segmented squares for easier dosing Infused formula designed for gradual effects Often comes in resealable premium packaging 👉 It’s positioned as a mix between a gourmet chocolate bar and an infused edible 🌰 Flavor Profile Fusion Bar Almond Crush The Almond Crush version stands out for its sweet + nutty combo : Buttery roasted almond taste Smooth, creamy chocolate Slight earthy undertone from the infusion 👉 Many describe it as tasting more like a dessert chocolate bar than a typical edible ⚡ Effects (Important) Effects depend on what’s actually inside the bar: If functional (non-psychoactive): Mild relaxation Focus or mood support No “high” If psychoactive (psilocybin or similar): Euphoria Altered perception Relaxation or introspection 👉 Effects can take 30–90 minutes to start and may last several hours 📊 Dosing Most bars are divided into squares for control: Beginner: 1–2 pieces Moderate: 2–4 pieces Strong: 5+ pieces 👉 Full bar is not recommended for beginners ⚠️ Reality Check (Very Important) This is where you need to be careful: ❌ Unregulated Market Many Fusion bars are not officially regulated Ingredients may not always match labels ❌ Counterfeit Risk Reddit users often warn: “Anyone can buy the packaging… you don’t know what’s inside” ❌ Mixed Experiences Some users report good experiences , while others say effects felt different from real mushrooms or inconsistent ⚖️ Legal Status Functional versions: Usually legal Psychedelic versions: Illegal in most countries (including much of EU & UK) 👉 Always check your local laws before buying or using 🧠 Final Verdict Fusion Bar Almond Crush 👍 Why People Like It ✔ Great chocolate taste ✔ Crunchy almond texture ✔ Easy to dose ✔ Convenient edible format ⚠️ Downsides ❌ Quality varies a lot ❌ Risk of fake or unknown ingredients ❌ Legal concerns depending on type ✅ Bottom Line Fusion Bar Almond Crush Almond Crush is popular because it combines good flavor + convenience + effects , but it’s not something to buy blindly .",
+        "shortDescription": null,
+        "sku": 247,
+        "averageRating": 4,
+        "reviewCount": 3,
+        "reviews": [
+          {
+            "sourceReviewId": "7",
+            "authorName": "Henry",
+            "rating": 4,
+            "body": "Strong visuals and surprisingly relaxing body effects.",
+            "reviewDate": "December 24, 2025",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "6",
+            "authorName": "Jim Curtis",
+            "rating": 4,
+            "body": "Almond Crush flavor completely masked the mushroom taste for me.",
+            "reviewDate": "February 11, 2026",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "5",
+            "authorName": "Karen",
+            "rating": 4,
+            "body": "Fusion Mushroom Bars tasted amazing and kicked in smoothly after about 40 minutes.",
+            "reviewDate": "May 18, 2026",
+            "isVerifiedBuyer": false
+          }
+        ],
+        "seoTitle": "Fusion Bar Almond Crush - fusionbarshop.com",
+        "seoDescription": "Fusion Bar Almond Crush (from Fusion Mushroom Bars) is a chocolate-based edible infused with mushroom extract or similar compounds, combined with crunchy.",
+        "canonical": "https://fusionbarshop.com/product/fusion-bar-almond-crush/",
+        "jsonLd": {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "@id": "https://fusionbarshop.com/product/fusion-bar-almond-crush/#product",
+          "name": "Fusion Bar Almond Crush",
+          "url": "https://fusionbarshop.com/product/fusion-bar-almond-crush/",
+          "description": "Fusion Bar Almond Crush (from Fusion Mushroom Bars) is a chocolate-based edible infused with mushroom extract or similar compounds, combined with crunchy roasted almonds for texture and flavor.",
+          "image": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Almond-Crush.jpg",
+          "sku": 247,
+          "offers": [
+            {
+              "@type": "Offer",
+              "priceSpecification": [
+                {
+                  "@type": "UnitPriceSpecification",
+                  "price": "20.00",
+                  "priceCurrency": "USD",
+                  "validThrough": "2027-12-31"
+                }
+              ],
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock",
+              "url": "https://fusionbarshop.com/product/fusion-bar-almond-crush/",
+              "seller": {
+                "@type": "Organization",
+                "name": "fusionbarshop.com",
+                "url": "https://fusionbarshop.com"
+              },
+              "price": "20.00",
+              "priceCurrency": "USD"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.00",
+            "reviewCount": 3
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Karen"
+              },
+              "reviewBody": "Fusion Mushroom Bars tasted amazing and kicked in smoothly after about 40 minutes.",
+              "datePublished": "2026-05-18T20:43:05+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Jim Curtis"
+              },
+              "reviewBody": "Almond Crush flavor completely masked the mushroom taste for me.",
+              "datePublished": "2026-02-11T20:46:11+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Henry"
+              },
+              "reviewBody": "Strong visuals and surprisingly relaxing body effects.",
+              "datePublished": "2025-12-24T20:46:31+00:00"
+            }
+          ]
+        }
+      },
+      "normalizationStatus": "PENDING",
+      "reviewStatus": "PENDING_REVIEW",
+      "publicationStatus": "PENDING_REVIEW",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-REF-0004",
+      "recordCode": "RAW-REF-0004",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Live Reference Website",
+      "sourceRecordId": "250",
+      "sourceSlug": "fusion-bar-birthday-cake",
+      "sourcePermalink": "https://fusionbarshop.com/product/fusion-bar-birthday-cake/",
+      "sourceSku": 250,
+      "sourceCategoryName": "FUSION MUSHROOM BARS",
+      "sourceBrand": "Fusion",
+      "sourceShortDescription": null,
+      "sourceFullDescription": "Fusion Bar Birthday Cake Fusion Bar Birthday Cake is a white chocolate–based infused bar designed to replicate the flavor of classic birthday cake, complete with vanilla frosting notes and colorful sprinkles . 👉 It’s one of the most popular “dessert-style” options in the Fusion lineup, combining sweet flavor + edible infusion . 🍫 Flavor Profile Fusion Bar Birthday Cake This version is all about a sweet, nostalgic dessert taste : Creamy white chocolate base Vanilla cake batter flavor Buttercream frosting notes Crunchy rainbow sprinkles 👉 The overall taste is often described as “like eating birthday cake in chocolate form” ⚡ Effects (Depends on Version) Fusion Birthday Cake bars can vary depending on what’s infused: 🟢 Functional versions: Light relaxation Mood uplift Mild focus or calm 🔴 Psychoactive versions (THC or psilocybin-type): Euphoria Relaxation Altered perception or mood 👉 Effects typically start within 30–60 minutes and can last several hours 📊 Dosing Most bars are divided into small squares: 1 square: light / beginner level 2–4 squares: moderate effects 5+ squares: stronger experience 👉 Always start low, especially if you’re new to edibles ✨ Key Features Fusion Bar Birthday Cake Breakable squares for easy dosing Smooth, balanced infusion Resealable packaging Often marketed as lab-tested and consistent 🎯 Why People Choose Birthday Cake Flavor ✔ Sweet and easy to consume ✔ Masks earthy mushroom taste ✔ Fun, nostalgic dessert vibe ✔ Good for beginners (taste-wise) 👉 It’s one of the most beginner-friendly flavors in Fusion bars ⚠️ Important Reality Check This is where you need to be careful: The market is largely unregulated Many similar products exist with unknown ingredients Some versions may contain different substances than expected Quality varies heavily depending on the seller 👉 Even online discussions often warn about inconsistent or questionable contents (especially outside verified sources) ⚖️ Legal Status Fusion Bar Birthday Cake Functional mushroom versions : ✅ Often legal THC / psilocybin versions: ❌ Illegal in many regions (including most of EU & UK) 👉 Always check your local laws before buying 🧠 Final Verdict 👍 Pros Great dessert-like flavor Easy dosing format Convenient and portable Beginner-friendly taste ⚠️ Cons Quality varies widely Risk of counterfeit products Legal concerns depending on type ✅ Bottom Line Fusion Bar Birthday Cake Birthday Cake stands out for its flavor and ease of use , making it one of the most appealing options in the lineup. But like all Fusion products, it’s only as good as the source and formulation , so don’t buy blindly.",
+      "sourcePrice": 20,
+      "sourceRegularPrice": null,
+      "sourceSalePrice": null,
+      "sourceCurrency": "USD",
+      "sourceStockStatus": "instock",
+      "sourceStockQuantity": null,
+      "sourceWeight": null,
+      "sourceDimensions": null,
+      "sourceAttributes": {},
+      "sourceVariations": [],
+      "sourceFlavor": "birthday cake",
+      "sourceSize": null,
+      "sourcePackSize": "Single",
+      "sourceNetContent": "6g",
+      "sourceIngredients": null,
+      "sourceAllergens": null,
+      "sourceEffects": "Effects (Depends on Version) Fusion Birthday Cake bars can vary depending on what’s infused: 🟢 Functional versions: Light relaxation Mood uplift Mild focus or calm 🔴 Psychoactive versions (THC or ps",
+      "sourceServingInfo": null,
+      "sourceDosageInfo": null,
+      "sourceWarnings": null,
+      "sourceUsageInfo": null,
+      "sourceTags": [
+        "cosmic fusion thc gummy sativa or indica"
+      ],
+      "sourceIsFeatured": false,
+      "sourceReviewCount": 2,
+      "sourceAverageRating": 4,
+      "sourcePublishedDate": null,
+      "sourceModifiedDate": null,
+      "sourceCanonicalUrl": "https://fusionbarshop.com/product/fusion-bar-birthday-cake/",
+      "sourceSeoTitle": "Fusion Bar Birthday Cake - fusionbarshop.com",
+      "sourceSeoDescription": "Fusion Bar Birthday Cake is a white chocolate–based infused bar designed to replicate the flavor of classic birthday cake, complete with vanilla frosting.",
+      "sourceOgImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/birthday-Cake.jpg",
+      "sourcePrimaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/birthday-Cake.jpg",
+      "sourceGalleryImages": [
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Ferrari-Rocher-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Matcha-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Gummies-Berry-Citrus-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookies-And-Cream-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-mocha-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Lemon-Blueberry-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Pretzel-Sea-Salt-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-key-Lime-Pie-300x300-1-247x296.jpg"
+      ],
+      "sourceFilePath": "snapshots/reference/product-fusion-bar-birthday-cake.html",
+      "sourceHash": "54e2c13baa685711e96eb70a5de75d644ee7f51a8b729115e9fbdba11601a43d",
+      "rawPayload": {
+        "sourceRecordId": "250",
+        "name": "Fusion Bar Birthday Cake",
+        "slug": "fusion-bar-birthday-cake",
+        "permalink": "https://fusionbarshop.com/product/fusion-bar-birthday-cake/",
+        "price": 20,
+        "category": "FUSION MUSHROOM BARS",
+        "tags": [
+          "cosmic fusion thc gummy sativa or indica"
+        ],
+        "primaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/birthday-Cake.jpg",
+        "galleryImages": [
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Ferrari-Rocher-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Matcha-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Gummies-Berry-Citrus-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookies-And-Cream-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-mocha-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Lemon-Blueberry-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Pretzel-Sea-Salt-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-key-Lime-Pie-300x300-1-247x296.jpg"
+        ],
+        "fullDescription": "Fusion Bar Birthday Cake Fusion Bar Birthday Cake is a white chocolate–based infused bar designed to replicate the flavor of classic birthday cake, complete with vanilla frosting notes and colorful sprinkles . 👉 It’s one of the most popular “dessert-style” options in the Fusion lineup, combining sweet flavor + edible infusion . 🍫 Flavor Profile Fusion Bar Birthday Cake This version is all about a sweet, nostalgic dessert taste : Creamy white chocolate base Vanilla cake batter flavor Buttercream frosting notes Crunchy rainbow sprinkles 👉 The overall taste is often described as “like eating birthday cake in chocolate form” ⚡ Effects (Depends on Version) Fusion Birthday Cake bars can vary depending on what’s infused: 🟢 Functional versions: Light relaxation Mood uplift Mild focus or calm 🔴 Psychoactive versions (THC or psilocybin-type): Euphoria Relaxation Altered perception or mood 👉 Effects typically start within 30–60 minutes and can last several hours 📊 Dosing Most bars are divided into small squares: 1 square: light / beginner level 2–4 squares: moderate effects 5+ squares: stronger experience 👉 Always start low, especially if you’re new to edibles ✨ Key Features Fusion Bar Birthday Cake Breakable squares for easy dosing Smooth, balanced infusion Resealable packaging Often marketed as lab-tested and consistent 🎯 Why People Choose Birthday Cake Flavor ✔ Sweet and easy to consume ✔ Masks earthy mushroom taste ✔ Fun, nostalgic dessert vibe ✔ Good for beginners (taste-wise) 👉 It’s one of the most beginner-friendly flavors in Fusion bars ⚠️ Important Reality Check This is where you need to be careful: The market is largely unregulated Many similar products exist with unknown ingredients Some versions may contain different substances than expected Quality varies heavily depending on the seller 👉 Even online discussions often warn about inconsistent or questionable contents (especially outside verified sources) ⚖️ Legal Status Fusion Bar Birthday Cake Functional mushroom versions : ✅ Often legal THC / psilocybin versions: ❌ Illegal in many regions (including most of EU & UK) 👉 Always check your local laws before buying 🧠 Final Verdict 👍 Pros Great dessert-like flavor Easy dosing format Convenient and portable Beginner-friendly taste ⚠️ Cons Quality varies widely Risk of counterfeit products Legal concerns depending on type ✅ Bottom Line Fusion Bar Birthday Cake Birthday Cake stands out for its flavor and ease of use , making it one of the most appealing options in the lineup. But like all Fusion products, it’s only as good as the source and formulation , so don’t buy blindly.",
+        "shortDescription": null,
+        "sku": 250,
+        "averageRating": 4,
+        "reviewCount": 2,
+        "reviews": [
+          {
+            "sourceReviewId": "9",
+            "authorName": "Frankline",
+            "rating": 4,
+            "body": "Started with two pieces and felt euphoric for hours.",
+            "reviewDate": "February 20, 2026",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "8",
+            "authorName": "Gabi Medina",
+            "rating": 4,
+            "body": "Definitely one of the better tasting mushroom chocolate bars I’ve tried.",
+            "reviewDate": "April 17, 2026",
+            "isVerifiedBuyer": false
+          }
+        ],
+        "seoTitle": "Fusion Bar Birthday Cake - fusionbarshop.com",
+        "seoDescription": "Fusion Bar Birthday Cake is a white chocolate–based infused bar designed to replicate the flavor of classic birthday cake, complete with vanilla frosting.",
+        "canonical": "https://fusionbarshop.com/product/fusion-bar-birthday-cake/",
+        "jsonLd": {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "@id": "https://fusionbarshop.com/product/fusion-bar-birthday-cake/#product",
+          "name": "Fusion Bar Birthday Cake",
+          "url": "https://fusionbarshop.com/product/fusion-bar-birthday-cake/",
+          "description": "Fusion Bar Birthday Cake is a white chocolate–based infused bar designed to replicate the flavor of classic birthday cake, complete with vanilla frosting notes and colorful sprinkles.\r\n👉 It’s one of the most popular “dessert-style” options in the Fusion lineup, combining sweet flavor + edible infusion.",
+          "image": "https://fusionbarshop.com/wp-content/uploads/2026/04/birthday-Cake.jpg",
+          "sku": 250,
+          "offers": [
+            {
+              "@type": "Offer",
+              "priceSpecification": [
+                {
+                  "@type": "UnitPriceSpecification",
+                  "price": "20.00",
+                  "priceCurrency": "USD",
+                  "validThrough": "2027-12-31"
+                }
+              ],
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock",
+              "url": "https://fusionbarshop.com/product/fusion-bar-birthday-cake/",
+              "seller": {
+                "@type": "Organization",
+                "name": "fusionbarshop.com",
+                "url": "https://fusionbarshop.com"
+              },
+              "price": "20.00",
+              "priceCurrency": "USD"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.00",
+            "reviewCount": 2
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Gabi Medina"
+              },
+              "reviewBody": "Definitely one of the better tasting mushroom chocolate bars I’ve tried.",
+              "datePublished": "2026-04-17T20:47:25+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Frankline"
+              },
+              "reviewBody": "Started with two pieces and felt euphoric for hours.",
+              "datePublished": "2026-02-20T20:47:48+00:00"
+            }
+          ]
+        }
+      },
+      "normalizationStatus": "PENDING",
+      "reviewStatus": "PENDING_REVIEW",
+      "publicationStatus": "PENDING_REVIEW",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-REF-0005",
+      "recordCode": "RAW-REF-0005",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Live Reference Website",
+      "sourceRecordId": "252",
+      "sourceSlug": "fusion-bar-cinnamon-toast",
+      "sourcePermalink": "https://fusionbarshop.com/product/fusion-bar-cinnamon-toast/",
+      "sourceSku": 252,
+      "sourceCategoryName": "FUSION MUSHROOM BARS",
+      "sourceBrand": "Fusion",
+      "sourceShortDescription": null,
+      "sourceFullDescription": "Fusion Bar Cinnamon Toast Fusion Bar Cinnamon Toast is a white chocolate–based infused bar that combines cinnamon flavor, crunchy cereal pieces, and a smooth chocolate base to create a nostalgic, dessert-style edible experience. 👉 It’s inspired by the classic cinnamon toast cereal taste, blended into a modern infused chocolate format. 🍩 Flavor Profile This flavor is all about warm, cozy sweetness with a crunchy twist : Rich white chocolate base Warm cinnamon sugar spice Crunchy cereal bits for texture Light brown sugar / caramel notes 👉 Many describe it as tasting like cinnamon toast cereal in chocolate form ⚡ Effects (Depends on Type) Like other Fusion bars, the effects depend on what’s infused: 🟢 Functional versions: Light relaxation Calm focus No psychoactive “high” 🔴 Psychoactive versions: Euphoria Relaxation Altered mood or perception 👉 Effects usually begin within 30–60 minutes and can last several hours . 📊 Dosing Guide Most bars are divided into small squares (often around 10 pieces): 1 square: mild / beginner 2–3 squares: moderate effects 4–5 squares: stronger relaxation 6+ squares: experienced users only 👉 Always start low and wait before taking more. ✨ Key Features Crunchy + creamy texture combination Easy-to-break dosing squares Smooth infusion (often marketed as evenly distributed) Resealable packaging for freshness 🎯 Why People Choose Cinnamon Toast ✔ Unique nostalgic flavor ✔ Great balance of sweet + spice ✔ Masks earthy mushroom taste well ✔ Fun and dessert-like experience 👉 It’s often considered one of the most flavorful and comforting options in the lineup. ⚠️ Important Reality Check Fusion Bar Cinnamon Toast Be careful when buying Fusion products: Market is largely unregulated Some products may have unknown or inconsistent ingredients Counterfeit versions exist Effects may vary between batches 👉 Source and authenticity matter a lot. ⚖️ Legal Status Fusion Bar Cinnamon Toast Functional mushroom versions: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (including most of EU & UK) 👉 Always check local laws before purchasing. 🧠 Final Verdict Fusion Bar Cinnamon Toast 👍 Pros Warm, dessert-style flavor Crunchy and satisfying texture Easy to portion and use Popular nostalgic taste ⚠️ Cons Quality varies widely Risk of fake or unverified products Legal concerns depending on type ✅ Bottom Line Fusion Bar Cinnamon Toast Cinnamon Toast stands out for its comforting cinnamon flavor and crunchy texture , making it one of the most enjoyable options in the Fusion range. Just make sure you’re buying from a trusted source and understand what’s inside the product before using it .",
+      "sourcePrice": 20,
+      "sourceRegularPrice": null,
+      "sourceSalePrice": null,
+      "sourceCurrency": "USD",
+      "sourceStockStatus": "instock",
+      "sourceStockQuantity": null,
+      "sourceWeight": null,
+      "sourceDimensions": null,
+      "sourceAttributes": {},
+      "sourceVariations": [],
+      "sourceFlavor": "cinnamon toast",
+      "sourceSize": null,
+      "sourcePackSize": "Single",
+      "sourceNetContent": "6g",
+      "sourceIngredients": null,
+      "sourceAllergens": null,
+      "sourceEffects": "Effects (Depends on Type) Like other Fusion bars, the effects depend on what’s infused: 🟢 Functional versions: Light relaxation Calm focus No psychoactive “high” 🔴 Psychoactive versions: Euphoria Re",
+      "sourceServingInfo": null,
+      "sourceDosageInfo": null,
+      "sourceWarnings": null,
+      "sourceUsageInfo": null,
+      "sourceTags": [
+        "cosmic fusion thc gummy sativa or indica"
+      ],
+      "sourceIsFeatured": false,
+      "sourceReviewCount": 2,
+      "sourceAverageRating": 4,
+      "sourcePublishedDate": null,
+      "sourceModifiedDate": null,
+      "sourceCanonicalUrl": "https://fusionbarshop.com/product/fusion-bar-cinnamon-toast/",
+      "sourceSeoTitle": "Fusion Bar Cinnamon Toast - fusionbarshop.com",
+      "sourceSeoDescription": "Fusion Bar Cinnamon Toast is a white chocolate–based infused bar that combines cinnamon flavor, crunchy cereal pieces, and a smooth chocolate base.",
+      "sourceOgImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cinnamon-Toast-300x300-1.jpg",
+      "sourcePrimaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cinnamon-Toast-300x300-1.jpg",
+      "sourceGalleryImages": [
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookies-And-Cream-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/fuison-bar-Milk-Chocolate-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Fruit-Loops-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Ferrari-Rocher-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Horchata-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-KitCat-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Lemon-Blueberry-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Twix-300x300-1-247x296.jpg"
+      ],
+      "sourceFilePath": "snapshots/reference/product-fusion-bar-cinnamon-toast.html",
+      "sourceHash": "02efd5b44b678ca46f6cd3863135fbb0fd52b1cd4b725344092c9c20c8a4e309",
+      "rawPayload": {
+        "sourceRecordId": "252",
+        "name": "Fusion Bar Cinnamon Toast",
+        "slug": "fusion-bar-cinnamon-toast",
+        "permalink": "https://fusionbarshop.com/product/fusion-bar-cinnamon-toast/",
+        "price": 20,
+        "category": "FUSION MUSHROOM BARS",
+        "tags": [
+          "cosmic fusion thc gummy sativa or indica"
+        ],
+        "primaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cinnamon-Toast-300x300-1.jpg",
+        "galleryImages": [
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookies-And-Cream-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/fuison-bar-Milk-Chocolate-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Fruit-Loops-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Ferrari-Rocher-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Horchata-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-KitCat-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Lemon-Blueberry-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Twix-300x300-1-247x296.jpg"
+        ],
+        "fullDescription": "Fusion Bar Cinnamon Toast Fusion Bar Cinnamon Toast is a white chocolate–based infused bar that combines cinnamon flavor, crunchy cereal pieces, and a smooth chocolate base to create a nostalgic, dessert-style edible experience. 👉 It’s inspired by the classic cinnamon toast cereal taste, blended into a modern infused chocolate format. 🍩 Flavor Profile This flavor is all about warm, cozy sweetness with a crunchy twist : Rich white chocolate base Warm cinnamon sugar spice Crunchy cereal bits for texture Light brown sugar / caramel notes 👉 Many describe it as tasting like cinnamon toast cereal in chocolate form ⚡ Effects (Depends on Type) Like other Fusion bars, the effects depend on what’s infused: 🟢 Functional versions: Light relaxation Calm focus No psychoactive “high” 🔴 Psychoactive versions: Euphoria Relaxation Altered mood or perception 👉 Effects usually begin within 30–60 minutes and can last several hours . 📊 Dosing Guide Most bars are divided into small squares (often around 10 pieces): 1 square: mild / beginner 2–3 squares: moderate effects 4–5 squares: stronger relaxation 6+ squares: experienced users only 👉 Always start low and wait before taking more. ✨ Key Features Crunchy + creamy texture combination Easy-to-break dosing squares Smooth infusion (often marketed as evenly distributed) Resealable packaging for freshness 🎯 Why People Choose Cinnamon Toast ✔ Unique nostalgic flavor ✔ Great balance of sweet + spice ✔ Masks earthy mushroom taste well ✔ Fun and dessert-like experience 👉 It’s often considered one of the most flavorful and comforting options in the lineup. ⚠️ Important Reality Check Fusion Bar Cinnamon Toast Be careful when buying Fusion products: Market is largely unregulated Some products may have unknown or inconsistent ingredients Counterfeit versions exist Effects may vary between batches 👉 Source and authenticity matter a lot. ⚖️ Legal Status Fusion Bar Cinnamon Toast Functional mushroom versions: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (including most of EU & UK) 👉 Always check local laws before purchasing. 🧠 Final Verdict Fusion Bar Cinnamon Toast 👍 Pros Warm, dessert-style flavor Crunchy and satisfying texture Easy to portion and use Popular nostalgic taste ⚠️ Cons Quality varies widely Risk of fake or unverified products Legal concerns depending on type ✅ Bottom Line Fusion Bar Cinnamon Toast Cinnamon Toast stands out for its comforting cinnamon flavor and crunchy texture , making it one of the most enjoyable options in the Fusion range. Just make sure you’re buying from a trusted source and understand what’s inside the product before using it .",
+        "shortDescription": null,
+        "sku": 252,
+        "averageRating": 4,
+        "reviewCount": 2,
+        "reviews": [
+          {
+            "sourceReviewId": "11",
+            "authorName": "Durelle",
+            "rating": 4,
+            "body": "Effects felt balanced and not overwhelming at lower doses.",
+            "reviewDate": "January 15, 2026",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "10",
+            "authorName": "Elvira",
+            "rating": 4,
+            "body": "Packaging looked premium and the chocolate texture was solid.",
+            "reviewDate": "May 10, 2026",
+            "isVerifiedBuyer": false
+          }
+        ],
+        "seoTitle": "Fusion Bar Cinnamon Toast - fusionbarshop.com",
+        "seoDescription": "Fusion Bar Cinnamon Toast is a white chocolate–based infused bar that combines cinnamon flavor, crunchy cereal pieces, and a smooth chocolate base.",
+        "canonical": "https://fusionbarshop.com/product/fusion-bar-cinnamon-toast/",
+        "jsonLd": {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "@id": "https://fusionbarshop.com/product/fusion-bar-cinnamon-toast/#product",
+          "name": "Fusion Bar Cinnamon Toast",
+          "url": "https://fusionbarshop.com/product/fusion-bar-cinnamon-toast/",
+          "description": "Fusion Bar Cinnamon Toast is a white chocolate–based infused bar that combines cinnamon flavor, crunchy cereal pieces, and a smooth chocolate base to create a nostalgic, dessert-style edible experience.",
+          "image": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cinnamon-Toast-300x300-1.jpg",
+          "sku": 252,
+          "offers": [
+            {
+              "@type": "Offer",
+              "priceSpecification": [
+                {
+                  "@type": "UnitPriceSpecification",
+                  "price": "20.00",
+                  "priceCurrency": "USD",
+                  "validThrough": "2027-12-31"
+                }
+              ],
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock",
+              "url": "https://fusionbarshop.com/product/fusion-bar-cinnamon-toast/",
+              "seller": {
+                "@type": "Organization",
+                "name": "fusionbarshop.com",
+                "url": "https://fusionbarshop.com"
+              },
+              "price": "20.00",
+              "priceCurrency": "USD"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.00",
+            "reviewCount": 2
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Elvira"
+              },
+              "reviewBody": "Packaging looked premium and the chocolate texture was solid.",
+              "datePublished": "2026-05-10T20:48:45+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Durelle"
+              },
+              "reviewBody": "Effects felt balanced and not overwhelming at lower doses.",
+              "datePublished": "2026-01-15T20:49:10+00:00"
+            }
+          ]
+        }
+      },
+      "normalizationStatus": "PENDING",
+      "reviewStatus": "PENDING_REVIEW",
+      "publicationStatus": "PENDING_REVIEW",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-REF-0006",
+      "recordCode": "RAW-REF-0006",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Live Reference Website",
+      "sourceRecordId": "254",
+      "sourceSlug": "fusion-bar-cookie-dough",
+      "sourcePermalink": "https://fusionbarshop.com/product/fusion-bar-cookie-dough/",
+      "sourceSku": 254,
+      "sourceCategoryName": "FUSION MUSHROOM BARS",
+      "sourceBrand": "Fusion",
+      "sourceShortDescription": null,
+      "sourceFullDescription": "Fusion Bar Cookie Dough Fusion Bar Cookie Dough Cookie Dough (from Fusion Mushroom Bars ) is a chocolate edible infused with mushroom blends , designed to recreate the classic raw Cookie Dough flavor in a smooth, easy-to-consume. 👉 It combines dessert-style taste + infused ingredients in one product. 🍫 Flavor Profile Fusion Bar Cookie Dough This is one of the most popular flavors because of its rich, nostalgic taste : Sweet brown sugar & vanilla notes Soft cookie dough-like texture Chocolate chips or cocoa hints Slight earthy undertone (from infusion) 👉 Many describe it as tasting like raw cookie dough covered in chocolate 🌿 Ingredients & Blend Fusion Bar Cookie Dough Typical versions include: Chocolate base (milk or dark) Cookie dough flavoring Functional mushrooms like: Lion’s Mane (focus) Reishi (calm) Cordyceps (energy) Chaga (immune support) 👉 Some versions are marketed as wellness-focused , while others may be psychoactive depending on formulation. ⚡ Effects (Important) Fusion Bar Cookie Dough Effects depend on what type of bar you have: 🟢 Functional versions: Mild focus and clarity Relaxation Balanced energy 🔴 Psychoactive versions: Euphoria Mood shifts Altered perception 👉 Effects usually begin within 30–90 minutes 📊 Dosing Fusion Bar Cookie Dough Most bars are divided into small squares: 1 piece: light / beginner 2–3 pieces: moderate 4+ pieces: stronger effects 👉 Always start low and wait before increasing ✨ Key Features Dessert-style flavor (very beginner-friendly) Easy portion control Portable and discreet Often marketed with even dosing per square 🎯 Why People Choose ✔ Familiar, sweet taste ✔ Masks mushroom flavor well ✔ Smooth texture (less gritty) ✔ Good entry option for beginners 👉 It’s often considered one of the best-tasting Fusion bars ⚠️ Important Reality Check You shouldn’t ignore this part: Market is largely unregulated Packaging can be easily copied Ingredients may not always match labels Effects can vary depending on source 👉 Online discussions frequently warn that quality depends heavily on where you buy it ⚖️ Legal Status Functional mushroom bars: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (including most of EU & UK) 🧠 Final Verdict 👍 Pros Great cookie dough flavor Easy to eat and dose Popular and beginner-friendly Convenient edible format ⚠️ Cons Quality varies widely Risk of counterfeit products Legal concerns depending on contents ✅ Bottom Line Fusion Bar Cookie Dough Cookie Dough stands out for its taste and ease of use , making it one of the most popular flavors. But like all Fusion products, the experience depends heavily on authenticity and ingredients , so choosing a reliable source is key .",
+      "sourcePrice": 20,
+      "sourceRegularPrice": null,
+      "sourceSalePrice": null,
+      "sourceCurrency": "USD",
+      "sourceStockStatus": "instock",
+      "sourceStockQuantity": null,
+      "sourceWeight": null,
+      "sourceDimensions": null,
+      "sourceAttributes": {},
+      "sourceVariations": [],
+      "sourceFlavor": "cookie dough",
+      "sourceSize": null,
+      "sourcePackSize": "Single",
+      "sourceNetContent": "6g",
+      "sourceIngredients": "Ingredients & Blend Fusion Bar Cookie Dough Typical versions include: Chocolate base (milk or dark) Cookie dough flavoring Functional mushrooms like: Lion’s Mane (focus) Reishi (calm) Cordyceps (energ",
+      "sourceAllergens": null,
+      "sourceEffects": "Effects (Important) Fusion Bar Cookie Dough Effects depend on what type of bar you have: 🟢 Functional versions: Mild focus and clarity Relaxation Balanced energy 🔴 Psychoactive versions: Euphoria Mo",
+      "sourceServingInfo": null,
+      "sourceDosageInfo": null,
+      "sourceWarnings": null,
+      "sourceUsageInfo": null,
+      "sourceTags": [
+        "cosmic fusion thc gummy sativa or indica"
+      ],
+      "sourceIsFeatured": false,
+      "sourceReviewCount": 2,
+      "sourceAverageRating": 4,
+      "sourcePublishedDate": null,
+      "sourceModifiedDate": null,
+      "sourceCanonicalUrl": "https://fusionbarshop.com/product/fusion-bar-cookie-dough/",
+      "sourceSeoTitle": "Fusion Bar Cookie Dough - fusionbarshop.com",
+      "sourceSeoDescription": "Fusion Bar Cookie Dough (from Fusion Mushroom Bars) is a chocolate edible infused with mushroom blends, designed to recreate the classic raw cookie dough.",
+      "sourceOgImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookie-Dough-300x300-1.jpg",
+      "sourcePrimaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookie-Dough-300x300-1.jpg",
+      "sourceGalleryImages": [
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Thin-Mint-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-key-Lime-Pie-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Strawberries-And-Cream-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cotton-Candy-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-KitCat-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Fruit-Loops-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Rocky-Rodeo-300x300-1-247x296.jpg"
+      ],
+      "sourceFilePath": "snapshots/reference/product-fusion-bar-cookie-dough.html",
+      "sourceHash": "c0200337c372f4e178808ed9c8a165178b6c1500625cb58a5d8be3425a3a2702",
+      "rawPayload": {
+        "sourceRecordId": "254",
+        "name": "Fusion Bar Cookie Dough",
+        "slug": "fusion-bar-cookie-dough",
+        "permalink": "https://fusionbarshop.com/product/fusion-bar-cookie-dough/",
+        "price": 20,
+        "category": "FUSION MUSHROOM BARS",
+        "tags": [
+          "cosmic fusion thc gummy sativa or indica"
+        ],
+        "primaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookie-Dough-300x300-1.jpg",
+        "galleryImages": [
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Thin-Mint-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-key-Lime-Pie-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Strawberries-And-Cream-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cotton-Candy-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-KitCat-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Fruit-Loops-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Rocky-Rodeo-300x300-1-247x296.jpg"
+        ],
+        "fullDescription": "Fusion Bar Cookie Dough Fusion Bar Cookie Dough Cookie Dough (from Fusion Mushroom Bars ) is a chocolate edible infused with mushroom blends , designed to recreate the classic raw Cookie Dough flavor in a smooth, easy-to-consume. 👉 It combines dessert-style taste + infused ingredients in one product. 🍫 Flavor Profile Fusion Bar Cookie Dough This is one of the most popular flavors because of its rich, nostalgic taste : Sweet brown sugar & vanilla notes Soft cookie dough-like texture Chocolate chips or cocoa hints Slight earthy undertone (from infusion) 👉 Many describe it as tasting like raw cookie dough covered in chocolate 🌿 Ingredients & Blend Fusion Bar Cookie Dough Typical versions include: Chocolate base (milk or dark) Cookie dough flavoring Functional mushrooms like: Lion’s Mane (focus) Reishi (calm) Cordyceps (energy) Chaga (immune support) 👉 Some versions are marketed as wellness-focused , while others may be psychoactive depending on formulation. ⚡ Effects (Important) Fusion Bar Cookie Dough Effects depend on what type of bar you have: 🟢 Functional versions: Mild focus and clarity Relaxation Balanced energy 🔴 Psychoactive versions: Euphoria Mood shifts Altered perception 👉 Effects usually begin within 30–90 minutes 📊 Dosing Fusion Bar Cookie Dough Most bars are divided into small squares: 1 piece: light / beginner 2–3 pieces: moderate 4+ pieces: stronger effects 👉 Always start low and wait before increasing ✨ Key Features Dessert-style flavor (very beginner-friendly) Easy portion control Portable and discreet Often marketed with even dosing per square 🎯 Why People Choose ✔ Familiar, sweet taste ✔ Masks mushroom flavor well ✔ Smooth texture (less gritty) ✔ Good entry option for beginners 👉 It’s often considered one of the best-tasting Fusion bars ⚠️ Important Reality Check You shouldn’t ignore this part: Market is largely unregulated Packaging can be easily copied Ingredients may not always match labels Effects can vary depending on source 👉 Online discussions frequently warn that quality depends heavily on where you buy it ⚖️ Legal Status Functional mushroom bars: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (including most of EU & UK) 🧠 Final Verdict 👍 Pros Great cookie dough flavor Easy to eat and dose Popular and beginner-friendly Convenient edible format ⚠️ Cons Quality varies widely Risk of counterfeit products Legal concerns depending on contents ✅ Bottom Line Fusion Bar Cookie Dough Cookie Dough stands out for its taste and ease of use , making it one of the most popular flavors. But like all Fusion products, the experience depends heavily on authenticity and ingredients , so choosing a reliable source is key .",
+        "shortDescription": null,
+        "sku": 254,
+        "averageRating": 4,
+        "reviewCount": 2,
+        "reviews": [
+          {
+            "sourceReviewId": "13",
+            "authorName": "Bella",
+            "rating": 4,
+            "body": "Fusion Bars hit faster than traditional mushrooms for me.",
+            "reviewDate": "December 24, 2025",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "12",
+            "authorName": "Corbett",
+            "rating": 4,
+            "body": "The Cookie Dough flavor was creamy and smooth without tasting too earthy.",
+            "reviewDate": "April 24, 2026",
+            "isVerifiedBuyer": false
+          }
+        ],
+        "seoTitle": "Fusion Bar Cookie Dough - fusionbarshop.com",
+        "seoDescription": "Fusion Bar Cookie Dough (from Fusion Mushroom Bars) is a chocolate edible infused with mushroom blends, designed to recreate the classic raw cookie dough.",
+        "canonical": "https://fusionbarshop.com/product/fusion-bar-cookie-dough/",
+        "jsonLd": {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "@id": "https://fusionbarshop.com/product/fusion-bar-cookie-dough/#product",
+          "name": "Fusion Bar Cookie Dough",
+          "url": "https://fusionbarshop.com/product/fusion-bar-cookie-dough/",
+          "description": "Fusion Bar Cookie Dough (from Fusion Mushroom Bars) is a chocolate edible infused with mushroom blends, designed to recreate the classic raw cookie dough flavor in a smooth, easy-to-consume bar.",
+          "image": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookie-Dough-300x300-1.jpg",
+          "sku": 254,
+          "offers": [
+            {
+              "@type": "Offer",
+              "priceSpecification": [
+                {
+                  "@type": "UnitPriceSpecification",
+                  "price": "20.00",
+                  "priceCurrency": "USD",
+                  "validThrough": "2027-12-31"
+                }
+              ],
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock",
+              "url": "https://fusionbarshop.com/product/fusion-bar-cookie-dough/",
+              "seller": {
+                "@type": "Organization",
+                "name": "fusionbarshop.com",
+                "url": "https://fusionbarshop.com"
+              },
+              "price": "20.00",
+              "priceCurrency": "USD"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "4.00",
+            "reviewCount": 2
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Corbett"
+              },
+              "reviewBody": "The Cookie Dough flavor was creamy and smooth without tasting too earthy.",
+              "datePublished": "2026-04-24T20:50:37+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Bella"
+              },
+              "reviewBody": "Fusion Bars hit faster than traditional mushrooms for me.",
+              "datePublished": "2025-12-24T20:51:02+00:00"
+            }
+          ]
+        }
+      },
+      "normalizationStatus": "PENDING",
+      "reviewStatus": "PENDING_REVIEW",
+      "publicationStatus": "PENDING_REVIEW",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-REF-0007",
+      "recordCode": "RAW-REF-0007",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Live Reference Website",
+      "sourceRecordId": "256",
+      "sourceSlug": "fusion-bar-cookies-cream",
+      "sourcePermalink": "https://fusionbarshop.com/product/fusion-bar-cookies-cream/",
+      "sourceSku": 256,
+      "sourceCategoryName": "FUSION MUSHROOM BARS",
+      "sourceBrand": "Fusion",
+      "sourceShortDescription": null,
+      "sourceFullDescription": "Fusion Bar Cookies & Cream Fusion Bar Cookies & Cream (from Fusion Mushroom Bars ) is a chocolate edible infused with mushroom blends , combining creamy white chocolate with crunchy cookie pieces for a rich, dessert-style experience. 👉 It’s one of the most popular flavors because it blends sweet creaminess + cookie crunch , similar to classic cookies & cream desserts. 🍫 Flavor Profile Fusion Bar Cookies & Cream This flavor is inspired by the classic Cookies and cream combination: Smooth white chocolate or cream base Crunchy chocolate cookie bits Sweet vanilla notes Slight earthy undertone (from infusion) 👉 The mix of creamy + crunchy texture is what makes it stand out 🌿 Ingredients & Blend Fusion Bar Cookies & Cream Typical Fusion Cookies & Cream bars may include: Chocolate base (often white or milk chocolate) Crushed cookie pieces Mushroom blend (varies by product): Lion’s Mane (focus) Reishi (calm) Cordyceps (energy) Chaga (immune support) 👉 Some versions are functional (wellness-focused) , while others may be psychoactive , depending on formulation. ⚡ Effects (Important) Fusion Bar Cookies & Cream 🟢 Functional versions: Mild relaxation Improved focus Balanced energy 🔴 Psychoactive versions: Euphoria Mood shifts Altered perception 👉 Effects usually begin within 30–90 minutes after consumption 📊 Dosing Most bars are divided into pieces for control: 1 piece: beginner / light 2–3 pieces: moderate 4+ pieces: stronger effects 👉 Always start low, especially if you’re new ✨ Key Features Classic cookies & cream flavor Crunchy + creamy texture combo Easy portion control Portable and discreet Often marketed as evenly infused 🎯 Why People Choose Cookies & Cream ✔ Familiar and enjoyable taste ✔ Masks mushroom flavor very well ✔ Smooth texture with crunch ✔ Beginner-friendly flavor profile 👉 It’s often considered one of the best-tasting Fusion bar options ⚠️ Important Reality Check This part matters: The market is largely unregulated Packaging can be copied easily Ingredients may not always match labels Effects can vary depending on source 👉 Even user discussions online highlight inconsistency and counterfeit risks ⚖️ Legal Status Functional mushroom bars: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (UK, EU, etc.) 👉 Always check your local laws before purchasing 🧠 Final Verdict Fusion Bar Cookies & Cream 👍 Pros Great cookies & cream taste Crunchy and satisfying texture Easy to dose Very popular flavor ⚠️ Cons Quality varies widely Risk of fake or unverified products Legal concerns depending on ingredients ✅ Bottom Line Fusion Bar Cookies & Cream Cookies & Cream is a top choice for its taste , texture, and convenience , making it one of the most appealing options in the Fusion lineup. Just make sure you’re buying from a reliable source and understand what’s inside before using it.",
+      "sourcePrice": 20,
+      "sourceRegularPrice": null,
+      "sourceSalePrice": null,
+      "sourceCurrency": "USD",
+      "sourceStockStatus": "instock",
+      "sourceStockQuantity": null,
+      "sourceWeight": null,
+      "sourceDimensions": null,
+      "sourceAttributes": {},
+      "sourceVariations": [],
+      "sourceFlavor": "cookies cream",
+      "sourceSize": null,
+      "sourcePackSize": "Single",
+      "sourceNetContent": "6g",
+      "sourceIngredients": "Ingredients & Blend Fusion Bar Cookies & Cream Typical Fusion Cookies & Cream bars may include: Chocolate base (often white or milk chocolate) Crushed cookie pieces Mushroom blend (varies by product):",
+      "sourceAllergens": null,
+      "sourceEffects": "Effects (Important) Fusion Bar Cookies & Cream 🟢 Functional versions: Mild relaxation Improved focus Balanced energy 🔴 Psychoactive versions: Euphoria Mood shifts Altered perception 👉 Effects usual",
+      "sourceServingInfo": null,
+      "sourceDosageInfo": null,
+      "sourceWarnings": null,
+      "sourceUsageInfo": null,
+      "sourceTags": [
+        "cosmic fusion thc gummy sativa or indica"
+      ],
+      "sourceIsFeatured": false,
+      "sourceReviewCount": 3,
+      "sourceAverageRating": 3.33,
+      "sourcePublishedDate": null,
+      "sourceModifiedDate": null,
+      "sourceCanonicalUrl": "https://fusionbarshop.com/product/fusion-bar-cookies-cream/",
+      "sourceSeoTitle": "Fusion Bar Cookies &amp; Cream - fusionbarshop.com",
+      "sourceSeoDescription": "Fusion Bar Cookies &amp; Cream (from Fusion Mushroom Bars) is a chocolate edible infused with mushroom blends, combining creamy white chocolate.",
+      "sourceOgImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookies-And-Cream-300x300-1.jpg",
+      "sourcePrimaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookies-And-Cream-300x300-1.jpg",
+      "sourceGalleryImages": [
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-KitCat-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-key-Lime-Pie-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Strawberries-And-Cream-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Twix-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cinnamon-Toast-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Nerds-Fusion-Bars-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Raspberry-Dark-Chocolate-300x300-1-247x296.jpg"
+      ],
+      "sourceFilePath": "snapshots/reference/product-fusion-bar-cookies-cream.html",
+      "sourceHash": "1e6866bfd914460be98ff6ae01f6322bda63ca031e6f37d7d13cda9b16783067",
+      "rawPayload": {
+        "sourceRecordId": "256",
+        "name": "Fusion Bar Cookies & Cream",
+        "slug": "fusion-bar-cookies-cream",
+        "permalink": "https://fusionbarshop.com/product/fusion-bar-cookies-cream/",
+        "price": 20,
+        "category": "FUSION MUSHROOM BARS",
+        "tags": [
+          "cosmic fusion thc gummy sativa or indica"
+        ],
+        "primaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookies-And-Cream-300x300-1.jpg",
+        "galleryImages": [
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-KitCat-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-key-Lime-Pie-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Strawberries-And-Cream-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Twix-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cinnamon-Toast-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Nerds-Fusion-Bars-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Raspberry-Dark-Chocolate-300x300-1-247x296.jpg"
+        ],
+        "fullDescription": "Fusion Bar Cookies & Cream Fusion Bar Cookies & Cream (from Fusion Mushroom Bars ) is a chocolate edible infused with mushroom blends , combining creamy white chocolate with crunchy cookie pieces for a rich, dessert-style experience. 👉 It’s one of the most popular flavors because it blends sweet creaminess + cookie crunch , similar to classic cookies & cream desserts. 🍫 Flavor Profile Fusion Bar Cookies & Cream This flavor is inspired by the classic Cookies and cream combination: Smooth white chocolate or cream base Crunchy chocolate cookie bits Sweet vanilla notes Slight earthy undertone (from infusion) 👉 The mix of creamy + crunchy texture is what makes it stand out 🌿 Ingredients & Blend Fusion Bar Cookies & Cream Typical Fusion Cookies & Cream bars may include: Chocolate base (often white or milk chocolate) Crushed cookie pieces Mushroom blend (varies by product): Lion’s Mane (focus) Reishi (calm) Cordyceps (energy) Chaga (immune support) 👉 Some versions are functional (wellness-focused) , while others may be psychoactive , depending on formulation. ⚡ Effects (Important) Fusion Bar Cookies & Cream 🟢 Functional versions: Mild relaxation Improved focus Balanced energy 🔴 Psychoactive versions: Euphoria Mood shifts Altered perception 👉 Effects usually begin within 30–90 minutes after consumption 📊 Dosing Most bars are divided into pieces for control: 1 piece: beginner / light 2–3 pieces: moderate 4+ pieces: stronger effects 👉 Always start low, especially if you’re new ✨ Key Features Classic cookies & cream flavor Crunchy + creamy texture combo Easy portion control Portable and discreet Often marketed as evenly infused 🎯 Why People Choose Cookies & Cream ✔ Familiar and enjoyable taste ✔ Masks mushroom flavor very well ✔ Smooth texture with crunch ✔ Beginner-friendly flavor profile 👉 It’s often considered one of the best-tasting Fusion bar options ⚠️ Important Reality Check This part matters: The market is largely unregulated Packaging can be copied easily Ingredients may not always match labels Effects can vary depending on source 👉 Even user discussions online highlight inconsistency and counterfeit risks ⚖️ Legal Status Functional mushroom bars: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (UK, EU, etc.) 👉 Always check your local laws before purchasing 🧠 Final Verdict Fusion Bar Cookies & Cream 👍 Pros Great cookies & cream taste Crunchy and satisfying texture Easy to dose Very popular flavor ⚠️ Cons Quality varies widely Risk of fake or unverified products Legal concerns depending on ingredients ✅ Bottom Line Fusion Bar Cookies & Cream Cookies & Cream is a top choice for its taste , texture, and convenience , making it one of the most appealing options in the Fusion lineup. Just make sure you’re buying from a reliable source and understand what’s inside before using it.",
+        "shortDescription": null,
+        "sku": 256,
+        "averageRating": 3.33,
+        "reviewCount": 3,
+        "reviews": [
+          {
+            "sourceReviewId": "16",
+            "authorName": "Melissa",
+            "rating": 3,
+            "body": "Effects came in waves but stayed manageable.",
+            "reviewDate": "January 24, 2026",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "15",
+            "authorName": "Aron Cartes",
+            "rating": 3,
+            "body": "The packaging design was eye-catching and clean.",
+            "reviewDate": "February 21, 2026",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "14",
+            "authorName": "Liam",
+            "rating": 4,
+            "body": "Body high felt warm and calming.",
+            "reviewDate": "May 1, 2026",
+            "isVerifiedBuyer": false
+          }
+        ],
+        "seoTitle": "Fusion Bar Cookies &amp; Cream - fusionbarshop.com",
+        "seoDescription": "Fusion Bar Cookies &amp; Cream (from Fusion Mushroom Bars) is a chocolate edible infused with mushroom blends, combining creamy white chocolate.",
+        "canonical": "https://fusionbarshop.com/product/fusion-bar-cookies-cream/",
+        "jsonLd": {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "@id": "https://fusionbarshop.com/product/fusion-bar-cookies-cream/#product",
+          "name": "Fusion Bar Cookies &amp;amp; Cream",
+          "url": "https://fusionbarshop.com/product/fusion-bar-cookies-cream/",
+          "description": "Fusion Bar Cookies &amp;amp; Cream (from Fusion Mushroom Bars) is a chocolate edible infused with mushroom blends, combining creamy white chocolate with crunchy cookie pieces for a rich, dessert-style experience.",
+          "image": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookies-And-Cream-300x300-1.jpg",
+          "sku": 256,
+          "offers": [
+            {
+              "@type": "Offer",
+              "priceSpecification": [
+                {
+                  "@type": "UnitPriceSpecification",
+                  "price": "20.00",
+                  "priceCurrency": "USD",
+                  "validThrough": "2027-12-31"
+                }
+              ],
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock",
+              "url": "https://fusionbarshop.com/product/fusion-bar-cookies-cream/",
+              "seller": {
+                "@type": "Organization",
+                "name": "fusionbarshop.com",
+                "url": "https://fusionbarshop.com"
+              },
+              "price": "20.00",
+              "priceCurrency": "USD"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "3.33",
+            "reviewCount": 3
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Liam"
+              },
+              "reviewBody": "Body high felt warm and calming.",
+              "datePublished": "2026-05-01T00:00:00+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "3",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Aron Cartes"
+              },
+              "reviewBody": "The packaging design was eye-catching and clean.",
+              "datePublished": "2026-02-21T20:52:02+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "3",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Melissa"
+              },
+              "reviewBody": "Effects came in waves but stayed manageable.",
+              "datePublished": "2026-01-24T20:52:22+00:00"
+            }
+          ]
+        }
+      },
+      "normalizationStatus": "PENDING",
+      "reviewStatus": "PENDING_REVIEW",
+      "publicationStatus": "PENDING_REVIEW",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-REF-0008",
+      "recordCode": "RAW-REF-0008",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Live Reference Website",
+      "sourceRecordId": "261",
+      "sourceSlug": "fusion-bar-ferrero-rocher",
+      "sourcePermalink": "https://fusionbarshop.com/product/fusion-bar-ferrero-rocher/",
+      "sourceSku": 261,
+      "sourceCategoryName": "FUSION MUSHROOM BARS",
+      "sourceBrand": "Fusion",
+      "sourceShortDescription": null,
+      "sourceFullDescription": "Fusion Bar Ferrero Rocher Fusion Bar Ferrero Rocher is a luxury-style infused chocolate bar inspired by the famous Ferrero Roche confection. It combines hazelnut chocolate, crispy wafer texture, and mushroom-infused ingredients into one premium edible experience. 👉 Think of it as a gourmet chocolate bar with a functional or infused twist . 🍫 Flavor Profile Fusion Bar Ferrero Rocher This is one of the most rich and indulgent flavors in the Fusion lineup: Smooth milk chocolate base Roasted hazelnut flavor Crunchy wafer or nut pieces Light vanilla sweetness Slight earthy undertone (from infusion) 👉 The taste closely mimics the classic hazelnut + chocolate + crunch combo that made Ferrero Rocher popular 🌿 Ingredients & Blend Ferrero Rocher Typical Fusion Ferrero Rocher bars may include: Premium cocoa and chocolate Roasted hazelnuts Wafer crunch elements Mushroom blend such as: Lion’s Mane (focus) Reishi (calm) Cordyceps (energy) 👉 Some versions are marketed as wellness-focused , while others may be psychoactive depending on formulation ⚡ Effects (Important) Fusion Bar Ferrero Rocher 🟢 Functional versions: Calm focus Mild relaxation Balanced energy 🔴 Psychoactive versions: Euphoria Relaxation Altered perception 👉 Effects usually begin within 30–90 minutes and vary by dosage 📊 Dosing Guide Most bars are divided into squares: 1 piece: light / beginner 2–3 pieces: moderate 4+ pieces: stronger effects 👉 Always start low and wait before increasing ✨ Key Features Premium, luxury dessert-style flavor Crunchy + creamy texture Easy portion control Often marketed as evenly infused and lab-tested Attractive, gift-style packaging 🎯 Why People Choose Fusion BarFerrero Rocher Flavor ✔ Rich, high-end chocolate taste ✔ Nutty crunch adds texture ✔ Feels more like a luxury dessert than an edible ✔ Popular for gifting or special occasions 👉 It’s often considered one of the most premium Fusion bar flavors ⚠️ Important Reality Check Be cautious : Market is largely unregulated Packaging can be easily copied Ingredients may not always match labels Some online sellers are unreliable 👉 Quality depends heavily on where you buy it ⚖️ Legal Status Fusion Bar Ferrero Rocher Functional mushroom versions: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (UK, EU, etc.) 👉 Always check local laws before purchasing 🧠 Final Verdict 👍 Pros Rich hazelnut chocolate flavor Premium, dessert-like experience Crunchy and satisfying texture Easy to portion ⚠️ Cons Quality varies widely Risk of counterfeit products Legal concerns depending on contents ✅ Bottom Line Ferrero Rocher is one of the most luxurious and indulgent options in the Fusion range, perfect for those who enjoy rich chocolate and nutty flavors . Just make sure you choose a trusted source and understand what’s inside before using it .",
+      "sourcePrice": 20,
+      "sourceRegularPrice": null,
+      "sourceSalePrice": null,
+      "sourceCurrency": "USD",
+      "sourceStockStatus": "instock",
+      "sourceStockQuantity": null,
+      "sourceWeight": null,
+      "sourceDimensions": null,
+      "sourceAttributes": {},
+      "sourceVariations": [],
+      "sourceFlavor": "ferrero rocher",
+      "sourceSize": null,
+      "sourcePackSize": "Single",
+      "sourceNetContent": "6g",
+      "sourceIngredients": "Ingredients & Blend Ferrero Rocher Typical Fusion Ferrero Rocher bars may include: Premium cocoa and chocolate Roasted hazelnuts Wafer crunch elements Mushroom blend such as: Lion’s Mane (focus) Reish",
+      "sourceAllergens": null,
+      "sourceEffects": "Effects (Important) Fusion Bar Ferrero Rocher 🟢 Functional versions: Calm focus Mild relaxation Balanced energy 🔴 Psychoactive versions: Euphoria Relaxation Altered perception 👉 Effects usually beg",
+      "sourceServingInfo": null,
+      "sourceDosageInfo": null,
+      "sourceWarnings": null,
+      "sourceUsageInfo": null,
+      "sourceTags": [
+        "cosmic fusion thc gummy sativa or indica"
+      ],
+      "sourceIsFeatured": false,
+      "sourceReviewCount": 2,
+      "sourceAverageRating": 3.5,
+      "sourcePublishedDate": null,
+      "sourceModifiedDate": null,
+      "sourceCanonicalUrl": "https://fusionbarshop.com/product/fusion-bar-ferrero-rocher/",
+      "sourceSeoTitle": "Fusion Bar Ferrero Rocher - fusionbarshop.com",
+      "sourceSeoDescription": "Fusion Bar Ferrero Rocher is a luxury-style infused chocolate bar inspired by the famous Ferrero Rocher confection. It combines hazelnut chocolate.",
+      "sourceOgImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Ferrari-Rocher-300x300-1.jpg",
+      "sourcePrimaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Ferrari-Rocher-300x300-1.jpg",
+      "sourceGalleryImages": [
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Rocky-Rodeo-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Lemon-Blueberry-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Pretzel-Sea-Salt-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cotton-Candy-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Thin-Mint-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Horchata-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Nerds-Fusion-Bars-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/fusion2-247x296.jpg"
+      ],
+      "sourceFilePath": "snapshots/reference/product-fusion-bar-ferrero-rocher.html",
+      "sourceHash": "14c9b830e0f3835b2ec90d1b9ee4944e8e21f7070a240fea314293019a5be252",
+      "rawPayload": {
+        "sourceRecordId": "261",
+        "name": "Fusion Bar Ferrero Rocher",
+        "slug": "fusion-bar-ferrero-rocher",
+        "permalink": "https://fusionbarshop.com/product/fusion-bar-ferrero-rocher/",
+        "price": 20,
+        "category": "FUSION MUSHROOM BARS",
+        "tags": [
+          "cosmic fusion thc gummy sativa or indica"
+        ],
+        "primaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Ferrari-Rocher-300x300-1.jpg",
+        "galleryImages": [
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Rocky-Rodeo-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Lemon-Blueberry-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Pretzel-Sea-Salt-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cotton-Candy-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Thin-Mint-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Horchata-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Nerds-Fusion-Bars-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/fusion2-247x296.jpg"
+        ],
+        "fullDescription": "Fusion Bar Ferrero Rocher Fusion Bar Ferrero Rocher is a luxury-style infused chocolate bar inspired by the famous Ferrero Roche confection. It combines hazelnut chocolate, crispy wafer texture, and mushroom-infused ingredients into one premium edible experience. 👉 Think of it as a gourmet chocolate bar with a functional or infused twist . 🍫 Flavor Profile Fusion Bar Ferrero Rocher This is one of the most rich and indulgent flavors in the Fusion lineup: Smooth milk chocolate base Roasted hazelnut flavor Crunchy wafer or nut pieces Light vanilla sweetness Slight earthy undertone (from infusion) 👉 The taste closely mimics the classic hazelnut + chocolate + crunch combo that made Ferrero Rocher popular 🌿 Ingredients & Blend Ferrero Rocher Typical Fusion Ferrero Rocher bars may include: Premium cocoa and chocolate Roasted hazelnuts Wafer crunch elements Mushroom blend such as: Lion’s Mane (focus) Reishi (calm) Cordyceps (energy) 👉 Some versions are marketed as wellness-focused , while others may be psychoactive depending on formulation ⚡ Effects (Important) Fusion Bar Ferrero Rocher 🟢 Functional versions: Calm focus Mild relaxation Balanced energy 🔴 Psychoactive versions: Euphoria Relaxation Altered perception 👉 Effects usually begin within 30–90 minutes and vary by dosage 📊 Dosing Guide Most bars are divided into squares: 1 piece: light / beginner 2–3 pieces: moderate 4+ pieces: stronger effects 👉 Always start low and wait before increasing ✨ Key Features Premium, luxury dessert-style flavor Crunchy + creamy texture Easy portion control Often marketed as evenly infused and lab-tested Attractive, gift-style packaging 🎯 Why People Choose Fusion BarFerrero Rocher Flavor ✔ Rich, high-end chocolate taste ✔ Nutty crunch adds texture ✔ Feels more like a luxury dessert than an edible ✔ Popular for gifting or special occasions 👉 It’s often considered one of the most premium Fusion bar flavors ⚠️ Important Reality Check Be cautious : Market is largely unregulated Packaging can be easily copied Ingredients may not always match labels Some online sellers are unreliable 👉 Quality depends heavily on where you buy it ⚖️ Legal Status Fusion Bar Ferrero Rocher Functional mushroom versions: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (UK, EU, etc.) 👉 Always check local laws before purchasing 🧠 Final Verdict 👍 Pros Rich hazelnut chocolate flavor Premium, dessert-like experience Crunchy and satisfying texture Easy to portion ⚠️ Cons Quality varies widely Risk of counterfeit products Legal concerns depending on contents ✅ Bottom Line Ferrero Rocher is one of the most luxurious and indulgent options in the Fusion range, perfect for those who enjoy rich chocolate and nutty flavors . Just make sure you choose a trusted source and understand what’s inside before using it .",
+        "shortDescription": null,
+        "sku": 261,
+        "averageRating": 3.5,
+        "reviewCount": 2,
+        "reviews": [
+          {
+            "sourceReviewId": "17",
+            "authorName": "Randy",
+            "rating": 4,
+            "body": "I liked how smooth the chocolate tasted.",
+            "reviewDate": "February 5, 2026",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "18",
+            "authorName": "Rebecca",
+            "rating": 3,
+            "body": "The chocolate quality felt premium compared to cheaper bars.",
+            "reviewDate": "April 5, 2026",
+            "isVerifiedBuyer": false
+          }
+        ],
+        "seoTitle": "Fusion Bar Ferrero Rocher - fusionbarshop.com",
+        "seoDescription": "Fusion Bar Ferrero Rocher is a luxury-style infused chocolate bar inspired by the famous Ferrero Rocher confection. It combines hazelnut chocolate.",
+        "canonical": "https://fusionbarshop.com/product/fusion-bar-ferrero-rocher/",
+        "jsonLd": {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "@id": "https://fusionbarshop.com/product/fusion-bar-ferrero-rocher/#product",
+          "name": "Fusion Bar Ferrero Rocher",
+          "url": "https://fusionbarshop.com/product/fusion-bar-ferrero-rocher/",
+          "description": "Fusion Bar Ferrero Rocher is a luxury-style infused chocolate bar inspired by the famous Ferrero Rocher confection. It combines hazelnut chocolate, crispy wafer texture, and mushroom-infused ingredients into one premium edible experience.",
+          "image": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Ferrari-Rocher-300x300-1.jpg",
+          "sku": 261,
+          "offers": [
+            {
+              "@type": "Offer",
+              "priceSpecification": [
+                {
+                  "@type": "UnitPriceSpecification",
+                  "price": "20.00",
+                  "priceCurrency": "USD",
+                  "validThrough": "2027-12-31"
+                }
+              ],
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock",
+              "url": "https://fusionbarshop.com/product/fusion-bar-ferrero-rocher/",
+              "seller": {
+                "@type": "Organization",
+                "name": "fusionbarshop.com",
+                "url": "https://fusionbarshop.com"
+              },
+              "price": "20.00",
+              "priceCurrency": "USD"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "3.50",
+            "reviewCount": 2
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "3",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Rebecca"
+              },
+              "reviewBody": "The chocolate quality felt premium compared to cheaper bars.",
+              "datePublished": "2026-04-05T10:39:38+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Randy"
+              },
+              "reviewBody": "I liked how smooth the chocolate tasted.",
+              "datePublished": "2026-02-05T10:38:19+00:00"
+            }
+          ]
+        }
+      },
+      "normalizationStatus": "PENDING",
+      "reviewStatus": "PENDING_REVIEW",
+      "publicationStatus": "PENDING_REVIEW",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-REF-0009",
+      "recordCode": "RAW-REF-0009",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Live Reference Website",
+      "sourceRecordId": "263",
+      "sourceSlug": "fusion-bar-fruit-loops",
+      "sourcePermalink": "https://fusionbarshop.com/product/fusion-bar-fruit-loops/",
+      "sourceSku": 263,
+      "sourceCategoryName": "FUSION MUSHROOM BARS",
+      "sourceBrand": "Fusion",
+      "sourceShortDescription": null,
+      "sourceFullDescription": "Fusion Bar Fruit Loops Fusion Bar Fruit Loops is a fruit cereal–inspired infused chocolate bar that combines white chocolate with colorful crunchy cereal pieces . It’s designed to deliver a nostalgic, sweet flavor with a functional mushroom blend or similar infusion . 👉 Think of it as a mix between breakfast cereal + dessert chocolate + infused edible . 🍓 Flavor Profile Fusion Bar Fruit Loops This is one of the most fun and nostalgic flavors in the Fusion lineup: Fruity cereal notes (orange, lemon, berry) Creamy white chocolate base Crunchy cereal bits in every bite Sweet vanilla finish 👉 Many describe it as tasting like “cereal milk in chocolate form” 🌿 Ingredients & Blend Typical Fusion Fruit Loops bars include: White chocolate (often Belgian-style) Fruit-flavored cereal pieces Mushroom blend such as: Lion’s Mane (focus) Reishi (calm) Cordyceps (energy) Chaga (immune support) 👉 Some versions are marketed as wellness (functional) , while others may be psychoactive depending on formulation . ⚡ Effects (Important) 🟢 Functional versions: Mild relaxation Improved focus Balanced mood 🔴 Psychoactive versions: Euphoria Mood shifts Altered perception 👉 Effects usually begin within 30–60 minutes and can last several hours 📊 Dosing Most bars come divided into squares: 1 square: light / beginner 2–3 squares: moderate 4+ squares: strong effects 👉 Start low—especially because the taste can make it easy to overconsume ✨ Key Features Fusion Bar Fruit Loops Fruity cereal + chocolate combo Crunchy + creamy texture Easy portion control Often marketed as lab-tested and evenly dosed Bright, colorful packaging 🎯 Why People Choose Fruit Loops Flavor ✔ Nostalgic cereal taste ✔ Very sweet and easy to eat ✔ Masks mushroom flavor well ✔ Fun and unique compared to standard chocolate 👉 It’s one of the most playful and beginner-friendly flavors (taste-wise) ⚠️ Important Reality Check You should be cautious: Market is largely unregulated Packaging can be easily copied Ingredients may not always match labels Effects can vary widely From community discussions: “you don’t know what’s in it… many fakes” 👉 This highlights the importance of verified sources and transparency ⚖️ Legal Status Functional mushroom versions: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (UK, EU , etc.) 🧠 Final Verdict Fusion Bar Fruit Loops 👍 Pros Fun, fruity cereal flavor Crunchy and creamy texture Easy to dose Very unique compared to other flavors ⚠️ Cons Can be overly sweet Quality varies depending on source Risk of counterfeit products Legal concerns depending on contents ✅ Bottom Line Fusion Bar Fruit Loops Fruit Loops stands out for its nostalgic flavor and fun texture , making it one of the most unique options in the Fusion range. Just make sure you understand what type of product you’re getting and where it’s coming from before using it .",
+      "sourcePrice": 20,
+      "sourceRegularPrice": null,
+      "sourceSalePrice": null,
+      "sourceCurrency": "USD",
+      "sourceStockStatus": "instock",
+      "sourceStockQuantity": null,
+      "sourceWeight": null,
+      "sourceDimensions": null,
+      "sourceAttributes": {},
+      "sourceVariations": [],
+      "sourceFlavor": "fruit loops",
+      "sourceSize": null,
+      "sourcePackSize": "Single",
+      "sourceNetContent": "6g",
+      "sourceIngredients": "Ingredients & Blend Typical Fusion Fruit Loops bars include: White chocolate (often Belgian-style) Fruit-flavored cereal pieces Mushroom blend such as: Lion’s Mane (focus) Reishi (calm) Cordyceps (ene",
+      "sourceAllergens": null,
+      "sourceEffects": "Effects (Important) 🟢 Functional versions: Mild relaxation Improved focus Balanced mood 🔴 Psychoactive versions: Euphoria Mood shifts Altered perception 👉 Effects usually begin within 30–60 minutes",
+      "sourceServingInfo": null,
+      "sourceDosageInfo": null,
+      "sourceWarnings": null,
+      "sourceUsageInfo": null,
+      "sourceTags": [
+        "cosmic fusion thc gummy sativa or indica"
+      ],
+      "sourceIsFeatured": false,
+      "sourceReviewCount": 2,
+      "sourceAverageRating": 3.5,
+      "sourcePublishedDate": null,
+      "sourceModifiedDate": null,
+      "sourceCanonicalUrl": "https://fusionbarshop.com/product/fusion-bar-fruit-loops/",
+      "sourceSeoTitle": "Fusion Bar Fruit Loops - fusionbarshop.com",
+      "sourceSeoDescription": "Fusion Bar Fruit Loops is a fruit cereal–inspired infused chocolate bar that combines white chocolate with colorful crunchy cereal pieces.",
+      "sourceOgImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Fruit-Loops-300x300-1.jpg",
+      "sourcePrimaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Fruit-Loops-300x300-1.jpg",
+      "sourceGalleryImages": [
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Raspberry-Dark-Chocolate-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Almond-Crush-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Pretzel-Sea-Salt-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/fuison-bar-Milk-Chocolate-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Horchata-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Nerds-Fusion-Bars-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Ferrari-Rocher-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/f258a07d-dc09-4e84-8691-93e0b32e9b7c-247x296.jpg"
+      ],
+      "sourceFilePath": "snapshots/reference/product-fusion-bar-fruit-loops.html",
+      "sourceHash": "a8e7bb916bafa67f7cf36fd9af8a484c96f68afdb41147f7a1c0c2768bc6f041",
+      "rawPayload": {
+        "sourceRecordId": "263",
+        "name": "Fusion Bar Fruit Loops",
+        "slug": "fusion-bar-fruit-loops",
+        "permalink": "https://fusionbarshop.com/product/fusion-bar-fruit-loops/",
+        "price": 20,
+        "category": "FUSION MUSHROOM BARS",
+        "tags": [
+          "cosmic fusion thc gummy sativa or indica"
+        ],
+        "primaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Fruit-Loops-300x300-1.jpg",
+        "galleryImages": [
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Raspberry-Dark-Chocolate-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Almond-Crush-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Pretzel-Sea-Salt-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/fuison-bar-Milk-Chocolate-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Horchata-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Nerds-Fusion-Bars-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Ferrari-Rocher-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/f258a07d-dc09-4e84-8691-93e0b32e9b7c-247x296.jpg"
+        ],
+        "fullDescription": "Fusion Bar Fruit Loops Fusion Bar Fruit Loops is a fruit cereal–inspired infused chocolate bar that combines white chocolate with colorful crunchy cereal pieces . It’s designed to deliver a nostalgic, sweet flavor with a functional mushroom blend or similar infusion . 👉 Think of it as a mix between breakfast cereal + dessert chocolate + infused edible . 🍓 Flavor Profile Fusion Bar Fruit Loops This is one of the most fun and nostalgic flavors in the Fusion lineup: Fruity cereal notes (orange, lemon, berry) Creamy white chocolate base Crunchy cereal bits in every bite Sweet vanilla finish 👉 Many describe it as tasting like “cereal milk in chocolate form” 🌿 Ingredients & Blend Typical Fusion Fruit Loops bars include: White chocolate (often Belgian-style) Fruit-flavored cereal pieces Mushroom blend such as: Lion’s Mane (focus) Reishi (calm) Cordyceps (energy) Chaga (immune support) 👉 Some versions are marketed as wellness (functional) , while others may be psychoactive depending on formulation . ⚡ Effects (Important) 🟢 Functional versions: Mild relaxation Improved focus Balanced mood 🔴 Psychoactive versions: Euphoria Mood shifts Altered perception 👉 Effects usually begin within 30–60 minutes and can last several hours 📊 Dosing Most bars come divided into squares: 1 square: light / beginner 2–3 squares: moderate 4+ squares: strong effects 👉 Start low—especially because the taste can make it easy to overconsume ✨ Key Features Fusion Bar Fruit Loops Fruity cereal + chocolate combo Crunchy + creamy texture Easy portion control Often marketed as lab-tested and evenly dosed Bright, colorful packaging 🎯 Why People Choose Fruit Loops Flavor ✔ Nostalgic cereal taste ✔ Very sweet and easy to eat ✔ Masks mushroom flavor well ✔ Fun and unique compared to standard chocolate 👉 It’s one of the most playful and beginner-friendly flavors (taste-wise) ⚠️ Important Reality Check You should be cautious: Market is largely unregulated Packaging can be easily copied Ingredients may not always match labels Effects can vary widely From community discussions: “you don’t know what’s in it… many fakes” 👉 This highlights the importance of verified sources and transparency ⚖️ Legal Status Functional mushroom versions: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (UK, EU , etc.) 🧠 Final Verdict Fusion Bar Fruit Loops 👍 Pros Fun, fruity cereal flavor Crunchy and creamy texture Easy to dose Very unique compared to other flavors ⚠️ Cons Can be overly sweet Quality varies depending on source Risk of counterfeit products Legal concerns depending on contents ✅ Bottom Line Fusion Bar Fruit Loops Fruit Loops stands out for its nostalgic flavor and fun texture , making it one of the most unique options in the Fusion range. Just make sure you understand what type of product you’re getting and where it’s coming from before using it .",
+        "shortDescription": null,
+        "sku": 263,
+        "averageRating": 3.5,
+        "reviewCount": 2,
+        "reviews": [
+          {
+            "sourceReviewId": "20",
+            "authorName": "Owen",
+            "rating": 4,
+            "body": "Fusion Bars gave me a calm and creative vibe.",
+            "reviewDate": "February 15, 2026",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "19",
+            "authorName": "Peter",
+            "rating": 3,
+            "body": "Great flavor variety compared to most mushroom brands.",
+            "reviewDate": "April 29, 2026",
+            "isVerifiedBuyer": false
+          }
+        ],
+        "seoTitle": "Fusion Bar Fruit Loops - fusionbarshop.com",
+        "seoDescription": "Fusion Bar Fruit Loops is a fruit cereal–inspired infused chocolate bar that combines white chocolate with colorful crunchy cereal pieces.",
+        "canonical": "https://fusionbarshop.com/product/fusion-bar-fruit-loops/",
+        "jsonLd": {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "@id": "https://fusionbarshop.com/product/fusion-bar-fruit-loops/#product",
+          "name": "Fusion Bar Fruit Loops",
+          "url": "https://fusionbarshop.com/product/fusion-bar-fruit-loops/",
+          "description": "Fusion Bar Fruit Loops is a fruit cereal–inspired infused chocolate bar that combines white chocolate with colorful crunchy cereal pieces. It’s designed to deliver a nostalgic, sweet flavor with a functional mushroom blend or similar infusion.",
+          "image": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Fruit-Loops-300x300-1.jpg",
+          "sku": 263,
+          "offers": [
+            {
+              "@type": "Offer",
+              "priceSpecification": [
+                {
+                  "@type": "UnitPriceSpecification",
+                  "price": "20.00",
+                  "priceCurrency": "USD",
+                  "validThrough": "2027-12-31"
+                }
+              ],
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock",
+              "url": "https://fusionbarshop.com/product/fusion-bar-fruit-loops/",
+              "seller": {
+                "@type": "Organization",
+                "name": "fusionbarshop.com",
+                "url": "https://fusionbarshop.com"
+              },
+              "price": "20.00",
+              "priceCurrency": "USD"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "3.50",
+            "reviewCount": 2
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "3",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Peter"
+              },
+              "reviewBody": "Great flavor variety compared to most mushroom brands.",
+              "datePublished": "2026-04-29T10:40:31+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Owen"
+              },
+              "reviewBody": "Fusion Bars gave me a calm and creative vibe.",
+              "datePublished": "2026-02-15T10:40:52+00:00"
+            }
+          ]
+        }
+      },
+      "normalizationStatus": "PENDING",
+      "reviewStatus": "PENDING_REVIEW",
+      "publicationStatus": "PENDING_REVIEW",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    },
+    {
+      "id": "RAW-REF-0010",
+      "recordCode": "RAW-REF-0010",
+      "sourceType": "REFERENCE_WEBSITE",
+      "sourceName": "Live Reference Website",
+      "sourceRecordId": "265",
+      "sourceSlug": "fusion-bar-heeth-english-toffee",
+      "sourcePermalink": "https://fusionbarshop.com/product/fusion-bar-heeth-english-toffee/",
+      "sourceSku": 265,
+      "sourceCategoryName": "FUSION MUSHROOM BARS",
+      "sourceBrand": "Fusion",
+      "sourceShortDescription": null,
+      "sourceFullDescription": "Fusion Bar Heeth English Toffee Fusion Bar Heeth English Toffee is a toffee-inspired infused chocolate bar that combines rich buttery toffee, chocolate coating, and a crunchy texture , often paired with a mushroom blend or similar infusion. 👉 It’s modeled after classic English toffee candy bars , which typically feature butter, sugar, and nuts coated in chocolate 🍯 Flavor Profile This is one of the more rich and indulgent flavors in the Fusion lineup: Deep buttery toffee taste Smooth milk chocolate coating Light vanilla sweetness Subtle sea salt balance Crunchy, slightly brittle texture 👉 The combination creates a sweet + salty + crunchy dessert experience 🌿 Ingredients & Blend Typical Fusion English Toffee bars may include: Chocolate base (milk chocolate or similar coating) Toffee (butter + sugar base) Sometimes almond or nut pieces Mushroom blend (varies): Lion’s Mane (focus) Reishi (calm) Cordyceps (energy) 👉 Some versions are functional (wellness) , while others may be psychoactive depending on formulation ⚡ Effects (Important) 🟢 Functional versions: Mild relaxation Focus and clarity Balanced mood 🔴 Psychoactive versions: Euphoria Mood changes Altered perception 👉 Effects typically begin within 30–90 minutes 📊 Dosing Guide Most bars are divided into squares: 1 piece: beginner / light 2–3 pieces: moderate 4+ pieces: stronger effects 👉 Start low and wait before increasing ✨ Key Features Rich toffee + chocolate flavor combo Crunchy, satisfying texture Easy portion control Premium dessert-style feel Often marketed as portable and resealable 🎯 Why People Choose English Toffee Flavor ✔ Rich, buttery dessert taste ✔ Balanced sweet + salty flavor ✔ Crunchy texture adds variety ✔ Feels more “premium” than fruity flavors 👉 It’s a great choice if you prefer classic chocolate candy flavors over sweet/candy-style ones ⚠️ Important Reality Check Fusion Bar Heeth English Toffee You should be careful with Fusion bars : Market is largely unregulated Packaging can be easily copied Ingredients may not always match labels Quality varies depending on source From community discussions: “90% chance it’s mystery chemicals” 👉 This highlights the importance of buying from trusted sources ⚖️ Legal Status Functional mushroom bars: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (UK, EU, etc.) 🧠 Final Verdict Fusion Bar Heeth English Toffee 👍 Pros Rich buttery toffee flavor Crunchy + creamy texture Premium dessert feel Easy to portion ⚠️ Cons Can be very sweet Quality varies widely Risk of counterfeit products Legal concerns depending on contents ✅ Bottom Line Fusion Bar Heeth English Toffee The Fusion Bar Heeth English Toffee is a luxury-style flavor that stands out for its buttery richness and crunchy texture . It’s perfect for those who enjoy classic chocolate-toffee desserts , but like all Fusion products, it’s important to verify the source and understand what you’re consuming before use.",
+      "sourcePrice": 20,
+      "sourceRegularPrice": null,
+      "sourceSalePrice": null,
+      "sourceCurrency": "USD",
+      "sourceStockStatus": "instock",
+      "sourceStockQuantity": null,
+      "sourceWeight": null,
+      "sourceDimensions": null,
+      "sourceAttributes": {},
+      "sourceVariations": [],
+      "sourceFlavor": "heeth english toffee",
+      "sourceSize": null,
+      "sourcePackSize": "Single",
+      "sourceNetContent": "6g",
+      "sourceIngredients": "Ingredients & Blend Typical Fusion English Toffee bars may include: Chocolate base (milk chocolate or similar coating) Toffee (butter + sugar base) Sometimes almond or nut pieces Mushroom blend (varie",
+      "sourceAllergens": null,
+      "sourceEffects": "Effects (Important) 🟢 Functional versions: Mild relaxation Focus and clarity Balanced mood 🔴 Psychoactive versions: Euphoria Mood changes Altered perception 👉 Effects typically begin within 30–90 m",
+      "sourceServingInfo": null,
+      "sourceDosageInfo": null,
+      "sourceWarnings": null,
+      "sourceUsageInfo": null,
+      "sourceTags": [
+        "cosmic fusion thc gummy sativa or indica"
+      ],
+      "sourceIsFeatured": false,
+      "sourceReviewCount": 3,
+      "sourceAverageRating": 3.33,
+      "sourcePublishedDate": null,
+      "sourceModifiedDate": null,
+      "sourceCanonicalUrl": "https://fusionbarshop.com/product/fusion-bar-heeth-english-toffee/",
+      "sourceSeoTitle": "Fusion Bar Heeth English Toffee - fusionbarshop.com",
+      "sourceSeoDescription": "Fusion Bar Heeth English Toffee is a toffee-inspired infused chocolate bar that combines rich buttery toffee, chocolate coating, and a crunchy texture.",
+      "sourceOgImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1.jpg",
+      "sourcePrimaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1.jpg",
+      "sourceGalleryImages": [
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/birthday-Cake-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Horchata-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/f258a07d-dc09-4e84-8691-93e0b32e9b7c-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Gummies-Berry-Citrus-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/fusion2-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-mocha-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Strawberries-And-Cream-300x300-1-247x296.jpg",
+        "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookie-Dough-300x300-1-247x296.jpg"
+      ],
+      "sourceFilePath": "snapshots/reference/product-fusion-bar-heeth-english-toffee.html",
+      "sourceHash": "6cbb0c78ebf83807c4f6e0129b5be5d6c658d3954084b14cc57a9137f544b4c8",
+      "rawPayload": {
+        "sourceRecordId": "265",
+        "name": "Fusion Bar Heeth English Toffee",
+        "slug": "fusion-bar-heeth-english-toffee",
+        "permalink": "https://fusionbarshop.com/product/fusion-bar-heeth-english-toffee/",
+        "price": 20,
+        "category": "FUSION MUSHROOM BARS",
+        "tags": [
+          "cosmic fusion thc gummy sativa or indica"
+        ],
+        "primaryImage": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1.jpg",
+        "galleryImages": [
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/birthday-Cake-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Horchata-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/f258a07d-dc09-4e84-8691-93e0b32e9b7c-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Gummies-Berry-Citrus-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/fusion2-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-mocha-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/05/Fusion-Bars-Strawberries-And-Cream-300x300-1-247x296.jpg",
+          "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Cookie-Dough-300x300-1-247x296.jpg"
+        ],
+        "fullDescription": "Fusion Bar Heeth English Toffee Fusion Bar Heeth English Toffee is a toffee-inspired infused chocolate bar that combines rich buttery toffee, chocolate coating, and a crunchy texture , often paired with a mushroom blend or similar infusion. 👉 It’s modeled after classic English toffee candy bars , which typically feature butter, sugar, and nuts coated in chocolate 🍯 Flavor Profile This is one of the more rich and indulgent flavors in the Fusion lineup: Deep buttery toffee taste Smooth milk chocolate coating Light vanilla sweetness Subtle sea salt balance Crunchy, slightly brittle texture 👉 The combination creates a sweet + salty + crunchy dessert experience 🌿 Ingredients & Blend Typical Fusion English Toffee bars may include: Chocolate base (milk chocolate or similar coating) Toffee (butter + sugar base) Sometimes almond or nut pieces Mushroom blend (varies): Lion’s Mane (focus) Reishi (calm) Cordyceps (energy) 👉 Some versions are functional (wellness) , while others may be psychoactive depending on formulation ⚡ Effects (Important) 🟢 Functional versions: Mild relaxation Focus and clarity Balanced mood 🔴 Psychoactive versions: Euphoria Mood changes Altered perception 👉 Effects typically begin within 30–90 minutes 📊 Dosing Guide Most bars are divided into squares: 1 piece: beginner / light 2–3 pieces: moderate 4+ pieces: stronger effects 👉 Start low and wait before increasing ✨ Key Features Rich toffee + chocolate flavor combo Crunchy, satisfying texture Easy portion control Premium dessert-style feel Often marketed as portable and resealable 🎯 Why People Choose English Toffee Flavor ✔ Rich, buttery dessert taste ✔ Balanced sweet + salty flavor ✔ Crunchy texture adds variety ✔ Feels more “premium” than fruity flavors 👉 It’s a great choice if you prefer classic chocolate candy flavors over sweet/candy-style ones ⚠️ Important Reality Check Fusion Bar Heeth English Toffee You should be careful with Fusion bars : Market is largely unregulated Packaging can be easily copied Ingredients may not always match labels Quality varies depending on source From community discussions: “90% chance it’s mystery chemicals” 👉 This highlights the importance of buying from trusted sources ⚖️ Legal Status Functional mushroom bars: ✅ Generally legal Psychoactive versions: ❌ Illegal in many regions (UK, EU, etc.) 🧠 Final Verdict Fusion Bar Heeth English Toffee 👍 Pros Rich buttery toffee flavor Crunchy + creamy texture Premium dessert feel Easy to portion ⚠️ Cons Can be very sweet Quality varies widely Risk of counterfeit products Legal concerns depending on contents ✅ Bottom Line Fusion Bar Heeth English Toffee The Fusion Bar Heeth English Toffee is a luxury-style flavor that stands out for its buttery richness and crunchy texture . It’s perfect for those who enjoy classic chocolate-toffee desserts , but like all Fusion products, it’s important to verify the source and understand what you’re consuming before use.",
+        "shortDescription": null,
+        "sku": 265,
+        "averageRating": 3.33,
+        "reviewCount": 3,
+        "reviews": [
+          {
+            "sourceReviewId": "23",
+            "authorName": "Laura",
+            "rating": 3,
+            "body": "Definitely stronger than I expected from just a few squares.",
+            "reviewDate": "February 25, 2026",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "21",
+            "authorName": "Nelly",
+            "rating": 3,
+            "body": "Perfect for relaxing with music and visuals.",
+            "reviewDate": "April 10, 2026",
+            "isVerifiedBuyer": false
+          },
+          {
+            "sourceReviewId": "22",
+            "authorName": "Merylen",
+            "rating": 4,
+            "body": "I appreciated that the mushroom flavor wasn’t overpowering.",
+            "reviewDate": "May 9, 2026",
+            "isVerifiedBuyer": false
+          }
+        ],
+        "seoTitle": "Fusion Bar Heeth English Toffee - fusionbarshop.com",
+        "seoDescription": "Fusion Bar Heeth English Toffee is a toffee-inspired infused chocolate bar that combines rich buttery toffee, chocolate coating, and a crunchy texture.",
+        "canonical": "https://fusionbarshop.com/product/fusion-bar-heeth-english-toffee/",
+        "jsonLd": {
+          "@context": "https://schema.org/",
+          "@type": "Product",
+          "@id": "https://fusionbarshop.com/product/fusion-bar-heeth-english-toffee/#product",
+          "name": "Fusion Bar Heeth English Toffee",
+          "url": "https://fusionbarshop.com/product/fusion-bar-heeth-english-toffee/",
+          "description": "Fusion Bar Heeth English Toffee is a toffee-inspired infused chocolate bar that combines rich buttery toffee, chocolate coating, and a crunchy texture, often paired with a mushroom blend or similar infusion.",
+          "image": "https://fusionbarshop.com/wp-content/uploads/2026/04/Fusion-Bars-Heeth-English-Toffee-Bars-300x300-1.jpg",
+          "sku": 265,
+          "offers": [
+            {
+              "@type": "Offer",
+              "priceSpecification": [
+                {
+                  "@type": "UnitPriceSpecification",
+                  "price": "20.00",
+                  "priceCurrency": "USD",
+                  "validThrough": "2027-12-31"
+                }
+              ],
+              "priceValidUntil": "2027-12-31",
+              "availability": "https://schema.org/InStock",
+              "url": "https://fusionbarshop.com/product/fusion-bar-heeth-english-toffee/",
+              "seller": {
+                "@type": "Organization",
+                "name": "fusionbarshop.com",
+                "url": "https://fusionbarshop.com"
+              },
+              "price": "20.00",
+              "priceCurrency": "USD"
+            }
+          ],
+          "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": "3.33",
+            "reviewCount": 3
+          },
+          "review": [
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "4",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Merylen"
+              },
+              "reviewBody": "I appreciated that the mushroom flavor wasn’t overpowering.",
+              "datePublished": "2026-05-09T10:41:57+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "3",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Nelly"
+              },
+              "reviewBody": "Perfect for relaxing with music and visuals.",
+              "datePublished": "2026-04-10T10:41:34+00:00"
+            },
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "bestRating": "5",
+                "ratingValue": "3",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": "Laura"
+              },
+              "reviewBody": "Definitely stronger than I expected from just a few squares.",
+              "datePublished": "2026-02-25T10:42:32+00:00"
+            }
+          ]
+        }
+      },
+      "normalizationStatus": "PENDING",
+      "reviewStatus": "PENDING_REVIEW",
+      "publicationStatus": "PENDING_REVIEW",
+      "capturedAt": "2026-09-25T11:22:02.774Z"
+    }
+  ],
+  "totalRawProducts": 218
+}

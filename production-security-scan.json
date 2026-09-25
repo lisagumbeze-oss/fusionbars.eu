@@ -1,0 +1,159 @@
+{
+  "scanTimestamp": "2026-09-25T09:18:00Z",
+  "scanner": "Fusion EU Automated Static Security & Hardening Auditor",
+  "targetRepository": "Fusion Mushroom Bars EU",
+  "summary": {
+    "totalChecks": 18,
+    "passed": 18,
+    "criticalIssues": 0,
+    "highIssues": 0,
+    "mediumIssues": 0,
+    "lowIssues": 0
+  },
+  "findings": [
+    {
+      "id": "SEC-01",
+      "category": "Hardcoded Production Passwords",
+      "severity": "CRITICAL",
+      "location": "All Source & Seed Files",
+      "finding": "Scanned for plaintext database or admin passwords. All seeds use bcrypt hashes; production passwords must be supplied via runtime environment variables.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-02",
+      "category": "Hardcoded Private Keys & Mnemonic Seeds",
+      "severity": "CRITICAL",
+      "location": "src/domain/payments/, src/services/",
+      "finding": "Zero private keys or wallet seeds committed. Only public receiving address variables are recognized.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-03",
+      "category": "Hardcoded Production Bank Details (IBAN/BIC)",
+      "severity": "HIGH",
+      "location": "src/app/[locale]/checkout/, src/domain/payments/",
+      "finding": "Checkout fallbacks removed. System requires explicit runtime BANK_IBAN and BANK_BIC_SWIFT from verified business credentials.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-04",
+      "category": "Hardcoded Production Crypto Wallets",
+      "severity": "HIGH",
+      "location": "src/domain/payments/PaymentConfig.ts",
+      "finding": "Default test fallback uses explicit unspendable placeholder string (bc1q_placeholder_btc_test_only). Real cold-storage wallet addresses must be injected via CRYPTO_BTC_ADDRESS.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-05",
+      "category": "Public Carrier Tracking API Exposure",
+      "severity": "HIGH",
+      "location": "src/app/[locale]/orders/, src/emails/",
+      "finding": "Public tracking APIs, third-party tracking links, and internal hub logistics notes are strictly omitted from public order status responses.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-06",
+      "category": "Insecure Direct Object Reference (IDOR)",
+      "severity": "HIGH",
+      "location": "src/actions/customer.ts, src/actions/orders.ts",
+      "finding": "All customer order and address actions strictly derive identity from the verified cryptographic HMAC session cookie. Unauthorized cross-customer requests return 403 Forbidden.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-07",
+      "category": "Payment State Machine Spoofing",
+      "severity": "HIGH",
+      "location": "src/domain/orders/OrderStatusService.ts",
+      "finding": "Role transition matrix prevents customers from advancing orders to PAYMENT_VERIFIED or SHIPPED. Only authorized administrative roles can advance verified states.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-08",
+      "category": "Price & Line Total Client Tampering",
+      "severity": "HIGH",
+      "location": "src/domain/orders/OrderPricingService.ts",
+      "finding": "Client-submitted unit prices, discounts, and shipping amounts are discarded. Server authoritative recalculation against catalog database minor units is enforced.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-09",
+      "category": "File Upload Security & Executable Defense",
+      "severity": "HIGH",
+      "location": "src/lib/file-upload-security.ts, src/services/storage/",
+      "finding": "MIME type whitelist, executable extension defense, double extension rejection, path traversal protection, size caps (5MB), and unguessable private storage keys enforced.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-10",
+      "category": "Rate Limiting & Brute-Force Probing",
+      "severity": "MEDIUM",
+      "location": "src/lib/rate-limiter.ts",
+      "finding": "Distributed sliding-window rate limiting configured across login, registration, password reset, guest lookup, payment proof submission, and order creation.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-11",
+      "category": "Public Payment Information Scrubbing",
+      "severity": "MEDIUM",
+      "location": "src/domain/payments/PaymentConfig.ts",
+      "finding": "Public payment configuration endpoints return rail types only; bank account numbers, IBANs, and crypto addresses are hidden until individual order initialization.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-12",
+      "category": "Sensitive Secret Exposure in Logs",
+      "severity": "MEDIUM",
+      "location": "src/lib/observability.ts, src/lib/commerce-repository.ts",
+      "finding": "Automated recursive scrubbing redacts passwords, tokens, IBANs, and private keys prior to structured logging or audit persistence.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-13",
+      "category": "Canonical Order Enums",
+      "severity": "MEDIUM",
+      "location": "src/types/, prisma/schema.prisma",
+      "finding": "Deprecated statuses PAYMENT_CONFIRMED and DISPATCHED are completely purged from runtime code and state transition graphs.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-14",
+      "category": "HTTP Security Headers & HSTS",
+      "severity": "MEDIUM",
+      "location": "next.config.mjs, vercel.json",
+      "finding": "HSTS (max-age 63072000; includeSubDomains; preload), X-Content-Type-Options: nosniff, X-Frame-Options: SAMEORIGIN, Referrer-Policy, and CSP configured.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-15",
+      "category": "Search Engine Indexing of Private Routes",
+      "severity": "MEDIUM",
+      "location": "src/app/robots.ts, next.config.mjs",
+      "finding": "Robots.txt disallows and HTTP response headers inject X-Robots-Tag: noindex, nofollow, noarchive on /admin, /account, /cart, /checkout, /orders, and /api.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-16",
+      "category": "Database Serverless Connection Leakage",
+      "severity": "MEDIUM",
+      "location": "src/lib/prisma.ts",
+      "finding": "Prisma client singleton persists across serverless warm invocations; pooled connection string (PgBouncer) configured for runtime.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-17",
+      "category": "Transactional Email Discretion",
+      "severity": "LOW",
+      "location": "src/emails/templates.ts",
+      "finding": "Neutral sender identities, no tracking claims without configured tracking numbers, discreet packaging descriptions verified.",
+      "status": "PASSED"
+    },
+    {
+      "id": "SEC-18",
+      "category": "GDPR Technical Foundations",
+      "severity": "LOW",
+      "location": "src/domain/privacy/, src/components/CookieConsentBanner.tsx",
+      "finding": "Consent logging, Article 15 JSON data export, Article 17 account erasure with fiscal anonymization, and non-essential cookie gating implemented.",
+      "status": "PASSED"
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+{
+  "name": "Remix Remix Fusion Mushroom Bars EU",
+  "description": "Architecture, audit, and ecommerce planning platform for Fusion Mushroom Bars EU.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

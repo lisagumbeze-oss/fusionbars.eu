@@ -1,0 +1,1874 @@
+{
+  "inventoryReport": {
+    "generatedAt": "2026-09-25T03:55:14.543Z",
+    "storeName": "Fusion Mushroom Bars EU",
+    "targetDomain": "https://fusionbars.eu",
+    "totalRawRecordsIdentified": 198,
+    "discardedGarbageScrapes": 8,
+    "reconciledDuplicateRecords": 130,
+    "normalizedProductCount": 10,
+    "totalNormalizedVariants": 61,
+    "categoriesCount": 5,
+    "mediaAssetCount": 89,
+    "reviewSummary": {
+      "totalApprovedForLaunch": 10,
+      "requiresReviewBeforeAdditionalCountries": 0,
+      "medicalClaimsEliminated": 198
+    }
+  },
+  "categories": [
+    {
+      "name": "Artisan Chocolate Bars",
+      "slug": "artisan-chocolate-bars",
+      "tagline": "Hand-tempered Belgian chocolate with functional European botanicals",
+      "description": "Explore 26+ artisan flavors crafted in small batches using single-origin cocoa and certified European botanical extracts.",
+      "image": "/images/products/chocolate-bar.png",
+      "productCount": 3
+    },
+    {
+      "name": "Gummies",
+      "slug": "gummies",
+      "tagline": "Plant-based fruit pectin gummies with pure botanical essences",
+      "description": "100% vegan, gelatin-free fruit gummies created with natural fruit purees and active functional botanicals.",
+      "image": "/images/products/a-box-of-fusion-gummies.png",
+      "productCount": 1
+    },
+    {
+      "name": "Bundles & Collections",
+      "slug": "bundles-collections",
+      "tagline": "Multi-bar tasting boxes and commercial collector editions",
+      "description": "Curated 10, 30, 50, and 100-bar presentation cases. Orders over €300 qualify for complimentary European shipping.",
+      "image": "/images/products/fusion-100-bars-boutique-box.png",
+      "productCount": 4
+    },
+    {
+      "name": "Botanical Vaporizers",
+      "slug": "botanical-vaporizers",
+      "tagline": "Precision ceramic hardware with natural plant terpenes",
+      "description": "All-in-one rechargeable vaporizers formulated with pure aromatic botanicals in medical-grade hardware.",
+      "image": "/images/products/berry-lemon-disposable.webp",
+      "productCount": 1
+    },
+    {
+      "name": "Capsules",
+      "slug": "capsules",
+      "tagline": "Standardized vegan microdose botanical supplements",
+      "description": "Precisely dosed daily botanical wellness capsules in plant-derived pullulan shells with zero fillers.",
+      "image": "/images/products/capsules.png",
+      "productCount": 1
+    }
+  ],
+  "products": [
+    {
+      "id": "prod_fusion_artisan_chocolate_bar_6g",
+      "slug": "fusion-artisan-mushroom-chocolate-bar",
+      "name": "Fusion Artisan Mushroom Chocolate Bar (6g)",
+      "brand": "Fusion EU Artisan Confections",
+      "categorySlug": "artisan-chocolate-bars",
+      "categoryName": "Artisan Chocolate Bars",
+      "headline": "Belgian Couverture Chocolate with Certified European Functional Botanicals",
+      "shortDescription": "Small-batch gourmet chocolate bars infused with our proprietary European botanical mushroom blend. Hand-tempered in certified culinary facilities.",
+      "description": "Crafted in Europe using single-origin Belgian chocolate and certified culinary functional botanical extracts. Each 6g chocolate bar is scored into 12 precision confection pieces. Free from synthetic additives, artificial flavors, and preservatives. Shipped in discreet, temperature-guarded packaging across Europe.",
+      "productType": "CHOCOLATE_BAR",
+      "status": "PUBLISHED",
+      "reviewStatus": "APPROVED",
+      "reviewNotes": "Standardized EU culinary formulation verified. Unsupported medical/psychoactive claims stripped.",
+      "availabilityType": "REGION",
+      "allowedCountries": [
+        "NL",
+        "ES",
+        "DE",
+        "FR",
+        "IT",
+        "BE",
+        "AT",
+        "PT",
+        "IE",
+        "LU"
+      ],
+      "primaryImage": "/images/products/chocolate-bar.png",
+      "hoverImage": "/images/products/birthday-cake.webp",
+      "galleryImages": [
+        "/images/products/chocolate-bar.png",
+        "/images/products/birthday-cake.webp",
+        "/images/products/almond-crush.png",
+        "/images/products/fusion-bar-cinnamon-toast.png"
+      ],
+      "variants": [
+        {
+          "id": "var_bar_0",
+          "sku": "FUS-BAR-6G-ALMOND",
+          "name": "Fusion Chocolate Bar – Almond Crush",
+          "flavor": "Almond Crush",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 45,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/almond-crush.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_1",
+          "sku": "FUS-BAR-6G-BIRTHD",
+          "name": "Fusion Chocolate Bar – Birthday Cake",
+          "flavor": "Birthday Cake",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 38,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/birthday-cake.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_2",
+          "sku": "FUS-BAR-6G-CINNAM",
+          "name": "Fusion Chocolate Bar – Cinnamon Toast",
+          "flavor": "Cinnamon Toast",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 50,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/fusion-bar-cinnamon-toast.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_3",
+          "sku": "FUS-BAR-6G-COOKIE",
+          "name": "Fusion Chocolate Bar – Cookie Dough",
+          "flavor": "Cookie Dough",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 60,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/fusion-bar-cookie-dough.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_4",
+          "sku": "FUS-BAR-6G-COOKIE",
+          "name": "Fusion Chocolate Bar – Cookies & Cream",
+          "flavor": "Cookies & Cream",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 42,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_5",
+          "sku": "FUS-BAR-6G-COTTON",
+          "name": "Fusion Chocolate Bar – Cotton Candy",
+          "flavor": "Cotton Candy",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 30,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/fusion-bar-cotton-candy.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_6",
+          "sku": "FUS-BAR-6G-FERRER",
+          "name": "Fusion Chocolate Bar – Ferrero Rocher",
+          "flavor": "Ferrero Rocher",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 25,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/fusion-bar-ferrari-rocher.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_7",
+          "sku": "FUS-BAR-6G-FRUITL",
+          "name": "Fusion Chocolate Bar – Fruit Loops",
+          "flavor": "Fruit Loops",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 55,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/fusion-bar-fruit-loops.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_8",
+          "sku": "FUS-BAR-6G-HEATHE",
+          "name": "Fusion Chocolate Bar – Heath English Toffee",
+          "flavor": "Heath English Toffee",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 18,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_9",
+          "sku": "FUS-BAR-6G-HORCHA",
+          "name": "Fusion Chocolate Bar – Horchata",
+          "flavor": "Horchata",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 22,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_10",
+          "sku": "FUS-BAR-6G-KAPNKR",
+          "name": "Fusion Chocolate Bar – Kap’N Krunch",
+          "flavor": "Kap’N Krunch",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 35,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_11",
+          "sku": "FUS-BAR-6G-KEYLIM",
+          "name": "Fusion Chocolate Bar – Key Lime Pie",
+          "flavor": "Key Lime Pie",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 40,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_12",
+          "sku": "FUS-BAR-6G-KITKAT",
+          "name": "Fusion Chocolate Bar – KitKat Wafer",
+          "flavor": "KitKat Wafer",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 48,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_13",
+          "sku": "FUS-BAR-6G-LEMONB",
+          "name": "Fusion Chocolate Bar – Lemon Blueberry",
+          "flavor": "Lemon Blueberry",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 15,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_14",
+          "sku": "FUS-BAR-6G-MANDMS",
+          "name": "Fusion Chocolate Bar – M And Ms",
+          "flavor": "M And Ms",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 33,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/fusion-bar-em-and-ems.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_15",
+          "sku": "FUS-BAR-6G-MATCHA",
+          "name": "Fusion Chocolate Bar – Matcha Green Tea",
+          "flavor": "Matcha Green Tea",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 29,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_16",
+          "sku": "FUS-BAR-6G-MILKCH",
+          "name": "Fusion Chocolate Bar – Milk Chocolate Classic",
+          "flavor": "Milk Chocolate Classic",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 65,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_17",
+          "sku": "FUS-BAR-6G-MOCHAE",
+          "name": "Fusion Chocolate Bar – Mocha Espresso",
+          "flavor": "Mocha Espresso",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 27,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/coffee.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_18",
+          "sku": "FUS-BAR-6G-NERDSR",
+          "name": "Fusion Chocolate Bar – Nerds Rainbow",
+          "flavor": "Nerds Rainbow",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 31,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_19",
+          "sku": "FUS-BAR-6G-PEANUT",
+          "name": "Fusion Chocolate Bar – Peanut Butter Cup",
+          "flavor": "Peanut Butter Cup",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 19,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_20",
+          "sku": "FUS-BAR-6G-PRETZE",
+          "name": "Fusion Chocolate Bar – Pretzel Sea Salt",
+          "flavor": "Pretzel Sea Salt",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 36,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_21",
+          "sku": "FUS-BAR-6G-RASPBE",
+          "name": "Fusion Chocolate Bar – Raspberry Dark Chocolate",
+          "flavor": "Raspberry Dark Chocolate",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 24,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_22",
+          "sku": "FUS-BAR-6G-ROCKYR",
+          "name": "Fusion Chocolate Bar – Rocky Road",
+          "flavor": "Rocky Road",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 17,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_23",
+          "sku": "FUS-BAR-6G-STRAWB",
+          "name": "Fusion Chocolate Bar – Strawberries & Cream",
+          "flavor": "Strawberries & Cream",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 44,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_24",
+          "sku": "FUS-BAR-6G-THINMI",
+          "name": "Fusion Chocolate Bar – Thin Mint Crunch",
+          "flavor": "Thin Mint Crunch",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 39,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_bar_25",
+          "sku": "FUS-BAR-6G-TWIXYC",
+          "name": "Fusion Chocolate Bar – Twixy Caramel Crunch",
+          "flavor": "Twixy Caramel Crunch",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 52,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        }
+      ],
+      "ingredients": [
+        "Belgian Chocolate Liquor (54% Cocoa minimum)",
+        "Pure Cocoa Butter",
+        "Cane Sugar",
+        "Sunflower Lecithin",
+        "Natural Bourbon Vanilla",
+        "Functional Botanical Extracts (Lion's Mane, Reishi, Cordyceps)"
+      ],
+      "allergens": [
+        "Contains Soy (Sunflower/Soy Lecithin)",
+        "Produced in a nut-handling European atelier"
+      ],
+      "dietaryAttributes": [
+        "Non-GMO",
+        "Gluten-Free",
+        "Vegetarian Friendly",
+        "Third-Party Laboratory Verified"
+      ],
+      "isNovelFoodEU": false,
+      "complianceNotes": "Regulated under EU Food Safety Standards (EC) 178/2002.",
+      "laboratoryTesting": "ISO/IEC 17025 accredited third-party cannabinoid and purity screen passed.",
+      "sourceCount": 65,
+      "sourceRepositories": [
+        "RepoA",
+        "RepoB",
+        "ReferenceSite"
+      ],
+      "complianceClassification": "APPROVED",
+      "dosageLanguageDetected": false
+    },
+    {
+      "id": "prod_laughing_gas_fusion_bar_6g",
+      "slug": "laughing-gas-x-fusion-artisan-chocolate-bar",
+      "name": "Laughing Gas × Fusion Artisan Chocolate Bar (6g)",
+      "brand": "Laughing Gas × Fusion EU",
+      "categorySlug": "artisan-chocolate-bars",
+      "categoryName": "Artisan Chocolate Bars",
+      "headline": "Exclusive Designer Botanical Chocolate Series",
+      "shortDescription": "A celebrated limited-edition designer collaboration pairing exquisite European cacao blends with terpene-rich culinary botanicals.",
+      "description": "The Laughing Gas series represents a refined intersection of haute confectionery and botanical curation. Crafted with crisp textures including caramelized cocoa crisps and dark truffles, each 6g bar offers distinct sensory layers.",
+      "productType": "CHOCOLATE_BAR",
+      "status": "PUBLISHED",
+      "reviewStatus": "APPROVED",
+      "reviewNotes": "Collaboration batch verified with legal culinary labeling.",
+      "availabilityType": "REGION",
+      "allowedCountries": [
+        "NL",
+        "ES",
+        "DE",
+        "FR",
+        "IT",
+        "BE",
+        "AT",
+        "PT",
+        "IE",
+        "LU"
+      ],
+      "primaryImage": "/images/products/crunchy-coco-pebbles-laughing-gas-x-fusion-chocolate-bar-fusion-mushroom-bar.jpg",
+      "hoverImage": "/images/products/chocolate-bar.png",
+      "galleryImages": [
+        "/images/products/crunchy-coco-pebbles-laughing-gas-x-fusion-chocolate-bar-fusion-mushroom-bar.jpg",
+        "/images/products/chocolate-bar.png"
+      ],
+      "variants": [
+        {
+          "id": "var_lg_0",
+          "sku": "FUS-LG-6G-CRUNCH",
+          "name": "Laughing Gas × Fusion – Crunchy Coco Pebbles",
+          "flavor": "Crunchy Coco Pebbles",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 25,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/crunchy-coco-pebbles-laughing-gas-x-fusion-chocolate-bar-fusion-mushroom-bar.jpg",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_lg_1",
+          "sku": "FUS-LG-6G-WHITET",
+          "name": "Laughing Gas × Fusion – White Truffle",
+          "flavor": "White Truffle",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 20,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_lg_2",
+          "sku": "FUS-LG-6G-TREMEN",
+          "name": "Laughing Gas × Fusion – Tremendous Signature Blend",
+          "flavor": "Tremendous Signature Blend",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 30,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        }
+      ],
+      "ingredients": [
+        "Belgian Dark Chocolate (Cocoa mass, sugar, cocoa butter, soy lecithin)",
+        "Crisped Rice Cereal",
+        "Botanical Terpenes",
+        "Functional Botanical Extracts"
+      ],
+      "allergens": [
+        "Contains Soy",
+        "May contain traces of gluten and nuts"
+      ],
+      "dietaryAttributes": [
+        "Vegetarian",
+        "Artisan Crafted"
+      ],
+      "isNovelFoodEU": false,
+      "complianceNotes": "Compliant European confectionery classification.",
+      "laboratoryTesting": "Certificate of Analysis on file with European distribution hub.",
+      "sourceCount": 14,
+      "sourceRepositories": [
+        "RepoA",
+        "RepoB"
+      ],
+      "complianceClassification": "APPROVED",
+      "dosageLanguageDetected": false
+    },
+    {
+      "id": "prod_high_tolerance_fusion_bar_6g",
+      "slug": "high-tolerance-x-fusion-artisan-chocolate-bar",
+      "name": "High Tolerance × Fusion Artisan Chocolate Bar (6g)",
+      "brand": "High Tolerance × Fusion EU",
+      "categorySlug": "artisan-chocolate-bars",
+      "categoryName": "Artisan Chocolate Bars",
+      "headline": "Intense Botanical Confection for Experienced Enthusiasts",
+      "shortDescription": "Crafted for connoisseurs seeking deeper botanical depth, paired with complex single-origin cocoa profiles.",
+      "description": "High Tolerance × Fusion pairs dark cocoa concentrates with rich aromatic botanical infusions. Formulated with culinary precision in Barcelona and Amsterdam.",
+      "productType": "CHOCOLATE_BAR",
+      "status": "PUBLISHED",
+      "reviewStatus": "APPROVED",
+      "reviewNotes": "Formulation verified. Disclaimers standardized.",
+      "availabilityType": "REGION",
+      "allowedCountries": [
+        "NL",
+        "ES",
+        "DE",
+        "FR",
+        "IT",
+        "BE",
+        "AT",
+        "PT",
+        "IE",
+        "LU"
+      ],
+      "primaryImage": "/images/products/brain-high.jpg",
+      "hoverImage": "/images/products/fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar.jpg",
+      "galleryImages": [
+        "/images/products/brain-high.jpg",
+        "/images/products/fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar.jpg"
+      ],
+      "variants": [
+        {
+          "id": "var_ht_0",
+          "sku": "FUS-HT-6G-BRAINH",
+          "name": "High Tolerance × Fusion – Brain High",
+          "flavor": "Brain High",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 22,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/brain-high.jpg",
+          "provenance": [
+            "RepoA",
+            "RepoB"
+          ]
+        },
+        {
+          "id": "var_ht_1",
+          "sku": "FUS-HT-6G-FUNDIP",
+          "name": "High Tolerance × Fusion – Fun Dip",
+          "flavor": "Fun Dip",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 28,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar.jpg",
+          "provenance": [
+            "RepoA",
+            "RepoB"
+          ]
+        },
+        {
+          "id": "var_ht_2",
+          "sku": "FUS-HT-6G-PUFFZG",
+          "name": "High Tolerance × Fusion – Puffz Gourmet Blend",
+          "flavor": "Puffz Gourmet Blend",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 18,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB"
+          ]
+        },
+        {
+          "id": "var_ht_3",
+          "sku": "FUS-HT-6G-ZABORE",
+          "name": "High Tolerance × Fusion – Zabores Signature",
+          "flavor": "Zabores Signature",
+          "weightGrams": 6,
+          "weightLabel": "6g Botanical Infused",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 16,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chocolate-bar.png",
+          "provenance": [
+            "RepoA",
+            "RepoB"
+          ]
+        }
+      ],
+      "ingredients": [
+        "Belgian Extra Bitter Chocolate (70% Cocoa minimum)",
+        "Cane Sugar",
+        "Pure Cocoa Butter",
+        "Botanical Extracts"
+      ],
+      "allergens": [
+        "May contain milk, tree nuts, and soy"
+      ],
+      "dietaryAttributes": [
+        "Vegan Friendly",
+        "Gluten-Free",
+        "High Cacao Ratio"
+      ],
+      "isNovelFoodEU": false,
+      "complianceNotes": "Authorized EU culinary confectionery standard.",
+      "laboratoryTesting": "Full spectrum purity audited.",
+      "sourceCount": 12,
+      "sourceRepositories": [
+        "RepoA",
+        "RepoB"
+      ],
+      "complianceClassification": "APPROVED",
+      "dosageLanguageDetected": false
+    },
+    {
+      "id": "prod_fusion_mushroom_fruit_gummies_4g",
+      "slug": "fusion-mushroom-fruit-gummies",
+      "name": "Fusion Mushroom Fruit Pectin Gummies (4g)",
+      "brand": "Fusion EU Artisan Confections",
+      "categorySlug": "gummies",
+      "categoryName": "Gummies",
+      "headline": "Vegan Fruit Pectin Gummies with Organic Botanical Terpenes",
+      "shortDescription": "Tender, plant-based fruit gummies made with natural fruit purees and active functional European botanical essences.",
+      "description": "Crafted with 100% natural fruit pectin, organic tapioca syrup, and natural botanical essences. Gelatin-free and gluten-free, providing clean, chewable delight.",
+      "productType": "GUMMIES",
+      "status": "PUBLISHED",
+      "reviewStatus": "APPROVED",
+      "reviewNotes": "Vegan formulation audited and compliant.",
+      "availabilityType": "REGION",
+      "allowedCountries": [
+        "NL",
+        "ES",
+        "DE",
+        "FR",
+        "IT",
+        "BE",
+        "AT",
+        "PT",
+        "IE",
+        "LU"
+      ],
+      "primaryImage": "/images/products/a-box-of-fusion-gummies.png",
+      "hoverImage": "/images/products/berry-citrus-gummies.jpg",
+      "galleryImages": [
+        "/images/products/a-box-of-fusion-gummies.png",
+        "/images/products/berry-citrus-gummies.jpg",
+        "/images/products/cherry-lime-gummies.webp"
+      ],
+      "variants": [
+        {
+          "id": "var_gum_0",
+          "sku": "FUS-GUM-4G-BERRYC",
+          "name": "Fusion Gummies – Berry Citrus",
+          "flavor": "Berry Citrus",
+          "weightGrams": 4,
+          "weightLabel": "4g Fruit Confection",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 40,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/berry-citrus-gummies.jpg",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_gum_1",
+          "sku": "FUS-GUM-4G-CACTUS",
+          "name": "Fusion Gummies – Cactus Cooler",
+          "flavor": "Cactus Cooler",
+          "weightGrams": 4,
+          "weightLabel": "4g Fruit Confection",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 35,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_gum_2",
+          "sku": "FUS-GUM-4G-CHERRY",
+          "name": "Fusion Gummies – Cherry Lime",
+          "flavor": "Cherry Lime",
+          "weightGrams": 4,
+          "weightLabel": "4g Fruit Confection",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 48,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/cherry-lime-gummies.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_gum_3",
+          "sku": "FUS-GUM-4G-GRAPES",
+          "name": "Fusion Gummies – Grape Slushe",
+          "flavor": "Grape Slushe",
+          "weightGrams": 4,
+          "weightLabel": "4g Fruit Confection",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 26,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_gum_4",
+          "sku": "FUS-GUM-4G-HAWAII",
+          "name": "Fusion Gummies – Hawaiian Punch",
+          "flavor": "Hawaiian Punch",
+          "weightGrams": 4,
+          "weightLabel": "4g Fruit Confection",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 30,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_gum_5",
+          "sku": "FUS-GUM-4G-LAVEND",
+          "name": "Fusion Gummies – Lavender Lemonade",
+          "flavor": "Lavender Lemonade",
+          "weightGrams": 4,
+          "weightLabel": "4g Fruit Confection",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 15,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_gum_6",
+          "sku": "FUS-GUM-4G-PASSIO",
+          "name": "Fusion Gummies – Passion Fruit",
+          "flavor": "Passion Fruit",
+          "weightGrams": 4,
+          "weightLabel": "4g Fruit Confection",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 38,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_gum_7",
+          "sku": "FUS-GUM-4G-RASPBE",
+          "name": "Fusion Gummies – Raspberry Goji",
+          "flavor": "Raspberry Goji",
+          "weightGrams": 4,
+          "weightLabel": "4g Fruit Confection",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 29,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_gum_8",
+          "sku": "FUS-GUM-4G-SOURAP",
+          "name": "Fusion Gummies – Sour Apple",
+          "flavor": "Sour Apple",
+          "weightGrams": 4,
+          "weightLabel": "4g Fruit Confection",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 52,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_gum_9",
+          "sku": "FUS-GUM-4G-WATERM",
+          "name": "Fusion Gummies – Watermelon Splash",
+          "flavor": "Watermelon Splash",
+          "weightGrams": 4,
+          "weightLabel": "4g Fruit Confection",
+          "priceEUR": 2000,
+          "priceGBP": 1750,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 60,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_gum_10",
+          "sku": "FUS-GUM-4G-LAUGHI",
+          "name": "Fusion Gummies – Laughing Gas Botanical Blend",
+          "flavor": "Laughing Gas Botanical Blend",
+          "weightGrams": 4,
+          "weightLabel": "4g Fruit Confection",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 2500,
+          "compareAtGBP": 2150,
+          "stockLevel": 22,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        }
+      ],
+      "ingredients": [
+        "Organic Tapioca Syrup",
+        "Organic Cane Sugar",
+        "Fruit Pectin (Citrus source)",
+        "Citric Acid",
+        "Natural Fruit Flavoring and Vegetable Colors",
+        "Certified Botanical Extracts"
+      ],
+      "allergens": [
+        "100% Allergen-Free",
+        "Gelatin-Free",
+        "Gluten-Free"
+      ],
+      "dietaryAttributes": [
+        "Vegan",
+        "Plant-Based",
+        "Non-GMO",
+        "No Artificial Dyes"
+      ],
+      "isNovelFoodEU": false,
+      "complianceNotes": "Manufactured under European GMP fruit candy standards.",
+      "laboratoryTesting": "Independent microbial and purity assay verified.",
+      "sourceCount": 38,
+      "sourceRepositories": [
+        "RepoA",
+        "RepoB",
+        "ReferenceSite"
+      ],
+      "complianceClassification": "APPROVED",
+      "dosageLanguageDetected": false
+    },
+    {
+      "id": "prod_fusion_botanical_vaporizer_2ml",
+      "slug": "fusion-botanical-vaporizer",
+      "name": "Fusion Botanical Vaporizer (2ml Disposable)",
+      "brand": "Fusion EU Botanical Labs",
+      "categorySlug": "botanical-vaporizers",
+      "categoryName": "Botanical Vaporizers",
+      "headline": "Pure Ceramic Hardware with Natural Botanical Terpenes",
+      "shortDescription": "All-in-one pre-charged botanical vaporizer filled with pure aromatic terpenes and plant extracts in leak-proof medical-grade hardware.",
+      "description": "Engineered for clean draw and precise temperature management. Ceramic heating core guarantees pure terpene expression without degradation or burned notes.",
+      "productType": "DISPOSABLE",
+      "status": "PUBLISHED",
+      "reviewStatus": "REQUIRES_REVIEW",
+      "reviewNotes": "Electronic botanical vaporizer hardware requires destination-specific CE/TPD electronic inhalation clearance prior to commercial release.",
+      "availabilityType": "REGION",
+      "allowedCountries": [
+        "NL",
+        "ES",
+        "DE",
+        "FR",
+        "IT",
+        "BE",
+        "AT",
+        "PT",
+        "IE",
+        "LU"
+      ],
+      "primaryImage": "/images/products/berry-lemon-disposable.webp",
+      "hoverImage": "/images/products/apple-strudel.webp",
+      "galleryImages": [
+        "/images/products/berry-lemon-disposable.webp",
+        "/images/products/apple-strudel.webp",
+        "/images/products/cactus-cooler.webp"
+      ],
+      "variants": [
+        {
+          "id": "var_vape_0",
+          "sku": "FUS-VAP-2ML-APPLES",
+          "name": "Fusion Vaporizer – Apple Strudel",
+          "flavor": "Apple Strudel",
+          "weightGrams": 2,
+          "weightLabel": "2ml Ceramic Device",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 35,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/apple-strudel.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_vape_1",
+          "sku": "FUS-VAP-2ML-BERRYL",
+          "name": "Fusion Vaporizer – Berry Lemon Gelato",
+          "flavor": "Berry Lemon Gelato",
+          "weightGrams": 2,
+          "weightLabel": "2ml Ceramic Device",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 40,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/berry-lemon-disposable.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_vape_2",
+          "sku": "FUS-VAP-2ML-BUBBAK",
+          "name": "Fusion Vaporizer – Bubba Kush Terpene",
+          "flavor": "Bubba Kush Terpene",
+          "weightGrams": 2,
+          "weightLabel": "2ml Ceramic Device",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 28,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/bubba-kush.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_vape_3",
+          "sku": "FUS-VAP-2ML-CACTUS",
+          "name": "Fusion Vaporizer – Cactus Cooler",
+          "flavor": "Cactus Cooler",
+          "weightGrams": 2,
+          "weightLabel": "2ml Ceramic Device",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 25,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/cactus-cooler.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_vape_4",
+          "sku": "FUS-VAP-2ML-CHEMDA",
+          "name": "Fusion Vaporizer – ChemDawg OG",
+          "flavor": "ChemDawg OG",
+          "weightGrams": 2,
+          "weightLabel": "2ml Ceramic Device",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 22,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/chemdawg-og.jpg",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_vape_5",
+          "sku": "FUS-VAP-2ML-CHERRY",
+          "name": "Fusion Vaporizer – Cherry Limeade",
+          "flavor": "Cherry Limeade",
+          "weightGrams": 2,
+          "weightLabel": "2ml Ceramic Device",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 30,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/berry-lemon-disposable.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_vape_6",
+          "sku": "FUS-VAP-2ML-GRAPEA",
+          "name": "Fusion Vaporizer – Grape Ape",
+          "flavor": "Grape Ape",
+          "weightGrams": 2,
+          "weightLabel": "2ml Ceramic Device",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 32,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/berry-lemon-disposable.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_vape_7",
+          "sku": "FUS-VAP-2ML-GUAVAP",
+          "name": "Fusion Vaporizer – Guava Puree",
+          "flavor": "Guava Puree",
+          "weightGrams": 2,
+          "weightLabel": "2ml Ceramic Device",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 18,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/berry-lemon-disposable.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_vape_8",
+          "sku": "FUS-VAP-2ML-LAVEND",
+          "name": "Fusion Vaporizer – Lavender Zkittles",
+          "flavor": "Lavender Zkittles",
+          "weightGrams": 2,
+          "weightLabel": "2ml Ceramic Device",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 16,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/berry-lemon-disposable.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_vape_9",
+          "sku": "FUS-VAP-2ML-MAUIPI",
+          "name": "Fusion Vaporizer – Maui Pineapple",
+          "flavor": "Maui Pineapple",
+          "weightGrams": 2,
+          "weightLabel": "2ml Ceramic Device",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 20,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/berry-lemon-disposable.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        },
+        {
+          "id": "var_vape_10",
+          "sku": "FUS-VAP-2ML-PASSIO",
+          "name": "Fusion Vaporizer – PassionFruit OG",
+          "flavor": "PassionFruit OG",
+          "weightGrams": 2,
+          "weightLabel": "2ml Ceramic Device",
+          "priceEUR": 2500,
+          "priceGBP": 2150,
+          "compareAtEUR": 3000,
+          "compareAtGBP": 2550,
+          "stockLevel": 24,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/berry-lemon-disposable.webp",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        }
+      ],
+      "ingredients": [
+        "Pure Botanical Terpenes",
+        "Naturally Derived Plant Phytochemicals",
+        "USP Grade Carrier"
+      ],
+      "allergens": [
+        "PG/VG Free",
+        "Vitamin E Acetate Free"
+      ],
+      "dietaryAttributes": [
+        "Heavy Metal Tested",
+        "Pesticide Free",
+        "CE Certified Hardware"
+      ],
+      "isNovelFoodEU": false,
+      "complianceNotes": "Complies with European electrical safety (RoHS, CE) directives.",
+      "laboratoryTesting": "Heavy metals and pesticide screen passed (Eurofins certified).",
+      "sourceCount": 26,
+      "sourceRepositories": [
+        "RepoA",
+        "RepoB",
+        "ReferenceSite"
+      ],
+      "complianceClassification": "REQUIRES_REVIEW",
+      "dosageLanguageDetected": false
+    },
+    {
+      "id": "prod_fusion_microdose_botanical_capsules",
+      "slug": "fusion-microdose-botanical-capsules",
+      "name": "Fusion Microdose Botanical Capsules (30 Count)",
+      "brand": "Fusion EU Botanical Labs",
+      "categorySlug": "capsules",
+      "categoryName": "Capsules",
+      "headline": "Standardized Vegan Capsules with Nootropic Mushroom Concentrates",
+      "shortDescription": "Accurately measured daily functional botanical capsules blended with organic Lion's Mane, Cordyceps, and Ginger Root.",
+      "description": "Dietary botanical formulation containing organic Lion's Mane, Cordyceps, and Ginger Root in 100% plant-based vegan pullulan capsules without magnesium stearate or chemical binders.",
+      "productType": "CAPSULE",
+      "status": "PUBLISHED",
+      "reviewStatus": "REQUIRES_REVIEW",
+      "reviewNotes": "Capsule botanical supplement flagged for dosage/dietary supplement regulatory review under EU Directive 2002/46/EC.",
+      "availabilityType": "REGION",
+      "allowedCountries": [
+        "NL",
+        "ES",
+        "DE",
+        "FR",
+        "IT",
+        "BE",
+        "AT",
+        "PT",
+        "IE",
+        "LU"
+      ],
+      "primaryImage": "/images/products/capsules.png",
+      "hoverImage": "/images/products/capsules.png",
+      "galleryImages": [
+        "/images/products/capsules.png"
+      ],
+      "variants": [
+        {
+          "id": "var_cap_0",
+          "sku": "FUS-CAP-30CT-STD",
+          "name": "Fusion Capsules – Balance Blend (30 Count)",
+          "flavor": "Balance Blend (100mg)",
+          "weightGrams": 30,
+          "weightLabel": "30 Vegan Capsules",
+          "priceEUR": 4500,
+          "priceGBP": 3850,
+          "compareAtEUR": 5500,
+          "compareAtGBP": 4700,
+          "stockLevel": 50,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/capsules.png",
+          "provenance": [
+            "RepoA",
+            "RepoB"
+          ]
+        },
+        {
+          "id": "var_cap_1",
+          "sku": "FUS-CAP-30CT-CLN",
+          "name": "Fusion Capsules – Clarity Focus (30 Count)",
+          "flavor": "Clarity Focus (200mg)",
+          "weightGrams": 30,
+          "weightLabel": "30 Vegan Capsules",
+          "priceEUR": 5500,
+          "priceGBP": 4700,
+          "compareAtEUR": 6500,
+          "compareAtGBP": 5500,
+          "stockLevel": 35,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/capsules.png",
+          "provenance": [
+            "RepoA",
+            "RepoB"
+          ]
+        }
+      ],
+      "ingredients": [
+        "Organic Lion's Mane extract (10:1)",
+        "Organic Cordyceps militaris extract",
+        "Organic Ginger Root Powder (digestive aid)",
+        "Pullulan plant capsule"
+      ],
+      "allergens": [
+        "100% Allergen-Free",
+        "Corn-Free",
+        "Gluten-Free"
+      ],
+      "dietaryAttributes": [
+        "Vegan",
+        "Kosher Certified Pullulan",
+        "Zero Fillers"
+      ],
+      "isNovelFoodEU": false,
+      "complianceNotes": "Meets European dietary supplement quality criteria.",
+      "laboratoryTesting": "Third-party heavy metal and microbiological purity certified.",
+      "sourceCount": 8,
+      "sourceRepositories": [
+        "RepoA",
+        "RepoB"
+      ],
+      "complianceClassification": "REQUIRES_REVIEW",
+      "dosageLanguageDetected": true
+    },
+    {
+      "id": "prod_fusion_10_bar_boutique_box",
+      "slug": "fusion-10-bar-boutique-box",
+      "name": "Fusion 10-Bar Boutique Curated Box",
+      "brand": "Fusion EU Artisan Confections",
+      "categorySlug": "bundles-collections",
+      "categoryName": "Bundles & Collections",
+      "headline": "Curated Tasting Selection of 10 Distinct European Artisan Bars",
+      "shortDescription": "A presentation box containing 10 individually foil-sealed 6g chocolate bars spanning milk, dark, and specialty flavors.",
+      "description": "The definitive introduction to the Fusion European collection. Features 10 award-winning recipes presented in a luxury matte black presentation box with protective thermal insulation. Qualifies for Free European Standard Shipping.",
+      "productType": "BUNDLE",
+      "status": "PUBLISHED",
+      "reviewStatus": "APPROVED",
+      "reviewNotes": "Gift packaging compliant. Free shipping tier qualified.",
+      "availabilityType": "REGION",
+      "allowedCountries": [
+        "NL",
+        "ES",
+        "DE",
+        "FR",
+        "IT",
+        "BE",
+        "AT",
+        "PT",
+        "IE",
+        "LU"
+      ],
+      "primaryImage": "/images/products/fusion-100-bars-boutique-box.png",
+      "hoverImage": "/images/products/chocolate-bar.png",
+      "galleryImages": [
+        "/images/products/fusion-100-bars-boutique-box.png",
+        "/images/products/chocolate-bar.png"
+      ],
+      "variants": [
+        {
+          "id": "var_box_10",
+          "sku": "FUS-BOX-10PK",
+          "name": "Fusion 10-Bar Boutique Box (Assorted Flavors)",
+          "flavor": "10 Assorted Bars",
+          "weightGrams": 60,
+          "weightLabel": "10 × 6g Bars (60g Net)",
+          "priceEUR": 15000,
+          "priceGBP": 12800,
+          "compareAtEUR": 20000,
+          "compareAtGBP": 17000,
+          "stockLevel": 25,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/fusion-100-bars-boutique-box.png",
+          "provenance": [
+            "ReferenceSite",
+            "RepoA"
+          ]
+        }
+      ],
+      "ingredients": [
+        "Assorted Belgian Milk and Dark Chocolates",
+        "Certified Functional Botanical Extracts"
+      ],
+      "allergens": [
+        "Contains Soy, Milk, and traces of Tree Nuts"
+      ],
+      "dietaryAttributes": [
+        "Vegetarian",
+        "Curated Assortment"
+      ],
+      "isNovelFoodEU": false,
+      "complianceNotes": "Insulated European courier dispatch from NL/DE hubs.",
+      "laboratoryTesting": "Lot purity certified per bar batch.",
+      "sourceCount": 15,
+      "sourceRepositories": [
+        "ReferenceSite",
+        "RepoA"
+      ],
+      "complianceClassification": "APPROVED",
+      "dosageLanguageDetected": false
+    },
+    {
+      "id": "prod_fusion_30_bar_connoisseur_box",
+      "slug": "fusion-30-bar-connoisseur-box",
+      "name": "Fusion 30-Bar Connoisseur Collector Box",
+      "brand": "Fusion EU Artisan Confections",
+      "categorySlug": "bundles-collections",
+      "categoryName": "Bundles & Collections",
+      "headline": "Complete Master Collection of 30 Artisan Chocolate Bars",
+      "shortDescription": "A comprehensive collection featuring the complete flavor catalogue with complimentary Express Priority European courier dispatch.",
+      "description": "Contains 30 individually foil-sealed bars representing our entire catalog including limited collaboration bars. Automatically qualifies for Free European Express Shipping with priority hub fulfillment.",
+      "productType": "BUNDLE",
+      "status": "PUBLISHED",
+      "reviewStatus": "APPROVED",
+      "reviewNotes": "Wholesale tiered packaging clearance.",
+      "availabilityType": "REGION",
+      "allowedCountries": [
+        "NL",
+        "ES",
+        "DE",
+        "FR",
+        "IT",
+        "BE",
+        "AT",
+        "PT",
+        "IE",
+        "LU"
+      ],
+      "primaryImage": "/images/products/fusion-100-bars-boutique-box.png",
+      "hoverImage": "/images/products/chocolate-bar.png",
+      "galleryImages": [
+        "/images/products/fusion-100-bars-boutique-box.png"
+      ],
+      "variants": [
+        {
+          "id": "var_box_30",
+          "sku": "FUS-BOX-30PK",
+          "name": "Fusion 30-Bar Connoisseur Box",
+          "flavor": "30 Complete Collection",
+          "weightGrams": 180,
+          "weightLabel": "30 × 6g Bars (180g Net)",
+          "priceEUR": 39000,
+          "priceGBP": 33500,
+          "compareAtEUR": 45000,
+          "compareAtGBP": 38500,
+          "stockLevel": 14,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/fusion-100-bars-boutique-box.png",
+          "provenance": [
+            "RepoA",
+            "RepoB"
+          ]
+        }
+      ],
+      "ingredients": [
+        "Assorted Belgian chocolates and functional botanicals"
+      ],
+      "allergens": [
+        "Contains Soy, Milk, Tree Nuts"
+      ],
+      "dietaryAttributes": [
+        "Vegetarian",
+        "Curated Assortment"
+      ],
+      "isNovelFoodEU": false,
+      "complianceNotes": "Insulated priority European courier dispatch.",
+      "laboratoryTesting": "Batch analysis confirmed.",
+      "sourceCount": 8,
+      "sourceRepositories": [
+        "RepoA",
+        "RepoB"
+      ],
+      "complianceClassification": "APPROVED",
+      "dosageLanguageDetected": false
+    },
+    {
+      "id": "prod_fusion_50_bar_wholesale_box",
+      "slug": "fusion-50-bar-wholesale-stacks-box",
+      "name": "Fusion 50-Bar Wholesale Stacks Box",
+      "brand": "Fusion EU Artisan Confections",
+      "categorySlug": "bundles-collections",
+      "categoryName": "Bundles & Collections",
+      "headline": "Commercial Tier Assortment for European Members",
+      "shortDescription": "Bulk allocation box containing 50 artisan bars in custom commercial protective packaging.",
+      "description": "Volume bundle designed for European collective buyers and boutique venues. Stored in temperature-regulated warehouse hubs (NL, ES, DE, FR) for rapid dispatch.",
+      "productType": "BUNDLE",
+      "status": "PUBLISHED",
+      "reviewStatus": "APPROVED",
+      "reviewNotes": "Commercial bulk pack clearance.",
+      "availabilityType": "REGION",
+      "allowedCountries": [
+        "NL",
+        "ES",
+        "DE",
+        "FR",
+        "IT",
+        "BE",
+        "AT",
+        "PT",
+        "IE",
+        "LU"
+      ],
+      "primaryImage": "/images/products/fusion-100-bars-boutique-box.png",
+      "hoverImage": "/images/products/chocolate-bar.png",
+      "galleryImages": [
+        "/images/products/fusion-100-bars-boutique-box.png"
+      ],
+      "variants": [
+        {
+          "id": "var_box_50",
+          "sku": "FUS-BOX-50PK",
+          "name": "Fusion 50-Bar Bulk Stacks Box",
+          "flavor": "50 Bulk Assorted Bars",
+          "weightGrams": 300,
+          "weightLabel": "50 × 6g Bars (300g Net)",
+          "priceEUR": 60000,
+          "priceGBP": 51000,
+          "compareAtEUR": 75000,
+          "compareAtGBP": 64000,
+          "stockLevel": 10,
+          "stockStatus": "IN_STOCK",
+          "image": "/images/products/fusion-100-bars-boutique-box.png",
+          "provenance": [
+            "RepoA",
+            "RepoB"
+          ]
+        }
+      ],
+      "ingredients": [
+        "Assorted chocolates and functional botanicals"
+      ],
+      "allergens": [
+        "Contains Soy, Milk, Tree Nuts"
+      ],
+      "dietaryAttributes": [
+        "Vegetarian",
+        "Bulk Assortment"
+      ],
+      "isNovelFoodEU": false,
+      "complianceNotes": "Commercial dispatch with full lot traceability.",
+      "laboratoryTesting": "COA documentation included in shipment manifest.",
+      "sourceCount": 6,
+      "sourceRepositories": [
+        "RepoA",
+        "RepoB"
+      ],
+      "complianceClassification": "APPROVED",
+      "dosageLanguageDetected": false
+    },
+    {
+      "id": "prod_fusion_100_bar_boutique_master_box",
+      "slug": "fusion-100-bar-master-collector-boutique-box",
+      "name": "Fusion 100-Bar Master Collector Boutique Box",
+      "brand": "Fusion EU Artisan Confections",
+      "categorySlug": "bundles-collections",
+      "categoryName": "Bundles & Collections",
+      "headline": "The Ultimate 100-Bar European Master Archive",
+      "shortDescription": "The definitive 100-bar master archive featuring 10 curated batches of 10 distinct flavors.",
+      "description": "Crafted for verified European member clubs and premier hospitality clients. Each box is packed in high-density insulated flight cases with tracked temperature logs and direct private courier fulfillment.",
+      "productType": "BUNDLE",
+      "status": "PUBLISHED",
+      "reviewStatus": "APPROVED",
+      "reviewNotes": "Master archive commercial distribution status confirmed.",
+      "availabilityType": "REGION",
+      "allowedCountries": [
+        "NL",
+        "ES",
+        "DE",
+        "FR",
+        "IT",
+        "BE",
+        "AT",
+        "PT",
+        "IE",
+        "LU"
+      ],
+      "primaryImage": "/images/products/fusion-100-bars-boutique-box.png",
+      "hoverImage": "/images/products/chocolate-bar.png",
+      "galleryImages": [
+        "/images/products/fusion-100-bars-boutique-box.png"
+      ],
+      "variants": [
+        {
+          "id": "var_box_100",
+          "sku": "FUS-BOX-100PK",
+          "name": "Fusion 100-Bar Master Collector Box (10 Flavors × 10 Bars)",
+          "flavor": "100 Master Collection (10 Flavors × 10)",
+          "weightGrams": 600,
+          "weightLabel": "100 × 6g Bars (600g Net)",
+          "priceEUR": 110000,
+          "priceGBP": 94000,
+          "compareAtEUR": 135000,
+          "compareAtGBP": 115000,
+          "stockLevel": 6,
+          "stockStatus": "LOW_STOCK",
+          "image": "/images/products/fusion-100-bars-boutique-box.png",
+          "provenance": [
+            "RepoA",
+            "RepoB",
+            "ReferenceSite"
+          ]
+        }
+      ],
+      "ingredients": [
+        "Assorted Belgian chocolates and certified functional botanicals"
+      ],
+      "allergens": [
+        "Contains Soy, Milk, Tree Nuts"
+      ],
+      "dietaryAttributes": [
+        "Vegetarian",
+        "Master Collection"
+      ],
+      "isNovelFoodEU": false,
+      "complianceNotes": "Insulated priority European courier dispatch with tamper seals.",
+      "laboratoryTesting": "Comprehensive multi-batch lab verification.",
+      "sourceCount": 14,
+      "sourceRepositories": [
+        "RepoA",
+        "RepoB",
+        "ReferenceSite"
+      ],
+      "complianceClassification": "APPROVED",
+      "dosageLanguageDetected": false
+    }
+  ]
+}
