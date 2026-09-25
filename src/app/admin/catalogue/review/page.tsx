@@ -1,10 +1,6 @@
-import LocaleLayout from '../../[locale]/layout';
-import CatalogueReviewCenterPage from '../../[locale]/admin/catalogue/review/page';
+import { redirect } from 'next/navigation';
+import { DEFAULT_LOCALE } from '@/i18n';
 
 export default function DirectCatalogueReviewPage() {
-  return (
-    <LocaleLayout params={Promise.resolve({ locale: 'en' })}>
-      <CatalogueReviewCenterPage />
-    </LocaleLayout>
-  );
+  redirect(`/${DEFAULT_LOCALE}/admin/catalogue/review`);
 }

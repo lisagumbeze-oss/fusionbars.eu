@@ -1,10 +1,6 @@
-import LocaleLayout from './[locale]/layout';
-import HomePage from './[locale]/page';
+import { redirect } from 'next/navigation';
+import { DEFAULT_LOCALE } from '@/i18n';
 
 export default function RootPage() {
-  return (
-    <LocaleLayout params={Promise.resolve({ locale: 'en' })}>
-      <HomePage params={Promise.resolve({ locale: 'en' })} />
-    </LocaleLayout>
-  );
+  redirect(`/${DEFAULT_LOCALE}`);
 }

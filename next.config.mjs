@@ -23,6 +23,11 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/admin/:path*',
+        destination: '/en/admin/:path*',
+        permanent: false,
+      },
+      {
         source: '/:locale(en|de|fr|es|it|nl)/track',
         destination: '/:locale/orders/lookup',
         permanent: true,
