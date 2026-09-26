@@ -3,20 +3,11 @@ const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
 
-  // Redirect non-canonical hostnames (www to apex)
+  // Host/www redirects are owned by Vercel Domains only.
+  // Keeping a www↔apex redirect here caused ERR_TOO_MANY_REDIRECTS when Vercel
+  // redirected the opposite direction.
   async redirects() {
     return [
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'www.fusionbars.eu',
-          },
-        ],
-        destination: 'https://fusionbars.eu/:path*',
-        permanent: true,
-      },
       {
         source: '/track',
         destination: '/en/orders/lookup',
