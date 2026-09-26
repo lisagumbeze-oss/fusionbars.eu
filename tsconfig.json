@@ -47,6 +47,8 @@
   ],
   "exclude": [
     "node_modules",
-    "data-source-cache"
+    "data-source-cache",
+    "src/test",
+    "scripts"
   ]
 }
