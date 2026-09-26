@@ -251,6 +251,26 @@ export default function AdminPage() {
             <p className="text-xs sm:text-sm text-[#5C5852] mt-1">
               Authoritative Order Pipeline &bull; Multi-Hub Inventory (NL, ES, DE, FR) &bull; SEPA &amp; Crypto Auditing
             </p>
+            <div className="flex items-center gap-2 mt-3">
+              <Link
+                href={`/${locale}/admin/catalogue/review`}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-[#4A5D4E] text-white hover:bg-[#3B4A3E]"
+              >
+                Catalogue Review Center
+              </Link>
+              <Link
+                href={`/${locale}/admin/catalogue/adjudication`}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#4A5D4E] text-[#4A5D4E] hover:bg-[#4A5D4E] hover:text-white"
+              >
+                Adjudication Workspace
+              </Link>
+              <Link
+                href={`/${locale}/admin/catalogue/imports`}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#E5E3DD] text-[#121212] hover:bg-white"
+              >
+                Master Import Registry
+              </Link>
+            </div>
           </div>
 
           {/* RBAC Role Selector */}

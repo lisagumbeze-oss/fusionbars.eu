@@ -105,6 +105,15 @@ export class ProductPurchaseEligibilityService {
           internalNote: override.internalNote || `Jurisdictional restrictions applied to ${country}`,
         };
       }
+
+      if (override.status === 'NOT_CONFIGURED') {
+        return {
+          eligible: false,
+          reasonCode: 'COUNTRY_RESTRICTED',
+          customerMessage: 'This product is currently unavailable for delivery in your destination country.',
+          internalNote: override.internalNote || `Country ${country} is NOT_CONFIGURED. Legal availability was not inferred.`,
+        };
+      }
     }
 
     // Gate 5: Availability Type Policy

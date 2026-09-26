@@ -5,6 +5,7 @@ import { LocaleCode } from '@/types';
 import { CommerceProvider } from '@/context/CommerceContext';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import MobileBottomNav from '@/components/MobileBottomNav';
 import CartDrawer from '@/components/CartDrawer';
 import CookieConsentBanner from '@/components/CookieConsentBanner';
 
@@ -31,6 +32,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
         <Header />
         <main className="flex-1">{children}</main>
         <Footer />
+        <MobileBottomNav />
         <CartDrawer />
         <CookieConsentBanner />
       </div>

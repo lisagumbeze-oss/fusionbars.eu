@@ -2,19 +2,64 @@
 
 import React from 'react';
 import { useCommerce } from '../context/CommerceContext';
-import { SUPPORTED_LOCALES, getDictionary } from '../i18n';
-import { LocaleCode, CurrencyCode } from '../types';
+import { SUPPORTED_LOCALES } from '../i18n';
+import { LocaleCode } from '../types';
 import { Globe, Truck } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
 
+const ANNOUNCEMENTS: Record<LocaleCode, string[]> = {
+  en: [
+    'Free European Courier on orders over €300',
+    '100% Plain Discreet Packaging',
+    'Dispatched from NL, ES, DE, FR',
+  ],
+  de: [
+    'Kostenloser Europa-Versand ab 300 €',
+    'Diskrete neutrale Verpackung',
+    'Versand aus NL, ES, DE, FR',
+  ],
+  fr: [
+    'Livraison européenne offerte dès 300 €',
+    'Expédition 100% discrète',
+    'Expédié depuis NL, ES, DE, FR',
+  ],
+  es: [
+    'Envío europeo gratuito a partir de 300 €',
+    'Empaque 100% discreto',
+    'Enviado desde NL, ES, DE, FR',
+  ],
+  it: [
+    'Spedizione europea gratuita oltre 300 €',
+    'Imballaggio 100% discreto',
+    'Spedito da NL, ES, DE, FR',
+  ],
+  nl: [
+    'Gratis Europese verzending vanaf €300',
+    '100% discrete verpakking',
+    'Verzonden vanuit NL, ES, DE, FR',
+  ],
+};
+
+function TickerCopy({ messages }: { messages: string[] }) {
+  return (
+    <span className="flex items-center shrink-0">
+      {messages.map((message) => (
+        <span key={message} className="flex items-center shrink-0">
+          <Truck className="w-3.5 h-3.5 text-[#88A48D] mx-3 shrink-0" aria-hidden="true" />
+          <span>{message}</span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
 export default function AnnouncementBar() {
   const { currency, setCurrency, locale } = useCommerce();
-  const dict = getDictionary(locale);
   const router = useRouter();
   const pathname = usePathname();
+  const messages = ANNOUNCEMENTS[locale] || ANNOUNCEMENTS.en;
 
   const handleLocaleChange = (newLocale: LocaleCode) => {
-    // Replace the locale in current pathname
     const segments = pathname.split('/');
     if (segments.length > 1 && SUPPORTED_LOCALES.includes(segments[1] as any)) {
       segments[1] = newLocale;
@@ -25,23 +70,19 @@ export default function AnnouncementBar() {
   };
 
   return (
-    <aside aria-label="Store announcement and preferences" className="bg-[#121212] text-[#FBFBF9] text-[11px] border-b border-neutral-800">
+    <aside
+      aria-label="Store announcement and preferences"
+      className="group/announce bg-[#121212] text-[#FBFBF9] text-[11px] border-b border-neutral-800"
+    >
+      <p className="sr-only">{messages.join('. ')}</p>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex flex-col sm:flex-row items-center justify-between gap-2">
-        <div className="flex items-center gap-2 tracking-wide font-normal text-neutral-300 text-center sm:text-left">
-          <Truck className="w-3.5 h-3.5 text-[#88A48D] shrink-0 hidden sm:inline" />
-          <span>
-            {locale === 'de'
-              ? 'Kostenloser Europa-Versand ab 300 € · Diskrete neutrale Verpackung aus NL, ES, DE, FR'
-              : locale === 'fr'
-              ? 'Livraison européenne offerte dès 300 € · Expédition discrète depuis NL, ES, DE, FR'
-              : locale === 'es'
-              ? 'Envío europeo gratuito a partir de 300 € · Empaque discreto desde NL, ES, DE, FR'
-              : locale === 'it'
-              ? 'Spedizione europea gratuita oltre 300 € · Imballaggio discreto da NL, ES, DE, FR'
-              : locale === 'nl'
-              ? 'Gratis Europese verzending vanaf €300 · Discrete verpakking vanuit NL, ES, DE, FR'
-              : 'Free European Courier on orders over €300 · 100% Plain Discreet Packaging from NL, ES, DE, FR'}
-          </span>
+        <div className="w-full sm:flex-1 min-w-0 overflow-hidden">
+          <div className="announce-marquee-track flex w-max items-center tracking-wide text-neutral-300 whitespace-nowrap">
+            <TickerCopy messages={messages} />
+            <span className="announce-marquee-duplicate flex" aria-hidden="true">
+              <TickerCopy messages={messages} />
+            </span>
+          </div>
         </div>
 
         {/* Currency & Language Controls */}

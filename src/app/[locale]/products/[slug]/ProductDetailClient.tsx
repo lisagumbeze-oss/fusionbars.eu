@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { Heart, ShoppingBag, Check, ShieldCheck, Truck, Clock, Sparkles, Plus, Minus, Info, CheckCircle2 } from 'lucide-react';
+import { Heart, ShoppingBag, Check, ShieldCheck, Truck, Clock, Sparkles, Plus, Minus, Info, CheckCircle2, ChevronDown } from 'lucide-react';
 import { NormalizedProduct, NormalizedVariant } from '@/types';
 import { useCommerce } from '@/context/CommerceContext';
 
@@ -145,26 +145,33 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <span className="text-[#8E8B85] font-mono">SKU: {selectedVariant.sku}</span>
             </div>
 
-            <div className="flex flex-wrap gap-2">
-              {product.variants.map((v, idx) => {
-                const isSelected = selectedVariantIndex === idx;
-                return (
-                  <button
-                    key={v.id}
-                    onClick={() => {
-                      setSelectedVariantIndex(idx);
-                      if (v.image) setActiveImage(v.image);
-                    }}
-                    className={`px-3.5 py-2 text-xs font-medium rounded-lg border transition cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#121212] text-white border-[#121212] shadow-xs'
-                        : 'bg-white text-[#5C5852] border-[#E5E3DD] hover:border-[#121212] hover:text-[#121212]'
-                    }`}
-                  >
-                    {v.flavor}
-                  </button>
-                );
-              })}
+            <div className="relative">
+              <select
+                id="product-flavor"
+                value={selectedVariantIndex}
+                aria-label={`Select flavor for ${product.name}`}
+                onChange={(event) => {
+                  const nextIndex = Number(event.target.value);
+                  const nextVariant = product.variants[nextIndex];
+                  setSelectedVariantIndex(nextIndex);
+                  if (nextVariant?.image) {
+                    setActiveImage(nextVariant.image);
+                  }
+                }}
+                className="w-full appearance-none bg-[#FBFBF9] border border-[#E5E3DD] rounded-md pl-3 pr-9 py-2.5 text-xs text-[#121212] font-medium outline-none focus-visible:border-[#4A5D4E] cursor-pointer"
+              >
+                {product.variants.map((variant, index) => (
+                  <option key={variant.id} value={index}>
+                    {variant.flavor}
+                    {variant.stockStatus === 'LOW_STOCK' ? ' (Low Stock)' : ''}
+                    {variant.stockStatus === 'OUT_OF_STOCK' ? ' (Unavailable)' : ''}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown
+                className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-[#8E8B85]"
+                aria-hidden="true"
+              />
             </div>
           </div>
         )}

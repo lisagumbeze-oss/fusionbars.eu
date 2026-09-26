@@ -129,6 +129,7 @@ export default function CatalogueReviewCenterPage() {
 
   // Content Rewrite Draft
   const [rewriteContentDraft, setRewriteContentDraft] = useState('');
+  const [seoDrafts, setSeoDrafts] = useState<Record<string, { title: string; description: string }>>({});
 
   // Initial Load
   useEffect(() => {
@@ -467,6 +468,7 @@ export default function CatalogueReviewCenterPage() {
     action:
       | 'APPROVE_CONTENT'
       | 'APPROVE_MEDIA'
+      | 'APPROVE_CATEGORY_MAPPINGS'
       | 'ASSIGN_CATEGORY'
       | 'ASSIGN_COMPLIANCE'
       | 'SET_COUNTRY_AVAILABILITY'
@@ -481,6 +483,10 @@ export default function CatalogueReviewCenterPage() {
       productSlugs: selectedSlugs,
       action,
       complianceClassification: action === 'ASSIGN_COMPLIANCE' ? 'APPROVED' : undefined,
+      targetCategorySlug: action === 'ASSIGN_CATEGORY' ? 'chocolate-bars' : undefined,
+      targetCategoryName: action === 'ASSIGN_CATEGORY' ? 'Mushroom Chocolate Bars' : undefined,
+      countryCode: action === 'SET_COUNTRY_AVAILABILITY' ? 'NL' : undefined,
+      countryStatus: action === 'SET_COUNTRY_AVAILABILITY' ? 'AVAILABLE' : undefined,
       actor: actorName,
       actorRole: currentRole,
       reason: `Bulk operation ${action} executed by ${currentRole}`,
@@ -551,9 +557,17 @@ export default function CatalogueReviewCenterPage() {
                 <option value="SUPER_ADMIN" className="bg-slate-900 text-slate-100">SUPER_ADMIN (Full Clearance)</option>
                 <option value="CATALOG_MANAGER" className="bg-slate-900 text-slate-100">CATALOG_MANAGER</option>
                 <option value="CONTENT_MANAGER" className="bg-slate-900 text-slate-100">CONTENT_MANAGER</option>
-                <option value="ORDER_MANAGER" className="bg-slate-900 text-slate-100">ORDER_MANAGER (Read-Only/Denied)</option>
+                <option value="COMPLIANCE_MANAGER" className="bg-slate-900 text-slate-100">COMPLIANCE_MANAGER</option>
+                <option value="ORDER_MANAGER" className="bg-slate-900 text-slate-100">ORDER_MANAGER (Denied)</option>
               </select>
             </div>
+
+            <Link
+              href={`/${locale}/admin/catalogue/adjudication`}
+              className="text-xs text-emerald-300 hover:text-white px-3 py-1.5 rounded-lg border border-emerald-800 bg-emerald-950/40 hover:bg-emerald-900/40 transition"
+            >
+              Adjudication Workspace
+            </Link>
 
             <Link
               href={`/${locale}/admin/catalogue/imports`}
@@ -864,7 +878,7 @@ export default function CatalogueReviewCenterPage() {
                         : 'bg-slate-950 text-slate-400 border border-slate-800 hover:text-white'
                     }`}
                   >
-                    {f.replace('_', ' ')}
+                    {f.replace(/_/g, ' ')}
                   </button>
                 ))}
               </div>
@@ -900,6 +914,24 @@ export default function CatalogueReviewCenterPage() {
                     className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded"
                   >
                     Set Compliance APPROVED
+                  </button>
+                  <button
+                    onClick={() => handleBulkAction('ASSIGN_CATEGORY')}
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded"
+                  >
+                    Assign Category
+                  </button>
+                  <button
+                    onClick={() => handleBulkAction('SET_COUNTRY_AVAILABILITY')}
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded"
+                  >
+                    Set NL Available
+                  </button>
+                  <button
+                    onClick={() => handleBulkAction('APPROVE_CATEGORY_MAPPINGS')}
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-2.5 py-1 rounded"
+                  >
+                    Approve Category Mappings
                   </button>
                   <button
                     onClick={() => handleBulkAction('PUBLISH_SELECTED')}
@@ -1502,9 +1534,31 @@ export default function CatalogueReviewCenterPage() {
             <div className="bg-slate-900 border border-slate-800 rounded-lg p-5 space-y-2">
               <h2 className="text-base font-bold text-white">Country Availability & Regulatory Matrix</h2>
               <p className="text-xs text-slate-400">
-                Matrix: Product × Country. Products marked REQUIRES_REVIEW or BLOCKED remain authoritative non-purchasable
-                via ProductPurchaseEligibilityService.
+                Matrix: Product × Country. Statuses: AVAILABLE, RESTRICTED, BLOCKED, NOT_CONFIGURED. Legal availability is
+                never inferred. Products marked REQUIRES_REVIEW or BLOCKED remain non-purchasable via
+                ProductPurchaseEligibilityService.
               </p>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3">
+              {products
+                .filter((p) => p.complianceClassification !== 'APPROVED')
+                .slice(0, 20)
+                .map((p) => (
+                  <div key={`comp-${p.canonicalSlug}`} className="bg-slate-900 border border-slate-800 rounded-lg p-3 text-xs">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <span className="font-semibold text-white">{p.name}</span>
+                        <div className="text-amber-400 mt-0.5">{p.complianceClassification}</div>
+                        <div className="text-slate-400 mt-1">{p.complianceReason}</div>
+                      </div>
+                      <div className="text-slate-500 text-right">
+                        <div>Publication: {p.publicationStatus}</div>
+                        <div>Purchasable: No until approved</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
             </div>
 
             <div className="bg-slate-900 border border-slate-800 rounded-lg overflow-x-auto">
@@ -1561,6 +1615,7 @@ export default function CatalogueReviewCenterPage() {
                               <option value="AVAILABLE" className="bg-slate-900 text-emerald-400">AVAILABLE</option>
                               <option value="RESTRICTED" className="bg-slate-900 text-amber-400">RESTRICTED</option>
                               <option value="BLOCKED" className="bg-slate-900 text-rose-400">BLOCKED</option>
+                              <option value="NOT_CONFIGURED" className="bg-slate-900 text-slate-400">NOT_CONFIGURED</option>
                             </select>
                           </td>
                         );
@@ -1615,6 +1670,18 @@ export default function CatalogueReviewCenterPage() {
                               Make Primary
                             </button>
                           )}
+                          <button
+                            onClick={() => handleMediaAction(p.canonicalSlug, asset.id, 'KEEP')}
+                            className="text-slate-300 hover:underline"
+                          >
+                            Keep
+                          </button>
+                          <button
+                            onClick={() => handleMediaAction(p.canonicalSlug, asset.id, 'REMOVE')}
+                            className="text-slate-400 hover:underline"
+                          >
+                            Remove
+                          </button>
                           <button
                             onClick={() => handleMediaAction(p.canonicalSlug, asset.id, 'FLAG_BROKEN')}
                             className="text-rose-400 hover:underline"
@@ -1685,6 +1752,14 @@ export default function CatalogueReviewCenterPage() {
                         Reject
                       </button>
                     )}
+                    {r.moderationStatus !== 'ARCHIVED' && (
+                      <button
+                        onClick={() => handleReviewModeration(r.id, 'ARCHIVE')}
+                        className="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3 py-1 rounded text-xs"
+                      >
+                        Archive
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -1712,6 +1787,37 @@ export default function CatalogueReviewCenterPage() {
                       <span className={`text-xs ${p.seo.isApproved ? 'text-emerald-400' : 'text-amber-400'}`}>
                         {p.seo.isApproved ? 'SEO Approved' : 'SEO Review Required'}
                       </span>
+                      {!p.seo.isApproved && (
+                        <button
+                          onClick={async () => {
+                            const draft = seoDrafts[p.canonicalSlug];
+                            const title = draft?.title?.trim();
+                            const description = draft?.description?.trim();
+                            if (!title || !description) {
+                              alert('Enter a FusionBars EU SEO title and description. Source metadata is not copied automatically.');
+                              return;
+                            }
+                            const res = await approveSeoAction({
+                              productSlug: p.canonicalSlug,
+                              approvedTitle: title,
+                              approvedDescription: description,
+                              actor: actorName,
+                              actorRole: currentRole,
+                              reason: 'Editorial SEO clearance after source metadata review',
+                            });
+                            if (res.success) {
+                              setStatusMessage({ type: 'success', text: `SEO approved for ${p.name}` });
+                              loadDashboard();
+                              loadProducts();
+                            } else {
+                              alert(res.error || 'SEO approval failed');
+                            }
+                          }}
+                          className="bg-amber-600 hover:bg-amber-500 text-slate-950 font-bold px-3 py-1 rounded text-xs"
+                        >
+                          Approve EU SEO
+                        </button>
+                      )}
                     </div>
                   </div>
 
@@ -1723,11 +1829,38 @@ export default function CatalogueReviewCenterPage() {
                       <div className="text-[11px] text-slate-500 mt-1 truncate">{p.seo.sourceCanonical}</div>
                     </div>
 
-                    <div className="bg-slate-950 p-3 rounded border border-slate-800">
-                      <span className="text-emerald-400 font-semibold block mb-1">FusionBars EU Approved SEO</span>
-                      <div className="text-white font-semibold">{p.seo.approvedTitle}</div>
-                      <p className="text-slate-300 mt-1">{p.seo.approvedDescription}</p>
-                      <div className="text-[11px] text-slate-400 mt-1 truncate">{p.seo.approvedCanonical}</div>
+                    <div className="bg-slate-950 p-3 rounded border border-slate-800 space-y-2">
+                      <span className="text-emerald-400 font-semibold block">FusionBars EU Approved SEO</span>
+                      <input
+                        type="text"
+                        placeholder="Enter EU SEO title (do not paste source blindly)"
+                        value={seoDrafts[p.canonicalSlug]?.title ?? p.seo.approvedTitle ?? ''}
+                        onChange={(e) =>
+                          setSeoDrafts({
+                            ...seoDrafts,
+                            [p.canonicalSlug]: {
+                              title: e.target.value,
+                              description: seoDrafts[p.canonicalSlug]?.description ?? p.seo.approvedDescription ?? '',
+                            },
+                          })
+                        }
+                        className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-white"
+                      />
+                      <textarea
+                        placeholder="Enter EU SEO description after editorial review"
+                        value={seoDrafts[p.canonicalSlug]?.description ?? p.seo.approvedDescription ?? ''}
+                        onChange={(e) =>
+                          setSeoDrafts({
+                            ...seoDrafts,
+                            [p.canonicalSlug]: {
+                              title: seoDrafts[p.canonicalSlug]?.title ?? p.seo.approvedTitle ?? '',
+                              description: e.target.value,
+                            },
+                          })
+                        }
+                        className="w-full bg-slate-900 border border-slate-700 rounded px-2 py-1 text-slate-300 min-h-[64px]"
+                      />
+                      <div className="text-[11px] text-slate-400 truncate">{p.seo.approvedCanonical || 'Canonical assigned on approval'}</div>
                     </div>
                   </div>
                 </div>
@@ -1874,9 +2007,62 @@ export default function CatalogueReviewCenterPage() {
                 )}
               </div>
 
+              {/* NORMALIZED PRODUCT */}
+              <div className="space-y-3">
+                <h3 className="font-bold text-white text-sm">Normalized Product</h3>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {[
+                    ['Name', detailProduct.name],
+                    ['Brand', detailProduct.brand || '—'],
+                    ['Category', detailProduct.categoryName],
+                    ['SKU', detailProduct.sku || 'MISSING'],
+                    ['EUR Price', detailProduct.priceEUR ? `€${(detailProduct.priceEUR / 100).toFixed(2)}` : 'PRICING_REVIEW_REQUIRED'],
+                    ['GBP Price', detailProduct.priceGBP ? `£${(detailProduct.priceGBP / 100).toFixed(2)}` : 'Not approved (fallback only if allowed)'],
+                    ['Publication', detailProduct.publicationStatus],
+                    ['Compliance', detailProduct.complianceClassification],
+                  ].map(([label, value]) => (
+                    <div key={label} className="bg-slate-950 border border-slate-800 rounded p-3">
+                      <span className="text-slate-500 block mb-1">{label}</span>
+                      <span className="text-white font-medium">{value}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="bg-slate-950 border border-slate-800 rounded p-3">
+                    <span className="text-slate-500 block mb-1">Variants</span>
+                    {detailProduct.variants.map((v) => (
+                      <div key={v.id} className="text-slate-300">
+                        {v.name} · {v.sku || 'NO SKU'} · {v.flavor || '—'}
+                      </div>
+                    ))}
+                  </div>
+                  <div className="bg-slate-950 border border-slate-800 rounded p-3">
+                    <span className="text-slate-500 block mb-1">Images / Ingredients / Attributes</span>
+                    <div className="text-slate-300 truncate">Primary: {detailProduct.primaryImage || 'None'}</div>
+                    <div className="text-slate-300">Ingredients: {detailProduct.ingredients.join(', ') || 'Not supplied by source'}</div>
+                    <div className="text-slate-400 mt-1">SEO approved: {detailProduct.seo.isApproved ? 'Yes' : 'No'}</div>
+                  </div>
+                </div>
+              </div>
+
               {/* SOURCE COMPARISON MATRIX */}
               <div className="space-y-3">
-                <h3 className="font-bold text-white text-sm">Source Comparison Matrix</h3>
+                <h3 className="font-bold text-white text-sm">Source Comparison</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  {(['reference', 'repoA', 'repoB'] as const).map((key) => {
+                    const provenance = detailProduct.sourceProvenance?.[key];
+                    const label = key === 'reference' ? 'Reference Website' : key === 'repoA' ? 'Repository A' : 'Repository B';
+                    return (
+                      <div key={key} className="bg-slate-950 border border-slate-800 rounded p-3 space-y-1">
+                        <span className="font-semibold text-white">{label}</span>
+                        <div className="text-slate-400 truncate">URL: {provenance?.sourceUrl || '—'}</div>
+                        <div className="text-slate-400 truncate">File: {provenance?.sourceFile || '—'}</div>
+                        <div className="text-slate-400">Timestamp: {provenance?.timestamp || '—'}</div>
+                        <div className="text-slate-500 font-mono break-all">Hash: {provenance?.hash || '—'}</div>
+                      </div>
+                    );
+                  })}
+                </div>
                 <div className="bg-slate-950 border border-slate-800 rounded-lg overflow-x-auto">
                   <table className="w-full text-left text-xs">
                     <thead className="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">

@@ -144,6 +144,14 @@ export default function MasterCatalogueImportAdminPage() {
               Admin Operations
             </Link>
             <span>/</span>
+            <Link href={`/${locale}/admin/catalogue/review`} className="hover:text-[#121212]">
+              Catalogue Review Center
+            </Link>
+            <span>/</span>
+            <Link href={`/${locale}/admin/catalogue/adjudication`} className="hover:text-[#121212]">
+              Adjudication
+            </Link>
+            <span>/</span>
             <span className="text-[#121212] font-semibold">Master Catalogue Import</span>
           </nav>
           <div className="flex items-center gap-3">

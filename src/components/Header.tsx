@@ -27,9 +27,10 @@ export default function Header() {
 
   return (
     <>
+      <div className="sticky top-0 z-40">
       <AnnouncementBar />
 
-      <header className="sticky top-0 z-40 bg-[#FBFBF9]/95 backdrop-blur-md border-b border-[#E5E3DD]">
+      <header className="bg-[#FBFBF9]/95 backdrop-blur-md border-b border-[#E5E3DD]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Left: Mobile Menu Toggle & Brand */}
@@ -91,19 +92,19 @@ export default function Header() {
                 <span>Architecture</span>
               </Link>
 
-              {/* Search Button */}
+              {/* Search — desktop only; mobile uses the bottom nav */}
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="p-2 text-[#5C5852] hover:text-[#121212] transition"
+                className="hidden lg:inline-flex p-2 text-[#5C5852] hover:text-[#121212] transition"
                 aria-label="Search catalog"
               >
                 <Search className="w-5 h-5" />
               </button>
 
-              {/* User Account Link */}
+              {/* Account — desktop only; mobile uses the bottom nav */}
               <Link
                 href={`/${locale}/account`}
-                className="p-2 text-[#5C5852] hover:text-[#121212] transition"
+                className="hidden lg:inline-flex p-2 text-[#5C5852] hover:text-[#121212] transition"
                 aria-label="Customer Account Portal"
                 title="Customer Account"
               >
@@ -124,10 +125,10 @@ export default function Header() {
                 )}
               </Link>
 
-              {/* Cart Drawer Trigger */}
+              {/* Cart — desktop only; mobile uses the bottom nav */}
               <button
                 onClick={() => setIsCartOpen(true)}
-                className="flex items-center gap-2 px-3 py-2 text-[#121212] hover:text-[#4A5D4E] transition rounded-lg hover:bg-neutral-100"
+                className="hidden lg:flex items-center gap-2 px-3 py-2 text-[#121212] hover:text-[#4A5D4E] transition rounded-lg hover:bg-neutral-100"
                 aria-label={`Open shopping cart, ${cartCount} items`}
               >
                 <div className="relative">
@@ -178,6 +179,7 @@ export default function Header() {
           </div>
         )}
       </header>
+      </div>
 
       {/* Global Search Modal */}
       <SearchModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />

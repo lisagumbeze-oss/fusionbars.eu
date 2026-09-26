@@ -43,6 +43,7 @@ import { ProductPublicationGuard } from '@/domain/catalog/ProductPublicationGuar
 import { MasterCatalogueImportService } from '@/domain/import/MasterCatalogueImportService';
 import { DeterministicMatchingEngine } from '@/domain/import/DeterministicMatchingEngine';
 import { CatalogueReviewService } from '@/domain/catalog/CatalogueReviewService';
+import { CatalogueAdjudicationService } from '@/domain/catalog/CatalogueAdjudicationService';
 
 export interface TestResult {
   name: string;
@@ -1779,15 +1780,24 @@ export class DomainTestSuite {
     // TEST 72: Missing DB Configuration Gate
     // ----------------------------------------------------
     await run('Missing DB Configuration Gate', 'Should return BLOCKED status when database credentials are not supplied', async () => {
-      const dummyEmptyConfig: any = {
-        database: { url: '', directUrl: '', isPooled: false },
-      };
-      const check = await LaunchReadinessService.checkDatabase(dummyEmptyConfig);
-      if (check.status !== 'BLOCKED') {
-        throw new Error(`Expected status BLOCKED for missing DATABASE_URL, received: ${check.status}`);
-      }
-      if (check.severity !== 'MANDATORY') {
-        throw new Error('Database check must be classified as MANDATORY severity');
+      const origDb = process.env.DATABASE_URL;
+      const origDirect = process.env.DIRECT_URL;
+      try {
+        process.env.DATABASE_URL = '';
+        process.env.DIRECT_URL = '';
+        const dummyEmptyConfig: any = {
+          database: { url: '', directUrl: '', isPooled: false },
+        };
+        const check = await LaunchReadinessService.checkDatabase(dummyEmptyConfig);
+        if (check.status !== 'BLOCKED') {
+          throw new Error(`Expected status BLOCKED for missing DATABASE_URL, received: ${check.status}`);
+        }
+        if (check.severity !== 'MANDATORY') {
+          throw new Error('Database check must be classified as MANDATORY severity');
+        }
+      } finally {
+        process.env.DATABASE_URL = origDb;
+        process.env.DIRECT_URL = origDirect;
       }
     });
 
@@ -2585,6 +2595,411 @@ export class DomainTestSuite {
       const afterProduct = CatalogueReviewService.getProductDetail(product.canonicalSlug);
       if (afterProduct?.originalSourceContent !== product.originalSourceContent) {
         throw new Error('Original source content on the review working copy must stay intact');
+      }
+    });
+
+    // ----------------------------------------------------
+    // CATALOGUE ADJUDICATION WORKSPACE (17 GOVERNANCE TESTS)
+    // ----------------------------------------------------
+    const adjActor = {
+      actor: 'qa.adjudication.officer@fusionbars.eu',
+      actorRole: 'SUPER_ADMIN' as const,
+    };
+
+    const resetAdjudication = () => {
+      CatalogueReviewService.resetStateForTests();
+      CatalogueAdjudicationService.resetStateForTests();
+    };
+
+    const requireAdjProduct = (slug = 'fusion-bar-almond-crush') => {
+      const product = CatalogueReviewService.getProductDetail(slug);
+      if (!product) throw new Error(`Expected adjudication product ${slug}`);
+      return product;
+    };
+
+    await run('Catalogue Adjudication', 'Review assignment', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      const result = CatalogueAdjudicationService.assignReviewer({
+        productSlug: product.canonicalSlug,
+        role: 'CONTENT_MANAGER',
+        ...adjActor,
+      });
+      if (!result.success) throw new Error(result.error || 'Assignment failed');
+      const state = CatalogueAdjudicationService.getState();
+      if (state.assignments[product.canonicalSlug]?.role !== 'CONTENT_MANAGER') {
+        throw new Error('Assignment must persist assignee role');
+      }
+      const audit = state.auditTrail.find((a) => a.action === 'REVIEW_ASSIGNED');
+      if (!audit || audit.actor !== adjActor.actor) throw new Error('Assignment must be audited with actor');
+    });
+
+    await run('Catalogue Adjudication', 'Review batching', () => {
+      resetAdjudication();
+      CatalogueAdjudicationService.setBatchSize(5);
+      const batch = CatalogueAdjudicationService.getBatch('PRICING', 5);
+      if (batch.batchSize !== 5) throw new Error('Batch size must be 5');
+      if (batch.items.length > 5) throw new Error('Batch must not exceed requested size');
+      const offsetBefore = batch.offset;
+      const next = CatalogueAdjudicationService.advanceBatch('PRICING');
+      const after = CatalogueAdjudicationService.getBatch('PRICING');
+      if (after.offset !== next) throw new Error('Batch cursor must advance and persist');
+      if (after.batchSize !== 5) throw new Error('Batch size must remain after navigation');
+      if (offsetBefore === after.offset && batch.total > 5) {
+        throw new Error('Expected batch cursor to move when more than one page exists');
+      }
+    });
+
+    await run('Catalogue Adjudication', 'Field decision persistence', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      const fieldName = product.fieldComparisons.find((c) => c.hasConflict)?.fieldName || product.fieldComparisons[0]?.fieldName || 'name';
+      const result = CatalogueAdjudicationService.adjudicateFieldConflict({
+        productSlug: product.canonicalSlug,
+        fieldName,
+        choice: 'KEEP_CURRENT_EU',
+        reason: 'Adjudication field kept as current EU working value',
+        ...adjActor,
+      });
+      if (!result.success) throw new Error(result.error || 'Field adjudication failed');
+      const reloaded = CatalogueReviewService.getProductDetail(product.canonicalSlug);
+      if (!reloaded?.fieldDecisions[fieldName]) throw new Error('Field decision must persist on review product');
+      const record = CatalogueAdjudicationService.getState().records[`DUPLICATE_CONFLICTS:${product.canonicalSlug}`];
+      if (record?.status !== 'APPROVED') throw new Error('Duplicate-conflict record must become APPROVED');
+    });
+
+    await run('Catalogue Adjudication', 'Merge approval', () => {
+      resetAdjudication();
+      const group = CatalogueAdjudicationService.getMatchGroups()[0];
+      if (!group) throw new Error('Expected at least one possible-match group');
+      const denied = CatalogueAdjudicationService.adjudicatePossibleMatch({
+        groupId: group.id,
+        decision: 'MERGE',
+        confirmMerge: false,
+        reason: 'Attempt without confirmation',
+        ...adjActor,
+      });
+      if (denied.success) throw new Error('MERGE without confirmation must fail');
+      const result = CatalogueAdjudicationService.adjudicatePossibleMatch({
+        groupId: group.id,
+        decision: 'MERGE',
+        confirmMerge: true,
+        reason: 'Confirmed human merge of possible match group',
+        ...adjActor,
+      });
+      if (!result.success || result.group?.decision !== 'MERGE') throw new Error(result.error || 'Merge failed');
+      const audit = CatalogueAdjudicationService.getAuditTrail().find((a) => a.action === 'MATCH_MERGED');
+      if (!audit) throw new Error('MATCH_MERGED audit missing');
+    });
+
+    await run('Catalogue Adjudication', 'Keep-separate approval', () => {
+      resetAdjudication();
+      const group = CatalogueAdjudicationService.getMatchGroups()[0];
+      if (!group) throw new Error('Expected possible-match group');
+      const denied = CatalogueAdjudicationService.adjudicatePossibleMatch({
+        groupId: group.id,
+        decision: 'KEEP_SEPARATE',
+        ...adjActor,
+      });
+      if (denied.success) throw new Error('KEEP_SEPARATE without reason must fail');
+      const result = CatalogueAdjudicationService.adjudicatePossibleMatch({
+        groupId: group.id,
+        decision: 'KEEP_SEPARATE',
+        reason: 'Distinct SKUs and source identities must remain separate',
+        ...adjActor,
+      });
+      if (!result.success || result.group?.decision !== 'KEEP_SEPARATE') {
+        throw new Error(result.error || 'Keep-separate failed');
+      }
+      const audit = CatalogueAdjudicationService.getAuditTrail().find((a) => a.action === 'MATCH_SEPARATED');
+      if (!audit?.reason.includes('Distinct SKUs')) throw new Error('Keep-separate reason must be audited');
+    });
+
+    await run('Catalogue Adjudication', 'Deferred state', () => {
+      resetAdjudication();
+      const group = CatalogueAdjudicationService.getMatchGroups()[0];
+      if (!group) throw new Error('Expected possible-match group');
+      const result = CatalogueAdjudicationService.adjudicatePossibleMatch({
+        groupId: group.id,
+        decision: 'DEFER',
+        reason: 'Needs further source comparison',
+        ...adjActor,
+      });
+      if (!result.success || result.group?.status !== 'DEFERRED') throw new Error('Defer must set DEFERRED');
+      if (result.group?.decision === 'MERGE') throw new Error('DEFERRED must not be treated as MERGE approval');
+      const record = CatalogueAdjudicationService.getState().records[`POSSIBLE_MATCHES:${group.id}`];
+      if (record?.status !== 'DEFERRED') throw new Error('Queue record must remain DEFERRED, not APPROVED');
+    });
+
+    await run('Catalogue Adjudication', 'Compliance decision', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      const result = CatalogueAdjudicationService.adjudicateCompliance({
+        productSlug: product.canonicalSlug,
+        classification: 'REQUIRES_REVIEW',
+        reason: 'Human compliance officer retained REQUIRES_REVIEW; no auto-approval from source presence',
+        ...adjActor,
+      });
+      if (!result.success) throw new Error(result.error || 'Compliance adjudication failed');
+      const after = CatalogueReviewService.getProductDetail(product.canonicalSlug);
+      if (after?.complianceClassification !== 'REQUIRES_REVIEW') {
+        throw new Error('Compliance classification must persist human decision');
+      }
+      const blocked = CatalogueAdjudicationService.adjudicateCompliance({
+        productSlug: product.canonicalSlug,
+        classification: 'BLOCKED',
+        reason: 'Explicit compliance block',
+        ...adjActor,
+      });
+      if (!blocked.success) throw new Error(blocked.error || 'Compliance block failed');
+      const audit = CatalogueAdjudicationService.getAuditTrail().find((a) => a.action === 'COMPLIANCE_BLOCKED');
+      if (!audit) throw new Error('COMPLIANCE_BLOCKED audit missing');
+    });
+
+    await run('Catalogue Adjudication', 'Country decision', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      const denied = CatalogueAdjudicationService.adjudicateCountry({
+        productSlug: product.canonicalSlug,
+        countryCode: 'NL',
+        status: 'BLOCKED',
+        ...adjActor,
+      });
+      if (denied.success) throw new Error('BLOCKED country without reason must fail');
+      const result = CatalogueAdjudicationService.adjudicateCountry({
+        productSlug: product.canonicalSlug,
+        countryCode: 'NL',
+        status: 'RESTRICTED',
+        reason: 'Internal restriction pending local counsel review',
+        ...adjActor,
+      });
+      if (!result.success) throw new Error(result.error || 'Country adjudication failed');
+      const after = CatalogueReviewService.getProductDetail(product.canonicalSlug);
+      if (after?.countryAvailability.NL !== 'RESTRICTED') throw new Error('Country status must persist');
+      const audit = CatalogueAdjudicationService.getAuditTrail().find((a) => a.action === 'COUNTRY_CHANGED');
+      if (!audit) throw new Error('COUNTRY_CHANGED audit missing');
+    });
+
+    await run('Catalogue Adjudication', 'Content rewrite', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      const original = product.originalSourceContent;
+      const result = CatalogueAdjudicationService.adjudicateContent({
+        productSlug: product.canonicalSlug,
+        action: 'REWRITE',
+        rewrittenContent: 'Approved European storefront copy without therapeutic claims.',
+        reason: 'Rewrote storefront copy; raw source preserved',
+        ...adjActor,
+      });
+      if (!result.success) throw new Error(result.error || 'Content rewrite failed');
+      const after = CatalogueReviewService.getProductDetail(product.canonicalSlug);
+      if (after?.originalSourceContent !== original) throw new Error('Raw source content must stay immutable');
+      if (after?.approvedStoreContent !== 'Approved European storefront copy without therapeutic claims.') {
+        throw new Error('Approved storefront content must store the rewrite');
+      }
+      const audit = CatalogueAdjudicationService.getAuditTrail().find((a) => a.action === 'CONTENT_REWRITTEN');
+      if (!audit) throw new Error('CONTENT_REWRITTEN audit missing');
+    });
+
+    await run('Catalogue Adjudication', 'Translation approval', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      CatalogueAdjudicationService.adjudicateContent({
+        productSlug: product.canonicalSlug,
+        action: 'APPROVE',
+        reason: 'Approve English storefront before translations',
+        ...adjActor,
+      });
+      const empty = CatalogueAdjudicationService.approveTranslation({
+        productSlug: product.canonicalSlug,
+        locale: 'de',
+        reason: 'Attempt empty approval',
+        ...adjActor,
+      });
+      if (empty.success) throw new Error('Empty/machine translation must not auto-approve');
+      CatalogueAdjudicationService.saveTranslationDraft({
+        productSlug: product.canonicalSlug,
+        locale: 'de',
+        value: 'Genehmigter deutscher Storefront-Text.',
+        ...adjActor,
+      });
+      const draftStatus = CatalogueAdjudicationService.getState().translations[product.canonicalSlug]?.locales.de.status;
+      if (draftStatus !== 'DRAFT') throw new Error('Saved translation must be DRAFT, not APPROVED');
+      const approved = CatalogueAdjudicationService.approveTranslation({
+        productSlug: product.canonicalSlug,
+        locale: 'de',
+        reason: 'Human approved German translation',
+        ...adjActor,
+      });
+      if (!approved.success) throw new Error(approved.error || 'Translation approval failed');
+      if (CatalogueAdjudicationService.getState().translations[product.canonicalSlug]?.locales.de.status !== 'APPROVED') {
+        throw new Error('Human approval must set APPROVED');
+      }
+    });
+
+    await run('Catalogue Adjudication', 'Media decision', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      const asset = product.mediaAssets[0];
+      if (!asset) throw new Error('Expected media asset');
+      const urlBefore = asset.url;
+      const result = CatalogueAdjudicationService.adjudicateMedia({
+        productSlug: product.canonicalSlug,
+        mediaId: asset.id,
+        action: 'SET_PRIMARY',
+        reason: 'Set primary without deleting raw media',
+        ...adjActor,
+      });
+      if (!result.success) throw new Error(result.error || 'Media adjudication failed');
+      const after = CatalogueReviewService.getProductDetail(product.canonicalSlug)?.mediaAssets.find((m) => m.id === asset.id);
+      if (!after || after.url !== urlBefore) throw new Error('Raw media URL must remain');
+      const audit = CatalogueAdjudicationService.getAuditTrail().find((a) => a.action === 'MEDIA_APPROVED');
+      if (!audit) throw new Error('MEDIA_APPROVED audit missing');
+    });
+
+    await run('Catalogue Adjudication', 'Publication readiness', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      const notReady = CatalogueAdjudicationService.markReadyForPublication({
+        productSlug: product.canonicalSlug,
+        reason: 'Attempt readiness without gates',
+        ...adjActor,
+      });
+      if (notReady.success) throw new Error('Incomplete products must not become READY_FOR_PUBLICATION');
+      if (!notReady.error?.includes('NOT_READY')) throw new Error('Readiness failure must report NOT_READY');
+    });
+
+    await run('Catalogue Adjudication', 'Two-step publication', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      const nonAdmin = CatalogueAdjudicationService.publishFinal({
+        productSlug: product.canonicalSlug,
+        actor: adjActor.actor,
+        actorRole: 'CATALOG_MANAGER',
+        reason: 'Catalog manager publish attempt',
+        confirm: true,
+      });
+      if (nonAdmin.success) throw new Error('Only SUPER_ADMIN may final-publish');
+      const unconfirmed = CatalogueAdjudicationService.publishFinal({
+        productSlug: product.canonicalSlug,
+        reason: 'No confirm',
+        confirm: false,
+        ...adjActor,
+      });
+      if (unconfirmed.success) throw new Error('Publication requires confirmation');
+      const notReady = CatalogueAdjudicationService.publishFinal({
+        productSlug: product.canonicalSlug,
+        reason: 'Skip ready gate',
+        confirm: true,
+        ...adjActor,
+      });
+      if (notReady.success) throw new Error('Must not publish without READY_FOR_PUBLICATION');
+      if (CatalogueAdjudicationService.getState().published.includes(product.canonicalSlug)) {
+        throw new Error('Incomplete product must not appear in published list');
+      }
+    });
+
+    await run('Catalogue Adjudication', 'Preview isolation', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      const preview = CatalogueAdjudicationService.getPreview({
+        productSlug: product.canonicalSlug,
+        locale: 'fr',
+        currency: 'GBP',
+        countryCode: 'DE',
+      });
+      if (!preview || preview.isolated !== true) throw new Error('Preview must be isolated from live storefront');
+      if (preview.locale !== 'fr' || preview.currency !== 'GBP' || preview.countryCode !== 'DE') {
+        throw new Error('Preview must reflect selected locale/currency/country');
+      }
+      if (CatalogueReviewService.getProductDetail(product.canonicalSlug)?.publicationStatus === 'PUBLISHED') {
+        throw new Error('Preview must not publish the product');
+      }
+    });
+
+    await run('Catalogue Adjudication', 'Bulk-action safety', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      const forbidden = CatalogueAdjudicationService.executeSafeBulk({
+        action: 'PUBLISH',
+        productSlugs: [product.canonicalSlug],
+        reason: 'Forbidden bulk publish',
+        ...adjActor,
+      });
+      if (forbidden.success || (forbidden.affectedCount || 0) > 0) {
+        throw new Error('Bulk publish must be forbidden');
+      }
+      const compliance = CatalogueAdjudicationService.executeSafeBulk({
+        action: 'APPROVE_ALL_COMPLIANCE',
+        productSlugs: [product.canonicalSlug],
+        reason: 'Forbidden bulk compliance',
+        ...adjActor,
+      });
+      if (compliance.success) throw new Error('Bulk approve-all-compliance must be forbidden');
+      const prices = CatalogueAdjudicationService.executeSafeBulk({
+        action: 'ASSIGN_EUR_PRICES',
+        productSlugs: [product.canonicalSlug],
+        reason: 'Forbidden bulk EUR',
+        ...adjActor,
+      });
+      if (prices.success) throw new Error('Bulk EUR price assignment must be forbidden');
+      const safe = CatalogueAdjudicationService.executeSafeBulk({
+        action: 'ASSIGN_REVIEWER',
+        productSlugs: [product.canonicalSlug],
+        assigneeRole: 'COMPLIANCE_MANAGER',
+        reason: 'Safe bulk assignment',
+        ...adjActor,
+      });
+      if (!safe.success || safe.affectedCount !== 1) throw new Error('Safe bulk assign reviewer must work');
+    });
+
+    await run('Catalogue Adjudication', 'Audit logging', () => {
+      resetAdjudication();
+      const product = requireAdjProduct();
+      CatalogueAdjudicationService.adjudicateCompliance({
+        productSlug: product.canonicalSlug,
+        classification: 'APPROVED',
+        reason: 'Audit-log verification compliance approval',
+        ...adjActor,
+      });
+      const audit = CatalogueAdjudicationService.getAuditTrail().find((a) => a.action === 'COMPLIANCE_APPROVED');
+      if (!audit) throw new Error('Audit entry missing');
+      if (audit.actor !== adjActor.actor) throw new Error('Audit must include actor');
+      if (!audit.timestamp) throw new Error('Audit must include timestamp');
+      if (audit.product !== product.canonicalSlug) throw new Error('Audit must include product');
+      if (audit.field !== 'complianceClassification') throw new Error('Audit must include field');
+      if (audit.afterValue !== 'APPROVED') throw new Error('Audit must include after value');
+      if (!audit.reason.includes('Audit-log')) throw new Error('Audit must include reason');
+    });
+
+    await run('Catalogue Adjudication', 'Raw-source immutability', () => {
+      resetAdjudication();
+      const importResult = MasterCatalogueImportService.getImportResult();
+      const rawBefore = JSON.stringify(
+        importResult.rawProducts.find((p) => p.sourceSlug === 'fusion-bar-almond-crush')
+      );
+      const product = requireAdjProduct();
+      CatalogueAdjudicationService.adjudicateContent({
+        productSlug: product.canonicalSlug,
+        action: 'REWRITE',
+        rewrittenContent: 'Adjudication rewrite must not touch raw import payloads.',
+        reason: 'Storefront rewrite only',
+        ...adjActor,
+      });
+      CatalogueAdjudicationService.adjudicatePricing({
+        productSlug: product.canonicalSlug,
+        decision: 'SET_EUR_PRICE',
+        priceEUR: 2999,
+        reason: 'Explicit EUR entry for immutability check',
+        ...adjActor,
+      });
+      const rawAfter = JSON.stringify(
+        MasterCatalogueImportService.getImportResult().rawProducts.find((p) => p.sourceSlug === 'fusion-bar-almond-crush')
+      );
+      if (rawBefore !== rawAfter) throw new Error('Raw import records must remain immutable during adjudication');
+      const after = CatalogueReviewService.getProductDetail(product.canonicalSlug);
+      if (after?.originalSourceContent !== product.originalSourceContent) {
+        throw new Error('originalSourceContent must remain immutable');
       }
     });
 

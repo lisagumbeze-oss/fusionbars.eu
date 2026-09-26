@@ -23,6 +23,13 @@ export interface Dictionary {
     cart: string;
     account: string;
   };
+  bottomBar: {
+    home: string;
+    shop: string;
+    search: string;
+    cart: string;
+    account: string;
+  };
   commerce: {
     addToCart: string;
     outOfStock: string;
@@ -69,6 +76,13 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       cart: 'Shopping Bag',
       account: 'Customer Account',
     },
+    bottomBar: {
+      home: 'Home',
+      shop: 'Shop',
+      search: 'Search',
+      cart: 'Bag',
+      account: 'Account',
+    },
     commerce: {
       addToCart: 'Add to Bag',
       outOfStock: 'Out of Stock',
@@ -112,6 +126,13 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       about: 'Über Fusion EU',
       cart: 'Warenkorb',
       account: 'Kundenkonto',
+    },
+    bottomBar: {
+      home: 'Start',
+      shop: 'Shop',
+      search: 'Suche',
+      cart: 'Korb',
+      account: 'Konto',
     },
     commerce: {
       addToCart: 'In den Warenkorb',
@@ -157,6 +178,13 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       cart: 'Panier',
       account: 'Mon Compte',
     },
+    bottomBar: {
+      home: 'Accueil',
+      shop: 'Boutique',
+      search: 'Recherche',
+      cart: 'Panier',
+      account: 'Compte',
+    },
     commerce: {
       addToCart: 'Ajouter au panier',
       outOfStock: 'Rupture de stock',
@@ -200,6 +228,13 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       about: 'Sobre Nosotros',
       cart: 'Cesta',
       account: 'Mi Cuenta',
+    },
+    bottomBar: {
+      home: 'Inicio',
+      shop: 'Tienda',
+      search: 'Buscar',
+      cart: 'Cesta',
+      account: 'Cuenta',
     },
     commerce: {
       addToCart: 'Añadir a la cesta',
@@ -245,6 +280,13 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       cart: 'Carrello',
       account: 'Il Mio Account',
     },
+    bottomBar: {
+      home: 'Home',
+      shop: 'Shop',
+      search: 'Cerca',
+      cart: 'Carrello',
+      account: 'Account',
+    },
     commerce: {
       addToCart: 'Aggiungi al carrello',
       outOfStock: 'Esaurito',
@@ -288,6 +330,13 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       about: 'Over Fusion EU',
       cart: 'Winkelmand',
       account: 'Mijn Account',
+    },
+    bottomBar: {
+      home: 'Home',
+      shop: 'Shop',
+      search: 'Zoeken',
+      cart: 'Tas',
+      account: 'Account',
     },
     commerce: {
       addToCart: 'In winkelmand',

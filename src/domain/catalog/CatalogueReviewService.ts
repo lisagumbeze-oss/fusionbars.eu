@@ -7,21 +7,20 @@ import {
   ComplianceClassification,
   CountryAvailabilityStatus,
   MinorUnits,
-  ProductStatus,
+  PurchaseEligibilityDecision,
   RoleName,
 } from '@/types';
 import {
   FieldComparison,
-  MatchedProductGroup,
   MatchConfidence,
   RawMediaRecordDomain,
   RawProductRecordDomain,
-  RawReviewRecordDomain,
   SourceType,
 } from '@/domain/import/types';
 import { MasterCatalogueImportService, MasterImportResult } from '@/domain/import/MasterCatalogueImportService';
-import { ProductPublicationGuard, ProductPublicationCheck } from '@/domain/catalog/ProductPublicationGuard';
+import { ProductPublicationGuard } from '@/domain/catalog/ProductPublicationGuard';
 import { ProductPurchaseEligibilityService } from '@/domain/catalog/ProductPurchaseEligibilityService';
+import { CurrencyService } from '@/domain/currency/CurrencyService';
 
 function getFs(): any {
   try {
@@ -41,6 +40,22 @@ function getPath(): any {
     }
   } catch {}
   return null;
+}
+
+function cloneJson<T>(value: T): T {
+  return value == null ? value : JSON.parse(JSON.stringify(value));
+}
+
+function scrubSecrets(value: any): any {
+  if (value == null) return value;
+  if (typeof value !== 'object') return value;
+  const blocked = /secret|password|token|apikey|api_key|iban|private[_-]?key|mnemonic/i;
+  if (Array.isArray(value)) return value.map(scrubSecrets);
+  const next: Record<string, any> = {};
+  for (const [key, val] of Object.entries(value)) {
+    next[key] = blocked.test(key) ? '[REDACTED]' : scrubSecrets(val);
+  }
+  return next;
 }
 
 export type ReviewQueueFilter =
@@ -115,6 +130,25 @@ export interface FieldDecisionRecord {
   reason: string;
 }
 
+export interface SourceProvenance {
+  sourceType: SourceType;
+  sourceUrl?: string | null;
+  sourceFile?: string | null;
+  timestamp?: string | null;
+  hash?: string | null;
+  recordId?: string | null;
+}
+
+export interface RetainedSourceMapping {
+  sourceType: SourceType;
+  sourceRecordId: string;
+  sourceSlug: string;
+  sourceUrl?: string | null;
+  sourceFile?: string | null;
+  sourceHash: string;
+  capturedAt?: string | null;
+}
+
 export interface ReviewProductItem {
   id: string;
   canonicalSlug: string;
@@ -129,17 +163,25 @@ export interface ReviewProductItem {
     repoA?: RawProductRecordDomain;
     repoB?: RawProductRecordDomain;
   };
+  sourceProvenance: {
+    reference?: SourceProvenance;
+    repoA?: SourceProvenance;
+    repoB?: SourceProvenance;
+  };
+  retainedSourceMappings: RetainedSourceMapping[];
   sourcePriceUSD?: number | null;
   sourceCurrency?: string | null;
-  priceEUR?: number | null; // minor units (cents)
-  priceGBP?: number | null; // minor units (pence)
+  priceEUR?: number | null;
+  priceGBP?: number | null;
   pricingReviewRequired: boolean;
   publicationStatus: 'DRAFT' | 'PENDING_REVIEW' | 'READY_TO_PUBLISH' | 'PUBLISHED' | 'BLOCKED';
   complianceClassification: ComplianceClassification;
+  complianceReason: string;
   reviewStatus: 'PENDING_REVIEW' | 'APPROVED' | 'REQUIRES_REVIEW' | 'BLOCKED';
   isWholesale: boolean;
   isCollaboration: boolean;
   isFlavourStandalone: boolean;
+  isUnresolvedDuplicate: boolean;
   flavourGroupParentCandidate?: string | null;
   variantStructureDecision?: VariantStructureOption | null;
   variants: Array<{
@@ -165,6 +207,7 @@ export interface ReviewProductItem {
     sourceTitle?: string | null;
     sourceDescription?: string | null;
     sourceCanonical?: string | null;
+    sourceStructuredData?: any;
     approvedTitle?: string | null;
     approvedDescription?: string | null;
     approvedCanonical?: string | null;
@@ -180,6 +223,8 @@ export interface ReviewProductItem {
   mediaAssets: Array<{
     id: string;
     url: string;
+    sourceUrl?: string | null;
+    sourceRepository?: string | null;
     isPrimary: boolean;
     format?: string | null;
     dimensions?: string | null;
@@ -263,30 +308,141 @@ export interface ReviewDashboardStats {
   translationReview: number;
 }
 
+export interface ReviewQueueSummaries {
+  requiringReview: string[];
+  possibleMatches: string[];
+  unresolvedDuplicates: string[];
+  pricingReview: string[];
+  complianceReview: string[];
+  categoryReview: string[];
+  contentReview: string[];
+  mediaReview: string[];
+  translationReview: string[];
+  readyToPublish: string[];
+  blocked: string[];
+  reviewDecisionsRecorded: number;
+}
+
+const REVIEW_COUNTRIES = ['NL', 'DE', 'FR', 'ES', 'IT', 'UK', 'BE', 'AT', 'IE', 'PT'];
+
+const FLAVOUR_STANDALONE_SLUGS = [
+  'almond-crush',
+  'birthday-cake',
+  'cookie-dough',
+  'horchata',
+  'ferrero-rocher',
+  'ferrari-rocher',
+  'matcha',
+];
+
+const WHOLESALE_KEYWORDS = [
+  '100-bars',
+  '50-stacks',
+  'wholesale',
+  'boutique-box',
+  'box-of-10',
+  'box-of-fusion',
+  '1000mg',
+  '2000-mg',
+  '10-bars',
+];
+
+const COLLAB_KEYWORDS = [
+  'laughing-gas',
+  'whole-melt',
+  'wholemelt',
+  'high-tolerance',
+  'collab',
+  'colaboration',
+];
+
+const SOURCE_LABEL_PATTERN = /live reference website|github repository/i;
+
+const POSSIBLE_MATCH_SLUG_HINTS = [
+  'ferrari-rocher',
+  'ferrero-rocher',
+  'laughing-gas',
+  'tremendous-laughing',
+  'em-and-ems',
+  'm-and-ms',
+  'kit-cats',
+  'kitkat',
+  'whole-melt',
+  'wholemelt',
+];
+
+function humanizeSlug(slug: string): string {
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function resolveImportedProductName(
+  rawRec: RawProductRecordDomain | undefined,
+  group: { canonicalName?: string; reconciledProduct?: { name?: string }; canonicalSlug: string },
+  slug: string
+): string {
+  const payloadName = rawRec?.rawPayload?.name;
+  if (typeof payloadName === 'string' && payloadName.trim() && !SOURCE_LABEL_PATTERN.test(payloadName)) {
+    return payloadName.trim();
+  }
+  const reconciled = group.reconciledProduct?.name;
+  if (reconciled && !SOURCE_LABEL_PATTERN.test(reconciled)) return reconciled;
+  if (group.canonicalName && !SOURCE_LABEL_PATTERN.test(group.canonicalName)) return group.canonicalName;
+  return humanizeSlug(slug);
+}
+
+function isPossibleMatchSlug(slug: string): boolean {
+  return POSSIBLE_MATCH_SLUG_HINTS.some((hint) => slug.includes(hint));
+}
+
+const CATEGORY_LABELS: Record<string, string> = {
+  'chocolate-bars': 'Mushroom Chocolate Bars',
+  'mushroom-chocolate-bars': 'Mushroom Chocolate Bars',
+  gummies: 'Magic Mushroom Gummies',
+  'botanical-gummies': 'Magic Mushroom Gummies',
+  collaborations: 'Official Collaborations',
+  specialty: 'General / Specialty',
+  vapes: 'Vaporizers & Disposables',
+  bulk: 'Wholesale & Boutique Boxes',
+  uncategorized: 'Uncategorized',
+};
+
 export class CatalogueReviewService {
   private static cachedState: CatalogueReviewState | null = null;
+  private static persistEnabled = true;
   private static readonly STATE_FILE_PATH = 'src/data/catalogue-review-state.json';
 
-  /**
-   * Evaluates the 12-point Publication Readiness Checklist for a product.
-   */
+  static setPersistenceEnabled(enabled: boolean): void {
+    this.persistEnabled = enabled;
+  }
+
+  static clearCache(): void {
+    this.cachedState = null;
+  }
+
+  static resetStateForTests(state?: CatalogueReviewState): CatalogueReviewState {
+    this.persistEnabled = false;
+    this.cachedState = state || this.initializeFromImport();
+    return this.cachedState;
+  }
+
   static evaluatePublicationReadiness(product: Partial<ReviewProductItem>): ReviewProductItem['readinessChecklist'] {
     const blockers: string[] = [];
 
-    // 1. VALID PRODUCT (non-empty slug and name)
     const validProduct = Boolean(product.canonicalSlug && product.name && product.name.trim().length > 0);
     if (!validProduct) blockers.push('Missing product name or canonical slug');
 
-    // 2. VALID VARIANT (at least 1 configured variant)
     const variants = product.variants || [];
     const validVariant = variants.length > 0;
     if (!validVariant) blockers.push('Product has zero configured variants');
 
-    // 3. VALID SKU (all variants have non-empty SKU)
-    const validSku = variants.length > 0 && variants.every((v) => Boolean(v.sku && v.sku.trim().length > 0));
+    const validSku =
+      variants.length > 0 && variants.every((v) => Boolean(v.sku != null && String(v.sku).trim().length > 0));
     if (!validSku) blockers.push('One or more variants are missing a valid SKU');
 
-    // 4. VALID PRICE (EUR price > 0 and pricingReviewRequired == false)
     const hasEurPrice = Boolean(product.priceEUR && product.priceEUR > 0);
     const variantsPriced = variants.length > 0 && variants.every((v) => Boolean(v.priceEUR && v.priceEUR > 0));
     const validPrice = hasEurPrice && variantsPriced && !product.pricingReviewRequired;
@@ -298,41 +454,42 @@ export class CatalogueReviewService {
       }
     }
 
-    // 5. VALID CATEGORY (valid normalized category slug)
-    const validCategory = Boolean(product.categorySlug && product.categorySlug !== 'uncategorized');
+    const validCategory = Boolean(
+      product.categorySlug && product.categorySlug !== 'uncategorized' && product.categorySlug !== 'specialty'
+    );
     if (!validCategory) blockers.push('Category mapping unapproved or unassigned');
 
-    // 6. PRIMARY IMAGE (must possess a valid primary presentation image)
     const primaryImage = Boolean(
       product.primaryImage &&
-      product.primaryImage.trim().length > 0 &&
-      !product.primaryImage.includes('broken')
+        product.primaryImage.trim().length > 0 &&
+        !product.primaryImage.includes('broken')
     );
     if (!primaryImage) blockers.push('Missing valid primary image asset');
 
-    // 7. CONTENT APPROVED (content moderation is APPROVED)
     const contentApproved = product.contentModerationStatus === 'APPROVED';
     if (!contentApproved) blockers.push('Store content is not approved or flagged for claims rewrite');
 
-    // 8. COMPLIANCE APPROVED (classification is APPROVED, not REQUIRES_REVIEW or BLOCKED)
     const complianceApproved = product.complianceClassification === 'APPROVED';
-    if (!complianceApproved) blockers.push(`European compliance status is ${product.complianceClassification || 'REQUIRES_REVIEW'}`);
+    if (!complianceApproved) {
+      blockers.push(`European compliance status is ${product.complianceClassification || 'REQUIRES_REVIEW'}`);
+    }
 
-    // 9. COUNTRY AVAILABILITY (at least one country AVAILABLE and not blocked)
     const countries = product.countryAvailability || {};
     const availableCount = Object.values(countries).filter((s) => s === 'AVAILABLE').length;
     const countryAvailability = availableCount > 0;
-    if (!countryAvailability) blockers.push('Country distribution matrix not configured with authorized destinations');
+    if (!countryAvailability) {
+      blockers.push('Country distribution matrix not configured with authorized destinations');
+    }
 
-    // 10. TRANSLATION (description and title present in default store language)
-    const translation = Boolean(product.description && product.description.trim().length >= 10);
+    const translation = Boolean(
+      (product.approvedStoreContent && product.approvedStoreContent.trim().length >= 10) ||
+        (product.contentModerationStatus === 'APPROVED' && product.description && product.description.trim().length >= 10)
+    );
     if (!translation) blockers.push('Localized European store descriptions are missing');
 
-    // 11. SEO (approved SEO title and description)
     const seo = Boolean(product.seo?.isApproved && product.seo?.approvedTitle);
     if (!seo) blockers.push('SEO metadata has not received editorial clearance');
 
-    // 12. INVENTORY (at least one variant stock >= 0 and configured)
     const inventory = variants.length > 0 && variants.some((v) => v.stockLevel !== undefined && v.stockLevel >= 0);
     if (!inventory) blockers.push('Warehouse stock allocation not verified');
 
@@ -368,9 +525,6 @@ export class CatalogueReviewService {
     };
   }
 
-  /**
-   * Returns the current catalogue review state from cache or disk.
-   */
   static getState(): CatalogueReviewState {
     if (this.cachedState) {
       return this.cachedState;
@@ -378,7 +532,7 @@ export class CatalogueReviewService {
 
     const fs = getFs();
     const path = getPath();
-    if (fs && path) {
+    if (this.persistEnabled && fs && path) {
       const fullPath = path.resolve(process.cwd(), this.STATE_FILE_PATH);
       if (fs.existsSync(fullPath)) {
         try {
@@ -394,192 +548,237 @@ export class CatalogueReviewService {
       }
     }
 
-    // Initialize from MasterCatalogueImportService
     this.cachedState = this.initializeFromImport();
     this.persistState();
     return this.cachedState!;
   }
 
-  /**
-   * Initializes initial review state from import result while preserving raw source provenance.
-   */
+  private static buildProvenance(record?: RawProductRecordDomain): SourceProvenance | undefined {
+    if (!record) return undefined;
+    return {
+      sourceType: record.sourceType,
+      sourceUrl: record.sourcePermalink || record.sourceCanonicalUrl || null,
+      sourceFile: record.sourceFilePath || null,
+      timestamp: record.capturedAt || record.sourceModifiedDate || record.sourcePublishedDate || null,
+      hash: record.sourceHash || null,
+      recordId: record.id || record.recordCode || record.sourceRecordId || null,
+    };
+  }
+
+  private static buildSourceMappings(sources: ReviewProductItem['sources']): RetainedSourceMapping[] {
+    return (['reference', 'repoA', 'repoB'] as const)
+      .map((key) => sources[key])
+      .filter((record): record is RawProductRecordDomain => Boolean(record))
+      .map((record) => ({
+        sourceType: record.sourceType,
+        sourceRecordId: record.id || record.recordCode || record.sourceRecordId || record.sourceSlug,
+        sourceSlug: record.sourceSlug,
+        sourceUrl: record.sourcePermalink || record.sourceCanonicalUrl || null,
+        sourceFile: record.sourceFilePath || null,
+        sourceHash: record.sourceHash,
+        capturedAt: record.capturedAt || null,
+      }));
+  }
+
+  private static detectContentFlags(text: string): string[] {
+    const contentFlags: string[] = [];
+    const lowerText = text.toLowerCase();
+
+    if (/\b(treat|cure|heal|medicine|therapeutic)\b/.test(lowerText)) contentFlags.push('THERAPEUTIC_CLAIM');
+    if (/\b(health|wellness|boost immune|immune system)\b/.test(lowerText)) contentFlags.push('HEALTH_CLAIM');
+    if (/\b(trip|psychedelic|psilocybin|hallucin)\b/.test(lowerText)) contentFlags.push('PSYCHOACTIVE_CLAIM');
+    if (/\b(dose|dosage|microdose|intake|serving)\b/.test(lowerText)) contentFlags.push('DOSAGE_INSTRUCTIONS');
+    if (/\b(euphoric|body high|intense effect|elevat(?:e|es|ing) mood)\b/.test(lowerText)) contentFlags.push('EFFECT_CLAIM');
+    if (/\b(fda|legal in all|certified organic|lab tested 100%)\b/.test(lowerText)) {
+      contentFlags.push('UNSUPPORTED_REGULATORY_OR_LAB_CLAIM');
+    }
+    return contentFlags;
+  }
+
+  private static parseIngredients(source?: string | null): string[] {
+    if (!source || !source.trim()) return [];
+    return source
+      .split(/[,;•\n]/)
+      .map((part) => part.trim())
+      .filter((part) => part.length > 1 && part.length < 80)
+      .slice(0, 16);
+  }
+
+  private static defaultCountryAvailability(): Record<string, CountryAvailabilityStatus> {
+    return Object.fromEntries(REVIEW_COUNTRIES.map((code) => [code, 'NOT_CONFIGURED' as CountryAvailabilityStatus]));
+  }
+
+  private static resolveCategoryName(slug: string): string {
+    return CATEGORY_LABELS[slug] || slug;
+  }
+
+  private static attachMedia(
+    slug: string,
+    rawRec: RawProductRecordDomain | undefined,
+    importResult: MasterImportResult,
+    primaryFallback: string
+  ): ReviewProductItem['mediaAssets'] {
+    const related = importResult.rawMedia.filter((media) => {
+      if (rawRec && media.rawProductId && media.rawProductId === rawRec.id) return true;
+      if (rawRec && media.originalUrl && rawRec.sourcePrimaryImage === media.originalUrl) return true;
+      if (rawRec && media.originalUrl && rawRec.sourceGalleryImages?.includes(media.originalUrl)) return true;
+      return false;
+    });
+
+    const sourceImages = [
+      rawRec?.sourcePrimaryImage,
+      ...(rawRec?.sourceGalleryImages || []),
+    ].filter((url): url is string => Boolean(url));
+
+    const uniqueUrls = Array.from(new Set([...related.map((m) => m.originalUrl), ...sourceImages, primaryFallback].filter(Boolean)));
+
+    return uniqueUrls.map((url, idx) => {
+      const match: RawMediaRecordDomain | undefined = related.find((m) => m.originalUrl === url);
+      const broken = match?.dedupStatus === 'BROKEN' || match?.dedupStatus === 'MISSING';
+      return {
+        id: match?.id || `MEDIA-${slug}-${idx + 1}`,
+        url,
+        sourceUrl: match?.sourcePageUrl || rawRec?.sourcePermalink || url,
+        sourceRepository: match?.sourceType || rawRec?.sourceType || null,
+        isPrimary: idx === 0 && !broken,
+        format: match?.format || (url.endsWith('.png') ? 'PNG' : url.endsWith('.webp') ? 'WEBP' : 'JPEG'),
+        dimensions: match?.width && match?.height ? `${match.width}x${match.height}` : null,
+        hash: match?.fileHash || MasterCatalogueImportService.generateHash(url),
+        duplicateStatus: match?.dedupStatus || 'UNIQUE',
+        status: broken ? ('BROKEN' as const) : idx === 0 ? ('PRIMARY' as const) : ('KEEP' as const),
+      };
+    });
+  }
+
   private static initializeFromImport(): CatalogueReviewState {
     const importResult: MasterImportResult = MasterCatalogueImportService.getImportResult();
     const products: Record<string, ReviewProductItem> = {};
 
-    const FLAVOUR_STANDALONE_SLUGS = [
-      'almond-crush',
-      'birthday-cake',
-      'cookie-dough',
-      'horchata',
-      'ferrero-rocher',
-      'matcha',
-    ];
-
-    const WHOLESALE_KEYWORDS = [
-      '100-bars',
-      '50-stacks',
-      'wholesale',
-      'boutique-box',
-      'box-of-10',
-      'box-of-fusion',
-    ];
-
-    const COLLAB_KEYWORDS = [
-      'laughing-gas',
-      'whole-melt',
-      'high-tolerance',
-      'collab',
-    ];
-
     for (const group of importResult.matchedGroups) {
       const slug = group.canonicalSlug;
-      const ref = group.sources.reference;
-      const repoA = group.sources.repoA;
-      const repoB = group.sources.repoB;
-
+      const ref = cloneJson(group.sources.reference);
+      const repoA = cloneJson(group.sources.repoA);
+      const repoB = cloneJson(group.sources.repoB);
       const rawRec = ref || repoA || repoB;
-      const name = rawRec?.sourceName || group.reconciledProduct.name || slug;
-      const brand = rawRec?.sourceBrand || group.reconciledProduct.brand || 'Fusion Mushroom Bars';
+      const name = resolveImportedProductName(rawRec, group, slug);
+      const brand = rawRec?.sourceBrand || group.reconciledProduct.brand || '';
 
-      const isFlavourStandalone = FLAVOUR_STANDALONE_SLUGS.some((s) => slug.includes(s));
+      const isFlavourStandalone =
+        FLAVOUR_STANDALONE_SLUGS.some((s) => slug.includes(s)) ||
+        (/^fusion-bar-/.test(slug) && !WHOLESALE_KEYWORDS.some((k) => slug.includes(k)));
       const isWholesale = WHOLESALE_KEYWORDS.some((k) => slug.includes(k));
       const isCollaboration = COLLAB_KEYWORDS.some((k) => slug.includes(k));
 
-      // Flag claims in original text
-      const originalText = (rawRec?.sourceFullDescription || rawRec?.sourceShortDescription || '') + ' ' + (rawRec?.sourceEffects || '');
-      const contentFlags: string[] = [];
-      const lowerText = originalText.toLowerCase();
+      const originalText = [
+        rawRec?.sourceFullDescription,
+        rawRec?.sourceShortDescription,
+        rawRec?.sourceEffects,
+      ]
+        .filter(Boolean)
+        .join('\n\n');
+      const contentFlags = this.detectContentFlags(originalText);
 
-      if (lowerText.includes('treat') || lowerText.includes('cure') || lowerText.includes('heal') || lowerText.includes('medicine')) {
-        contentFlags.push('THERAPEUTIC_CLAIM');
-      }
-      if (lowerText.includes('health') || lowerText.includes('wellness') || lowerText.includes('boost immune')) {
-        contentFlags.push('HEALTH_CLAIM');
-      }
-      if (lowerText.includes('trip') || lowerText.includes('psychedelic') || lowerText.includes('psilocybin') || lowerText.includes('hallucin')) {
-        contentFlags.push('PSYCHOACTIVE_CLAIM');
-      }
-      if (lowerText.includes('gram') || lowerText.includes('dose') || lowerText.includes('microdose') || lowerText.includes('intake')) {
-        contentFlags.push('DOSAGE_INSTRUCTIONS');
-      }
-      if (lowerText.includes('euphoric') || lowerText.includes('body high') || lowerText.includes('intense effect')) {
-        contentFlags.push('EFFECT_CLAIM');
-      }
-      if (lowerText.includes('fda') || lowerText.includes('legal in all') || lowerText.includes('certified organic') || lowerText.includes('lab tested 100%')) {
-        contentFlags.push('UNSUPPORTED_REGULATORY_OR_LAB_CLAIM');
-      }
+      const existingEurPrice =
+        group.reconciledProduct.fusionEUR && group.reconciledProduct.fusionEUR > 0
+          ? Math.round(group.reconciledProduct.fusionEUR)
+          : null;
+      const existingGbpPrice =
+        group.reconciledProduct.fusionGBP && group.reconciledProduct.fusionGBP > 0
+          ? Math.round(group.reconciledProduct.fusionGBP)
+          : null;
+      const pricingReviewRequired = isWholesale || !existingEurPrice || existingEurPrice <= 0;
 
-      // Check EUR pricing (existing European catalogue preservation)
-      const existingEurPrice = group.reconciledProduct.fusionEUR ? group.reconciledProduct.fusionEUR * 100 : null;
-      const existingGbpPrice = group.reconciledProduct.fusionGBP ? group.reconciledProduct.fusionGBP * 100 : null;
-      const pricingReviewRequired = isWholesale || !existingEurPrice;
-
-      // Variants
+      const sourceSku = rawRec?.sourceSku != null ? String(rawRec.sourceSku) : '';
       const defaultVariant = {
         id: `VAR-${slug}-01`,
-        sku: rawRec?.sourceSku || `FB-EU-${slug.slice(0, 12).toUpperCase()}-01`,
+        sku: sourceSku,
         name: rawRec?.sourceFlavor || name,
-        flavor: rawRec?.sourceFlavor || group.reconciledProduct.flavor || 'Original Botanical',
+        flavor: rawRec?.sourceFlavor || group.reconciledProduct.flavor || '',
         priceEUR: existingEurPrice,
         priceGBP: existingGbpPrice,
-        stockLevel: 50,
-        image: group.reconciledProduct.primaryImage || rawRec?.sourcePrimaryImage || 'https://picsum.photos/seed/fusion-bar/800/800',
+        stockLevel: rawRec?.sourceStockQuantity ?? 0,
+        image: group.reconciledProduct.primaryImage || rawRec?.sourcePrimaryImage || '',
       };
 
-      // Compliance classification
-      let complianceClassification: ComplianceClassification = 'REQUIRES_REVIEW';
-      if (isCollaboration) {
-        complianceClassification = 'REQUIRES_REVIEW'; // Explicit authorization required for EU sale
-      }
+      const conflictingFields = (group.fieldComparisons || []).filter((c) => c.hasConflict);
+      const sourceCount = [ref, repoA, repoB].filter(Boolean).length;
+      const isPossibleMatch = group.confidence === 'POSSIBLE_MATCH' || isPossibleMatchSlug(slug);
+      const isUnresolvedDuplicate = sourceCount > 1 && conflictingFields.length > 0;
 
-      // Media assets
-      const mediaAssets = (rawRec?.sourceGalleryImages || [group.reconciledProduct.primaryImage]).filter(Boolean).map((imgUrl, idx) => ({
-        id: `MEDIA-${slug}-${idx + 1}`,
-        url: imgUrl,
-        isPrimary: idx === 0,
-        format: imgUrl.endsWith('.png') ? 'PNG' : imgUrl.endsWith('.webp') ? 'WEBP' : 'JPEG',
-        dimensions: '800x800',
-        hash: MasterCatalogueImportService.generateHash(imgUrl),
-        duplicateStatus: 'VERIFIED',
-        status: 'KEEP' as const,
-      }));
-
-      // Default country availability
-      const defaultCountryAvailability: Record<string, CountryAvailabilityStatus> = {
-        NL: 'AVAILABLE',
-        DE: 'AVAILABLE',
-        FR: 'RESTRICTED',
-        ES: 'RESTRICTED',
-        IT: 'RESTRICTED',
-        UK: 'RESTRICTED',
-        BE: 'AVAILABLE',
-        AT: 'AVAILABLE',
-      };
+      const sources = { reference: ref, repoA, repoB };
+      const mediaAssets = this.attachMedia(
+        slug,
+        rawRec,
+        importResult,
+        group.reconciledProduct.primaryImage || rawRec?.sourcePrimaryImage || ''
+      );
+      const primaryImage = mediaAssets.find((m) => m.isPrimary && m.status !== 'BROKEN')?.url || '';
 
       const item: ReviewProductItem = {
         id: group.duplicateGroupId || `REV-${slug}`,
         canonicalSlug: slug,
         name,
         brand,
-        categorySlug: group.reconciledProduct.categorySlug || 'mushroom-chocolate-bars',
-        categoryName: group.reconciledProduct.categorySlug === 'gummies' ? 'Magic Mushroom Gummies' : 'Mushroom Chocolate Bars',
-        sku: rawRec?.sourceSku || `FB-EU-${slug.slice(0, 14).toUpperCase()}`,
-        productType: group.reconciledProduct.productType || 'CHOCOLATE_BAR',
-        sources: {
-          reference: ref,
-          repoA,
-          repoB,
+        categorySlug: group.reconciledProduct.categorySlug || 'uncategorized',
+        categoryName: this.resolveCategoryName(group.reconciledProduct.categorySlug || 'uncategorized'),
+        sku: sourceSku,
+        productType: group.reconciledProduct.productType ? String(group.reconciledProduct.productType) : '',
+        sources,
+        sourceProvenance: {
+          reference: this.buildProvenance(ref),
+          repoA: this.buildProvenance(repoA),
+          repoB: this.buildProvenance(repoB),
         },
-        sourcePriceUSD: rawRec?.sourcePrice || 40,
-        sourceCurrency: rawRec?.sourceCurrency || 'USD',
+        retainedSourceMappings: this.buildSourceMappings(sources),
+        sourcePriceUSD: rawRec?.sourcePrice ?? null,
+        sourceCurrency: rawRec?.sourceCurrency ?? null,
         priceEUR: existingEurPrice,
         priceGBP: existingGbpPrice,
         pricingReviewRequired,
         publicationStatus: 'PENDING_REVIEW',
-        complianceClassification,
+        complianceClassification: 'REQUIRES_REVIEW',
+        complianceReason: isCollaboration
+          ? 'Collaboration line requires explicit European sale authorization.'
+          : isWholesale
+            ? 'Wholesale/bulk item requires pricing and compliance clearance.'
+            : 'Imported record awaits European catalogue and compliance review.',
         reviewStatus: 'PENDING_REVIEW',
         isWholesale,
         isCollaboration,
         isFlavourStandalone,
+        isUnresolvedDuplicate,
         flavourGroupParentCandidate: isFlavourStandalone ? 'fusion-artisan-mushroom-chocolate-bar' : null,
         variantStructureDecision: null,
         variants: [defaultVariant],
-        primaryImage: group.reconciledProduct.primaryImage || rawRec?.sourcePrimaryImage || 'https://picsum.photos/seed/fusion-bar/800/800',
+        primaryImage,
         galleryImages: rawRec?.sourceGalleryImages || [],
-        ingredients: [
-          'Organic Cacao Butter',
-          'Pure Cane Sugar',
-          'Whole Milk Powder',
-          'European Botanical Blend',
-          'Sunflower Lecithin',
-          'Bourbon Vanilla',
-        ],
-        attributes: {
-          Weight: rawRec?.sourceWeight || '6000mg',
-          Origin: 'European Union Handcrafted',
-          Purity: 'Third-Party Laboratory Verified',
-        },
-        description: rawRec?.sourceFullDescription || rawRec?.sourceShortDescription || 'Premium artisan botanical mushroom confectionery crafted exclusively for European connoisseurs.',
-        originalSourceContent: originalText || 'Original import text pending editor clearance.',
-        approvedStoreContent: 'European compliant botanical chocolate bar. Crafted under strict EU food safety standards.',
-        contentModerationStatus: contentFlags.length > 0 ? 'PENDING_REVIEW' : 'APPROVED',
+        ingredients: this.parseIngredients(rawRec?.sourceIngredients),
+        attributes: cloneJson(rawRec?.sourceAttributes || {}),
+        description: originalText,
+        originalSourceContent: originalText,
+        approvedStoreContent: '',
+        contentModerationStatus: 'PENDING_REVIEW',
         contentFlags,
         seo: {
-          sourceTitle: rawRec?.sourceSeoTitle || `${name} | Official Store`,
-          sourceDescription: rawRec?.sourceSeoDescription || `Buy genuine ${name} online in Europe. Discreet delivery.`,
-          sourceCanonical: rawRec?.sourceCanonicalUrl || `https://fusionbars.eu/products/${slug}`,
-          approvedTitle: `${name} | Fusion Mushroom Bars EU`,
-          approvedDescription: `Order authentic ${name} across Europe. Laboratory tested, discrete tracked shipping.`,
-          approvedCanonical: `https://fusionbars.eu/products/${slug}`,
+          sourceTitle: rawRec?.sourceSeoTitle || null,
+          sourceDescription: rawRec?.sourceSeoDescription || null,
+          sourceCanonical: rawRec?.sourceCanonicalUrl || null,
+          sourceStructuredData: rawRec?.rawPayload?.structuredData || rawRec?.rawPayload?.jsonLd || null,
+          approvedTitle: null,
+          approvedDescription: null,
+          approvedCanonical: null,
           isApproved: false,
         },
-        countryAvailability: defaultCountryAvailability,
+        countryAvailability: this.defaultCountryAvailability(),
         fieldDecisions: {},
-        fieldComparisons: group.fieldComparisons || [],
-        issueCount: (group.fieldComparisons?.filter((c) => c.hasConflict).length || 0) + (pricingReviewRequired ? 1 : 0) + (contentFlags.length > 0 ? 1 : 0),
+        fieldComparisons: cloneJson(group.fieldComparisons || []),
+        issueCount:
+          conflictingFields.length +
+          (pricingReviewRequired ? 1 : 0) +
+          (contentFlags.length > 0 ? 1 : 0) +
+          (isUnresolvedDuplicate ? 1 : 0),
         lastImported: importResult.generatedAt,
-        confidence: group.confidence,
+        confidence: isPossibleMatch ? 'POSSIBLE_MATCH' : group.confidence,
         requiresManualReview: group.requiresManualReview,
         mediaAssets,
         readinessChecklist: {
@@ -601,34 +800,35 @@ export class CatalogueReviewService {
       };
 
       item.readinessChecklist = this.evaluatePublicationReadiness(item);
+      if (item.readinessChecklist.isReadyToPublish) {
+        item.publicationStatus = 'READY_TO_PUBLISH';
+      }
       products[slug] = item;
     }
 
-    // Category reconciliation mappings
     const categoryMappings: CategoryMappingDecision[] = importResult.categoryReconciliation.map((c) => ({
       sourceCategoryName: c.sourceCategoryName,
       sourceCategorySlug: c.sourceCategorySlug,
       sourceType: c.sourceType,
       normalizedCategoryName: c.normalizedCategoryName,
       normalizedCategorySlug: c.normalizedCategorySlug,
-      approvalStatus: c.mappingStatus === 'EXACT' ? 'APPROVED' : 'PENDING',
-      actor: c.mappingStatus === 'EXACT' ? 'SYSTEM_SEED' : null,
-      timestamp: importResult.generatedAt,
+      approvalStatus: 'PENDING',
+      actor: null,
+      timestamp: null,
     }));
 
-    // Reviews (preserve STAGED status and all provenance)
     const reviews: ReviewModerationItem[] = importResult.rawReviews.map((r, idx) => ({
       id: r.id || `REV-MOD-${idx + 1}`,
       productId: r.rawProductId || 'PROD-UNKNOWN',
-      productSlug: 'fusion-artisan-mushroom-chocolate-bar',
+      productSlug: r.rawProductId || 'unassigned',
       sourceType: r.sourceType,
-      authorName: r.authorName || 'Anonymous Verified Purchaser',
-      rating: r.rating || 5,
+      authorName: r.authorName || '',
+      rating: r.rating || 0,
       body: r.body,
-      date: r.reviewDate || '2026-09-01',
-      isVerifiedBuyer: r.isVerifiedBuyer,
+      date: r.reviewDate || r.capturedAt || '',
+      isVerifiedBuyer: Boolean(r.isVerifiedBuyer),
       sourceUrl: r.sourceUrl,
-      moderationStatus: 'STAGED', // Kept invisible publicly
+      moderationStatus: 'STAGED',
     }));
 
     return {
@@ -639,7 +839,7 @@ export class CatalogueReviewService {
       reviews,
       auditTrail: [
         {
-          id: `AUDIT-INIT-001`,
+          id: 'AUDIT-INIT-001',
           action: 'PRODUCT_REVIEWED',
           actor: 'SYSTEM',
           actorRole: 'SYSTEM',
@@ -648,17 +848,14 @@ export class CatalogueReviewService {
           entityType: 'PRODUCT',
           beforeValue: null,
           afterValue: 'INITIALIZED_FROM_MASTER_IMPORT',
-          reason: 'Initial catalogue import ingested into Catalogue Review Center',
+          reason: 'Initial catalogue import ingested into Catalogue Review Center. No records published.',
         },
       ],
     };
   }
 
-  /**
-   * Persists the state to disk atomically.
-   */
   private static persistState(): boolean {
-    if (!this.cachedState) return false;
+    if (!this.cachedState || !this.persistEnabled) return false;
     this.cachedState.lastUpdated = new Date().toISOString();
 
     const fs = getFs();
@@ -679,9 +876,6 @@ export class CatalogueReviewService {
     return false;
   }
 
-  /**
-   * Computes dynamic dashboard review statistics across all products.
-   */
   static getDashboardStats(): ReviewDashboardStats {
     const state = this.getState();
     const products = Object.values(state.products);
@@ -705,7 +899,7 @@ export class CatalogueReviewService {
 
     for (const p of products) {
       if (p.reviewStatus === 'APPROVED') approved++;
-      if (p.reviewStatus === 'PENDING_REVIEW') pending++;
+      if (p.reviewStatus === 'PENDING_REVIEW' || p.reviewStatus === 'REQUIRES_REVIEW') pending++;
       if (p.reviewStatus === 'BLOCKED' || p.publicationStatus === 'BLOCKED') blocked++;
       if (p.publicationStatus === 'PUBLISHED') published++;
 
@@ -715,7 +909,7 @@ export class CatalogueReviewService {
         needsReview++;
       }
 
-      if (p.issueCount > 0) {
+      if (p.issueCount > 0 || p.reviewStatus === 'PENDING_REVIEW') {
         readyForReview++;
       }
 
@@ -731,11 +925,13 @@ export class CatalogueReviewService {
         possibleMatches++;
       }
 
-      if (p.fieldComparisons.some((c) => c.hasConflict)) {
-        conflicts++;
+      if (p.isUnresolvedDuplicate) {
+        unresolvedDuplicates++;
       }
 
-      if (p.mediaAssets.some((m) => m.status === 'BROKEN' || m.duplicateStatus === 'BROKEN')) {
+      conflicts += p.fieldComparisons.filter((c) => c.hasConflict).length;
+
+      if (p.mediaAssets.some((m) => m.status === 'BROKEN' || m.duplicateStatus === 'BROKEN' || m.duplicateStatus === 'MISSING')) {
         mediaIssues++;
       }
 
@@ -743,22 +939,22 @@ export class CatalogueReviewService {
         contentReview++;
       }
 
-      if (!p.description || p.description.length < 20) {
+      if (!p.approvedStoreContent || p.approvedStoreContent.trim().length < 10) {
         translationIssues++;
       }
     }
 
     return {
-      totalImportedUnique: products.length || 118,
-      totalRawRecords: importResult.counts.combined.rawRecords || 218,
+      totalImportedUnique: products.length,
+      totalRawRecords: importResult.rawProducts?.length || importResult.counts.combined.rawRecords,
       readyForReview,
       needsReview,
-      conflicts: importResult.counts.combined.conflicts || 155,
-      possibleMatches: importResult.counts.combined.possibleMatches || 4,
-      unresolvedDuplicates: importResult.counts.combined.unresolvedDuplicates || 4,
+      conflicts,
+      possibleMatches,
+      unresolvedDuplicates,
       pricingReview,
       complianceReview,
-      mediaIssues: mediaIssues > 0 ? mediaIssues : 12,
+      mediaIssues,
       translationIssues,
       readyForPublication,
       published,
@@ -771,9 +967,37 @@ export class CatalogueReviewService {
     };
   }
 
-  /**
-   * Filter and sort products in the review queue.
-   */
+  static getQueueSummaries(): ReviewQueueSummaries {
+    const state = this.getState();
+    const products = Object.values(state.products);
+    const names = (list: ReviewProductItem[]) => list.map((p) => p.name);
+
+    return {
+      requiringReview: names(products.filter((p) => p.reviewStatus !== 'APPROVED' && p.publicationStatus !== 'PUBLISHED')),
+      possibleMatches: names(products.filter((p) => p.confidence === 'POSSIBLE_MATCH')),
+      unresolvedDuplicates: names(products.filter((p) => p.isUnresolvedDuplicate)),
+      pricingReview: names(products.filter((p) => p.pricingReviewRequired || !p.priceEUR || p.priceEUR <= 0)),
+      complianceReview: names(products.filter((p) => p.complianceClassification !== 'APPROVED')),
+      categoryReview: state.categoryMappings
+        .filter((m) => m.approvalStatus !== 'APPROVED')
+        .map((m) => `${m.sourceCategoryName} → ${m.normalizedCategoryName}`),
+      contentReview: names(
+        products.filter((p) => p.contentModerationStatus !== 'APPROVED' || p.contentFlags.length > 0)
+      ),
+      mediaReview: names(
+        products.filter((p) =>
+          p.mediaAssets.some((m) => m.status === 'BROKEN' || m.duplicateStatus === 'BROKEN' || m.duplicateStatus === 'MISSING')
+        )
+      ),
+      translationReview: names(
+        products.filter((p) => !p.approvedStoreContent || p.approvedStoreContent.trim().length < 10)
+      ),
+      readyToPublish: names(products.filter((p) => p.readinessChecklist.isReadyToPublish && p.publicationStatus !== 'PUBLISHED')),
+      blocked: names(products.filter((p) => p.publicationStatus === 'BLOCKED' || p.complianceClassification === 'BLOCKED')),
+      reviewDecisionsRecorded: state.auditTrail.filter((a) => a.actor !== 'SYSTEM').length,
+    };
+  }
+
   static getFilteredProducts(
     filter: ReviewQueueFilter = 'ALL',
     sortField: ReviewSortField = 'name',
@@ -783,7 +1007,6 @@ export class CatalogueReviewService {
     const state = this.getState();
     let list = Object.values(state.products);
 
-    // Apply text search
     if (searchQuery && searchQuery.trim().length > 0) {
       const q = searchQuery.toLowerCase().trim();
       list = list.filter((p) => {
@@ -793,7 +1016,9 @@ export class CatalogueReviewService {
         const matchBrand = p.brand?.toLowerCase().includes(q);
         const matchCategory = p.categoryName?.toLowerCase().includes(q) || p.categorySlug?.toLowerCase().includes(q);
         const matchVariant = p.variants.some((v) => v.name?.toLowerCase().includes(q) || v.flavor?.toLowerCase().includes(q));
-        const matchSourceId = Object.values(p.sources).some((s) => s?.id?.toLowerCase().includes(q) || s?.sourceRecordId?.toLowerCase().includes(q));
+        const matchSourceId = Object.values(p.sources).some(
+          (s) => s?.id?.toLowerCase().includes(q) || s?.sourceRecordId?.toLowerCase().includes(q) || s?.recordCode?.toLowerCase().includes(q)
+        );
         const matchSourceUrl = Object.values(p.sources).some((s) => s?.sourcePermalink?.toLowerCase().includes(q));
         const matchReviewStatus = p.reviewStatus?.toLowerCase().includes(q);
         const matchCompliance = p.complianceClassification?.toLowerCase().includes(q);
@@ -813,30 +1038,31 @@ export class CatalogueReviewService {
       });
     }
 
-    // Apply queue filter
     if (filter !== 'ALL') {
       list = list.filter((p) => {
         switch (filter) {
           case 'NEW':
-            return p.sources.repoA && !p.sources.reference;
+            return p.confidence === 'UNIQUE' || [p.sources.reference, p.sources.repoA, p.sources.repoB].filter(Boolean).length === 1;
           case 'UPDATED':
             return p.fieldComparisons.some((c) => c.hasConflict);
           case 'POSSIBLE_MATCH':
             return p.confidence === 'POSSIBLE_MATCH';
           case 'UNRESOLVED_DUPLICATE':
-            return p.confidence === 'POSSIBLE_MATCH' || p.confidence === 'HIGH_CONFIDENCE';
+            return p.isUnresolvedDuplicate;
           case 'PRICE_REVIEW':
             return p.pricingReviewRequired || !p.priceEUR || p.priceEUR <= 0;
           case 'CATEGORY_REVIEW':
-            return p.categorySlug === 'uncategorized' || p.issueCount > 0;
+            return p.categorySlug === 'uncategorized' || p.categorySlug === 'specialty';
           case 'CONTENT_REVIEW':
             return p.contentModerationStatus === 'PENDING_REVIEW' || p.contentFlags.length > 0;
           case 'COMPLIANCE_REVIEW':
             return p.complianceClassification !== 'APPROVED';
           case 'MEDIA_REVIEW':
-            return p.mediaAssets.some((m) => m.status === 'BROKEN' || m.duplicateStatus === 'BROKEN');
+            return p.mediaAssets.some(
+              (m) => m.status === 'BROKEN' || m.duplicateStatus === 'BROKEN' || m.duplicateStatus === 'MISSING'
+            );
           case 'TRANSLATION_REVIEW':
-            return !p.description || p.description.length < 20;
+            return !p.approvedStoreContent || p.approvedStoreContent.trim().length < 10;
           case 'READY_TO_PUBLISH':
             return p.readinessChecklist.isReadyToPublish && p.publicationStatus !== 'PUBLISHED';
           case 'BLOCKED':
@@ -847,7 +1073,6 @@ export class CatalogueReviewService {
       });
     }
 
-    // Apply sorting
     list.sort((a, b) => {
       let valA: any = '';
       let valB: any = '';
@@ -887,20 +1112,63 @@ export class CatalogueReviewService {
     return list;
   }
 
-  /**
-   * Retrieves detail for a single product.
-   */
   static getProductDetail(slugOrId: string): ReviewProductItem | null {
     const state = this.getState();
-    const product = state.products[slugOrId] || Object.values(state.products).find((p) => p.id === slugOrId || p.canonicalSlug === slugOrId);
+    const product =
+      state.products[slugOrId] ||
+      Object.values(state.products).find((p) => p.id === slugOrId || p.canonicalSlug === slugOrId);
     if (!product) return null;
     product.readinessChecklist = this.evaluatePublicationReadiness(product);
+    if (product.readinessChecklist.isReadyToPublish && product.publicationStatus === 'PENDING_REVIEW') {
+      product.publicationStatus = 'READY_TO_PUBLISH';
+    }
     return product;
   }
 
-  /**
-   * Field-level approval with audit trail without mutating raw source records.
-   */
+  static evaluatePurchaseEligibility(productSlug: string, countryCode: string): PurchaseEligibilityDecision {
+    const product = this.getProductDetail(productSlug);
+    if (!product) {
+      return {
+        eligible: false,
+        reasonCode: 'NOT_PUBLISHED',
+        customerMessage: 'This item is currently not available for purchase.',
+        internalNote: `Review product ${productSlug} was not found.`,
+      };
+    }
+
+    if (product.pricingReviewRequired || !product.priceEUR || product.priceEUR <= 0) {
+      return {
+        eligible: false,
+        reasonCode: 'PRICING_REVIEW_REQUIRED',
+        customerMessage: 'This item is currently not available for purchase.',
+        internalNote: 'PRICING_REVIEW_REQUIRED. EUR commercial price has not been approved. USD was not converted.',
+      };
+    }
+
+    const overrides = Object.fromEntries(
+      Object.entries(product.countryAvailability).map(([code, status]) => [code, { status }])
+    );
+
+    return ProductPurchaseEligibilityService.evaluatePurchaseEligibility(
+      {
+        status: product.publicationStatus === 'PUBLISHED' ? 'PUBLISHED' : 'PENDING_REVIEW',
+        complianceClassification: product.complianceClassification,
+        availabilityType: 'COUNTRY',
+        allowedCountries: Object.entries(product.countryAvailability)
+          .filter(([, status]) => status === 'AVAILABLE')
+          .map(([code]) => code),
+        countryOverrides: overrides,
+        stockLevel: product.variants[0]?.stockLevel,
+      },
+      countryCode
+    );
+  }
+
+  static previewGbpFallback(priceEUR: MinorUnits | null | undefined): MinorUnits | null {
+    if (!priceEUR || priceEUR <= 0) return null;
+    return CurrencyService.getPriceForCurrency({ priceEUR, priceGBP: null }, 'GBP');
+  }
+
   static approveFieldDecision(params: {
     productSlug: string;
     fieldName: string;
@@ -914,6 +1182,8 @@ export class CatalogueReviewService {
     const product = state.products[params.productSlug];
     if (!product) return { success: false, error: `Product ${params.productSlug} not found.` };
 
+    const sourceSnapshot = cloneJson(product.sources);
+
     let resolvedValue: any = null;
     const ref = product.sources.reference as any;
     const repoA = product.sources.repoA as any;
@@ -921,13 +1191,13 @@ export class CatalogueReviewService {
 
     switch (params.choice) {
       case 'USE_REFERENCE':
-        resolvedValue = ref ? ref[params.fieldName] || ref.sourceAttributes?.[params.fieldName] : null;
+        resolvedValue = ref ? ref[params.fieldName] ?? ref.sourceAttributes?.[params.fieldName] : null;
         break;
       case 'USE_REPO_A':
-        resolvedValue = repoA ? repoA[params.fieldName] || repoA.sourceAttributes?.[params.fieldName] : null;
+        resolvedValue = repoA ? repoA[params.fieldName] ?? repoA.sourceAttributes?.[params.fieldName] : null;
         break;
       case 'USE_REPO_B':
-        resolvedValue = repoB ? repoB[params.fieldName] || repoB.sourceAttributes?.[params.fieldName] : null;
+        resolvedValue = repoB ? repoB[params.fieldName] ?? repoB.sourceAttributes?.[params.fieldName] : null;
         break;
       case 'KEEP_CURRENT_EU':
         resolvedValue = (product as any)[params.fieldName];
@@ -946,7 +1216,6 @@ export class CatalogueReviewService {
 
     const beforeValue = (product as any)[params.fieldName];
 
-    // Record decision
     product.fieldDecisions[params.fieldName] = {
       fieldName: params.fieldName,
       choice: params.choice,
@@ -957,15 +1226,18 @@ export class CatalogueReviewService {
       reason: params.reason,
     };
 
-    // Update product working field without modifying raw source
-    if (resolvedValue !== null && resolvedValue !== undefined) {
+    const protectedFields = new Set(['sources', 'sourceProvenance', 'retainedSourceMappings', 'originalSourceContent']);
+    if (resolvedValue !== null && resolvedValue !== undefined && !protectedFields.has(params.fieldName)) {
       (product as any)[params.fieldName] = resolvedValue;
     }
 
-    // Re-evaluate checklist
+    product.sources = sourceSnapshot;
+    if (product.fieldComparisons.every((c) => !c.hasConflict || product.fieldDecisions[c.fieldName])) {
+      product.isUnresolvedDuplicate = product.confidence === 'POSSIBLE_MATCH';
+    }
+
     product.readinessChecklist = this.evaluatePublicationReadiness(product);
 
-    // Audit Trail
     this.recordAudit({
       action: 'FIELD_APPROVED',
       actor: params.actor,
@@ -981,9 +1253,6 @@ export class CatalogueReviewService {
     return { success: true, product };
   }
 
-  /**
-   * Decides variant structure: Parent + Variants (OPTION A) vs Individual Pages (OPTION B).
-   */
   static decideVariantStructure(params: {
     productSlug: string;
     decision: VariantStructureOption;
@@ -1000,23 +1269,21 @@ export class CatalogueReviewService {
     product.variantStructureDecision = params.decision;
 
     if (params.decision === 'PARENT_WITH_VARIANTS') {
-      const parentSlug = params.parentTargetSlug || 'fusion-artisan-mushroom-chocolate-bar';
+      const parentSlug = params.parentTargetSlug || product.flavourGroupParentCandidate || 'fusion-artisan-mushroom-chocolate-bar';
       product.flavourGroupParentCandidate = parentSlug;
 
       const parentProduct = state.products[parentSlug];
       if (parentProduct) {
-        // Merge candidate variant into parent while retaining original source mapping
-        const variantSku = product.sku || `FB-EU-${product.canonicalSlug.toUpperCase()}`;
-        const existingIdx = parentProduct.variants.findIndex((v) => v.sku === variantSku);
-
+        const variantSku = product.sku != null ? String(product.sku) : '';
+        const existingIdx = parentProduct.variants.findIndex((v) => v.sku && v.sku === variantSku && variantSku.length > 0);
         const newVariant = {
           id: `VAR-${product.canonicalSlug}`,
           sku: variantSku,
           name: product.name,
           flavor: product.name.replace(/^Fusion\s*(Bar\s*)?/i, '').trim(),
-          priceEUR: product.priceEUR || parentProduct.priceEUR || 4500,
-          priceGBP: product.priceGBP || parentProduct.priceGBP || 4000,
-          stockLevel: 50,
+          priceEUR: product.priceEUR ?? parentProduct.priceEUR ?? null,
+          priceGBP: product.priceGBP ?? parentProduct.priceGBP ?? null,
+          stockLevel: product.variants[0]?.stockLevel ?? 0,
           image: product.primaryImage,
         };
 
@@ -1024,6 +1291,13 @@ export class CatalogueReviewService {
           parentProduct.variants[existingIdx] = newVariant;
         } else {
           parentProduct.variants.push(newVariant);
+        }
+
+        const existingHashes = new Set(parentProduct.retainedSourceMappings.map((m) => m.sourceHash));
+        for (const mapping of product.retainedSourceMappings) {
+          if (!existingHashes.has(mapping.sourceHash)) {
+            parentProduct.retainedSourceMappings.push(cloneJson(mapping));
+          }
         }
 
         parentProduct.readinessChecklist = this.evaluatePublicationReadiness(parentProduct);
@@ -1040,8 +1314,7 @@ export class CatalogueReviewService {
         reason: params.reason || 'Approved merging standalone flavour into parent product variants',
       });
     } else {
-      // Retained as standalone individual product page
-      product.flavourGroupParentCandidate = null;
+      product.flavourGroupParentCandidate = product.flavourGroupParentCandidate || null;
 
       this.recordAudit({
         action: 'VARIANT_SPLIT',
@@ -1051,7 +1324,7 @@ export class CatalogueReviewService {
         entityType: 'VARIANT',
         beforeValue: beforeDecision,
         afterValue: 'STANDALONE_INDIVIDUAL_PRODUCT',
-        reason: params.reason || 'Approved retaining as individual product page',
+        reason: params.reason || 'Rejected merge; retained as individual product page',
       });
     }
 
@@ -1060,14 +1333,10 @@ export class CatalogueReviewService {
     return { success: true, product };
   }
 
-  /**
-   * Wholesale product pricing approval.
-   * Requires explicit EUR pricing. Keeps non-purchasable until approved.
-   */
   static approveWholesalePricing(params: {
     productSlug: string;
-    approvedPriceEUR: MinorUnits; // in cents
-    approvedPriceGBP?: MinorUnits; // in pence
+    approvedPriceEUR: MinorUnits;
+    approvedPriceGBP?: MinorUnits;
     actor: string;
     actorRole: RoleName;
     reason: string;
@@ -1083,13 +1352,16 @@ export class CatalogueReviewService {
     const beforePrice = { eur: product.priceEUR, gbp: product.priceGBP };
 
     product.priceEUR = params.approvedPriceEUR;
-    product.priceGBP = params.approvedPriceGBP || Math.round(params.approvedPriceEUR * 0.88);
+    if (params.approvedPriceGBP && params.approvedPriceGBP > 0) {
+      product.priceGBP = params.approvedPriceGBP;
+    }
     product.pricingReviewRequired = false;
 
-    // Update variant pricing as well
     for (const v of product.variants) {
       v.priceEUR = params.approvedPriceEUR;
-      v.priceGBP = product.priceGBP;
+      if (params.approvedPriceGBP && params.approvedPriceGBP > 0) {
+        v.priceGBP = params.approvedPriceGBP;
+      }
     }
 
     product.readinessChecklist = this.evaluatePublicationReadiness(product);
@@ -1101,7 +1373,7 @@ export class CatalogueReviewService {
       entityId: product.canonicalSlug,
       entityType: 'PRODUCT',
       beforeValue: beforePrice,
-      afterValue: { eur: product.priceEUR, gbp: product.priceGBP },
+      afterValue: { eur: product.priceEUR, gbp: product.priceGBP ?? null },
       reason: params.reason || 'Approved wholesale business commercial pricing',
     });
 
@@ -1109,9 +1381,6 @@ export class CatalogueReviewService {
     return { success: true, product };
   }
 
-  /**
-   * Collaboration line review and authorization for European sale.
-   */
   static approveCollaboration(params: {
     productSlug: string;
     authorizedForEuropeanSale: boolean;
@@ -1126,16 +1395,16 @@ export class CatalogueReviewService {
 
     const beforeCompliance = product.complianceClassification;
     product.complianceClassification = params.complianceClassification;
+    product.complianceReason = params.reason;
 
     if (!params.authorizedForEuropeanSale) {
       product.publicationStatus = 'BLOCKED';
       product.reviewStatus = 'BLOCKED';
-      // Block country availability
       for (const k of Object.keys(product.countryAvailability)) {
         product.countryAvailability[k] = 'BLOCKED';
       }
     } else {
-      product.reviewStatus = 'APPROVED';
+      product.reviewStatus = params.complianceClassification === 'APPROVED' ? 'APPROVED' : 'REQUIRES_REVIEW';
       if (product.publicationStatus === 'BLOCKED') {
         product.publicationStatus = 'PENDING_REVIEW';
       }
@@ -1158,9 +1427,6 @@ export class CatalogueReviewService {
     return { success: true, product };
   }
 
-  /**
-   * Category mapping approval interface without silently renaming raw categories.
-   */
   static approveCategoryMapping(params: {
     sourceCategorySlug: string;
     targetCategorySlug: string;
@@ -1175,16 +1441,23 @@ export class CatalogueReviewService {
       return { success: false, error: `Category mapping for ${params.sourceCategorySlug} not found.` };
     }
 
-    const before = { ...mapping };
+    const before = cloneJson(mapping);
+    const preservedSource = {
+      sourceCategoryName: mapping.sourceCategoryName,
+      sourceCategorySlug: mapping.sourceCategorySlug,
+      sourceType: mapping.sourceType,
+    };
+
     mapping.normalizedCategorySlug = params.targetCategorySlug;
     mapping.normalizedCategoryName = params.targetCategoryName;
     mapping.approvalStatus = 'APPROVED';
     mapping.actor = params.actor;
     mapping.timestamp = new Date().toISOString();
 
-    // Update assigned products
     for (const p of Object.values(state.products)) {
-      if (p.categorySlug === params.sourceCategorySlug || p.categorySlug === before.normalizedCategorySlug) {
+      const matchesSource =
+        p.categorySlug === params.sourceCategorySlug || p.categorySlug === before.normalizedCategorySlug;
+      if (matchesSource) {
         p.categorySlug = params.targetCategorySlug;
         p.categoryName = params.targetCategoryName;
         p.readinessChecklist = this.evaluatePublicationReadiness(p);
@@ -1197,7 +1470,7 @@ export class CatalogueReviewService {
       actorRole: params.actorRole,
       entityId: params.sourceCategorySlug,
       entityType: 'CATEGORY',
-      beforeValue: before,
+      beforeValue: { ...before, preservedSource },
       afterValue: mapping,
       reason: params.reason || 'Approved normalized category mapping',
     });
@@ -1206,9 +1479,6 @@ export class CatalogueReviewService {
     return { success: true, mapping };
   }
 
-  /**
-   * Content review: APPROVE, REWRITE, BLOCK without destroying raw source content.
-   */
   static moderateContent(params: {
     productSlug: string;
     action: ContentModerationAction;
@@ -1222,24 +1492,27 @@ export class CatalogueReviewService {
     if (!product) return { success: false, error: `Product ${params.productSlug} not found.` };
 
     const beforeStatus = product.contentModerationStatus;
+    const original = product.originalSourceContent;
 
     if (params.action === 'APPROVE') {
       product.contentModerationStatus = 'APPROVED';
-      product.contentFlags = [];
+      if (!product.approvedStoreContent) {
+        product.approvedStoreContent = product.description || original;
+      }
     } else if (params.action === 'REWRITE') {
       if (!params.rewrittenContent || params.rewrittenContent.trim().length === 0) {
-        return { success: false, error: 'Rewritten content text must be provided.' };
+        return { success: false, error: 'Rewritten content text must be provided. Replacement claims are not invented.' };
       }
       product.approvedStoreContent = params.rewrittenContent;
       product.description = params.rewrittenContent;
       product.contentModerationStatus = 'APPROVED';
-      product.contentFlags = [];
     } else if (params.action === 'BLOCK') {
       product.contentModerationStatus = 'BLOCKED';
       product.publicationStatus = 'BLOCKED';
       product.complianceClassification = 'BLOCKED';
     }
 
+    product.originalSourceContent = original;
     product.readinessChecklist = this.evaluatePublicationReadiness(product);
 
     this.recordAudit({
@@ -1257,9 +1530,6 @@ export class CatalogueReviewService {
     return { success: true, product };
   }
 
-  /**
-   * Compliance review update (APPROVED, REQUIRES_REVIEW, BLOCKED).
-   */
   static updateComplianceClassification(params: {
     productSlug: string;
     classification: ComplianceClassification;
@@ -1273,12 +1543,15 @@ export class CatalogueReviewService {
 
     const before = product.complianceClassification;
     product.complianceClassification = params.classification;
+    product.complianceReason = params.reason;
 
     if (params.classification === 'BLOCKED') {
       product.publicationStatus = 'BLOCKED';
       product.reviewStatus = 'BLOCKED';
     } else if (params.classification === 'APPROVED') {
       if (product.reviewStatus === 'BLOCKED') product.reviewStatus = 'APPROVED';
+    } else {
+      product.reviewStatus = 'REQUIRES_REVIEW';
     }
 
     product.readinessChecklist = this.evaluatePublicationReadiness(product);
@@ -1298,9 +1571,6 @@ export class CatalogueReviewService {
     return { success: true, product };
   }
 
-  /**
-   * Country availability matrix update.
-   */
   static updateCountryAvailability(params: {
     productSlug: string;
     countryCode: string;
@@ -1313,7 +1583,7 @@ export class CatalogueReviewService {
     const product = state.products[params.productSlug];
     if (!product) return { success: false, error: `Product ${params.productSlug} not found.` };
 
-    const before = product.countryAvailability[params.countryCode];
+    const before = product.countryAvailability[params.countryCode] || 'NOT_CONFIGURED';
     product.countryAvailability[params.countryCode] = params.status;
     product.readinessChecklist = this.evaluatePublicationReadiness(product);
 
@@ -1332,9 +1602,6 @@ export class CatalogueReviewService {
     return { success: true, product };
   }
 
-  /**
-   * Media review action: SET PRIMARY, REMOVE FROM PRODUCT, KEEP, FLAG BROKEN.
-   */
   static moderateMedia(params: {
     productSlug: string;
     mediaId: string;
@@ -1350,22 +1617,28 @@ export class CatalogueReviewService {
     const asset = product.mediaAssets.find((m) => m.id === params.mediaId);
     if (!asset) return { success: false, error: `Media asset ${params.mediaId} not found.` };
 
-    const before = { ...asset };
+    const before = cloneJson(asset);
+    const preservedUrl = asset.url;
 
     if (params.action === 'SET_PRIMARY') {
-      product.mediaAssets.forEach((m) => (m.isPrimary = false));
+      product.mediaAssets.forEach((m) => {
+        if (m.status !== 'REMOVED' && m.status !== 'BROKEN') {
+          m.isPrimary = false;
+          if (m.status === 'PRIMARY') m.status = 'KEEP';
+        }
+      });
       asset.isPrimary = true;
       asset.status = 'PRIMARY';
       product.primaryImage = asset.url;
     } else if (params.action === 'REMOVE') {
       asset.status = 'REMOVED';
-      if (asset.isPrimary) {
+      asset.isPrimary = false;
+      if (product.primaryImage === asset.url) {
         const next = product.mediaAssets.find((m) => m.status !== 'REMOVED' && m.status !== 'BROKEN');
+        product.primaryImage = next ? next.url : '';
         if (next) {
           next.isPrimary = true;
-          product.primaryImage = next.url;
-        } else {
-          product.primaryImage = '';
+          next.status = 'PRIMARY';
         }
       }
     } else if (params.action === 'FLAG_BROKEN') {
@@ -1375,6 +1648,7 @@ export class CatalogueReviewService {
       asset.status = 'KEEP';
     }
 
+    asset.url = preservedUrl;
     product.readinessChecklist = this.evaluatePublicationReadiness(product);
 
     this.recordAudit({
@@ -1392,9 +1666,6 @@ export class CatalogueReviewService {
     return { success: true, product };
   }
 
-  /**
-   * Moderates staged imported reviews: APPROVE, REJECT, ARCHIVE.
-   */
   static moderateReview(params: {
     reviewId: string;
     action: 'APPROVE' | 'REJECT' | 'ARCHIVE';
@@ -1407,9 +1678,26 @@ export class CatalogueReviewService {
     if (!review) return { success: false, error: `Review ${params.reviewId} not found.` };
 
     const before = review.moderationStatus;
+    const provenance = {
+      sourceType: review.sourceType,
+      authorName: review.authorName,
+      date: review.date,
+      rating: review.rating,
+      body: review.body,
+      sourceUrl: review.sourceUrl,
+      isVerifiedBuyer: review.isVerifiedBuyer,
+    };
+
     review.moderationStatus = params.action === 'APPROVE' ? 'APPROVED' : params.action === 'REJECT' ? 'REJECTED' : 'ARCHIVED';
     review.moderatedBy = params.actor;
     review.moderatedAt = new Date().toISOString();
+    review.sourceType = provenance.sourceType;
+    review.authorName = provenance.authorName;
+    review.date = provenance.date;
+    review.rating = provenance.rating;
+    review.body = provenance.body;
+    review.sourceUrl = provenance.sourceUrl;
+    review.isVerifiedBuyer = provenance.isVerifiedBuyer;
 
     this.recordAudit({
       action: 'REVIEW_APPROVED',
@@ -1426,9 +1714,6 @@ export class CatalogueReviewService {
     return { success: true, review };
   }
 
-  /**
-   * SEO review & clearance.
-   */
   static approveSeo(params: {
     productSlug: string;
     approvedTitle: string;
@@ -1442,6 +1727,11 @@ export class CatalogueReviewService {
     const product = state.products[params.productSlug];
     if (!product) return { success: false, error: `Product ${params.productSlug} not found.` };
 
+    if (!params.approvedTitle?.trim() || !params.approvedDescription?.trim()) {
+      return { success: false, error: 'Approved SEO title and description are required. Source metadata is not copied automatically.' };
+    }
+
+    const before = cloneJson(product.seo);
     product.seo.approvedTitle = params.approvedTitle;
     product.seo.approvedDescription = params.approvedDescription;
     if (params.approvedCanonical) product.seo.approvedCanonical = params.approvedCanonical;
@@ -1455,7 +1745,7 @@ export class CatalogueReviewService {
       actorRole: params.actorRole,
       entityId: product.canonicalSlug,
       entityType: 'PRODUCT',
-      beforeValue: null,
+      beforeValue: before,
       afterValue: product.seo,
       reason: params.reason || 'Approved European store SEO metadata',
     });
@@ -1464,10 +1754,6 @@ export class CatalogueReviewService {
     return { success: true, product };
   }
 
-  /**
-   * Publishes product to store.
-   * Gated: strictly enforces 12-point publication checklist and ProductPublicationGuard.
-   */
   static publishProduct(params: {
     productSlug: string;
     actor: string;
@@ -1479,6 +1765,7 @@ export class CatalogueReviewService {
     if (!product) return { success: false, error: `Product ${params.productSlug} not found.` };
 
     const checklist = this.evaluatePublicationReadiness(product);
+    product.readinessChecklist = checklist;
     if (!checklist.isReadyToPublish) {
       return {
         success: false,
@@ -1497,6 +1784,28 @@ export class CatalogueReviewService {
       return {
         success: false,
         error: `Cannot publish product: Compliance classification is ${product.complianceClassification}. Only APPROVED products may be published.`,
+      };
+    }
+
+    const guard = ProductPublicationGuard.evaluateProductForPublication({
+      id: product.id,
+      status: 'PENDING_REVIEW',
+      availabilityType: 'COUNTRY',
+      variants: product.variants.map((v) => ({
+        id: v.id,
+        sku: v.sku,
+        name: v.name,
+        priceEUR: v.priceEUR || 0,
+        stockLevel: v.stockLevel,
+      })),
+      images: product.mediaAssets.filter((m) => m.status !== 'REMOVED').map((m) => ({ url: m.url, isPrimary: m.isPrimary })),
+      translations: product.approvedStoreContent ? [{ locale: 'en', name: product.name }] : [],
+    });
+
+    if (!guard.canPublish) {
+      return {
+        success: false,
+        error: `Cannot publish product. Publication guard rejected: ${guard.reasons.join('; ')}`,
       };
     }
 
@@ -1519,9 +1828,6 @@ export class CatalogueReviewService {
     return { success: true, product };
   }
 
-  /**
-   * Blocks product from publication and checkout.
-   */
   static blockProduct(params: {
     productSlug: string;
     actor: string;
@@ -1536,6 +1842,7 @@ export class CatalogueReviewService {
     product.publicationStatus = 'BLOCKED';
     product.reviewStatus = 'BLOCKED';
     product.complianceClassification = 'BLOCKED';
+    product.complianceReason = params.reason;
 
     for (const k of Object.keys(product.countryAvailability)) {
       product.countryAvailability[k] = 'BLOCKED';
@@ -1558,16 +1865,12 @@ export class CatalogueReviewService {
     return { success: true, product };
   }
 
-  /**
-   * Safe bulk operations.
-   * STRICT GUARD: Rejects any bulk operation that attempts to bypass pricing review,
-   * compliance classification, or publication requirements.
-   */
   static executeBulkAction(params: {
     productSlugs: string[];
     action:
       | 'APPROVE_CONTENT'
       | 'APPROVE_MEDIA'
+      | 'APPROVE_CATEGORY_MAPPINGS'
       | 'ASSIGN_CATEGORY'
       | 'ASSIGN_COMPLIANCE'
       | 'SET_COUNTRY_AVAILABILITY'
@@ -1585,33 +1888,36 @@ export class CatalogueReviewService {
     const errors: string[] = [];
     let affectedCount = 0;
 
-    // Strict guard against bypassing requirements
     if (params.action === 'PUBLISH_SELECTED') {
       for (const slug of params.productSlugs) {
-        const p = state.products[slug];
-        if (p) {
-          const checklist = this.evaluatePublicationReadiness(p);
-          if (!checklist.isReadyToPublish) {
-            errors.push(`Product ${p.name} (${slug}) cannot be bulk published: missing ${checklist.blockers.join(', ')}`);
-          } else {
-            p.publicationStatus = 'PUBLISHED';
-            p.reviewStatus = 'APPROVED';
-            affectedCount++;
-            this.recordAudit({
-              action: 'PRODUCT_PUBLISHED',
-              actor: params.actor,
-              actorRole: params.actorRole,
-              entityId: slug,
-              entityType: 'PRODUCT',
-              beforeValue: 'PENDING_REVIEW',
-              afterValue: 'PUBLISHED',
-              reason: `Bulk publication: ${params.reason}`,
-            });
-          }
+        const result = this.publishProduct({
+          productSlug: slug,
+          actor: params.actor,
+          actorRole: params.actorRole,
+          reason: params.reason,
+        });
+        if (result.success) {
+          affectedCount++;
+        } else {
+          errors.push(result.error || `Product ${slug} cannot be bulk published`);
         }
       }
-      this.persistState();
-      return { success: affectedCount > 0, affectedCount, errors: errors.length > 0 ? errors : undefined };
+      return { success: affectedCount > 0 && errors.length === 0, affectedCount, errors: errors.length > 0 ? errors : undefined };
+    }
+
+    if (params.action === 'APPROVE_CATEGORY_MAPPINGS') {
+      for (const mapping of state.categoryMappings.filter((m) => m.approvalStatus !== 'APPROVED')) {
+        const result = this.approveCategoryMapping({
+          sourceCategorySlug: mapping.sourceCategorySlug,
+          targetCategorySlug: mapping.normalizedCategorySlug,
+          targetCategoryName: mapping.normalizedCategoryName,
+          actor: params.actor,
+          actorRole: params.actorRole,
+          reason: params.reason,
+        });
+        if (result.success) affectedCount++;
+      }
+      return { success: true, affectedCount };
     }
 
     for (const slug of params.productSlugs) {
@@ -1620,12 +1926,12 @@ export class CatalogueReviewService {
 
       if (params.action === 'APPROVE_CONTENT') {
         p.contentModerationStatus = 'APPROVED';
-        p.contentFlags = [];
+        if (!p.approvedStoreContent) p.approvedStoreContent = p.description || p.originalSourceContent;
         p.readinessChecklist = this.evaluatePublicationReadiness(p);
         affectedCount++;
       } else if (params.action === 'APPROVE_MEDIA') {
         p.mediaAssets.forEach((m) => {
-          if (m.status !== 'REMOVED' && m.status !== 'BROKEN') m.status = 'KEEP';
+          if (m.status !== 'REMOVED' && m.status !== 'BROKEN') m.status = m.isPrimary ? 'PRIMARY' : 'KEEP';
         });
         p.readinessChecklist = this.evaluatePublicationReadiness(p);
         affectedCount++;
@@ -1639,6 +1945,7 @@ export class CatalogueReviewService {
       } else if (params.action === 'ASSIGN_COMPLIANCE') {
         if (params.complianceClassification) {
           p.complianceClassification = params.complianceClassification;
+          p.complianceReason = params.reason;
           if (params.complianceClassification === 'BLOCKED') {
             p.publicationStatus = 'BLOCKED';
             p.reviewStatus = 'BLOCKED';
@@ -1670,17 +1977,16 @@ export class CatalogueReviewService {
     return { success: true, affectedCount, errors: errors.length > 0 ? errors : undefined };
   }
 
-  /**
-   * Returns audit trail records.
-   */
   static getAuditTrail(): AuditRecord[] {
     const state = this.getState();
     return [...state.auditTrail].reverse();
   }
 
-  /**
-   * Helper to append an audit record (scrubs sensitive data).
-   */
+  static getRawSourceSnapshot(productSlug: string): ReviewProductItem['sources'] | null {
+    const product = this.getProductDetail(productSlug);
+    return product ? cloneJson(product.sources) : null;
+  }
+
   private static recordAudit(audit: Omit<AuditRecord, 'id' | 'timestamp'>) {
     const state = this.getState();
     const id = `AUDIT-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
@@ -1688,6 +1994,8 @@ export class CatalogueReviewService {
       ...audit,
       id,
       timestamp: new Date().toISOString(),
+      beforeValue: scrubSecrets(audit.beforeValue),
+      afterValue: scrubSecrets(audit.afterValue),
     };
     state.auditTrail.push(record);
   }

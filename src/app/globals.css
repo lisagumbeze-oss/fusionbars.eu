@@ -7,6 +7,8 @@
     --text-muted: #5C5852;
     --botanical: #4A5D4E;
     --border-neutral: #E5E3DD;
+    --mobile-bottom-nav-height: 4rem;
+    --announce-marquee-duration: 28s;
   }
 
   body {
@@ -20,5 +22,39 @@
   *:focus-visible {
     outline: 2px solid #4A5D4E;
     outline-offset: 2px;
+  }
+}
+
+@keyframes announce-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@layer utilities {
+  .announce-marquee-track {
+    animation: announce-marquee var(--announce-marquee-duration) linear infinite;
+    will-change: transform;
+  }
+
+  .group\/announce:hover .announce-marquee-track,
+  .group\/announce:focus-within .announce-marquee-track {
+    animation-play-state: paused;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .announce-marquee-track {
+      animation: none;
+      transform: none;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .announce-marquee-duplicate {
+      display: none;
+    }
   }
 }

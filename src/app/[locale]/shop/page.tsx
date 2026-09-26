@@ -4,7 +4,8 @@ import { CatalogService } from '@/lib/catalog';
 import ProductCard from '@/components/ProductCard';
 import { LocaleCode } from '@/types';
 import { getDictionary } from '@/i18n';
-import { SlidersHorizontal, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
+import ShopFilters from '@/components/ShopFilters';
 
 interface ShopPageProps {
   params: Promise<{ locale: string }> | { locale: string };
@@ -64,60 +65,18 @@ export default async function ShopPage({ params, searchParams }: ShopPageProps) 
         </div>
       </div>
 
-      {/* Filter & Sorting Controls Bar (Interactive Segmented Bar, Zero-Pill Discipline) */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-3.5 rounded-xl border border-[#E5E3DD] shadow-xs">
-        {/* Category Tabs */}
-        <div className="flex items-center gap-1 overflow-x-auto pb-1 lg:pb-0 text-xs">
-          <Link
-            href={`/${locale}/shop?sort=${currentSort}`}
-            className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap transition cursor-pointer ${
-              currentCategorySlug === 'all'
-                ? 'bg-[#121212] text-white shadow-xs'
-                : 'text-[#5C5852] hover:text-[#121212] hover:bg-neutral-100'
-            }`}
-          >
-            All Collections ({CatalogService.getProducts().length})
-          </Link>
-          {categories.map((cat) => (
-            <Link
-              key={cat.slug}
-              href={`/${locale}/shop?category=${cat.slug}&sort=${currentSort}`}
-              className={`px-3 py-1.5 rounded-md font-medium whitespace-nowrap transition cursor-pointer ${
-                currentCategorySlug === cat.slug
-                  ? 'bg-[#4A5D4E] text-white shadow-xs'
-                  : 'text-[#5C5852] hover:text-[#121212] hover:bg-neutral-100'
-              }`}
-            >
-              {cat.name} ({cat.productCount})
-            </Link>
-          ))}
-        </div>
-
-        {/* Sorting Dropdown */}
-        <div className="flex items-center gap-2 shrink-0 text-xs text-[#5C5852]">
-          <SlidersHorizontal className="w-3.5 h-3.5 text-[#8E8B85]" />
-          <span>Sort by:</span>
-          <form method="GET" action={`/${locale}/shop`} className="inline-block">
-            {currentCategorySlug !== 'all' && (
-              <input type="hidden" name="category" value={currentCategorySlug} />
-            )}
-            <select
-              name="sort"
-              defaultValue={currentSort}
-              aria-label="Sort products by"
-              className="bg-[#FBFBF9] border border-[#E5E3DD] rounded-md px-2.5 py-1 text-xs text-[#121212] font-medium outline-none focus:border-[#4A5D4E]"
-            >
-              <option value="featured">Featured Selections</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="name-asc">Alphabetical (A &ndash; Z)</option>
-            </select>
-            <noscript>
-              <button type="submit" className="ml-1 px-2 py-0.5 bg-neutral-200 text-xs rounded">Apply</button>
-            </noscript>
-          </form>
-        </div>
-      </div>
+      <ShopFilters
+        locale={locale}
+        currentCategory={currentCategorySlug}
+        currentSort={currentSort}
+        searchQuery={searchQuery}
+        totalCount={CatalogService.getProducts().length}
+        categories={categories.map((category) => ({
+          name: category.name,
+          slug: category.slug,
+          productCount: category.productCount,
+        }))}
+      />
 
       {/* Product Grid */}
       {products.length === 0 ? (
@@ -131,7 +90,7 @@ export default async function ShopPage({ params, searchParams }: ShopPageProps) 
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

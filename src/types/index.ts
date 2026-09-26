@@ -8,7 +8,7 @@ export type LocaleCode = 'en' | 'de' | 'fr' | 'es' | 'it' | 'nl';
 
 export type ProductStatus = 'DRAFT' | 'PENDING_REVIEW' | 'PUBLISHED' | 'ARCHIVED';
 export type AvailabilityType = 'GLOBAL' | 'REGION' | 'COUNTRY' | 'BLOCKED';
-export type CountryAvailabilityStatus = 'AVAILABLE' | 'RESTRICTED' | 'BLOCKED';
+export type CountryAvailabilityStatus = 'AVAILABLE' | 'RESTRICTED' | 'BLOCKED' | 'NOT_CONFIGURED';
 export type ComplianceClassification = 'APPROVED' | 'REQUIRES_REVIEW' | 'BLOCKED';
 
 export type OrderStatus =
@@ -40,6 +40,7 @@ export type EligibilityReasonCode =
   | 'COUNTRY_BLOCKED'
   | 'COUNTRY_RESTRICTED'
   | 'COMPLIANCE_REVIEW_REQUIRED'
+  | 'PRICING_REVIEW_REQUIRED'
   | 'OUT_OF_STOCK'
   | 'VARIANT_UNAVAILABLE'
   | 'INVALID_DESTINATION';
@@ -78,6 +79,7 @@ export type RoleName =
   | 'ORDER_MANAGER'
   | 'FINANCE_MANAGER'
   | 'CONTENT_MANAGER'
+  | 'COMPLIANCE_MANAGER'
   | 'CUSTOMER'
   | 'SYSTEM';
 

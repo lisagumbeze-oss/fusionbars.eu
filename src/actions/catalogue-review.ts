@@ -13,13 +13,14 @@ import {
   ReviewModerationItem,
   AuditRecord,
 } from '@/domain/catalog/CatalogueReviewService';
-import { ComplianceClassification, CountryAvailabilityStatus, MinorUnits, RoleName } from '@/types';
+import { ComplianceClassification, CountryAvailabilityStatus, MinorUnits, PurchaseEligibilityDecision, RoleName } from '@/types';
+import { RBACService } from '@/domain/auth/RBACService';
 
-// Role Gate for Catalogue Review Center
-const AUTHORIZED_ROLES: RoleName[] = ['SUPER_ADMIN', 'CATALOG_MANAGER', 'CONTENT_MANAGER'];
+const AUTHORIZED_ROLES: RoleName[] = ['SUPER_ADMIN', 'CATALOG_MANAGER', 'CONTENT_MANAGER', 'COMPLIANCE_MANAGER'];
 
 function assertAuthorized(role?: RoleName) {
-  if (!role || !AUTHORIZED_ROLES.includes(role)) {
+  if (!role || !AUTHORIZED_ROLES.includes(role) || !RBACService.hasPermission(role, 'catalog:review')) {
+    if (role && RBACService.hasPermission(role, '*')) return;
     throw new Error(`Unauthorized. Role '${role || 'ANONYMOUS'}' lacks permissions for Catalogue Review Center.`);
   }
 }
@@ -347,13 +348,14 @@ export async function blockProductAction(params: {
 
 export async function executeBulkReviewAction(params: {
   productSlugs: string[];
-  action:
-    | 'APPROVE_CONTENT'
-    | 'APPROVE_MEDIA'
-    | 'ASSIGN_CATEGORY'
-    | 'ASSIGN_COMPLIANCE'
-    | 'SET_COUNTRY_AVAILABILITY'
-    | 'PUBLISH_SELECTED';
+    action:
+      | 'APPROVE_CONTENT'
+      | 'APPROVE_MEDIA'
+      | 'APPROVE_CATEGORY_MAPPINGS'
+      | 'ASSIGN_CATEGORY'
+      | 'ASSIGN_COMPLIANCE'
+      | 'SET_COUNTRY_AVAILABILITY'
+      | 'PUBLISH_SELECTED';
   targetCategorySlug?: string;
   targetCategoryName?: string;
   complianceClassification?: ComplianceClassification;
@@ -383,6 +385,26 @@ export async function getAuditTrailAction(role: RoleName = 'SUPER_ADMIN'): Promi
   try {
     assertAuthorized(role);
     return { success: true, auditTrail: CatalogueReviewService.getAuditTrail() };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+export async function evaluateReviewPurchaseEligibilityAction(params: {
+  productSlug: string;
+  countryCode: string;
+  role?: RoleName;
+}): Promise<{
+  success: boolean;
+  decision?: PurchaseEligibilityDecision;
+  error?: string;
+}> {
+  try {
+    assertAuthorized(params.role || 'SUPER_ADMIN');
+    return {
+      success: true,
+      decision: CatalogueReviewService.evaluatePurchaseEligibility(params.productSlug, params.countryCode),
+    };
   } catch (err: any) {
     return { success: false, error: err.message };
   }

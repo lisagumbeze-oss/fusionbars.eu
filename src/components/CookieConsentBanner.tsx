@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { ShieldCheck, Cookie, Settings, Check, X } from 'lucide-react';
 import { useCommerce } from '@/context/CommerceContext';
 
@@ -16,6 +17,8 @@ const COOKIE_CONSENT_KEY = 'fb_cookie_consent_v1';
 
 export default function CookieConsentBanner() {
   const { locale } = useCommerce();
+  const pathname = usePathname();
+  const sitsAboveBottomNav = !pathname.includes('/admin') && !pathname.includes('/checkout');
   const [visible, setVisible] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
   const [analyticsAllowed, setAnalyticsAllowed] = useState(false);
@@ -77,7 +80,11 @@ export default function CookieConsentBanner() {
   return (
     <aside
       aria-label="Privacy and Cookie Consent"
-      className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 animate-fadeIn"
+      className={`fixed left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 animate-fadeIn ${
+        sitsAboveBottomNav
+          ? 'bottom-[calc(var(--mobile-bottom-nav-height)+1rem+env(safe-area-inset-bottom,0px))] lg:bottom-4'
+          : 'bottom-4'
+      }`}
     >
       <div className="bg-[#121212]/95 backdrop-blur-md text-[#FBFBF9] p-5 sm:p-6 rounded-2xl border border-neutral-700 shadow-2xl space-y-4">
         <div className="flex items-start gap-3">

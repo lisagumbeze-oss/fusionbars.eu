@@ -13,6 +13,7 @@ export class RBACService {
       'catalog:write',
       'catalog:publish',
       'catalog:restrictions',
+      'catalog:review',
       'content:write',
     ],
     ORDER_MANAGER: [
@@ -33,6 +34,14 @@ export class RBACService {
       'content:write',
       'content:publish',
       'catalog:read',
+      'catalog:review',
+    ],
+    COMPLIANCE_MANAGER: [
+      'catalog:read',
+      'catalog:review',
+      'catalog:restrictions',
+      'compliance:write',
+      'compliance:read',
     ],
     CUSTOMER: [
       'customer:profile',

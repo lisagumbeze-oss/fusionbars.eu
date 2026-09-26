@@ -51,14 +51,14 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Product Image Frame */}
       <Link
         href={`/${locale}/products/${product.slug}`}
-        className="relative aspect-square w-full bg-[#FBFBF9] overflow-hidden flex items-center justify-center p-6 border-b border-[#E5E3DD]/60"
+        className="relative aspect-square w-full bg-[#FBFBF9] overflow-hidden flex items-center justify-center p-3 sm:p-6 border-b border-[#E5E3DD]/60"
       >
         <Image
           src={displayImage}
           alt={`${product.name} - ${selectedVariant.flavor}`}
           fill
-          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          className="object-contain p-4 group-hover:scale-105 transition-transform duration-500"
+          sizes="(max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+          className="object-contain p-2 sm:p-4 group-hover:scale-105 transition-transform duration-500"
           referrerPolicy="no-referrer"
         />
 
@@ -82,37 +82,35 @@ export default function ProductCard({ product }: ProductCardProps) {
         {/* Stock Status Label - Unboxed, quiet text */}
         <div className="absolute bottom-3 left-3 text-[11px] font-medium text-[#5C5852] bg-white/90 px-2 py-0.5 rounded border border-[#E5E3DD] backdrop-blur-xs">
           {selectedVariant.stockStatus === 'IN_STOCK' ? (
-            <span className="text-[#4A5D4E] font-semibold">In Stock · EU Hubs</span>
+            <span className="text-[#4A5D4E] font-semibold">
+              <span className="sm:hidden">In Stock</span>
+              <span className="hidden sm:inline">In Stock · EU Hubs</span>
+            </span>
           ) : selectedVariant.stockStatus === 'LOW_STOCK' ? (
-            <span className="text-amber-700 font-semibold">Low Stock · Few Left</span>
+            <span className="text-amber-700 font-semibold">Low Stock</span>
           ) : (
-            <span className="text-neutral-500 font-semibold">Temporarily Reserved</span>
+            <span className="text-neutral-500 font-semibold">Reserved</span>
           )}
         </div>
       </Link>
 
       {/* Card Content Area */}
-      <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
+      <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between space-y-2 sm:space-y-3">
         <div>
           {/* Category Kicker (Quiet inline text) */}
-          <div className="flex items-center gap-1.5 text-[11px] text-[#5C5852] uppercase tracking-wider font-semibold mb-1">
-            <span>{product.categoryName}</span>
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-[#5C5852] uppercase tracking-wider font-semibold mb-1 min-w-0">
+            <span className="truncate">{product.categoryName}</span>
             <span aria-hidden="true">&bull;</span>
-            <span>{selectedVariant.weightLabel}</span>
+            <span className="shrink-0">{selectedVariant.weightLabel}</span>
           </div>
 
           {/* Product Title */}
           <Link
             href={`/${locale}/products/${product.slug}`}
-            className="block font-serif text-base font-bold text-[#121212] group-hover:text-[#4A5D4E] transition-colors line-clamp-1"
+            className="block font-serif text-sm sm:text-base font-bold text-[#121212] group-hover:text-[#4A5D4E] transition-colors line-clamp-2 sm:line-clamp-1"
           >
             {product.name}
           </Link>
-
-          {/* Headline / Flavor Preview */}
-          <p className="text-xs text-[#5C5852] line-clamp-2 mt-1 leading-relaxed">
-            {product.headline || product.shortDescription}
-          </p>
         </div>
 
         {/* Variant Selector (if multi-variant) */}
@@ -137,9 +135,9 @@ export default function ProductCard({ product }: ProductCardProps) {
         )}
 
         {/* Pricing & Quick Add Button */}
-        <div className="pt-2 border-t border-[#E5E3DD]/60 flex items-center justify-between">
+        <div className="pt-2 border-t border-[#E5E3DD]/60 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-baseline gap-2">
-            <span className="text-base font-bold text-[#121212] font-mono">
+            <span className="text-sm sm:text-base font-bold text-[#121212] font-mono">
               {formatMoney(unitPrice)}
             </span>
             {compareAt && compareAt > unitPrice && (
@@ -152,7 +150,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <button
             onClick={handleQuickAdd}
             disabled={selectedVariant.stockStatus === 'OUT_OF_STOCK'}
-            className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+            className={`w-full sm:w-auto justify-center px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
               isAdded
                 ? 'bg-emerald-600 text-white'
                 : selectedVariant.stockStatus === 'OUT_OF_STOCK'
