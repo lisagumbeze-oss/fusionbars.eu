@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Mail, Clock, ShieldCheck, Send, CheckCircle2, AlertCircle, Building2, MapPin } from 'lucide-react';
 import { LocaleCode } from '@/types';
-import { RateLimiterService } from '@/lib/rate-limiter';
+import { submitContactInquiryAction } from '@/actions/contact';
 
 export default function ContactPage() {
   const params = useParams();
@@ -19,24 +19,27 @@ export default function ContactPage() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
     setSubmitting(true);
 
-    // Apply rate limit
-    const rateCheck = RateLimiterService.consume('newsletter_contact', email);
-    if (!rateCheck.allowed) {
-      setErrorMsg(`Too many contact submissions. Please wait ${rateCheck.retryAfterSeconds} seconds.`);
+    const result = await submitContactInquiryAction({
+      name,
+      email,
+      subjectCategory: subject,
+      message,
+      locale,
+    });
+
+    if (!result.success) {
+      setErrorMsg(result.error || 'Failed to send inquiry.');
       setSubmitting(false);
       return;
     }
 
-    // Process submission
-    setTimeout(() => {
-      setSubmitted(true);
-      setSubmitting(false);
-    }, 500);
+    setSubmitted(true);
+    setSubmitting(false);
   };
 
   return (

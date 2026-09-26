@@ -23,7 +23,7 @@ import { PaymentConfigService, CryptoAsset } from '@/domain/payments/PaymentConf
 import { CommerceRepository, DbOrder } from '@/lib/commerce-repository';
 import { GuestOrderService } from './GuestOrderService';
 import { OrderService } from './OrderService';
-import { EmailTemplates } from '@/emails/templates';
+import { dispatchEmailSafely, EmailService } from '@/services/email/EmailService';
 
 export interface CreateOrderInput {
   items: Array<{ variantId: string; quantity: number }>;
@@ -307,33 +307,34 @@ export class OrderCreationService {
       await CommerceRepository.reserveInventory(it.variantId, chosenHub, it.quantity, orderId);
     }
 
-    // Send confirmation email
+    const paymentMethodLabel =
+      paymentMethodCode === 'SEPA_IBAN'
+        ? 'Bank Transfer (SEPA / IBAN)'
+        : paymentMethodCode.replace('CRYPTO_', 'Cryptocurrency ');
+
     if (paymentMethodCode === 'SEPA_IBAN') {
-      EmailTemplates.renderSepaOrderConfirmation({
-        customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
-        orderNumber,
-        totalAmount: pricingQuote.totalAmount,
-        currency,
-        items: pricingQuote.items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.unitPrice })),
-        supportEmail: 'sales@fusionbars.eu',
-        iban: paymentNotificationDetails.iban || 'NL00TEST0000000000',
-        bic: paymentNotificationDetails.bic || 'TESTNL2A',
-        bankName: paymentNotificationDetails.bankName || 'European Merchant Bank',
-        accountHolder: paymentNotificationDetails.accountHolder || 'Fusion EU Logistics B.V.',
-      });
+      void dispatchEmailSafely('sepa_order_confirmation', () =>
+        EmailService.sendSepaOrderConfirmation(dbOrder, {
+          iban: paymentNotificationDetails.iban || 'NL00TEST0000000000',
+          bic: paymentNotificationDetails.bic || 'TESTNL2A',
+          accountHolder: paymentNotificationDetails.accountHolder || 'Fusion EU Logistics B.V.',
+          bankName: paymentNotificationDetails.bankName || 'European Merchant Bank',
+          reference: orderNumber,
+        })
+      );
     } else {
-      EmailTemplates.renderCryptoOrderConfirmation({
-        customerName: `${shippingAddress.firstName} ${shippingAddress.lastName}`,
-        orderNumber,
-        totalAmount: pricingQuote.totalAmount,
-        currency,
-        items: pricingQuote.items.map((i) => ({ name: i.name, quantity: i.quantity, price: i.unitPrice })),
-        supportEmail: 'sales@fusionbars.eu',
-        cryptoName: paymentNotificationDetails.cryptoName || 'Bitcoin',
-        network: paymentNotificationDetails.network || 'Bitcoin Mainnet',
-        receivingAddress: paymentNotificationDetails.receivingAddress || 'bc1q_placeholder_btc_test_only',
-      });
+      void dispatchEmailSafely('crypto_order_confirmation', () =>
+        EmailService.sendCryptoOrderConfirmation(dbOrder, {
+          cryptoName: paymentNotificationDetails.cryptoName || 'Bitcoin',
+          network: paymentNotificationDetails.network || 'Bitcoin Mainnet',
+          receivingAddress: paymentNotificationDetails.receivingAddress || 'bc1q_placeholder_btc_test_only',
+        })
+      );
     }
+
+    void dispatchEmailSafely('admin_order_alert', () =>
+      EmailService.sendAdminOrderAlert(dbOrder, paymentMethodLabel)
+    );
 
     CommerceRepository.logAudit({
       action: 'ORDER_CREATED',

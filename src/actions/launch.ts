@@ -78,20 +78,11 @@ export async function sendTestEmailAction(input: {
       return { success: false, error: 'A valid recipient email address is required.' };
     }
 
-    const provider = EmailService.getProvider();
-    const result = await provider.sendEmail({
-      to: recipientEmail,
-      subject: '[TEST] Fusion Mushroom Bars EU - Email Infrastructure Probe',
-      html: `
-        <div style="font-family: sans-serif; padding: 20px; color: #1a1a1a;">
-          <h2 style="color: #4A5D4E;">Transactional Email Test Verified</h2>
-          <p>This is a controlled verification message initiated by SUPER_ADMIN (${admin.email}).</p>
-          <p>Provider: <strong>${provider.name}</strong></p>
-          <p>Timestamp: ${new Date().toISOString()}</p>
-        </div>
-      `,
-      text: `Fusion Mushroom Bars EU - Email Infrastructure Probe initiated by ${admin.email} at ${new Date().toISOString()}`,
+    const result = await EmailService.sendTestProbe({
+      recipientEmail,
+      initiatedBy: admin.email,
     });
+    const provider = EmailService.getProvider();
 
     CommerceRepository.logAudit({
       action: 'TEST_EMAIL_DISPATCHED',

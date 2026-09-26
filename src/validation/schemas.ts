@@ -152,6 +152,19 @@ export const couponCreateSchema = z.object({
   expiresAt: z.string().datetime().optional(),
 });
 
+export const contactInquirySchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  email: z.string().email('Valid email address required'),
+  subjectCategory: z.string().min(1).max(120),
+  message: z.string().min(10, 'Message must be at least 10 characters').max(5000),
+  locale: localeSchema.default('en'),
+});
+
+export const newsletterSubscribeSchema = z.object({
+  email: z.string().email('Valid email address required'),
+  locale: localeSchema.default('en'),
+});
+
 export const adminLoginSchema = z.object({
   email: z.string().email('Valid admin email is required'),
   password: z.string().min(8, 'Password must be at least 8 characters'),

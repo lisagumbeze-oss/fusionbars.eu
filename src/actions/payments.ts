@@ -7,7 +7,8 @@ import { RBACService } from '../domain/auth/RBACService';
 import { AuthService } from '../domain/auth/AuthService';
 import { RoleName } from '../types';
 import { CommerceRepository } from '../lib/commerce-repository';
-import { EmailTemplates } from '../emails/templates';
+import { dispatchEmailSafely, EmailService } from '@/services/email/EmailService';
+import { dispatchOrderStatusEmail } from '@/services/email/order-notifications';
 
 /**
  * Server Action: Customer submits payment proof (Bank transfer reference, wire slip, or Crypto TXID).
@@ -78,13 +79,9 @@ export async function submitPaymentProofAction(rawInput: unknown) {
       `Payment reference submitted: ${referenceOrTxid}${senderAccountName ? ` (Account: ${senderAccountName})` : ''}`
     );
 
-    // Send customer receipt email notice
-    EmailTemplates.renderPaymentProofSubmittedNotice({
-      customerName: `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`,
-      orderNumber: order.orderNumber,
-      referenceOrTxid,
-      supportEmail: 'sales@fusionbars.eu',
-    });
+    await dispatchEmailSafely('payment_proof_submitted', () =>
+      EmailService.sendPaymentProofSubmitted(order, referenceOrTxid)
+    );
 
     CommerceRepository.logAudit({
       action: 'PAYMENT_PROOF_SUBMITTED',
@@ -137,6 +134,8 @@ export async function verifyPaymentStatusAction(input: VerifyPaymentInput) {
       return { success: false, error: `Order ${orderId} not found.` };
     }
 
+    const previousStatus = order.status;
+
     // Finite State Machine verification
     const transitionCheck = OrderStatusService.canRolePerformTransition({
       fromStatus: order.status,
@@ -159,14 +158,10 @@ export async function verifyPaymentStatusAction(input: VerifyPaymentInput) {
       notes || `Payment audited and confirmed by ${actorRole}`
     );
 
-    // Send confirmation email if verified
-    if (targetStatus === 'PAYMENT_VERIFIED') {
-      EmailTemplates.renderPaymentVerifiedNotice({
-        customerName: `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`,
-        orderNumber: order.orderNumber,
-        supportEmail: 'sales@fusionbars.eu',
-      });
-    }
+    await dispatchOrderStatusEmail(order, targetStatus, {
+      previousStatus,
+      reason: notes,
+    });
 
     CommerceRepository.logAudit({
       action: 'PAYMENT_VERIFIED',

@@ -3,6 +3,22 @@
 # Production DNS Records Checklist for https://fusionbars.eu
 # ==============================================================================
 
+## 0. Application Environment Variables (Resend)
+
+Configure these in Vercel **Production** and **Preview** (and locally in `.env`, never committed):
+
+| Variable | Purpose |
+| :--- | :--- |
+| `EMAIL_PROVIDER` | `resend` in production, `mock` in local dev |
+| `EMAIL_PROVIDER_KEY` | Resend API key (`re_…`) |
+| `EMAIL_FROM` | e.g. `Fusion Mushroom Bars EU <sales@fusionbars.eu>` |
+| `EMAIL_REPLY_TO` | Customer reply address (`sales@fusionbars.eu`) |
+| `EMAIL_OPS_INBOX` | Internal alerts for new orders and contact form (`sales@fusionbars.eu`) |
+
+Transactional templates (orders, payment updates, contact, newsletter) send through [src/services/email/EmailService.ts](../src/services/email/EmailService.ts) once DNS authentication below is verified.
+
+---
+
 ## 1. Domain Authentication Overview
 
 To ensure deliverability of transactional emails from `sales@fusionbars.eu` to European inboxes (Gmail, Outlook, ProtonMail, GMX, T-Online) and avoid quarantine or spam classification, configure the following DNS records at the domain registrar / DNS provider for `fusionbars.eu`.

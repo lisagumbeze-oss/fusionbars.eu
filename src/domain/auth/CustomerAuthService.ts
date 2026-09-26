@@ -7,7 +7,7 @@ import crypto from 'crypto';
 import { CurrencyCode, LocaleCode, MinorUnits } from '@/types';
 import { AuthService } from './AuthService';
 import { CommerceRepository, DbAddress, DbCustomer } from '@/lib/commerce-repository';
-import { EmailTemplates } from '@/emails/templates';
+import { dispatchEmailSafely, EmailService } from '@/services/email/EmailService';
 
 export interface CustomerRegistrationInput {
   email: string;
@@ -80,6 +80,19 @@ export class CustomerAuthService {
       metadata: JSON.stringify({ email: created.email, currency: created.preferredCurrency }),
     });
 
+    const locale = input.preferredLocale || 'en';
+    const baseUrl =
+      process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://fusionbars.eu';
+    const accountUrl = `${baseUrl.replace(/\/$/, '')}/${locale}/account`;
+    const verifyUrl = `${accountUrl}?verifyToken=${verificationToken}`;
+
+    void dispatchEmailSafely('customer_welcome', () =>
+      EmailService.sendCustomerWelcome(created.email, created.firstName, locale)
+    );
+    void dispatchEmailSafely('email_verification', () =>
+      EmailService.sendEmailVerification(created.email, created.firstName, verifyUrl)
+    );
+
     return {
       customer: this.sanitizeCustomer(created),
       sessionToken,
@@ -148,14 +161,14 @@ export class CustomerAuthService {
       resetPasswordExpires: expiresAt,
     } as any);
 
-    const resetUrl = `https://fusionbars.eu/${customer.languageCode || 'en'}/account/reset-password?token=${resetToken}`;
+    const locale = customer.languageCode || 'en';
+    const baseUrl =
+      process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://fusionbars.eu';
+    const resetUrl = `${baseUrl.replace(/\/$/, '')}/${locale}/account/reset-password?token=${resetToken}`;
 
-    // Dispatches email template
-    EmailTemplates.renderPasswordResetEmail({
-      customerName: customer.firstName,
-      resetUrl,
-      supportEmail: 'sales@fusionbars.eu',
-    });
+    void dispatchEmailSafely('password_reset', () =>
+      EmailService.sendPasswordReset(customer.email, customer.firstName, resetUrl)
+    );
 
     CommerceRepository.logAudit({
       action: 'PASSWORD_RESET_REQUESTED',

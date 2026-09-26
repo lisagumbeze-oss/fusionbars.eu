@@ -4,6 +4,7 @@
 // ==============================================================================
 
 import { resolveDatabaseUrls } from '@/config/database-url';
+import { EmailService } from '@/services/email/EmailService';
 
 export type EnvironmentMode = 'development' | 'preview' | 'production' | 'test';
 
@@ -28,6 +29,7 @@ export interface AppEnvironmentConfig {
     apiKey?: string;
     from: string;
     replyTo: string;
+    opsInbox: string;
   };
   storage: {
     provider: 'mock' | 's3' | 'cloudflare_r2';
@@ -112,8 +114,18 @@ export class EnvironmentService {
     // 3. Email provider
     const emailProvider = (process.env.EMAIL_PROVIDER as any) || (isProduction ? 'resend' : 'mock');
     const emailKey = process.env.EMAIL_PROVIDER_KEY;
-    const emailFrom = process.env.EMAIL_FROM || 'sales@fusionbars.eu';
+    const emailFrom = process.env.EMAIL_FROM || 'Fusion Mushroom Bars EU <sales@fusionbars.eu>';
     const emailReplyTo = process.env.EMAIL_REPLY_TO || 'sales@fusionbars.eu';
+    const emailOpsInbox = process.env.EMAIL_OPS_INBOX || emailReplyTo;
+
+    EmailService.initializeFromConfig({
+      providerName: emailProvider,
+      apiKey: emailKey,
+      from: emailFrom,
+      replyTo: emailReplyTo,
+      opsInbox: emailOpsInbox,
+      baseUrl: siteUrl,
+    });
 
     // 4. Object storage
     const storageProvider = (process.env.STORAGE_PROVIDER as any) || (isProduction ? 's3' : 'mock');
@@ -169,6 +181,7 @@ export class EnvironmentService {
         apiKey: emailKey,
         from: emailFrom,
         replyTo: emailReplyTo,
+        opsInbox: emailOpsInbox,
       },
       storage: {
         provider: storageProvider,

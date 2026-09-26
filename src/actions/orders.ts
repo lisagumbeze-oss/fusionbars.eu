@@ -8,7 +8,6 @@ import { OrderStatusService } from '../domain/orders/OrderStatusService';
 import { RBACService } from '../domain/auth/RBACService';
 import { AuthService } from '../domain/auth/AuthService';
 import { CommerceRepository, DbOrder } from '../lib/commerce-repository';
-import { EmailTemplates } from '../emails/templates';
 import { OrderStatus, RoleName } from '../types';
 
 /**
@@ -207,6 +206,8 @@ export async function updateOrderStatusAdminAction(input: {
       order.carrierName = input.carrierName.trim();
     }
 
+    const previousStatus = order.status;
+
     const updated = await CommerceRepository.updateOrderStatus(
       order.id,
       validated.newStatus,
@@ -215,39 +216,11 @@ export async function updateOrderStatusAdminAction(input: {
       validated.note
     );
 
-    // Dispatch Lifecycle Email Notifications
-    const customerName = `${order.shippingAddress.firstName} ${order.shippingAddress.lastName}`;
-    const supportEmail = 'sales@fusionbars.eu';
-
-    if (validated.newStatus === 'PAYMENT_VERIFIED') {
-      EmailTemplates.renderPaymentVerifiedNotice({
-        customerName,
-        orderNumber: order.orderNumber,
-        supportEmail,
-      });
-    } else if (validated.newStatus === 'SHIPPED') {
-      EmailTemplates.renderOrderShippedNotice({
-        customerName,
-        orderNumber: order.orderNumber,
-        trackingNumber: order.trackingNumber || undefined,
-        carrierName: order.carrierName || undefined,
-        hubCode: order.shippingOriginHub,
-        supportEmail,
-      });
-    } else if (validated.newStatus === 'DELIVERED') {
-      EmailTemplates.renderOrderDeliveredNotice({
-        customerName,
-        orderNumber: order.orderNumber,
-        supportEmail,
-      });
-    } else if (validated.newStatus === 'CANCELLED') {
-      EmailTemplates.renderOrderCancelledNotice({
-        customerName,
-        orderNumber: order.orderNumber,
-        reason: validated.note || 'Administrative cancellation',
-        supportEmail,
-      });
-    }
+    const { dispatchOrderStatusEmail } = await import('@/services/email/order-notifications');
+    await dispatchOrderStatusEmail(order, validated.newStatus, {
+      previousStatus,
+      reason: validated.note,
+    });
 
     CommerceRepository.logAudit({
       action: 'ORDER_STATUS_CHANGED',

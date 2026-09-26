@@ -5,19 +5,32 @@ import Link from 'next/link';
 import { Mail, Shield, Check, ArrowRight } from 'lucide-react';
 import { useCommerce } from '../context/CommerceContext';
 import { getDictionary } from '../i18n';
+import { subscribeNewsletterAction } from '@/actions/contact';
 
 export default function Footer() {
   const { locale } = useCommerce();
   const dict = getDictionary(locale);
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [subscribeError, setSubscribeError] = useState<string | null>(null);
+  const [subscribing, setSubscribing] = useState(false);
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email && email.includes('@')) {
-      setSubscribed(true);
-      setEmail('');
+    setSubscribeError(null);
+    if (!email || !email.includes('@')) return;
+
+    setSubscribing(true);
+    const result = await subscribeNewsletterAction({ email, locale });
+    setSubscribing(false);
+
+    if (!result.success) {
+      setSubscribeError(result.error || 'Subscription failed.');
+      return;
     }
+
+    setSubscribed(true);
+    setEmail('');
   };
 
   return (
@@ -134,16 +147,21 @@ export default function Footer() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter email address..."
+                  disabled={subscribing}
                   className="w-full bg-neutral-900 border border-neutral-700 px-3 py-2 text-neutral-200 text-xs rounded-l outline-none focus:border-[#4A5D4E]"
                 />
                 <button
                   type="submit"
-                  className="px-3.5 bg-[#4A5D4E] hover:bg-[#3B4A3E] text-white rounded-r transition flex items-center justify-center cursor-pointer"
+                  disabled={subscribing}
+                  className="px-3.5 bg-[#4A5D4E] hover:bg-[#3B4A3E] text-white rounded-r transition flex items-center justify-center cursor-pointer disabled:opacity-50"
                   aria-label="Subscribe to newsletter"
                 >
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
+              {subscribeError && (
+                <p className="text-[10px] text-red-400">{subscribeError}</p>
+              )}
               <p className="text-[10px] text-neutral-500">We respect European GDPR privacy standards. No marketing spam.</p>
             </form>
           )}

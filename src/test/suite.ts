@@ -42,6 +42,7 @@ import { PaymentActivationService } from '@/domain/payments/PaymentActivationSer
 import { ProductPublicationGuard } from '@/domain/catalog/ProductPublicationGuard';
 import { MasterCatalogueImportService } from '@/domain/import/MasterCatalogueImportService';
 import { DeterministicMatchingEngine } from '@/domain/import/DeterministicMatchingEngine';
+import { CatalogueReviewService } from '@/domain/catalog/CatalogueReviewService';
 
 export interface TestResult {
   name: string;
@@ -1732,6 +1733,16 @@ export class DomainTestSuite {
         if (!dict.navigation || !dict.navigation.shop || !dict.navigation.cart || !dict.navigation.account) {
           throw new Error(`Locale "${loc}" has incomplete navigation dictionary keys`);
         }
+        if (
+          !dict.bottomBar ||
+          !dict.bottomBar.home ||
+          !dict.bottomBar.shop ||
+          !dict.bottomBar.search ||
+          !dict.bottomBar.cart ||
+          !dict.bottomBar.account
+        ) {
+          throw new Error(`Locale "${loc}" has incomplete mobile bottom-bar dictionary keys`);
+        }
         if (!dict.common || !dict.common.brandName || !dict.common.supportEmail) {
           throw new Error(`Locale "${loc}" has incomplete common dictionary keys`);
         }
@@ -2194,6 +2205,386 @@ export class DomainTestSuite {
       const ordersAfter = await CommerceRepository.getAllOrders();
       if (ordersBefore.length !== ordersAfter.length) {
         throw new Error('Master import pipeline mutated order records');
+      }
+    });
+
+    // ----------------------------------------------------
+    // CATALOGUE REVIEW CENTER (15 GOVERNANCE TESTS)
+    // ----------------------------------------------------
+    const reviewActor = {
+      actor: 'qa.review.officer@fusionbars.eu',
+      actorRole: 'SUPER_ADMIN' as const,
+    };
+
+    const requireReviewProduct = (slug = 'fusion-bar-almond-crush') => {
+      const product = CatalogueReviewService.getProductDetail(slug);
+      if (!product) throw new Error(`Expected review product ${slug} to exist`);
+      return product;
+    };
+
+    await run('Catalogue Review Center', 'Review decision persistence', () => {
+      CatalogueReviewService.resetStateForTests();
+      const product = requireReviewProduct();
+      const fieldName = product.fieldComparisons[0]?.fieldName || 'name';
+      const result = CatalogueReviewService.approveFieldDecision({
+        productSlug: product.canonicalSlug,
+        fieldName,
+        choice: 'KEEP_CURRENT_EU',
+        ...reviewActor,
+        reason: 'Persisted European working value after source comparison',
+      });
+      if (!result.success) throw new Error(result.error || 'Field approval failed');
+      const reloaded = CatalogueReviewService.getProductDetail(product.canonicalSlug);
+      if (!reloaded?.fieldDecisions[fieldName]) {
+        throw new Error('Field decision was not persisted on the review product');
+      }
+      if (reloaded.fieldDecisions[fieldName].actor !== reviewActor.actor) {
+        throw new Error('Persisted decision must record the acting administrator');
+      }
+    });
+
+    await run('Catalogue Review Center', 'Source provenance preservation', () => {
+      CatalogueReviewService.resetStateForTests();
+      const product = requireReviewProduct();
+      const beforeSources = JSON.stringify(product.sources);
+      const beforeMappings = JSON.stringify(product.retainedSourceMappings);
+      CatalogueReviewService.approveFieldDecision({
+        productSlug: product.canonicalSlug,
+        fieldName: 'name',
+        choice: 'CUSTOM_APPROVED_VALUE',
+        customValue: 'European Working Title',
+        ...reviewActor,
+        reason: 'Working title updated without mutating source provenance',
+      });
+      const after = CatalogueReviewService.getProductDetail(product.canonicalSlug);
+      if (JSON.stringify(after?.sources) !== beforeSources) {
+        throw new Error('Source records must remain unchanged after a field decision');
+      }
+      if (JSON.stringify(after?.retainedSourceMappings) !== beforeMappings) {
+        throw new Error('Retained source mappings must be preserved');
+      }
+    });
+
+    await run('Catalogue Review Center', 'Variant merge approval', () => {
+      CatalogueReviewService.resetStateForTests();
+      const child = requireReviewProduct('fusion-bar-almond-crush');
+      const parentSlug = 'fusion-mushroom-chocolate-bar';
+      const parentBefore = CatalogueReviewService.getProductDetail(parentSlug);
+      const parentVariantCount = parentBefore?.variants.length || 0;
+      const result = CatalogueReviewService.decideVariantStructure({
+        productSlug: child.canonicalSlug,
+        decision: 'PARENT_WITH_VARIANTS',
+        parentTargetSlug: parentSlug,
+        ...reviewActor,
+        reason: 'Explicit administrator approval to merge flavour into parent variants',
+      });
+      if (!result.success) throw new Error(result.error || 'Variant merge failed');
+      const childAfter = CatalogueReviewService.getProductDetail(child.canonicalSlug);
+      if (childAfter?.variantStructureDecision !== 'PARENT_WITH_VARIANTS') {
+        throw new Error('Approved merge must record PARENT_WITH_VARIANTS');
+      }
+      if (!childAfter?.retainedSourceMappings.length) {
+        throw new Error('Merged flavour must retain original source mappings');
+      }
+      const parentAfter = CatalogueReviewService.getProductDetail(parentSlug);
+      if (parentAfter && parentAfter.variants.length < parentVariantCount) {
+        throw new Error('Parent variant list must not shrink after an approved merge');
+      }
+      const mergeAudit = CatalogueReviewService.getAuditTrail().find((a) => a.action === 'VARIANT_MERGED');
+      if (!mergeAudit) throw new Error('VARIANT_MERGED audit record was not created');
+    });
+
+    await run('Catalogue Review Center', 'Variant merge rejection', () => {
+      CatalogueReviewService.resetStateForTests();
+      const parentSlug = 'fusion-mushroom-chocolate-bar';
+      const parentBefore = CatalogueReviewService.getProductDetail(parentSlug);
+      const parentSkus = parentBefore?.variants.map((v) => v.sku).join('|') || '';
+      const child = requireReviewProduct('fusion-bar-matcha');
+      const result = CatalogueReviewService.decideVariantStructure({
+        productSlug: child.canonicalSlug,
+        decision: 'INDIVIDUAL_PRODUCTS',
+        parentTargetSlug: parentSlug,
+        ...reviewActor,
+        reason: 'Rejected automatic flavour merge; keep individual product page',
+      });
+      if (!result.success) throw new Error(result.error || 'Variant merge rejection failed');
+      const childAfter = CatalogueReviewService.getProductDetail(child.canonicalSlug);
+      if (childAfter?.variantStructureDecision !== 'INDIVIDUAL_PRODUCTS') {
+        throw new Error('Rejected merge must record INDIVIDUAL_PRODUCTS');
+      }
+      const parentAfter = CatalogueReviewService.getProductDetail(parentSlug);
+      if (parentAfter && parentAfter.variants.map((v) => v.sku).join('|') !== parentSkus) {
+        throw new Error('Rejected merge must not attach variants onto the parent product');
+      }
+      const splitAudit = CatalogueReviewService.getAuditTrail().find((a) => a.action === 'VARIANT_SPLIT');
+      if (!splitAudit) throw new Error('VARIANT_SPLIT audit record was not created');
+    });
+
+    await run('Catalogue Review Center', 'Pricing review blocking publication', () => {
+      CatalogueReviewService.resetStateForTests();
+      const wholesale =
+        CatalogueReviewService.getProductDetail('fusion-100-bars-boutique-box') ||
+        CatalogueReviewService.getFilteredProducts('PRICE_REVIEW')[0];
+      if (!wholesale) throw new Error('Expected a pricing-review product');
+      if (!wholesale.pricingReviewRequired) {
+        throw new Error('Wholesale/unpriced imports must start as PRICING_REVIEW_REQUIRED');
+      }
+      const published = CatalogueReviewService.publishProduct({
+        productSlug: wholesale.canonicalSlug,
+        ...reviewActor,
+        reason: 'Attempt to publish without approved EUR price',
+      });
+      if (published.success) throw new Error('Products in pricing review must not be publishable');
+      if (!published.error?.toLowerCase().includes('pric')) {
+        throw new Error(`Expected pricing blocker, received: ${published.error}`);
+      }
+    });
+
+    await run('Catalogue Review Center', 'Compliance review blocking publication', () => {
+      CatalogueReviewService.resetStateForTests();
+      const product = requireReviewProduct();
+      CatalogueReviewService.updateComplianceClassification({
+        productSlug: product.canonicalSlug,
+        classification: 'REQUIRES_REVIEW',
+        ...reviewActor,
+        reason: 'Compliance still open',
+      });
+      const published = CatalogueReviewService.publishProduct({
+        productSlug: product.canonicalSlug,
+        ...reviewActor,
+        reason: 'Attempt to publish without compliance approval',
+      });
+      if (published.success) throw new Error('REQUIRES_REVIEW products must not be publishable');
+    });
+
+    await run('Catalogue Review Center', 'Country availability blocking purchase', () => {
+      CatalogueReviewService.resetStateForTests();
+      const product = requireReviewProduct();
+      const live = CatalogueReviewService.getState().products[product.canonicalSlug];
+      live.pricingReviewRequired = false;
+      live.priceEUR = 2500;
+      live.variants[0].priceEUR = 2500;
+      live.variants[0].sku = live.variants[0].sku || 'FUS-ALM-6G';
+      live.complianceClassification = 'APPROVED';
+      live.publicationStatus = 'PUBLISHED';
+      CatalogueReviewService.updateCountryAvailability({
+        productSlug: product.canonicalSlug,
+        countryCode: 'NL',
+        status: 'BLOCKED',
+        ...reviewActor,
+        reason: 'Explicit Netherlands block for review-center eligibility test',
+      });
+      const decision = CatalogueReviewService.evaluatePurchaseEligibility(product.canonicalSlug, 'NL');
+      if (decision.eligible) throw new Error('Blocked country must not be purchasable');
+      if (decision.reasonCode !== 'COUNTRY_BLOCKED') {
+        throw new Error(`Expected COUNTRY_BLOCKED, received ${decision.reasonCode}`);
+      }
+    });
+
+    await run('Catalogue Review Center', 'Category mapping approval', () => {
+      CatalogueReviewService.resetStateForTests();
+      const mapping = CatalogueReviewService.getState().categoryMappings.find((m) => m.approvalStatus === 'PENDING');
+      if (!mapping) throw new Error('Expected at least one pending category mapping');
+      const sourceSlug = mapping.sourceCategorySlug;
+      const sourceName = mapping.sourceCategoryName;
+      const result = CatalogueReviewService.approveCategoryMapping({
+        sourceCategorySlug: sourceSlug,
+        targetCategorySlug: mapping.normalizedCategorySlug,
+        targetCategoryName: mapping.normalizedCategoryName,
+        ...reviewActor,
+        reason: 'Approved source-to-EU category mapping without renaming the raw source category',
+      });
+      if (!result.success || !result.mapping) throw new Error(result.error || 'Category approval failed');
+      if (result.mapping.sourceCategorySlug !== sourceSlug || result.mapping.sourceCategoryName !== sourceName) {
+        throw new Error('Raw source category identity must be preserved');
+      }
+      if (result.mapping.approvalStatus !== 'APPROVED' || result.mapping.actor !== reviewActor.actor) {
+        throw new Error('Approved mapping must record actor and APPROVED status');
+      }
+      if (!result.mapping.timestamp) throw new Error('Approved mapping must record a timestamp');
+    });
+
+    await run('Catalogue Review Center', 'Content approval', () => {
+      CatalogueReviewService.resetStateForTests();
+      const product = requireReviewProduct();
+      const original = product.originalSourceContent;
+      const result = CatalogueReviewService.moderateContent({
+        productSlug: product.canonicalSlug,
+        action: 'APPROVE',
+        ...reviewActor,
+        reason: 'Source copy accepted for European storefront after claims review',
+      });
+      if (!result.success) throw new Error(result.error || 'Content approval failed');
+      if (result.product?.originalSourceContent !== original) {
+        throw new Error('Content approval must not overwrite original source content');
+      }
+      if (result.product?.contentModerationStatus !== 'APPROVED') {
+        throw new Error('Approved content must move to APPROVED');
+      }
+    });
+
+    await run('Catalogue Review Center', 'Review moderation', () => {
+      CatalogueReviewService.resetStateForTests();
+      const review = CatalogueReviewService.getState().reviews[0];
+      if (!review) throw new Error('Expected staged imported reviews');
+      if (review.moderationStatus !== 'STAGED') throw new Error('Imported reviews must start STAGED');
+      const before = {
+        authorName: review.authorName,
+        body: review.body,
+        rating: review.rating,
+        sourceUrl: review.sourceUrl,
+        isVerifiedBuyer: review.isVerifiedBuyer,
+      };
+      const result = CatalogueReviewService.moderateReview({
+        reviewId: review.id,
+        action: 'APPROVE',
+        ...reviewActor,
+        reason: 'Staged review approved for later public use',
+      });
+      if (!result.success || result.review?.moderationStatus !== 'APPROVED') {
+        throw new Error(result.error || 'Review approval failed');
+      }
+      if (
+        result.review.authorName !== before.authorName ||
+        result.review.body !== before.body ||
+        result.review.rating !== before.rating ||
+        result.review.sourceUrl !== before.sourceUrl ||
+        result.review.isVerifiedBuyer !== before.isVerifiedBuyer
+      ) {
+        throw new Error('Review moderation must preserve source, reviewer, rating, body, and verification evidence');
+      }
+    });
+
+    await run('Catalogue Review Center', 'Media approval', () => {
+      CatalogueReviewService.resetStateForTests();
+      const product = requireReviewProduct();
+      const asset = product.mediaAssets[0];
+      if (!asset) throw new Error('Expected at least one media asset on the imported product');
+      const originalUrl = asset.url;
+      const result = CatalogueReviewService.moderateMedia({
+        productSlug: product.canonicalSlug,
+        mediaId: asset.id,
+        action: 'SET_PRIMARY',
+        ...reviewActor,
+        reason: 'Set imported image as working primary without deleting the raw media record',
+      });
+      if (!result.success) throw new Error(result.error || 'Media approval failed');
+      const updated = result.product?.mediaAssets.find((m) => m.id === asset.id);
+      if (!updated?.isPrimary || updated.url !== originalUrl) {
+        throw new Error('Media approval must keep the raw URL and only change product assignment');
+      }
+    });
+
+    await run('Catalogue Review Center', 'Publication readiness', () => {
+      const incomplete = CatalogueReviewService.evaluatePublicationReadiness({
+        canonicalSlug: 'readiness-test',
+        name: 'Readiness Test Bar',
+        pricingReviewRequired: true,
+        complianceClassification: 'REQUIRES_REVIEW',
+        contentModerationStatus: 'PENDING_REVIEW',
+        categorySlug: 'uncategorized',
+        primaryImage: '',
+        variants: [{ id: 'v1', sku: '', name: 'x', flavor: '', stockLevel: 0, image: '' }],
+        countryAvailability: { NL: 'NOT_CONFIGURED' },
+        seo: { isApproved: false },
+        description: '',
+        approvedStoreContent: '',
+      });
+      if (incomplete.isReadyToPublish) throw new Error('Incomplete products must not be READY_TO_PUBLISH');
+      if (incomplete.blockers.length < 6) {
+        throw new Error('Publication checklist must enumerate the failed gates');
+      }
+
+      const complete = CatalogueReviewService.evaluatePublicationReadiness({
+        canonicalSlug: 'ready-bar',
+        name: 'Ready Bar',
+        pricingReviewRequired: false,
+        priceEUR: 2500,
+        complianceClassification: 'APPROVED',
+        contentModerationStatus: 'APPROVED',
+        categorySlug: 'chocolate-bars',
+        primaryImage: '/images/products/chocolate-bar.png',
+        variants: [{ id: 'v1', sku: 'FUS-RDY-6G', name: 'Ready', flavor: 'Original', priceEUR: 2500, stockLevel: 10, image: '/x.png' }],
+        countryAvailability: { NL: 'AVAILABLE' },
+        seo: { isApproved: true, approvedTitle: 'Ready Bar | FusionBars EU' },
+        description: 'Approved European store description for the ready bar.',
+        approvedStoreContent: 'Approved European store description for the ready bar.',
+      });
+      if (!complete.isReadyToPublish) {
+        throw new Error(`Expected READY_TO_PUBLISH, blockers: ${complete.blockers.join('; ')}`);
+      }
+    });
+
+    await run('Catalogue Review Center', 'Audit log creation', () => {
+      CatalogueReviewService.resetStateForTests();
+      const product = requireReviewProduct();
+      CatalogueReviewService.blockProduct({
+        productSlug: product.canonicalSlug,
+        ...reviewActor,
+        reason: 'Blocked for audit-log verification',
+      });
+      const audit = CatalogueReviewService.getAuditTrail().find((a) => a.action === 'PRODUCT_BLOCKED');
+      if (!audit) throw new Error('PRODUCT_BLOCKED audit record missing');
+      if (audit.actor !== reviewActor.actor) throw new Error('Audit record must include actor');
+      if (!audit.timestamp) throw new Error('Audit record must include timestamp');
+      if (audit.entityId !== product.canonicalSlug) throw new Error('Audit record must include entity');
+      if (audit.beforeValue == null) throw new Error('Audit record must include before value');
+      if (audit.afterValue !== 'BLOCKED') throw new Error('Audit record must include after value');
+      if (!audit.reason.includes('audit-log')) throw new Error('Audit record must include reason');
+    });
+
+    await run('Catalogue Review Center', 'Bulk-review safety', () => {
+      CatalogueReviewService.resetStateForTests();
+      const product = requireReviewProduct();
+      const result = CatalogueReviewService.executeBulkAction({
+        productSlugs: [product.canonicalSlug],
+        action: 'PUBLISH_SELECTED',
+        ...reviewActor,
+        reason: 'Bulk publish must not bypass pricing, compliance, or readiness gates',
+      });
+      if (result.affectedCount !== 0) {
+        throw new Error('Bulk publish must not publish products that fail readiness gates');
+      }
+      if (!result.errors || result.errors.length === 0) {
+        throw new Error('Bulk publish must return per-product gate failures');
+      }
+      const stillDraft = CatalogueReviewService.getProductDetail(product.canonicalSlug);
+      if (stillDraft?.publicationStatus === 'PUBLISHED') {
+        throw new Error('Bulk publish must not mark gated products as PUBLISHED');
+      }
+    });
+
+    await run('Catalogue Review Center', 'Raw source immutability', () => {
+      CatalogueReviewService.resetStateForTests();
+      const importResult = MasterCatalogueImportService.getImportResult();
+      const rawBefore = JSON.stringify(
+        importResult.rawProducts.find((p) => p.sourceSlug === 'fusion-bar-almond-crush')
+      );
+      const product = requireReviewProduct();
+      CatalogueReviewService.approveFieldDecision({
+        productSlug: product.canonicalSlug,
+        fieldName: 'name',
+        choice: 'CUSTOM_APPROVED_VALUE',
+        customValue: 'Mutated Working Name',
+        ...reviewActor,
+        reason: 'Working copy change must not mutate raw import records',
+      });
+      CatalogueReviewService.moderateContent({
+        productSlug: product.canonicalSlug,
+        action: 'REWRITE',
+        rewrittenContent: 'Administrator-supplied European store copy.',
+        ...reviewActor,
+        reason: 'Rewrite store copy only',
+      });
+      const rawAfter = JSON.stringify(
+        MasterCatalogueImportService.getImportResult().rawProducts.find((p) => p.sourceSlug === 'fusion-bar-almond-crush')
+      );
+      if (rawBefore !== rawAfter) {
+        throw new Error('Raw import records must remain immutable during catalogue review');
+      }
+      const afterProduct = CatalogueReviewService.getProductDetail(product.canonicalSlug);
+      if (afterProduct?.originalSourceContent !== product.originalSourceContent) {
+        throw new Error('Original source content on the review working copy must stay intact');
       }
     });
 
