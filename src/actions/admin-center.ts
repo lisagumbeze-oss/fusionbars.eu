@@ -14,6 +14,7 @@ import { EmailService } from '@/services/email/EmailService';
 import { LaunchReadinessService } from '@/domain/launch/LaunchReadinessService';
 import { RBACService } from '@/domain/auth/RBACService';
 import { PublicationReadinessService } from '@/domain/catalog/PublicationReadinessService';
+import { PaymentConfigurationService } from '@/domain/payments/PaymentConfigurationService';
 import { CatalogueRolloutService, QueueFilters } from '@/domain/catalog/CatalogueRolloutService';
 import { RoleName } from '@/types';
 import { AdminOverrides } from '@/domain/admin/AdminOverrides';
@@ -199,12 +200,12 @@ export async function getAdminPaymentsAction(role: RoleName) {
       currency: order.currency,
       method: order.paymentMethodCode,
       status: order.status,
-      proof: order.proofFileUrl || '',
+      proofStored: Boolean(order.proofFileUrl),
       reference: order.paymentReference || '',
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
     }));
-  return { success: true as const, payments: queue, canVerify: AdminAccess.canVerifyPayments(role) };
+  return { success: true as const, payments: queue, canVerify: AdminAccess.canVerifyPayments(role), readiness: PaymentConfigurationService.report() };
 }
 
 export async function getAdminProductListAction(role: RoleName, query = '') {

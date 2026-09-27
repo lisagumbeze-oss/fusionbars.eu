@@ -276,6 +276,22 @@ export class LaunchReadinessService {
       };
     }
 
+    const bankText = `${iban} ${bic} ${holder} ${bankName}`.toLowerCase();
+    if (bankText.includes('test') || bankText.includes('placeholder') || iban.includes('0000000000')) {
+      return {
+        id: 'bank_transfer',
+        name: 'Production Bank Transfer Coordinates',
+        category: 'Payments',
+        description: 'European SEPA banking details for direct bank transfer settlements.',
+        severity: 'MANDATORY',
+        status: 'BLOCKED',
+        validationMessage: 'Bank transfer credentials are test placeholders and cannot be treated as production configuration.',
+        requiredInput: 'BANK_ACCOUNT_HOLDER, BANK_NAME, BANK_IBAN, and BANK_BIC_SWIFT from corporate treasury.',
+        owner: 'Finance & Treasury',
+        lastCheckedAt: now,
+      };
+    }
+
     if (!bicRegex.test(bic.replace(/\s+/g, ''))) {
       return {
         id: 'bank_transfer',

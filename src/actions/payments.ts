@@ -57,6 +57,15 @@ export async function submitPaymentProofAction(rawInput: unknown) {
       };
     }
 
+    if (proofFileUrl && /^https?:\/\//i.test(proofFileUrl)) {
+      return { success: false, error: 'Payment evidence cannot use a public URL.' };
+    }
+
+    const existingOrders = await CommerceRepository.getAllOrders();
+    if (existingOrders.some((existing) => existing.id !== order.id && existing.paymentReference === referenceOrTxid)) {
+      return { success: false, error: 'Duplicate payment reference.' };
+    }
+
     // Validate that order can transition from PENDING_PAYMENT to PAYMENT_SUBMITTED by CUSTOMER
     const transitionCheck = OrderStatusService.canRolePerformTransition({
       fromStatus: order.status,
@@ -109,6 +118,7 @@ export interface VerifyPaymentInput {
   actorRole: RoleName;
   actorId: string;
   notes?: string;
+  submittedAmount?: number | null;
 }
 
 /**
@@ -132,6 +142,24 @@ export async function verifyPaymentStatusAction(input: VerifyPaymentInput) {
     const order = await CommerceRepository.findOrderByIdOrNumber(orderId);
     if (!order) {
       return { success: false, error: `Order ${orderId} not found.` };
+    }
+
+    if (order.status === 'PAYMENT_VERIFIED' && targetStatus === 'PAYMENT_VERIFIED') {
+      return {
+        success: true,
+        message: `Order ${order.orderNumber} is already verified.`,
+        orderId: order.id,
+        newStatus: 'PAYMENT_VERIFIED',
+        idempotent: true,
+      };
+    }
+
+    if (input.submittedAmount != null && input.submittedAmount !== order.totalAmount) {
+      return { success: false, error: 'AMOUNT_MISMATCH' };
+    }
+
+    if (targetStatus === 'CANCELLED' && !notes?.trim()) {
+      return { success: false, error: 'Rejection requires a reason.' };
     }
 
     const previousStatus = order.status;

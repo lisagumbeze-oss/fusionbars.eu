@@ -54,7 +54,7 @@ export const paymentProofSubmissionSchema = z.object({
   orderId: z.string().min(1, 'Order ID is required'),
   referenceOrTxid: z.string().min(4, 'Reference or TXID is required').max(255),
   senderAccountName: z.string().max(100).optional(),
-  proofFileUrl: z.string().url('Proof file must be a valid URL').optional(),
+  proofFileUrl: z.string().min(1).max(500).refine((value) => !/^https?:\/\//i.test(value) && !value.includes('..'), 'Payment evidence cannot use a public URL.').optional(),
   lookupToken: z.string().optional(),
   guestEmail: z.string().email().optional(),
 });

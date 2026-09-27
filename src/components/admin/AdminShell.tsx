@@ -21,6 +21,7 @@ const GROUPS: Array<{ label: string; items: NavItem[] }> = [
     items: [
       { section: 'orders', label: 'Orders', href: '/admin/orders' },
       { section: 'payments', label: 'Payments', href: '/admin/payments' },
+      { section: 'payments', label: 'Payment settings', href: '/admin/settings/payments' },
       { section: 'pricing', label: 'Pricing', href: '/admin/pricing' },
       { section: 'customers', label: 'Customers', href: '/admin/customers' },
       { section: 'promotions', label: 'Promotions', href: '/admin/promotions' },
@@ -79,6 +80,7 @@ const GROUPS: Array<{ label: string; items: NavItem[] }> = [
 const TITLES: Array<{ test: (path: string) => boolean; title: string; description: string }> = [
   { test: (path) => path.endsWith('/admin'), title: 'Operations dashboard', description: 'Live commerce, catalogue, and governance workload.' },
   { test: (path) => path.includes('/admin/orders'), title: 'Orders', description: 'Canonical order lifecycle and fulfilment.' },
+  { test: (path) => path.includes('/admin/settings/payments'), title: 'Payment settings', description: 'Bank transfer and crypto readiness. Placeholder credentials cannot become active.' },
   { test: (path) => path.includes('/admin/payments'), title: 'Payment verification', description: 'Bank transfer and crypto evidence awaiting a human decision.' },
   { test: (path) => path.includes('/admin/pricing'), title: 'Commercial pricing', description: 'Approved selling prices stay separate from source prices. Missing prices stay unconfigured.' },
   { test: (path) => path.includes('/admin/settings/commercial'), title: 'Commercial settings', description: 'Currency, tax, shipping, and promotion policy. Production stays paused.' },

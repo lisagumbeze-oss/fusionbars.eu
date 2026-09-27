@@ -369,6 +369,17 @@ export default function AdminModule({ module }: { module: ModuleId }) {
           <Link className="rounded-lg border px-2 py-1" href={`/${locale}/admin/payments?method=bank`}>Bank transfer</Link>
           <Link className="rounded-lg border px-2 py-1" href={`/${locale}/admin/payments?method=crypto`}>Crypto</Link>
         </div>
+        {payload?.readiness && (
+          <div className="rounded-2xl border border-[#E5E3DD] bg-white p-4 text-sm">
+            <p>Production: {payload.readiness.production}</p>
+            <p>Bank transfer: {payload.readiness.bank}</p>
+            <p>Bitcoin: {payload.readiness.crypto.BTC}</p>
+            <p>USDT: {payload.readiness.crypto.USDT}</p>
+            <p>Ethereum: {payload.readiness.crypto.ETH}</p>
+            <p>Production payment options: {payload.readiness.productionOptions.join(', ') || 'None'}</p>
+            <p>Crypto amount rule: {payload.readiness.conversion}</p>
+          </div>
+        )}
         {rows.length === 0 ? <StateMessage message="No payments currently require verification." /> : (
           <div className="overflow-x-auto rounded-2xl border border-[#E5E3DD] bg-white">
             <table className="w-full text-left text-xs">
@@ -382,7 +393,7 @@ export default function AdminModule({ module }: { module: ModuleId }) {
                     <td className="p-3">{row.method}</td>
                     <td className="p-3">{row.status}</td>
                     <td className="p-3">{row.updatedAt || row.createdAt}</td>
-                    <td className="p-3">{row.proof ? <a className="underline" href={row.proof}>View evidence</a> : row.reference || 'No evidence file is attached.'}</td>
+                    <td className="p-3">{row.proofStored ? 'Private evidence on file' : row.reference || 'No evidence file is attached.'}</td>
                     <td className="p-3 space-y-1">
                       <button type="button" disabled={!payload?.canVerify} className="block text-left underline disabled:opacity-40" onClick={() => setConfirm({ title: `Verify ${row.orderNumber}? This records an auditable payment decision.`, run: async () => { const res = await verifyPaymentStatusAction({ orderId: row.id, targetStatus: 'PAYMENT_VERIFIED', actorRole: role, actorId: 'admin-finance-desk' }); setNotice(res.success ? res.message || 'Verified' : res.error || 'Verification was not applied.'); } })}>Verify</button>
                       <button type="button" disabled={!payload?.canVerify} className="block text-left underline disabled:opacity-40" onClick={() => setConfirm({ title: `Reject ${row.orderNumber}? The order moves to CANCELLED and the action is audited.`, run: async () => { const res = await updateOrderStatusAdminAction({ orderId: row.id, newStatus: 'CANCELLED', actorRole: role, actorId: 'admin-finance-desk', note: 'Payment rejected' }); setNotice(res.success ? 'Payment rejected.' : res.error || 'Rejection was not applied.'); } })}>Reject</button>

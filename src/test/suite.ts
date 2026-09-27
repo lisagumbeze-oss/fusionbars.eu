@@ -47,6 +47,8 @@ import { getDictionary } from '@/i18n';
 import { LaunchReadinessService } from '@/domain/launch/LaunchReadinessService';
 import { ProductionDeploymentGuard } from '@/domain/launch/ProductionDeploymentGuard';
 import { PaymentActivationService } from '@/domain/payments/PaymentActivationService';
+import { PaymentConfigurationService } from '@/domain/payments/PaymentConfigurationService';
+import { PaymentVerificationService } from '@/domain/payments/PaymentVerificationService';
 import { ProductPublicationGuard } from '@/domain/catalog/ProductPublicationGuard';
 import { MasterCatalogueImportService } from '@/domain/import/MasterCatalogueImportService';
 import { DeterministicMatchingEngine } from '@/domain/import/DeterministicMatchingEngine';
@@ -5988,6 +5990,52 @@ export class DomainTestSuite {
       }
       if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production must stay paused');
       DestinationEngine.resetForTests();
+    });
+
+    await run('Payment Configuration', 'Production payment methods stay inactive until explicit activation', () => {
+      PaymentConfigurationService.resetForTests();
+      PaymentVerificationService.resetForTests();
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const beforeSpecialist = JSON.stringify(specialistExecution);
+      const report = PaymentConfigurationService.report();
+      if (report.production !== 'PAUSED' || report.productionOptions.length !== 0) throw new Error('A payment method became production-active');
+      if (report.bank === 'ACTIVE' || report.crypto.BTC === 'ACTIVE') throw new Error('Placeholder credentials were treated as active');
+      if (PaymentConfigurationService.quoteCrypto('BTC').error !== 'CRYPTO_RATE_CONFIGURATION_REQUIRED') throw new Error('A crypto rate was guessed');
+      if (!PaymentConfigurationService.customerReference('FB-EU-2026-10001').startsWith('FUSION-FB-EU-')) throw new Error('Payment reference was not customer-safe');
+      const activation = PaymentConfigurationService.activate({ code: 'SEPA_IBAN', actor: 'finance', role: 'SUPER_ADMIN', confirmation: 'ACTIVATE_PAYMENT_METHOD', rationale: 'Attempt' });
+      if (activation.success) throw new Error('Saving or confirming placeholders activated bank transfer');
+      PaymentConfigurationService.disable({ code: 'CRYPTO_BTC', actor: 'finance', role: 'FINANCE_MANAGER', rationale: 'Pause new attempts' });
+      if (PaymentConfigurationService.cryptoState('BTC') !== 'DISABLED' || PaymentConfigurationService.report().audit < 1) throw new Error('Disabling a method did not keep an audit record');
+      PaymentVerificationService.registerProof({ orderNumber: 'FB-EU-2026-10001', reference: 'BANK-REF-1', expectedAmount: 1500, evidenceKey: 'private/proofs/bank-ref-1' });
+      const mismatch = PaymentVerificationService.review({ orderNumber: 'FB-EU-2026-10001', actor: 'finance', role: 'FINANCE_MANAGER', decision: 'VERIFIED', submittedAmount: 1400, reason: 'Checked' });
+      if (mismatch.code !== 'AMOUNT_MISMATCH') throw new Error('An amount mismatch was verified');
+      const verified = PaymentVerificationService.review({ orderNumber: 'FB-EU-2026-10001', actor: 'finance', role: 'FINANCE_MANAGER', decision: 'VERIFIED', submittedAmount: 1500, reason: 'Matched' });
+      const repeat = PaymentVerificationService.review({ orderNumber: 'FB-EU-2026-10001', actor: 'finance', role: 'FINANCE_MANAGER', decision: 'VERIFIED', submittedAmount: 1500, reason: 'Matched again' });
+      if (verified.state !== 'VERIFIED' || !repeat.idempotent || repeat.notified) throw new Error('Verification was not idempotent');
+      PaymentVerificationService.registerProof({ orderNumber: 'FB-EU-2026-10002', reference: 'BANK-REF-2', expectedAmount: 1500, evidenceKey: 'private/proofs/bank-ref-2' });
+      const rejected = PaymentVerificationService.review({ orderNumber: 'FB-EU-2026-10002', actor: 'finance', role: 'FINANCE_MANAGER', decision: 'REJECTED', reason: 'Invalid evidence' });
+      const resubmitted = PaymentVerificationService.resubmit({ orderNumber: 'FB-EU-2026-10002', reference: 'BANK-REF-3', evidenceKey: 'private/proofs/bank-ref-3' });
+      if (rejected.previousEvidence !== 'private/proofs/bank-ref-2' || resubmitted.evidenceKey !== 'private/proofs/bank-ref-3') throw new Error('Resubmission overwrote evidence');
+      let duplicate = false;
+      try { PaymentVerificationService.registerProof({ orderNumber: 'FB-EU-2026-10003', reference: 'BANK-REF-1', expectedAmount: 1500 }); } catch { duplicate = true; }
+      let publicUrl = false;
+      try { PaymentVerificationService.registerProof({ orderNumber: 'FB-EU-2026-10004', reference: 'BANK-REF-4', expectedAmount: 1500, evidenceKey: 'https://example.com/proof.png' }); } catch { publicUrl = true; }
+      let unauthorized = false;
+      try { PaymentVerificationService.review({ orderNumber: 'FB-EU-2026-10002', actor: 'customer', role: 'CUSTOMER', decision: 'VERIFIED', reason: 'Self approval' }); } catch { unauthorized = true; }
+      let unpublished = false;
+      try { PaymentVerificationService.assertPayable({ status: 'PENDING_PAYMENT', slug: 'audit-test-product', country: 'DE' }); } catch { unpublished = true; }
+      let cancelled = false;
+      try { PaymentVerificationService.assertPayable({ status: 'CANCELLED' }); } catch { cancelled = true; }
+      let paid = false;
+      try { PaymentVerificationService.assertPayable({ status: 'PAYMENT_VERIFIED' }); } catch { paid = true; }
+      if (!duplicate || !publicUrl || !unauthorized || !unpublished || !cancelled || !paid) throw new Error('Payment guards did not reject an invalid case');
+      if (!PaymentVerificationService.eventsRecorded().includes('PaymentVerified') || !PaymentVerificationService.eventsRecorded().includes('PaymentRejected')) throw new Error('Payment events were not recorded');
+      const publicOptions = PaymentConfigService.getPublicPaymentOptions();
+      if (publicOptions.some((option) => 'iban' in option || 'receivingAddress' in option)) throw new Error('Public payment options exposed credentials');
+      if (JSON.stringify(firstBatchState) !== beforeBatch || JSON.stringify(specialistExecution) !== beforeSpecialist) throw new Error('Payment configuration changed the pilot files');
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production must stay paused');
+      PaymentConfigurationService.resetForTests();
+      PaymentVerificationService.resetForTests();
     });
 
     const passedCount = results.filter((r) => r.passed).length;

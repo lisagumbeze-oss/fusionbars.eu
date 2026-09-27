@@ -98,11 +98,11 @@ export default function OrderLookupPage() {
       case 'DRAFT':
         return <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-neutral-100 text-neutral-700">DRAFT</span>;
       case 'PENDING_PAYMENT':
-        return <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-50 text-amber-800 border border-amber-200">AWAITING PAYMENT</span>;
+        return <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-amber-50 text-amber-800 border border-amber-200">Payment instructions provided</span>;
       case 'PAYMENT_SUBMITTED':
-        return <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-800 border border-blue-200">PAYMENT SUBMITTED (AUDIT IN PROGRESS)</span>;
+        return <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-blue-50 text-blue-800 border border-blue-200">Payment under verification</span>;
       case 'PAYMENT_VERIFIED':
-        return <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">PAYMENT VERIFIED</span>;
+        return <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200">Payment verified</span>;
       case 'PROCESSING':
         return <span className="px-2.5 py-1 text-xs font-semibold rounded-full bg-indigo-50 text-indigo-800 border border-indigo-200">PROCESSING & DISCREET PACKAGING</span>;
       case 'SHIPPED':
