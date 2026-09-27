@@ -44,6 +44,7 @@ const GROUPS: Array<{ label: string; items: NavItem[] }> = [
     items: [
       { section: 'compliance', label: 'Compliance', href: '/admin/compliance' },
       { section: 'countries', label: 'Country Eligibility', href: '/admin/compliance/countries' },
+      { section: 'shipping', label: 'Shipping', href: '/admin/shipping' },
       { section: 'content-review', label: 'Content Review', href: '/admin/content' },
       { section: 'audit', label: 'Audit Logs', href: '/admin/audit' },
     ],
@@ -92,6 +93,7 @@ const TITLES: Array<{ test: (path: string) => boolean; title: string; descriptio
   { test: (path) => path.includes('/admin/catalogue/media'), title: 'Media review', description: 'Products whose media still needs a human check.' },
   { test: (path) => path.includes('/admin/catalogue/translations'), title: 'Translation review', description: 'Locale workflow still waiting for human text.' },
   { test: (path) => path.includes('/admin/catalogue'), title: 'Catalogue operations', description: 'Data, specialist, and publication state for the current review batch.' },
+  { test: (path) => path.includes('/admin/shipping'), title: 'Shipping and destinations', description: 'Store shipping, product eligibility, and fulfilment routing stay separate. Missing eligibility is not approval.' },
   { test: (path) => path.includes('/admin/compliance/countries'), title: 'Country eligibility', description: 'Country decisions stay unresolved until a compliance officer records them.' },
   { test: (path) => path.includes('/admin/compliance'), title: 'Compliance', description: 'Compliance reviews that are still pending.' },
   { test: (path) => path.includes('/admin/content'), title: 'Content review', description: 'Internal source content that has not been approved for the public site.' },

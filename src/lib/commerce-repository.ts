@@ -125,6 +125,17 @@ export interface DbOrder {
     destinationCountry: string;
     capturedAt: string;
   };
+  shippingSnapshot?: {
+    country: string;
+    method: string;
+    price: MinorUnits;
+    currency: CurrencyCode;
+    taxTreatment: string;
+    hub: string;
+    configurationVersion: number;
+    eligibility: string;
+    capturedAt: string;
+  };
 }
 
 export interface DbInventoryRecord {

@@ -7,6 +7,7 @@ import { CurrencyCode, FulfilmentHubCode, MinorUnits, ShippingMethodOption } fro
 import { MoneyEngine } from '@/lib/money';
 import { AdminOverrides } from '@/domain/admin/AdminOverrides';
 import { CommercialConfigurationService } from '@/domain/commercial/CommercialConfigurationService';
+import { DestinationEngine } from '@/domain/shipping/DestinationEngine';
 
 export interface ShippingCalculationRequest {
   subtotal: MinorUnits;
@@ -93,24 +94,27 @@ export class ShippingService {
         id: 'ship-standard',
         code: 'STANDARD',
         name: 'Standard Discreet Courier',
-        estimatedDays: '2-4 business days',
+        estimatedDays: '',
         cost: standardCost,
         currency,
         isFree: qualifiesForFreeShipping,
       },
-      {
+    ];
+    if (DestinationEngine.expressAvailable(request.destinationCountry)) {
+      methods.push({
         id: 'ship-express',
         code: 'EXPRESS',
         name: 'Express Priority Courier',
-        estimatedDays: '1-2 business days',
+        estimatedDays: '',
         cost: expressCost,
         currency,
         isFree: false,
-      },
-    ];
+      });
+    }
 
     const selectedCode = request.selectedMethodCode || 'STANDARD';
-    const selectedMethod = methods.find((m) => m.code === selectedCode) || methods[0];
+    const selectedMethod = methods.find((m) => m.code === selectedCode);
+    if (!selectedMethod) throw new Error('This delivery method is not available for the selected address.');
     const hub = this.resolveOptimalFulfilmentHub(request.destinationCountry);
 
     return {

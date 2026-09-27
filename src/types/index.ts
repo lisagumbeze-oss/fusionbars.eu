@@ -68,6 +68,7 @@ export interface CountryInfo {
   isEUMember: boolean;
   currency: CurrencyCode;
   active: boolean;
+  alpha3?: string;
 }
 
 export type PaymentMethodType = 'BANK_TRANSFER' | 'CRYPTOCURRENCY';

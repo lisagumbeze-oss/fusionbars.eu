@@ -68,6 +68,8 @@ import { CommercialConfigurationService } from '@/domain/commercial/CommercialCo
 import { PricingEngine } from '@/domain/commercial/PricingEngine';
 import { TaxEngine } from '@/domain/commercial/TaxEngine';
 import { CurrencyConversionService } from '@/domain/commercial/CurrencyConversionService';
+import { DestinationEngine } from '@/domain/shipping/DestinationEngine';
+import { FulfilmentRoutingService } from '@/domain/shipping/FulfilmentRoutingService';
 import rolloutState from '@/data/catalogue-rollout-state.json';
 import firstBatchState from '@/data/catalogue-first-batch-state.json';
 import specialistExecution from '@/data/catalogue-specialist-review-state.json';
@@ -404,7 +406,7 @@ export class DomainTestSuite {
     });
 
     await run('Authentication Sessions', 'Should issue and cryptographically verify session token', () => {
-      const user = { id: 'usr-admin-1', email: 'admin@fusionbars.eu', role: 'SUPER_ADMIN' as const };
+      const user = { id: 'usr-admin-1', email: 'sales@fusionbars.eu', role: 'SUPER_ADMIN' as const };
       const token = AuthService.generateSessionToken(user);
       const verified = AuthService.verifySessionToken(token);
       if (!verified) throw new Error('Failed to verify valid session token');
@@ -5429,24 +5431,24 @@ export class DomainTestSuite {
     await run('Admin Login', 'Only the configured super admin email and password open an admin session', () => {
       const previousEmail = process.env.ADMIN_EMAIL;
       const previousPassword = process.env.ADMIN_PASSWORD;
-      process.env.ADMIN_EMAIL = 'admin@fusionbars.eu';
+      process.env.ADMIN_EMAIL = 'sales@fusionbars.eu';
       process.env.ADMIN_PASSWORD = 'correct-horse-battery';
       try {
-        const wrong = AdminAuthService.authenticate('admin@fusionbars.eu', 'wrong-password-value');
+        const wrong = AdminAuthService.authenticate('sales@fusionbars.eu', 'wrong-password-value');
         if (wrong) throw new Error('Wrong password must not create a session');
         const other = AdminAuthService.authenticate('other@fusionbars.eu', 'correct-horse-battery');
         if (other) throw new Error('A different email must not create a session');
-        const session = AdminAuthService.authenticate('Admin@Fusionbars.eu', 'correct-horse-battery');
+        const session = AdminAuthService.authenticate('Sales@Fusionbars.eu', 'correct-horse-battery');
         if (!session) throw new Error('Configured admin credentials must sign in');
         const user = AuthService.verifySessionToken(session.token);
-        if (!user || user.role !== 'SUPER_ADMIN' || user.email !== 'admin@fusionbars.eu') {
+        if (!user || user.role !== 'SUPER_ADMIN' || user.email !== 'sales@fusionbars.eu') {
           throw new Error('Admin session must be the super admin');
         }
         if (AdminAuthService.sessionFromToken(session.token)?.role !== 'SUPER_ADMIN') {
           throw new Error('Admin cookie token must resolve to super admin');
         }
         process.env.ADMIN_PASSWORD = 'short';
-        if (AdminAuthService.authenticate('admin@fusionbars.eu', 'short')) {
+        if (AdminAuthService.authenticate('sales@fusionbars.eu', 'short')) {
           throw new Error('A short password must not be accepted as configuration');
         }
       } finally {
@@ -5834,6 +5836,158 @@ export class DomainTestSuite {
       }
       if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production must stay paused');
       CommercialConfigurationService.resetForTests();
+    });
+
+    await run('Destination and Shipping', 'Unresolved country eligibility stays blocked and the pilot is unchanged', () => {
+      DestinationEngine.resetForTests();
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const beforeSpecialist = JSON.stringify(specialistExecution);
+      const unresolved = DestinationEngine.evaluate({ slug: 'fixture-no-rule', country: 'DE' });
+      if (unresolved.productDecision !== 'NOT_CONFIGURED' || unresolved.explicitlyAllowed) {
+        throw new Error('Missing country eligibility was treated as allowed');
+      }
+      if (DestinationEngine.storeStatus('DE') !== 'ENABLED' || DestinationEngine.storeStatus('US') !== 'DISABLED' || DestinationEngine.storeStatus('ZZ') !== 'NOT_CONFIGURED') {
+        throw new Error('Store destination status was inferred incorrectly');
+      }
+      const allowed = DestinationEngine.recordRule({
+        actor: 'compliance.review@fusionbars.eu',
+        actorRole: 'COMPLIANCE_MANAGER',
+        productSlug: 'fixture-ship-bar',
+        country: 'DE',
+        decision: 'ALLOWED',
+        rationale: 'Fixture destination approval',
+        evidence: 'Isolated fixture',
+        effectiveFrom: '2020-01-01T00:00:00.000Z',
+      });
+      const allowedDecision = DestinationEngine.evaluate({ slug: 'fixture-ship-bar', country: 'DE', at: '2026-01-01T00:00:00.000Z' });
+      if (!allowedDecision.explicitlyAllowed || allowed.version !== 1) throw new Error('Explicit allowed rule was not used');
+      DestinationEngine.recordRule({
+        actor: 'compliance.review@fusionbars.eu',
+        actorRole: 'COMPLIANCE_MANAGER',
+        productSlug: 'fixture-blocked-bar',
+        country: 'DE',
+        decision: 'BLOCKED',
+        rationale: 'Fixture block',
+        evidence: 'Isolated fixture',
+        effectiveFrom: '2020-01-01T00:00:00.000Z',
+      });
+      const blocked = DestinationEngine.evaluate({ slug: 'fixture-blocked-bar', country: 'DE' });
+      if (!blocked.blockCheckout || /reviewer|evidence|compliance note/i.test(blocked.customerMessage)) {
+        throw new Error('Blocked destination exposed internal compliance detail or remained open');
+      }
+      DestinationEngine.recordRule({
+        actor: 'compliance.review@fusionbars.eu',
+        actorRole: 'COMPLIANCE_MANAGER',
+        productSlug: 'fixture-restricted-bar',
+        country: 'DE',
+        decision: 'RESTRICTED',
+        rationale: 'Fixture restriction',
+        evidence: 'Isolated fixture',
+        effectiveFrom: '2020-01-01T00:00:00.000Z',
+        conditions: [{ type: 'DOCUMENTATION', detail: 'Fixture condition', releasesCheckout: false }],
+      });
+      if (!DestinationEngine.evaluate({ slug: 'fixture-restricted-bar', country: 'DE' }).blockCheckout) {
+        throw new Error('Restricted product was allowed without a releasing condition');
+      }
+      DestinationEngine.deferProducts({
+        actor: 'compliance.review@fusionbars.eu',
+        actorRole: 'COMPLIANCE_MANAGER',
+        productSlugs: ['fixture-deferred-bar'],
+        country: 'DE',
+        reason: 'Awaiting country determination',
+        evidence: 'Fixture deferral',
+      });
+      if (DestinationEngine.evaluate({ slug: 'fixture-deferred-bar', country: 'DE' }).productDecision !== 'DEFERRED') {
+        throw new Error('Deferred country rule was not preserved');
+      }
+      const auditProduct = DestinationEngine.evaluate({ slug: 'audit-test-product', country: 'DE' });
+      if (!auditProduct.blockCheckout) throw new Error('DO_NOT_PUBLISH product became destination-eligible');
+      const cohort = DestinationEngine.cohort();
+      if (cohort.length !== 10 || cohort.some((row) => row.eligibility !== 'NOT_CONFIGURED' || row.countryDecisions !== 0)) {
+        throw new Error('Pilot country decisions were changed');
+      }
+      const route = FulfilmentRoutingService.plan({ destinationCountry: 'DE', items: [{ variantId: 'fixture-line', quantity: 1 }] });
+      if (!route.ok || route.hub !== 'DE') throw new Error(`Expected the Germany hub, got ${JSON.stringify(route)}`);
+      const split = FulfilmentRoutingService.plan({
+        destinationCountry: 'DE',
+        items: [
+          { variantId: 'fixture-a', quantity: 1, requiredHub: 'NL' },
+          { variantId: 'fixture-b', quantity: 1, requiredHub: 'FR' },
+        ],
+      });
+      if (split.ok || split.code !== 'MULTI_HUB_NOT_CONFIGURED') throw new Error('A multi-hub order was split without configuration');
+      const noRoute = FulfilmentRoutingService.plan({
+        destinationCountry: 'DE',
+        items: [{ variantId: 'fixture-stock', quantity: 1 }],
+        failClosed: true,
+        hubStockChecker: () => false,
+      });
+      if (noRoute.ok || noRoute.code !== 'NO_ELIGIBLE_FULFILMENT_ROUTE') throw new Error('A route was invented when no hub could fulfil the order');
+      const standard = ShippingService.calculateShipping({ subtotal: 1000, currency: 'EUR', destinationCountry: 'DE', selectedMethodCode: 'STANDARD' });
+      const express = ShippingService.calculateShipping({ subtotal: 1000, currency: 'EUR', destinationCountry: 'DE', selectedMethodCode: 'EXPRESS' });
+      const free = ShippingService.calculateShipping({ subtotal: 30000, currency: 'EUR', destinationCountry: 'DE', selectedMethodCode: 'STANDARD' });
+      if (standard.selectedMethod.cost !== 1500 || express.selectedMethod.cost !== 2000 || free.selectedMethod.cost !== 0) {
+        throw new Error('Shipping prices changed');
+      }
+      if (standard.selectedMethod.estimatedDays) throw new Error('An unconfigured delivery estimate was published');
+      const shippingTax = DestinationEngine.shippingTax('DE', standard.selectedMethod.cost);
+      if (shippingTax.status !== 'TAX_CONFIGURATION_REQUIRED') throw new Error('Shipping tax was guessed');
+      DestinationEngine.disableExpress('DE', 'order.manager@fusionbars.eu', 'ORDER_MANAGER', 'Fixture express unavailable');
+      let expressHidden = false;
+      try {
+        ShippingService.calculateShipping({ subtotal: 1000, currency: 'EUR', destinationCountry: 'DE', selectedMethodCode: 'EXPRESS' });
+      } catch (err: any) {
+        expressHidden = /not available/.test(err.message || '');
+      }
+      if (!expressHidden) throw new Error('Express remained available after it was disabled for the destination');
+      const historical = { price: 1500, country: 'DE' };
+      DestinationEngine.recordRule({
+        actor: 'compliance.review@fusionbars.eu',
+        actorRole: 'COMPLIANCE_MANAGER',
+        productSlug: 'fixture-later-rule',
+        country: 'FR',
+        decision: 'BLOCKED',
+        rationale: 'Later rule',
+        evidence: 'Must not rewrite the snapshot',
+        effectiveFrom: '2026-09-01T00:00:00.000Z',
+      });
+      if (historical.price !== 1500) throw new Error('A later shipping rule rewrote a stored snapshot');
+      let contentDenied = false;
+      try {
+        DestinationEngine.recordRule({
+          actor: 'content.review@fusionbars.eu',
+          actorRole: 'CONTENT_MANAGER',
+          productSlug: 'fixture-denied',
+          country: 'DE',
+          decision: 'BLOCKED',
+          rationale: 'Should fail',
+          evidence: 'Should fail',
+          effectiveFrom: '2026-01-01T00:00:00.000Z',
+        });
+      } catch (err: any) {
+        contentDenied = /Unauthorized/.test(err.message || '');
+      }
+      if (!contentDenied || !DestinationEngine.canWriteEligibility('COMPLIANCE_MANAGER') || DestinationEngine.canWriteEligibility('FINANCE_MANAGER') || DestinationEngine.canWriteEligibility('CATALOG_MANAGER')) {
+        throw new Error('Country eligibility authority was assigned to the wrong role');
+      }
+      if (!AdminAccess.can('ORDER_MANAGER', 'shipping') || !AdminAccess.can('FINANCE_MANAGER', 'shipping') || AdminAccess.can('CUSTOMER', 'shipping')) {
+        throw new Error('Shipping navigation permissions drifted');
+      }
+      let bulkDenied = false;
+      try {
+        DestinationEngine.rejectUnsafeBulk('ALLOW_ALL_EUROPE');
+      } catch (err: any) {
+        bulkDenied = /not available/.test(err.message || '');
+      }
+      if (!bulkDenied) throw new Error('Bulk Europe approval was available');
+      if (DestinationEngine.get().audit.length < 1) throw new Error('Country changes were not audited');
+      const projection = JSON.stringify(DestinationEngine.publicProjection(blocked));
+      if (/reviewer|evidence|rationale/i.test(projection)) throw new Error('Public destination result exposed internal review data');
+      if (JSON.stringify(firstBatchState) !== beforeBatch || JSON.stringify(specialistExecution) !== beforeSpecialist) {
+        throw new Error('Destination configuration changed the pilot files');
+      }
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production must stay paused');
+      DestinationEngine.resetForTests();
     });
 
     const passedCount = results.filter((r) => r.passed).length;

@@ -17,6 +17,7 @@ import { CountryRegistry } from '@/domain/countries/CountryRegistry';
 import { ProductPurchaseEligibilityService } from '@/domain/catalog/ProductPurchaseEligibilityService';
 import { OrderPricingService } from './OrderPricingService';
 import { ShippingService } from '@/domain/shipping/ShippingService';
+import { DestinationEngine } from '@/domain/shipping/DestinationEngine';
 import { HubAllocationService } from '@/domain/inventory/HubAllocationService';
 import { InventoryService } from '@/domain/inventory/InventoryService';
 import { BankTransferPaymentService, CryptoPaymentService, PaymentInstructions } from '@/domain/payments/PaymentService';
@@ -136,6 +137,10 @@ export class OrderCreationService {
       const publication = PublicationReadinessService.customerPurchaseDecision(product.slug);
       if (!publication.allowed) {
         throw new Error(publication.customerMessage);
+      }
+      const destination = DestinationEngine.evaluate({ slug: product.slug, country: destinationCountry });
+      if (destination.blockCheckout && !destination.unresolved) {
+        throw new Error(destination.customerMessage);
       }
     }
 
@@ -363,6 +368,17 @@ export class OrderCreationService {
       pricingVersion: 'CATALOGUE_UNAPPROVED',
       configurationVersion: commercial.configurationVersion,
       destinationCountry,
+      capturedAt: dbOrder.createdAt,
+    };
+    dbOrder.shippingSnapshot = {
+      country: destinationCountry,
+      method: shippingMethodCode,
+      price: dbOrder.shippingAmount,
+      currency,
+      taxTreatment: 'NOT_CONFIGURED',
+      hub: chosenHub,
+      configurationVersion: DestinationEngine.get().version,
+      eligibility: 'NOT_CONFIGURED',
       capturedAt: dbOrder.createdAt,
     };
 

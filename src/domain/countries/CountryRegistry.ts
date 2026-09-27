@@ -132,4 +132,22 @@ export class CountryRegistry {
     const c = this.getCountry(code);
     return c?.currency || 'EUR';
   }
+
+  static getAlpha3(code: string): string | null {
+    return ALPHA3[code.toUpperCase()] || null;
+  }
+
+  /** Store shipping configuration only. This is not a legal or product eligibility decision. */
+  static storeDestinationStatus(code: string): 'ENABLED' | 'DISABLED' | 'NOT_CONFIGURED' {
+    const country = this.getCountry(code);
+    if (!country) return 'NOT_CONFIGURED';
+    return country.active ? 'ENABLED' : 'DISABLED';
+  }
 }
+
+const ALPHA3: Record<string, string> = {
+  AT: 'AUT', BE: 'BEL', BG: 'BGR', HR: 'HRV', CY: 'CYP', CZ: 'CZE', DK: 'DNK', EE: 'EST', FI: 'FIN', FR: 'FRA',
+  DE: 'DEU', GR: 'GRC', HU: 'HUN', IE: 'IRL', IT: 'ITA', LV: 'LVA', LT: 'LTU', LU: 'LUX', MT: 'MLT', NL: 'NLD',
+  PL: 'POL', PT: 'PRT', RO: 'ROU', SK: 'SVK', SI: 'SVN', ES: 'ESP', SE: 'SWE', GB: 'GBR', NO: 'NOR', IS: 'ISL',
+  LI: 'LIE', AD: 'AND', MC: 'MCO', SM: 'SMR', VA: 'VAT', CH: 'CHE', US: 'USA', CA: 'CAN', AU: 'AUS', JP: 'JPN',
+};

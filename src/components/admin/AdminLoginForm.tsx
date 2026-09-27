@@ -40,7 +40,7 @@ export default function AdminLoginForm() {
       <form onSubmit={onSubmit} className="w-full max-w-sm rounded-2xl border border-[#E5E3DD] bg-[#FBFBF9] p-6 shadow-sm">
         <p className="font-serif text-2xl">Fusion EU</p>
         <h1 className="mt-1 text-sm font-semibold">Super Admin sign in</h1>
-        <p className="mt-1 text-xs text-[#5C5852]">Use the admin email and password.</p>
+        <p className="mt-1 text-xs text-[#5C5852]">Sign in with sales@fusionbars.eu.</p>
         <label className="mt-5 block text-xs font-semibold" htmlFor="admin-email">Email</label>
         <input
           id="admin-email"

@@ -27,6 +27,7 @@ export type AdminSection =
   | 'settings'
   | 'pricing'
   | 'commercial-settings'
+  | 'shipping'
   | 'roles'
   | 'launch';
 
@@ -36,24 +37,24 @@ const ALL: AdminSection[] = [
   'compliance', 'countries', 'content-review', 'audit',
   'notifications', 'email-templates', 'email-delivery',
   'sales-reports', 'catalogue-reports', 'ops-reports',
-  'settings', 'pricing', 'commercial-settings', 'roles', 'launch',
+  'settings', 'pricing', 'commercial-settings', 'shipping', 'roles', 'launch',
 ];
 
 const ROLE_SECTIONS: Record<RoleName, AdminSection[] | '*'> = {
   SUPER_ADMIN: '*',
   SYSTEM: '*',
-  ORDER_MANAGER: ['dashboard', 'orders', 'customers', 'inventory', 'notifications', 'ops-reports'],
-  FINANCE_MANAGER: ['dashboard', 'orders', 'payments', 'customers', 'notifications', 'sales-reports', 'email-delivery', 'pricing', 'commercial-settings'],
+  ORDER_MANAGER: ['dashboard', 'orders', 'customers', 'inventory', 'notifications', 'ops-reports', 'shipping'],
+  FINANCE_MANAGER: ['dashboard', 'orders', 'payments', 'customers', 'notifications', 'sales-reports', 'email-delivery', 'pricing', 'commercial-settings', 'shipping'],
   CATALOG_MANAGER: [
     'dashboard', 'products', 'catalogue-review', 'publication', 'specialist-review', 'media-review',
-    'inventory', 'notifications', 'catalogue-reports', 'audit', 'pricing', 'commercial-settings',
+    'inventory', 'notifications', 'catalogue-reports', 'audit', 'pricing', 'commercial-settings', 'shipping',
   ],
   CONTENT_MANAGER: [
     'dashboard', 'products', 'content-review', 'translation-review', 'specialist-review', 'publication',
     'email-templates', 'notifications', 'catalogue-reports',
   ],
   COMPLIANCE_MANAGER: [
-    'dashboard', 'compliance', 'countries', 'specialist-review', 'publication', 'audit', 'notifications', 'catalogue-reports',
+    'dashboard', 'compliance', 'countries', 'specialist-review', 'publication', 'audit', 'notifications', 'catalogue-reports', 'shipping',
   ],
   CUSTOMER: [],
 };
