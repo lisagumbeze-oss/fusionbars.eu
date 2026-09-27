@@ -53,6 +53,7 @@ import { CatalogueAdjudicationService } from '@/domain/catalog/CatalogueAdjudica
 import { CatalogueDecisionRecommendationService } from '@/domain/catalog/CatalogueDecisionRecommendationService';
 import { CatalogueReviewWorkspaceService } from '@/domain/catalog/CatalogueReviewWorkspaceService';
 import { CatalogueFirstBatchService } from '@/domain/catalog/CatalogueFirstBatchService';
+import { CatalogueSpecialistReviewService } from '@/domain/catalog/CatalogueSpecialistReviewService';
 
 export interface TestResult {
   name: string;
@@ -4594,6 +4595,291 @@ export class DomainTestSuite {
         }
         if (!('beforeValue' in audit) || !('afterValue' in audit)) throw new Error('Audit must record before and after');
       }
+    });
+
+    const specialistActor = {
+      actor: 'qa.specialist@fusionbars.eu',
+      actorRole: 'SUPER_ADMIN' as const,
+    };
+    const resetSpecialist = () => {
+      resetFirstBatch();
+      CatalogueSpecialistReviewService.resetStateForTests();
+    };
+
+    await run('Specialist Review', 'First-batch queue only', () => {
+      resetSpecialist();
+      const rows = CatalogueSpecialistReviewService.listFirstBatch();
+      if (rows.length !== 10) throw new Error(`Expected 10 specialist products, got ${rows.length}`);
+      const slugs = rows.map((row) => row.productSlug);
+      if (!slugs.includes('audit-test-product') || !slugs.includes('a-box-of-10-fusion-gummies')) {
+        throw new Error('Specialist queue must be the adjudicated first batch');
+      }
+      if (rows.some((row) => row.publicationStatus === 'READY_FOR_PUBLICATION')) {
+        throw new Error('Unresolved specialist review must not be publication-ready');
+      }
+    });
+
+    await run('Specialist Review', 'Customer access denied', () => {
+      let denied = false;
+      try {
+        CatalogueSpecialistReviewService.assertAccess('CUSTOMER');
+      } catch {
+        denied = true;
+      }
+      if (!denied) throw new Error('Customers must not access specialist review');
+    });
+
+    await run('Specialist Review', 'Pricing authority and explicit value', () => {
+      resetSpecialist();
+      const slug = 'fusion-bars-banana-chocolate';
+      const before = CatalogueReviewService.getProductDetail(slug);
+      const denied = CatalogueSpecialistReviewService.recordPricingDecision({
+        productSlug: slug,
+        state: 'PRICE_APPROVED',
+        approvedCurrency: 'EUR',
+        approvedPrice: 12,
+        rationale: 'Commercial decision',
+        evidence: 'Finance worksheet FB-1',
+        actor: 'catalog@fusionbars.eu',
+        actorRole: 'CATALOG_MANAGER',
+      });
+      if (denied.success) throw new Error('Catalog managers must not approve prices');
+      const missing = CatalogueSpecialistReviewService.recordPricingDecision({
+        productSlug: slug,
+        state: 'PRICE_APPROVED',
+        rationale: 'Missing amount',
+        evidence: 'None',
+        actor: 'finance@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+      });
+      if (missing.success) throw new Error('PRICE_APPROVED without a human-entered price must fail');
+      const approved = CatalogueSpecialistReviewService.recordPricingDecision({
+        productSlug: slug,
+        state: 'PRICE_APPROVED',
+        approvedCurrency: 'EUR',
+        approvedPrice: 12.5,
+        rationale: 'Explicit finance decision',
+        evidence: 'Finance worksheet FB-1',
+        actor: 'finance@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+      });
+      if (!approved.success) throw new Error(approved.error || 'Finance approval failed');
+      const after = CatalogueReviewService.getProductDetail(slug);
+      if ((after?.priceEUR ?? null) !== (before?.priceEUR ?? null)) throw new Error('Catalogue EUR price must stay unchanged');
+      if (after?.sourcePriceUSD !== before?.sourcePriceUSD) throw new Error('Source USD price must not be converted');
+      if (after?.name !== before?.name) throw new Error('Confirmed name must stay unchanged');
+    });
+
+    await run('Specialist Review', 'Compliance evidence required', () => {
+      resetSpecialist();
+      const slug = 'fusion-bars-peanut-butter';
+      const bare = CatalogueSpecialistReviewService.recordComplianceDecision({
+        productSlug: slug,
+        state: 'APPROVED_FOR_PUBLICATION',
+        actor: specialistActor.actor,
+        actorRole: 'COMPLIANCE_MANAGER',
+      });
+      if (bare.success) throw new Error('Compliance approval without evidence must fail');
+      const deferred = CatalogueSpecialistReviewService.recordComplianceDecision({
+        productSlug: slug,
+        state: 'DEFERRED',
+        rationale: 'No legal opinion on file',
+        evidence: 'Source record only',
+        actor: specialistActor.actor,
+        actorRole: 'COMPLIANCE_MANAGER',
+      });
+      if (!deferred.success) throw new Error(deferred.error || 'Defer failed');
+      if (CatalogueSpecialistReviewService.getReview(slug).compliance.state !== 'DEFERRED') {
+        throw new Error('Deferred compliance must be recorded as deferred');
+      }
+    });
+
+    await run('Specialist Review', 'Country eligibility is explicit', () => {
+      resetSpecialist();
+      const slug = 'fusion-cactus-cooler-gummies';
+      const before = JSON.stringify(CatalogueReviewService.getProductDetail(slug)?.countryAvailability || {});
+      const saved = CatalogueSpecialistReviewService.recordCountryDecision({
+        productSlug: slug,
+        country: 'DE',
+        decision: 'DEFERRED',
+        rationale: 'Shipping coverage is not product eligibility',
+        evidence: 'No country approval record',
+        actor: specialistActor.actor,
+        actorRole: 'COMPLIANCE_MANAGER',
+      });
+      if (!saved.success) throw new Error(saved.error || 'Country defer failed');
+      const review = CatalogueSpecialistReviewService.getReview(slug);
+      if (review.countries.length !== 1 || review.countries[0].decision !== 'DEFERRED') {
+        throw new Error('Only the explicit country decision may be stored');
+      }
+      const destinations = CatalogueSpecialistReviewService.getDetail(slug)?.destinations.length || 0;
+      if (review.countries.length === destinations) throw new Error('Store destinations must not be approved in bulk');
+      const after = JSON.stringify(CatalogueReviewService.getProductDetail(slug)?.countryAvailability || {});
+      if (after !== before) throw new Error('Catalogue country availability must stay unchanged');
+    });
+
+    await run('Specialist Review', 'Public content is not copied from source', () => {
+      resetSpecialist();
+      const slug = 'fusion-cherry-lime-gummies';
+      const source = CatalogueReviewService.getProductDetail(slug)?.originalSourceContent || '';
+      const copied = CatalogueSpecialistReviewService.recordContentDecision({
+        productSlug: slug,
+        state: 'CONTENT_APPROVED',
+        candidatePublicContent: source || 'treats anxiety with a 2g dose',
+        actor: specialistActor.actor,
+        actorRole: 'CONTENT_MANAGER',
+      });
+      if (copied.success) throw new Error('Source text or claim language must not be approved automatically');
+      const draft = CatalogueSpecialistReviewService.recordContentDecision({
+        productSlug: slug,
+        state: 'CONTENT_DEFERRED',
+        candidatePublicContent: 'Cherry lime gummies.',
+        rationale: 'Public copy still needs approval',
+        actor: specialistActor.actor,
+        actorRole: 'CONTENT_MANAGER',
+      });
+      if (!draft.success) throw new Error(draft.error || 'Content defer failed');
+      if (CatalogueReviewService.getProductDetail(slug)?.approvedStoreContent) {
+        throw new Error('Storefront content must not be written by specialist staging');
+      }
+    });
+
+    await run('Specialist Review', 'Translation is not generated', () => {
+      resetSpecialist();
+      const slug = 'a-box-of-fusion-gummies';
+      const empty = CatalogueSpecialistReviewService.recordTranslation({
+        productSlug: slug,
+        locale: 'de',
+        state: 'DRAFTED',
+        actor: specialistActor.actor,
+        actorRole: 'CONTENT_MANAGER',
+      });
+      if (empty.success) throw new Error('Empty translation draft must fail');
+      const drafted = CatalogueSpecialistReviewService.recordTranslation({
+        productSlug: slug,
+        locale: 'de',
+        state: 'DRAFTED',
+        draft: 'Eine Packung Fusion Gummies.',
+        actor: specialistActor.actor,
+        actorRole: 'CONTENT_MANAGER',
+      });
+      if (!drafted.success) throw new Error(drafted.error || 'Draft failed');
+      const review = CatalogueSpecialistReviewService.getReview(slug);
+      if (review.translations.fr.state !== 'PENDING' || review.translations.fr.draft) {
+        throw new Error('Other locales must stay pending and empty');
+      }
+    });
+
+    await run('Specialist Review', 'Test record stays unpublished', () => {
+      resetSpecialist();
+      const gate = CatalogueSpecialistReviewService.acknowledgePublicationGate({
+        productSlug: 'audit-test-product',
+        ...specialistActor,
+      });
+      if (gate.publication !== 'DO_NOT_PUBLISH' || gate.published !== false) {
+        throw new Error('Audit test product must remain DO_NOT_PUBLISH');
+      }
+      const media = CatalogueSpecialistReviewService.recordMediaReview({
+        productSlug: 'audit-test-product',
+        decision: 'CONFIRM_EXISTING_VERIFIED',
+        unrelatedImageUrl: 'https://example.com/other.png',
+        reason: 'Attempt to substitute an image',
+        ...specialistActor,
+        actorRole: 'CATALOG_MANAGER',
+      });
+      if (media.success) throw new Error('Unrelated media must not clear MEDIA_REVIEW');
+      if (CatalogueSpecialistReviewService.getReview('audit-test-product').media.state !== 'MEDIA_REVIEW') {
+        throw new Error('Placeholder media must stay in MEDIA_REVIEW');
+      }
+    });
+
+    await run('Specialist Review', 'Publication gate does not publish', () => {
+      resetSpecialist();
+      const slug = 'fusion-bars-banana-chocolate';
+      const publishedBefore = CatalogueAdjudicationService.getState().published.length;
+      const pending = CatalogueSpecialistReviewService.acknowledgePublicationGate({ productSlug: slug, ...specialistActor });
+      if (pending.publication !== 'NOT_READY') throw new Error('Pending specialist review must stay NOT_READY');
+      const price = CatalogueSpecialistReviewService.recordPricingDecision({
+        productSlug: slug,
+        state: 'PRICE_APPROVED',
+        approvedCurrency: 'EUR',
+        approvedPrice: 19,
+        rationale: 'Explicit price',
+        evidence: 'Worksheet FB-2',
+        actor: specialistActor.actor,
+        actorRole: 'FINANCE_MANAGER',
+      });
+      if (!price.success) throw new Error(price.error || 'Price failed');
+      CatalogueSpecialistReviewService.recordComplianceDecision({
+        productSlug: slug,
+        state: 'APPROVED_FOR_PUBLICATION',
+        rationale: 'Reviewer compliance decision',
+        evidence: 'Compliance file FB-2',
+        ...specialistActor,
+        actorRole: 'COMPLIANCE_MANAGER',
+      });
+      CatalogueSpecialistReviewService.recordCountryDecision({
+        productSlug: slug,
+        country: 'NL',
+        decision: 'ALLOWED',
+        effectiveDate: '2026-10-01',
+        rationale: 'Single-country reviewer decision',
+        evidence: 'Country file FB-2',
+        ...specialistActor,
+        actorRole: 'COMPLIANCE_MANAGER',
+      });
+      CatalogueSpecialistReviewService.recordContentDecision({
+        productSlug: slug,
+        state: 'CONTENT_APPROVED',
+        candidatePublicContent: 'Banana chocolate bar.',
+        ...specialistActor,
+        actorRole: 'CONTENT_MANAGER',
+      });
+      for (const locale of ['en', 'de', 'fr', 'es', 'it', 'nl']) {
+        CatalogueSpecialistReviewService.recordTranslation({
+          productSlug: slug,
+          locale,
+          state: 'DRAFTED',
+          draft: `Banana chocolate bar ${locale}.`,
+          ...specialistActor,
+          actorRole: 'CONTENT_MANAGER',
+        });
+        CatalogueSpecialistReviewService.recordTranslation({
+          productSlug: slug,
+          locale,
+          state: 'APPROVED',
+          ...specialistActor,
+          actorRole: 'CONTENT_MANAGER',
+        });
+      }
+      const gate = CatalogueSpecialistReviewService.acknowledgePublicationGate({ productSlug: slug, ...specialistActor });
+      if (gate.publication !== 'READY_FOR_PUBLICATION') throw new Error(gate.error || `Expected ready gate, got ${gate.publication}`);
+      if (gate.published !== false) throw new Error('Ready gate must not publish');
+      if (CatalogueAdjudicationService.getState().published.length !== publishedBefore) {
+        throw new Error('Published catalogue must stay unchanged');
+      }
+      const eligibility = CatalogueReviewService.evaluatePurchaseEligibility(slug, 'NL');
+      if (eligibility.eligible) throw new Error('Specialist review must not make the product purchasable');
+    });
+
+    await run('Specialist Review', 'Failed decision rolls back', () => {
+      resetSpecialist();
+      const slug = 'fusion-100-bars-boutique-box';
+      const failed = CatalogueSpecialistReviewService.recordPricingDecision({
+        productSlug: slug,
+        state: 'PRICE_APPROVED',
+        approvedCurrency: 'EUR',
+        rationale: 'Amount omitted',
+        evidence: 'Worksheet',
+        actor: specialistActor.actor,
+        actorRole: 'FINANCE_MANAGER',
+      });
+      if (failed.success) throw new Error('Incomplete approval must fail');
+      if (CatalogueSpecialistReviewService.getReview(slug).pricing.state !== 'PRICE_REVIEW_PENDING') {
+        throw new Error('Failed pricing decision must roll back to PRICE_REVIEW_PENDING');
+      }
+      const audit = CatalogueSpecialistReviewService.getAuditTrail().find((row) => row.product === slug && row.decision === 'PRICE_APPROVED');
+      if (audit) throw new Error('Rolled-back decision must not be audited as approved');
     });
 
     const passedCount = results.filter((r) => r.passed).length;

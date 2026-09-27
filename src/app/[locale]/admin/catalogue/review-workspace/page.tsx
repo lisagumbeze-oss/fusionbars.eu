@@ -243,6 +243,9 @@ export default function CatalogueReviewWorkspacePage() {
             <Link href={`/${locale}/admin/catalogue/review-workspace/first-batch`} className="px-2 py-1 border border-teal-700 text-teal-300 rounded">
               First batch
             </Link>
+            <Link href={`/${locale}/admin/catalogue/review-workspace/specialist-review`} className="px-2 py-1 border border-amber-700 text-amber-300 rounded">
+              Specialist review
+            </Link>
             <Link href={`/${locale}/admin/catalogue/adjudication`} className="px-2 py-1 border border-slate-700 rounded">
               Adjudication
             </Link>

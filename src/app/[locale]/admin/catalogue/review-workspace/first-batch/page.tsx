@@ -254,6 +254,9 @@ export default function FirstBatchReviewPage() {
             <Link href={`/${locale}/admin/catalogue/review-workspace`} className="px-2 py-1 border border-slate-700 rounded">
               Full workspace
             </Link>
+            <Link href={`/${locale}/admin/catalogue/review-workspace/specialist-review`} className="px-2 py-1 border border-amber-700 text-amber-300 rounded">
+              Specialist review
+            </Link>
           </div>
         </div>
       </header>
