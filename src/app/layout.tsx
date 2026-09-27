@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import './globals.css';
+import ScrollToTop from '@/components/ScrollToTop';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -57,6 +59,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-[#FBFBF9] text-[#121212] antialiased min-h-screen selection:bg-[#4A5D4E] selection:text-white">
+        <Script id="scroll-restoration" strategy="beforeInteractive">
+          {`if('scrollRestoration' in history){history.scrollRestoration='manual';}window.scrollTo(0,0);`}
+        </Script>
+        <ScrollToTop />
         {children}
       </body>
     </html>
