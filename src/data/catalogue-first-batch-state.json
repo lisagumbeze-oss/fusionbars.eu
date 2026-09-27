@@ -1,0 +1,4939 @@
+{
+  "version": 1,
+  "batchSize": 10,
+  "selectedSlugs": [
+    "a-box-of-10-fusion-gummies",
+    "a-box-of-fusion-gummies",
+    "audit-test-product",
+    "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+    "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+    "fusion-100-bars-boutique-box",
+    "fusion-bars-banana-chocolate",
+    "fusion-bars-peanut-butter",
+    "fusion-cactus-cooler-gummies",
+    "fusion-cherry-lime-gummies"
+  ],
+  "selectionGeneratedAt": "2026-09-27T02:01:56.068Z",
+  "selectionScores": [
+    {
+      "productSlug": "a-box-of-10-fusion-gummies",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "a-box-of-fusion-gummies",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "audit-test-product",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-100-bars-boutique-box",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-bars-banana-chocolate",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-bars-peanut-butter",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-cactus-cooler-gummies",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-cherry-lime-gummies",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-cookies-and-cream",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-crunch",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-gummies-grape-slushe",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-mushroom-bars-wholesale",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-mushroom-chocolate-bar",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-mushroom-gummies",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "latopop-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "neau-tropics-gummies",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "neau-tropics-magic-mushroom-chocolate-bars",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "nerds-fusion-bars",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "oulala-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "puffz-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "strawberries-and-cream",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "white-gummy-ice-fusion-chocolate-official-store",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "zabores-high-tolerance-x-fusion-chocolate-bar-fusion-mushroom-bar",
+      "score": 20,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-mushroom-bars-wholesale-100-packs",
+      "score": 18,
+      "signals": [
+        "exact_source_name_agreement",
+        "category_agreement",
+        "identity_exact_match",
+        "valid_primary_image",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-berry-citrus-gummy",
+      "score": 17,
+      "signals": [
+        "identity_unique",
+        "no_identity_conflict",
+        "complete_metadata",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-cactus-cooler-gummy",
+      "score": 17,
+      "signals": [
+        "identity_unique",
+        "no_identity_conflict",
+        "complete_metadata",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-lavender-lemonade-gummy",
+      "score": 17,
+      "signals": [
+        "identity_unique",
+        "no_identity_conflict",
+        "complete_metadata",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-mushroom-bars-boutique-box",
+      "score": 17,
+      "signals": [
+        "identity_unique",
+        "no_identity_conflict",
+        "complete_metadata",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    },
+    {
+      "productSlug": "fusion-raspberry-dark-chocolate-bar",
+      "score": 17,
+      "signals": [
+        "identity_unique",
+        "no_identity_conflict",
+        "complete_metadata",
+        "valid_primary_image",
+        "matched_media_hash",
+        "unambiguous_structure",
+        "no_pricing_conflict",
+        "no_high_risk_compliance_flag"
+      ]
+    }
+  ],
+  "exclusions": [
+    {
+      "productSlug": "fusion-10-bars-boutique-box",
+      "productName": "Fusion 10 Bars Boutique Box",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-apple-strudel-vape",
+      "productName": "Fusion Apple Strudel Vape",
+      "reasons": [
+        "high_risk_compliance_flag",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-almond-crush",
+      "productName": "Fusion Bar Almond Crush",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-birthday-cake",
+      "productName": "Fusion Bar Birthday Cake",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-cinnamon-toast",
+      "productName": "Fusion Bar Cinnamon Toast",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-cookie-dough",
+      "productName": "Fusion Bar Cookie Dough",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-cookies-cream",
+      "productName": "Fusion Bar Cookies & Cream",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-ferrero-rocher",
+      "productName": "Fusion Bar Ferrero Rocher",
+      "reasons": [
+        "possible_match",
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-fruit-loops",
+      "productName": "Fusion Bar Fruit Loops",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag",
+        "major_price_conflict",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "PRICING_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-heeth-english-toffee",
+      "productName": "Fusion Bar Heeth English Toffee",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-horchata",
+      "productName": "Fusion Bar Horchata",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-kapn-krunch",
+      "productName": "Fusion Bar Kap’N Krunch",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-lemon-blueberry",
+      "productName": "Fusion Bar Lemon Blueberry",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-m-and-ms",
+      "productName": "Fusion Bar M And Ms",
+      "reasons": [
+        "possible_match",
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-matcha",
+      "productName": "Fusion Bar Matcha",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-milk-chocolate",
+      "productName": "Fusion Bar Milk Chocolate",
+      "reasons": [
+        "requires_structural_merge_decision",
+        "high_risk_compliance_flag",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-berry-lemon-gelato-vape",
+      "productName": "Fusion Berry Lemon Gelato Vape",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bubba-kush-vape",
+      "productName": "Fusion Bubba Kush Vape",
+      "reasons": [
+        "high_risk_compliance_flag",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-cactus-cooler-vape",
+      "productName": "Fusion Cactus Cooler Vape",
+      "reasons": [
+        "high_risk_compliance_flag",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-chemdawg-og-vape",
+      "productName": "Fusion ChemDawg OG Vape",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-cherry-lime-gummy",
+      "productName": "Fusion Cherry Lime Gummy",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-cherry-limeade-vape",
+      "productName": "Fusion Cherry Limeade Vape",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-grape-ape-vape",
+      "productName": "Fusion Grape Ape Vape",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-grape-slushe-gummy",
+      "productName": "Fusion Grape Slushe Gummy",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-guava-puree-vape",
+      "productName": "Fusion Guava Puree Vape",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-hawaiian-punch-gummy",
+      "productName": "Fusion Hawaiian Punch Gummy",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-key-lime-pie-bar",
+      "productName": "Fusion Key Lime Pie Bar",
+      "reasons": [
+        "high_risk_compliance_flag",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-kitkat-bar",
+      "productName": "Fusion KitKat Bar",
+      "reasons": [
+        "possible_match",
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-laughing-gas-gummy",
+      "productName": "Fusion Laughing Gas Gummy",
+      "reasons": [
+        "possible_match",
+        "collaboration_unresolved_identity"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-lavender-zkittles-vape",
+      "productName": "Fusion Lavender Zkittles Vape",
+      "reasons": [
+        "high_risk_compliance_flag",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-maui-pineapple-vape",
+      "productName": "Fusion Maui Pineapple Vape",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-mocha-chocolate-bar",
+      "productName": "Fusion Mocha Chocolate Bar",
+      "reasons": [
+        "high_risk_compliance_flag",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-mushroom-bars-cotton-candy",
+      "productName": "Fusion Mushroom Bars Cotton Candy",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-nerds-chocolate-bar",
+      "productName": "Fusion Nerds Chocolate Bar",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-passion-fruit-gummy",
+      "productName": "Fusion Passion Fruit Gummy",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-peanut-butter-cup-bar",
+      "productName": "Fusion Peanut Butter Cup Bar",
+      "reasons": [
+        "high_risk_compliance_flag",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-pretzel-sea-salt-chocolate-bar",
+      "productName": "Fusion Pretzel Sea Salt Chocolate Bar",
+      "reasons": [
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-raspberry-goji-gummy",
+      "productName": "Fusion Raspberry Goji Gummy",
+      "reasons": [
+        "high_risk_compliance_flag",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-rocky-rodeo-chocolate-bar",
+      "productName": "Fusion Rocky Rodeo Chocolate Bar",
+      "reasons": [
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-sour-apple-gummy",
+      "productName": "Fusion Sour Apple Gummy",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-strawberries-cream-chocolate-bar",
+      "productName": "Fusion Strawberries & Cream Chocolate Bar",
+      "reasons": [
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-thin-mint-chocolate-bar",
+      "productName": "Fusion Thin Mint Chocolate Bar",
+      "reasons": [
+        "high_risk_compliance_flag",
+        "major_price_conflict"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "PRICING_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-twixy-chocolate-bar",
+      "productName": "Fusion Twixy Chocolate Bar",
+      "reasons": [
+        "major_price_conflict",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "PRICING_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-watermelon-gummy",
+      "productName": "Fusion Watermelon Gummy",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "passionfruit-og-vape",
+      "productName": "PassionFruit OG Vape",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "laughing-gas-x-fusion",
+      "productName": "LAUGHING GAS X FUSION - Fusion Mushroom Bars",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-x-whole-melt-extract-box-of-10",
+      "productName": "Fusion X Whole Melt Extract Box of 10 - Fusion Mushroom Bars",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-x-whole-melt-50-stacks-box",
+      "productName": "Fusion X Whole Melt 50 stacks box - Fusion Mushroom Bars",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-x-whole-melt-wholesale-2000-mg-vaporizer",
+      "productName": "Fusion X Whole Melt Wholesale 2000 MG Vaporizer | Bulk Extracts",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity",
+        "high_risk_compliance_flag",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "mimosa-haze-fusion-x-whole-melt",
+      "productName": "Mimosa Haze Fusion X Whole Melt - Fusion Mushroom Bars",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "super-limon-haze-fusion-x-wholemelt",
+      "productName": "Super Limon Haze Fusion X Wholemelt | 2G Live Diamond Extracts",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity",
+        "high_risk_compliance_flag",
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW",
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW",
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-x-whole-melt-wholesale",
+      "productName": "Fusion X Whole Melt Wholesale - Fusion Mushroom Bars",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-gummies-berry-citrus",
+      "productName": "Fusion Gummies Berry Citrus - Fusion Mushroom Bars",
+      "reasons": [
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-gummies-hawaiian-punch",
+      "productName": "Fusion Gummies Hawaiian Punch - Fusion Mushroom Bars",
+      "reasons": [
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-gummies-lavender-lemonade",
+      "productName": "Fusion Gummies Lavender Lemonade - Fusion Mushroom Bars",
+      "reasons": [
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-gummies-raspberry-goji",
+      "productName": "Fusion Gummies Raspberry Goji - Fusion Mushroom Bars",
+      "reasons": [
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-gummies-sour-apple",
+      "productName": "Fusion Gummies Sour Apple - Fusion Mushroom Bars",
+      "reasons": [
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-gummies-watermelon",
+      "productName": "Fusion Gummies Watermelon - Fusion Mushroom Bars",
+      "reasons": [
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-passion-fruit-gummies",
+      "productName": "Fusion Passion Fruit Gummies",
+      "reasons": [
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-kit-cats",
+      "productName": "Fusion Bar Kit Cats - Fusion Mushroom Bars",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "requires_structural_merge_decision"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-nurdz",
+      "productName": "Fusion Bar Nurdz - Fusion Mushroom Bars",
+      "reasons": [
+        "requires_structural_merge_decision"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-em-and-ems",
+      "productName": "Fusion Bar Em and Ems - Fusion Mushroom Bars",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "requires_structural_merge_decision"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-ferrari-rocher",
+      "productName": "Fusion Bar Ferrari Rocher - Fusion Mushroom Bars",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "requires_structural_merge_decision"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-cotton-candy",
+      "productName": "Fusion Bar Cotton Candy - Fusion Mushroom Bars",
+      "reasons": [
+        "requires_structural_merge_decision"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-heath",
+      "productName": "Fusion Bar Heath - Fusion Mushroom Bars",
+      "reasons": [
+        "requires_structural_merge_decision"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-peanut-butter",
+      "productName": "Fusion Bar Peanut butter - Fusion Mushroom Bars",
+      "reasons": [
+        "requires_structural_merge_decision"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "magic-mushroom-chocolates",
+      "productName": "Magic Mushroom Chocolates - Fusion Chocolate Bar",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "raspberry-dark-chocolate",
+      "productName": "Raspberry Dark Chocolate - Fusion Mushroom Bars",
+      "reasons": [
+        "missing_primary_image"
+      ],
+      "specialistQueues": [
+        "MEDIA_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-bar-red-velvet",
+      "productName": "Fusion Bar Red Velvet - Fusion Mushroom Bars",
+      "reasons": [
+        "requires_structural_merge_decision"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "wholesale-deals-on-fusion-100-bars-box-of-10-flavors",
+      "productName": "Wholesale Deals on Fusion 100 Bars Box of 10 Flavors - Fusion Mushroom Bars",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "apple-strudel-vape-fusion-chocolate-official-store",
+      "productName": "Apple Strudel Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "berry-lemon-gelato-vape-fusion-chocolate-official-store",
+      "productName": "Berry Lemon Gelato Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "bubba-kush-vape-fusion-chocolate-official-store",
+      "productName": "Bubba Kush Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "cactus-coolerz-vape-fusion-chocolate-official-store",
+      "productName": "Cactus Coolerz Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "chemdawg-og-vape-fusion-chocolate-official-store",
+      "productName": "ChemDawg OG Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "cherry-limeade-vape-fusion-chocolate-official-store",
+      "productName": "Cherry Limeade Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "grape-ape-vape-fusion-chocolate-official-store",
+      "productName": "Grape Ape Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "guava-puree-vape-fusion-chocolate-official-store",
+      "productName": "Guava Puree Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "lavender-zkittles-vape-fusion-chocolate-official-store",
+      "productName": "Lavender Zkittles Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "passionfruit-og-vape-fusion-chocolate-official-store",
+      "productName": "PassionFruit OG Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "pearly-pearz-vape-fusion-chocolate-official-store",
+      "productName": "Pearly Pearz Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "punchbowl-kush-vape-fusion-chocolate-official-store",
+      "productName": "PunchBowl Kush Vape - Fusion Chocolate Official Store",
+      "reasons": [
+        "high_risk_compliance_flag"
+      ],
+      "specialistQueues": [
+        "COMPLIANCE_REVIEW",
+        "CONTENT_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "laughing-gas-gummy-fusion-chocolate-official-store",
+      "productName": "Laughing Gas Gummy - Fusion Chocolate Official Store",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "fusion-chocolate-bar-tremendous-laughing-gas-x-fusion-mushroom-bar",
+      "productName": "Fusion Chocolate Bar – Tremendous Laughing Gas X Fusion Mushroom Bar",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "white-truffle-laughing-gas-x-fusion-chocolate-bar-fusion-mushroom-bar-premium",
+      "productName": "White Truffle Laughing Gas X Fusion Chocolate Bar | Fusion Mushroom Bar Premium",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "laughing-gas-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "productName": "Laughing Gas X Fusion Chocolate Bar | Premium Fusion Mushroom Bar",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    },
+    {
+      "productSlug": "crunchy-coco-pebbles-laughing-gas-x-fusion-chocolate-bar-fusion-mushroom-bar",
+      "productName": "Crunchy Coco Pebbles Laughing Gas X Fusion Chocolate Bar | Fusion Mushroom Bar",
+      "reasons": [
+        "possible_match",
+        "unresolved_duplicate",
+        "collaboration_unresolved_identity"
+      ],
+      "specialistQueues": [
+        "STRUCTURAL_REVIEW"
+      ]
+    }
+  ],
+  "products": {
+    "a-box-of-10-fusion-gummies": {
+      "productSlug": "a-box-of-10-fusion-gummies",
+      "status": "FULLY_REVIEWED",
+      "pendingFieldDecisions": [],
+      "pendingMediaDecisions": [],
+      "internalNotes": [],
+      "lastSummary": {
+        "productSlug": "a-box-of-10-fusion-gummies",
+        "productName": "A Box of 10 Fusion Gummies - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.112Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "completedSections": [
+        "name",
+        "slug",
+        "category",
+        "variant",
+        "description",
+        "primaryImage"
+      ],
+      "deferredSections": [
+        "sku",
+        "shortDescription",
+        "ingredients",
+        "attributes",
+        "weight",
+        "gallery"
+      ],
+      "mediaStatus": "VERIFIED",
+      "contentDisposition": "KEEP_INTERNAL_SOURCE_ONLY",
+      "pricingDecision": "PRICE_REVIEW_PENDING",
+      "translationSlots": {
+        "en": "PENDING",
+        "de": "PENDING",
+        "fr": "PENDING",
+        "es": "PENDING",
+        "it": "PENDING",
+        "nl": "PENDING"
+      },
+      "ingredientStatus": "UNKNOWN",
+      "commercialDisposition": "COMMERCIAL_CANDIDATE",
+      "publicationDisposition": "NOT_READY",
+      "relationshipDecision": {
+        "otherSlug": "a-box-of-fusion-gummies",
+        "relationship": "DISTINCT_PRODUCTS",
+        "evidence": [
+          "distinct_source_record_ids",
+          "distinct_slugs",
+          "distinct_primary_images",
+          "distinct_source_prices:200_vs_30",
+          "distinct_names"
+        ],
+        "merged": false
+      },
+      "completionLevels": [
+        "DATA_ADJUDICATED",
+        "SPECIALIST_REVIEW_REQUIRED"
+      ]
+    },
+    "a-box-of-fusion-gummies": {
+      "productSlug": "a-box-of-fusion-gummies",
+      "status": "FULLY_REVIEWED",
+      "pendingFieldDecisions": [],
+      "pendingMediaDecisions": [],
+      "internalNotes": [],
+      "lastSummary": {
+        "productSlug": "a-box-of-fusion-gummies",
+        "productName": "A Box of Fusion Gummies - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.145Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "completedSections": [
+        "name",
+        "slug",
+        "category",
+        "variant",
+        "description",
+        "primaryImage"
+      ],
+      "deferredSections": [
+        "sku",
+        "shortDescription",
+        "ingredients",
+        "attributes",
+        "weight",
+        "gallery"
+      ],
+      "mediaStatus": "VERIFIED",
+      "contentDisposition": "KEEP_INTERNAL_SOURCE_ONLY",
+      "pricingDecision": "PRICE_REVIEW_PENDING",
+      "translationSlots": {
+        "en": "PENDING",
+        "de": "PENDING",
+        "fr": "PENDING",
+        "es": "PENDING",
+        "it": "PENDING",
+        "nl": "PENDING"
+      },
+      "ingredientStatus": "UNKNOWN",
+      "commercialDisposition": "COMMERCIAL_CANDIDATE",
+      "publicationDisposition": "NOT_READY",
+      "relationshipDecision": {
+        "otherSlug": "a-box-of-10-fusion-gummies",
+        "relationship": "DISTINCT_PRODUCTS",
+        "evidence": [
+          "distinct_source_record_ids",
+          "distinct_slugs",
+          "distinct_primary_images",
+          "distinct_source_prices:200_vs_30",
+          "distinct_names"
+        ],
+        "merged": false
+      },
+      "completionLevels": [
+        "DATA_ADJUDICATED",
+        "SPECIALIST_REVIEW_REQUIRED"
+      ]
+    },
+    "audit-test-product": {
+      "productSlug": "audit-test-product",
+      "status": "FULLY_REVIEWED",
+      "pendingFieldDecisions": [],
+      "pendingMediaDecisions": [],
+      "internalNotes": [
+        {
+          "id": "FB-NOTE-1790474516146",
+          "text": "NON_COMMERCIAL_TEST_RECORD. DO_NOT_PUBLISH. Evidence: name_or_slug_identifies_test_fixture, placeholder_image_host. Raw source retained.",
+          "actor": "catalogue.reviewer@fusionbars.eu",
+          "actorRole": "CATALOG_MANAGER",
+          "createdAt": "2026-09-27T02:01:56.146Z",
+          "customerVisible": false
+        }
+      ],
+      "lastSummary": {
+        "productSlug": "audit-test-product",
+        "productName": "Audit Test Product",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 0,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.176Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "MEDIA_REVIEW",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "DO_NOT_PUBLISH"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "completedSections": [
+        "name",
+        "slug",
+        "category",
+        "variant",
+        "description",
+        "primaryImage"
+      ],
+      "deferredSections": [
+        "sku",
+        "shortDescription",
+        "ingredients",
+        "attributes",
+        "weight",
+        "gallery"
+      ],
+      "mediaStatus": "MEDIA_REVIEW",
+      "contentDisposition": "KEEP_INTERNAL_SOURCE_ONLY",
+      "pricingDecision": "PRICE_REVIEW_PENDING",
+      "translationSlots": {
+        "en": "PENDING",
+        "de": "PENDING",
+        "fr": "PENDING",
+        "es": "PENDING",
+        "it": "PENDING",
+        "nl": "PENDING"
+      },
+      "ingredientStatus": "UNKNOWN",
+      "commercialDisposition": "NON_COMMERCIAL_TEST_RECORD",
+      "publicationDisposition": "DO_NOT_PUBLISH",
+      "completionLevels": [
+        "DATA_ADJUDICATED",
+        "SPECIALIST_REVIEW_REQUIRED"
+      ]
+    },
+    "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar": {
+      "productSlug": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "status": "FULLY_REVIEWED",
+      "pendingFieldDecisions": [],
+      "pendingMediaDecisions": [],
+      "internalNotes": [],
+      "lastSummary": {
+        "productSlug": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+        "productName": "Brain High Tolerance X Fusion Chocolate Bar | Premium Fusion Mushroom Bar",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.214Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "completedSections": [
+        "name",
+        "slug",
+        "category",
+        "variant",
+        "description",
+        "primaryImage"
+      ],
+      "deferredSections": [
+        "sku",
+        "shortDescription",
+        "ingredients",
+        "attributes",
+        "weight",
+        "gallery"
+      ],
+      "mediaStatus": "VERIFIED",
+      "contentDisposition": "KEEP_INTERNAL_SOURCE_ONLY",
+      "pricingDecision": "PRICE_REVIEW_PENDING",
+      "translationSlots": {
+        "en": "PENDING",
+        "de": "PENDING",
+        "fr": "PENDING",
+        "es": "PENDING",
+        "it": "PENDING",
+        "nl": "PENDING"
+      },
+      "ingredientStatus": "UNKNOWN",
+      "commercialDisposition": "COMMERCIAL_CANDIDATE",
+      "publicationDisposition": "NOT_READY",
+      "completionLevels": [
+        "DATA_ADJUDICATED",
+        "SPECIALIST_REVIEW_REQUIRED"
+      ]
+    },
+    "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar": {
+      "productSlug": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "status": "FULLY_REVIEWED",
+      "pendingFieldDecisions": [],
+      "pendingMediaDecisions": [],
+      "internalNotes": [],
+      "lastSummary": {
+        "productSlug": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+        "productName": "Fun Dip High Tolerance X Fusion Chocolate Bar | Premium Fusion Mushroom Bar",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.242Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "completedSections": [
+        "name",
+        "slug",
+        "category",
+        "variant",
+        "description",
+        "primaryImage"
+      ],
+      "deferredSections": [
+        "sku",
+        "shortDescription",
+        "ingredients",
+        "attributes",
+        "weight",
+        "gallery"
+      ],
+      "mediaStatus": "VERIFIED",
+      "contentDisposition": "KEEP_INTERNAL_SOURCE_ONLY",
+      "pricingDecision": "PRICE_REVIEW_PENDING",
+      "translationSlots": {
+        "en": "PENDING",
+        "de": "PENDING",
+        "fr": "PENDING",
+        "es": "PENDING",
+        "it": "PENDING",
+        "nl": "PENDING"
+      },
+      "ingredientStatus": "UNKNOWN",
+      "commercialDisposition": "COMMERCIAL_CANDIDATE",
+      "publicationDisposition": "NOT_READY",
+      "completionLevels": [
+        "DATA_ADJUDICATED",
+        "SPECIALIST_REVIEW_REQUIRED"
+      ]
+    },
+    "fusion-100-bars-boutique-box": {
+      "productSlug": "fusion-100-bars-boutique-box",
+      "status": "FULLY_REVIEWED",
+      "pendingFieldDecisions": [],
+      "pendingMediaDecisions": [],
+      "internalNotes": [],
+      "lastSummary": {
+        "productSlug": "fusion-100-bars-boutique-box",
+        "productName": "Fusion 100 Bars Boutique Box 10 Flavors-official fusion bar",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.271Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "completedSections": [
+        "name",
+        "slug",
+        "category",
+        "variant",
+        "description",
+        "primaryImage"
+      ],
+      "deferredSections": [
+        "sku",
+        "shortDescription",
+        "ingredients",
+        "attributes",
+        "weight",
+        "gallery"
+      ],
+      "mediaStatus": "VERIFIED",
+      "contentDisposition": "KEEP_INTERNAL_SOURCE_ONLY",
+      "pricingDecision": "PRICE_REVIEW_PENDING",
+      "translationSlots": {
+        "en": "PENDING",
+        "de": "PENDING",
+        "fr": "PENDING",
+        "es": "PENDING",
+        "it": "PENDING",
+        "nl": "PENDING"
+      },
+      "ingredientStatus": "UNKNOWN",
+      "commercialDisposition": "COMMERCIAL_CANDIDATE",
+      "publicationDisposition": "NOT_READY",
+      "completionLevels": [
+        "DATA_ADJUDICATED",
+        "SPECIALIST_REVIEW_REQUIRED"
+      ]
+    },
+    "fusion-bars-banana-chocolate": {
+      "productSlug": "fusion-bars-banana-chocolate",
+      "status": "FULLY_REVIEWED",
+      "pendingFieldDecisions": [],
+      "pendingMediaDecisions": [],
+      "internalNotes": [],
+      "lastSummary": {
+        "productSlug": "fusion-bars-banana-chocolate",
+        "productName": "Fusion Bars Banana Chocolate - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.296Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "completedSections": [
+        "name",
+        "slug",
+        "category",
+        "variant",
+        "description",
+        "primaryImage"
+      ],
+      "deferredSections": [
+        "sku",
+        "shortDescription",
+        "ingredients",
+        "attributes",
+        "weight",
+        "gallery"
+      ],
+      "mediaStatus": "VERIFIED",
+      "contentDisposition": "KEEP_INTERNAL_SOURCE_ONLY",
+      "pricingDecision": "PRICE_REVIEW_PENDING",
+      "translationSlots": {
+        "en": "PENDING",
+        "de": "PENDING",
+        "fr": "PENDING",
+        "es": "PENDING",
+        "it": "PENDING",
+        "nl": "PENDING"
+      },
+      "ingredientStatus": "UNKNOWN",
+      "commercialDisposition": "COMMERCIAL_CANDIDATE",
+      "publicationDisposition": "NOT_READY",
+      "completionLevels": [
+        "DATA_ADJUDICATED",
+        "SPECIALIST_REVIEW_REQUIRED"
+      ]
+    },
+    "fusion-bars-peanut-butter": {
+      "productSlug": "fusion-bars-peanut-butter",
+      "status": "FULLY_REVIEWED",
+      "pendingFieldDecisions": [],
+      "pendingMediaDecisions": [],
+      "internalNotes": [],
+      "lastSummary": {
+        "productSlug": "fusion-bars-peanut-butter",
+        "productName": "Fusion Bars Peanut Butter - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.328Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "completedSections": [
+        "name",
+        "slug",
+        "category",
+        "variant",
+        "description",
+        "primaryImage"
+      ],
+      "deferredSections": [
+        "sku",
+        "shortDescription",
+        "ingredients",
+        "attributes",
+        "weight",
+        "gallery"
+      ],
+      "mediaStatus": "VERIFIED",
+      "contentDisposition": "KEEP_INTERNAL_SOURCE_ONLY",
+      "pricingDecision": "PRICE_REVIEW_PENDING",
+      "translationSlots": {
+        "en": "PENDING",
+        "de": "PENDING",
+        "fr": "PENDING",
+        "es": "PENDING",
+        "it": "PENDING",
+        "nl": "PENDING"
+      },
+      "ingredientStatus": "UNKNOWN",
+      "commercialDisposition": "COMMERCIAL_CANDIDATE",
+      "publicationDisposition": "NOT_READY",
+      "completionLevels": [
+        "DATA_ADJUDICATED",
+        "SPECIALIST_REVIEW_REQUIRED"
+      ]
+    },
+    "fusion-cactus-cooler-gummies": {
+      "productSlug": "fusion-cactus-cooler-gummies",
+      "status": "FULLY_REVIEWED",
+      "pendingFieldDecisions": [],
+      "pendingMediaDecisions": [],
+      "internalNotes": [],
+      "lastSummary": {
+        "productSlug": "fusion-cactus-cooler-gummies",
+        "productName": "Fusion Cactus Cooler Gummies - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.358Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "completedSections": [
+        "name",
+        "slug",
+        "category",
+        "variant",
+        "description",
+        "primaryImage"
+      ],
+      "deferredSections": [
+        "sku",
+        "shortDescription",
+        "ingredients",
+        "attributes",
+        "weight",
+        "gallery"
+      ],
+      "mediaStatus": "VERIFIED",
+      "contentDisposition": "KEEP_INTERNAL_SOURCE_ONLY",
+      "pricingDecision": "PRICE_REVIEW_PENDING",
+      "translationSlots": {
+        "en": "PENDING",
+        "de": "PENDING",
+        "fr": "PENDING",
+        "es": "PENDING",
+        "it": "PENDING",
+        "nl": "PENDING"
+      },
+      "ingredientStatus": "UNKNOWN",
+      "commercialDisposition": "COMMERCIAL_CANDIDATE",
+      "publicationDisposition": "NOT_READY",
+      "completionLevels": [
+        "DATA_ADJUDICATED",
+        "SPECIALIST_REVIEW_REQUIRED"
+      ]
+    },
+    "fusion-cherry-lime-gummies": {
+      "productSlug": "fusion-cherry-lime-gummies",
+      "status": "FULLY_REVIEWED",
+      "pendingFieldDecisions": [],
+      "pendingMediaDecisions": [],
+      "internalNotes": [],
+      "lastSummary": {
+        "productSlug": "fusion-cherry-lime-gummies",
+        "productName": "Fusion Cherry Lime Gummies - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.391Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "completedSections": [
+        "name",
+        "slug",
+        "category",
+        "variant",
+        "description",
+        "primaryImage"
+      ],
+      "deferredSections": [
+        "sku",
+        "shortDescription",
+        "ingredients",
+        "attributes",
+        "weight",
+        "gallery"
+      ],
+      "mediaStatus": "VERIFIED",
+      "contentDisposition": "KEEP_INTERNAL_SOURCE_ONLY",
+      "pricingDecision": "PRICE_REVIEW_PENDING",
+      "translationSlots": {
+        "en": "PENDING",
+        "de": "PENDING",
+        "fr": "PENDING",
+        "es": "PENDING",
+        "it": "PENDING",
+        "nl": "PENDING"
+      },
+      "ingredientStatus": "UNKNOWN",
+      "commercialDisposition": "COMMERCIAL_CANDIDATE",
+      "publicationDisposition": "NOT_READY",
+      "completionLevels": [
+        "DATA_ADJUDICATED",
+        "SPECIALIST_REVIEW_REQUIRED"
+      ]
+    }
+  },
+  "auditTrail": [
+    {
+      "action": "BATCH_SELECTED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "FIRST_BATCH",
+      "field": "selection",
+      "decision": "size=10",
+      "beforeValue": null,
+      "afterValue": {
+        "selected": [
+          "a-box-of-10-fusion-gummies",
+          "a-box-of-fusion-gummies",
+          "audit-test-product",
+          "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+          "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+          "fusion-100-bars-boutique-box",
+          "fusion-bars-banana-chocolate",
+          "fusion-bars-peanut-butter",
+          "fusion-cactus-cooler-gummies",
+          "fusion-cherry-lime-gummies"
+        ],
+        "excluded": 87
+      },
+      "reason": "Deterministic first-batch selection by evidence strength (not legality)",
+      "id": "FB-AUD-1790474516068-3360",
+      "timestamp": "2026-09-27T02:01:56.068Z"
+    },
+    {
+      "action": "CONTENT_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "content",
+      "decision": "KEEP_INTERNAL_SOURCE_ONLY",
+      "beforeValue": "PENDING",
+      "afterValue": "KEEP_INTERNAL_SOURCE_ONLY",
+      "reason": "Raw source copy kept internal until EU content is explicitly approved.",
+      "id": "FB-AUD-1790474516076-2479",
+      "timestamp": "2026-09-27T02:01:56.076Z"
+    },
+    {
+      "action": "PRICING_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "priceEUR",
+      "decision": "PRICE_REVIEW_PENDING",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "PRICE_REVIEW_PENDING — no approved FusionBars EU price on record",
+      "id": "FB-AUD-1790474516076-5710",
+      "timestamp": "2026-09-27T02:01:56.076Z"
+    },
+    {
+      "action": "RELATIONSHIP_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "variantStructure",
+      "decision": "DISTINCT_PRODUCTS",
+      "beforeValue": null,
+      "afterValue": [
+        "distinct_source_record_ids",
+        "distinct_slugs",
+        "distinct_primary_images",
+        "distinct_source_prices:200_vs_30",
+        "distinct_names"
+      ],
+      "reason": "Relationship recorded only from source-record, price, image, and slug evidence. No name-similarity merge.",
+      "id": "FB-AUD-1790474516077-3644",
+      "timestamp": "2026-09-27T02:01:56.077Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "name",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "A Box of 10 Fusion Gummies - Fusion Mushroom Bars",
+      "afterValue": "A Box of 10 Fusion Gummies - Fusion Mushroom Bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-7732",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "slug",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "a-box-of-10-fusion-gummies",
+      "afterValue": "a-box-of-10-fusion-gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-5951",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "sku",
+      "decision": "DEFER",
+      "beforeValue": "",
+      "afterValue": "",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-1972",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "category",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Magic Mushroom Gummies",
+      "afterValue": "Magic Mushroom Gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-9784",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "variant",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "a box of 10 fusion gummies",
+      "afterValue": "a box of 10 fusion gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-739",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "description",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "A Box of 10 Fusion Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "A Box of 10 Fusion Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-435",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "shortDescription",
+      "decision": "DEFER",
+      "beforeValue": "A Box of 10 Fusion Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "A Box of 10 Fusion Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-7799",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "ingredients",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-2758",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "attributes",
+      "decision": "DEFER",
+      "beforeValue": {},
+      "afterValue": {},
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-4640",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "weight",
+      "decision": "DEFER",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-2344",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "primaryImage",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2024/09/a-box-of-10-fusion-gummies.png",
+      "afterValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2024/09/a-box-of-10-fusion-gummies.png",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-6470",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "gallery",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516111-1076",
+      "timestamp": "2026-09-27T02:01:56.111Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "MEDIA-REPO-A-RAW-REPO-A-0010-0",
+      "decision": "PRIMARY",
+      "beforeValue": null,
+      "afterValue": "PRIMARY",
+      "reason": "Primary image selected from verified source media",
+      "id": "FB-AUD-1790474516112-2873",
+      "timestamp": "2026-09-27T02:01:56.112Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "MEDIA-a-box-of-10-fusion-gummies-2",
+      "decision": "GALLERY",
+      "beforeValue": null,
+      "afterValue": "GALLERY",
+      "reason": "Additional verified source image kept in gallery. Raw media retained.",
+      "id": "FB-AUD-1790474516112-9338",
+      "timestamp": "2026-09-27T02:01:56.112Z"
+    },
+    {
+      "action": "BATCH_SAVED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "field": "productReview",
+      "decision": "FULLY_REVIEWED",
+      "beforeValue": null,
+      "afterValue": {
+        "productSlug": "a-box-of-10-fusion-gummies",
+        "productName": "A Box of 10 Fusion Gummies - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.112Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "reason": "First-batch data adjudication save",
+      "id": "FB-AUD-1790474516112-3850",
+      "timestamp": "2026-09-27T02:01:56.112Z"
+    },
+    {
+      "action": "CONTENT_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "content",
+      "decision": "KEEP_INTERNAL_SOURCE_ONLY",
+      "beforeValue": "PENDING",
+      "afterValue": "KEEP_INTERNAL_SOURCE_ONLY",
+      "reason": "Raw source copy kept internal until EU content is explicitly approved.",
+      "id": "FB-AUD-1790474516114-3129",
+      "timestamp": "2026-09-27T02:01:56.114Z"
+    },
+    {
+      "action": "PRICING_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "priceEUR",
+      "decision": "PRICE_REVIEW_PENDING",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "PRICE_REVIEW_PENDING — no approved FusionBars EU price on record",
+      "id": "FB-AUD-1790474516114-2562",
+      "timestamp": "2026-09-27T02:01:56.114Z"
+    },
+    {
+      "action": "RELATIONSHIP_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "variantStructure",
+      "decision": "DISTINCT_PRODUCTS",
+      "beforeValue": null,
+      "afterValue": [
+        "distinct_source_record_ids",
+        "distinct_slugs",
+        "distinct_primary_images",
+        "distinct_source_prices:200_vs_30",
+        "distinct_names"
+      ],
+      "reason": "Relationship recorded only from source-record, price, image, and slug evidence. No name-similarity merge.",
+      "id": "FB-AUD-1790474516114-6148",
+      "timestamp": "2026-09-27T02:01:56.114Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "name",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "A Box of Fusion Gummies - Fusion Mushroom Bars",
+      "afterValue": "A Box of Fusion Gummies - Fusion Mushroom Bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-9788",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "slug",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "a-box-of-fusion-gummies",
+      "afterValue": "a-box-of-fusion-gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-1693",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "sku",
+      "decision": "DEFER",
+      "beforeValue": "",
+      "afterValue": "",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-1886",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "category",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Magic Mushroom Gummies",
+      "afterValue": "Magic Mushroom Gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-9648",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "variant",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "a box of fusion gummies",
+      "afterValue": "a box of fusion gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-9346",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "description",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "A Box of Fusion Gummies,fusion mushroom bars,fusion shroom bars,mushroom gummy,polkadot gummies,fusion bars,fusion chocolate bar,mushroom bites gummies,mushroom.gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "A Box of Fusion Gummies,fusion mushroom bars,fusion shroom bars,mushroom gummy,polkadot gummies,fusion bars,fusion chocolate bar,mushroom bites gummies,mushroom.gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-1620",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "shortDescription",
+      "decision": "DEFER",
+      "beforeValue": "A Box of Fusion Gummies,fusion mushroom bars,fusion shroom bars,mushroom gummy,polkadot gummies,fusion bars,fusion chocolate bar,mushroom bites gummies,mushroom",
+      "afterValue": "A Box of Fusion Gummies,fusion mushroom bars,fusion shroom bars,mushroom gummy,polkadot gummies,fusion bars,fusion chocolate bar,mushroom bites gummies,mushroom",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-7732",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "ingredients",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-5747",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "attributes",
+      "decision": "DEFER",
+      "beforeValue": {},
+      "afterValue": {},
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-9900",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "weight",
+      "decision": "DEFER",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-2916",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "primaryImage",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2024/04/photo1705972254.jpeg",
+      "afterValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2024/04/photo1705972254.jpeg",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-3859",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "gallery",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516145-754",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "MEDIA-REPO-A-RAW-REPO-A-0003-0",
+      "decision": "PRIMARY",
+      "beforeValue": null,
+      "afterValue": "PRIMARY",
+      "reason": "Primary image selected from verified source media",
+      "id": "FB-AUD-1790474516145-286",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "MEDIA-a-box-of-fusion-gummies-2",
+      "decision": "GALLERY",
+      "beforeValue": null,
+      "afterValue": "GALLERY",
+      "reason": "Additional verified source image kept in gallery. Raw media retained.",
+      "id": "FB-AUD-1790474516145-1382",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "BATCH_SAVED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "field": "productReview",
+      "decision": "FULLY_REVIEWED",
+      "beforeValue": null,
+      "afterValue": {
+        "productSlug": "a-box-of-fusion-gummies",
+        "productName": "A Box of Fusion Gummies - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.145Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "reason": "First-batch data adjudication save",
+      "id": "FB-AUD-1790474516145-5814",
+      "timestamp": "2026-09-27T02:01:56.145Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "primaryImage",
+      "decision": "MEDIA_REVIEW",
+      "beforeValue": "https://example.com/image.png",
+      "afterValue": "https://example.com/image.png",
+      "reason": "Primary image is missing, broken, or not a verified source asset. No substitute image assigned.",
+      "id": "FB-AUD-1790474516146-1338",
+      "timestamp": "2026-09-27T02:01:56.146Z"
+    },
+    {
+      "action": "CONTENT_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "content",
+      "decision": "KEEP_INTERNAL_SOURCE_ONLY",
+      "beforeValue": "PENDING",
+      "afterValue": "KEEP_INTERNAL_SOURCE_ONLY",
+      "reason": "Raw source copy kept internal until EU content is explicitly approved.",
+      "id": "FB-AUD-1790474516146-6981",
+      "timestamp": "2026-09-27T02:01:56.146Z"
+    },
+    {
+      "action": "PRICING_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "priceEUR",
+      "decision": "PRICE_REVIEW_PENDING",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "PRICE_REVIEW_PENDING — no approved FusionBars EU price on record",
+      "id": "FB-AUD-1790474516146-3212",
+      "timestamp": "2026-09-27T02:01:56.146Z"
+    },
+    {
+      "action": "NOTE_ADDED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "internalNote",
+      "decision": "NOTE",
+      "beforeValue": null,
+      "afterValue": {
+        "id": "FB-NOTE-1790474516146",
+        "customerVisible": false
+      },
+      "reason": "Internal reviewer note (not customer-facing)",
+      "id": "FB-AUD-1790474516146-1932",
+      "timestamp": "2026-09-27T02:01:56.146Z"
+    },
+    {
+      "action": "TEST_RECORD_FLAG",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "commercialDisposition",
+      "decision": "NON_COMMERCIAL_TEST_RECORD",
+      "beforeValue": null,
+      "afterValue": "DO_NOT_PUBLISH",
+      "reason": "name_or_slug_identifies_test_fixture; placeholder_image_host",
+      "id": "FB-AUD-1790474516146-6328",
+      "timestamp": "2026-09-27T02:01:56.146Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "name",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Audit Test Product",
+      "afterValue": "Audit Test Product",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-4106",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "slug",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "audit-test-product",
+      "afterValue": "audit-test-product",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-959",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "sku",
+      "decision": "DEFER",
+      "beforeValue": "",
+      "afterValue": "",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-9096",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "category",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "artisan-chocolate-bars",
+      "afterValue": "artisan-chocolate-bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-9887",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "variant",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "audit test product",
+      "afterValue": "audit test product",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-1461",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "description",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "This is a test product for the audit.",
+      "afterValue": "This is a test product for the audit.",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-2599",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "shortDescription",
+      "decision": "DEFER",
+      "beforeValue": "This is a test product for the audit.",
+      "afterValue": "This is a test product for the audit.",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-8471",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "ingredients",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-1659",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "attributes",
+      "decision": "DEFER",
+      "beforeValue": {},
+      "afterValue": {},
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-545",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "weight",
+      "decision": "DEFER",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-4049",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "primaryImage",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "https://example.com/image.png",
+      "afterValue": "https://example.com/image.png",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-5454",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "gallery",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516176-8998",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "BATCH_SAVED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "audit-test-product",
+      "field": "productReview",
+      "decision": "FULLY_REVIEWED",
+      "beforeValue": null,
+      "afterValue": {
+        "productSlug": "audit-test-product",
+        "productName": "Audit Test Product",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 0,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.176Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "MEDIA_REVIEW",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "DO_NOT_PUBLISH"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "reason": "First-batch data adjudication save",
+      "id": "FB-AUD-1790474516176-7716",
+      "timestamp": "2026-09-27T02:01:56.176Z"
+    },
+    {
+      "action": "CONTENT_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "content",
+      "decision": "KEEP_INTERNAL_SOURCE_ONLY",
+      "beforeValue": "PENDING",
+      "afterValue": "KEEP_INTERNAL_SOURCE_ONLY",
+      "reason": "Source claims stay internal. No substitute public claims created.",
+      "id": "FB-AUD-1790474516177-1584",
+      "timestamp": "2026-09-27T02:01:56.177Z"
+    },
+    {
+      "action": "PRICING_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "priceEUR",
+      "decision": "PRICE_REVIEW_PENDING",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "PRICE_REVIEW_PENDING — no approved FusionBars EU price on record",
+      "id": "FB-AUD-1790474516177-3813",
+      "timestamp": "2026-09-27T02:01:56.177Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "name",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Brain High Tolerance X Fusion Chocolate Bar | Premium Fusion Mushroom Bar",
+      "afterValue": "Brain High Tolerance X Fusion Chocolate Bar | Premium Fusion Mushroom Bar",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-7095",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "slug",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "afterValue": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-6154",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "sku",
+      "decision": "DEFER",
+      "beforeValue": "",
+      "afterValue": "",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-5785",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "category",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "artisan-chocolate-bars",
+      "afterValue": "artisan-chocolate-bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-5956",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "variant",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "brain high tolerance x fusion chocolate bar premium fusion mushroom bar",
+      "afterValue": "brain high tolerance x fusion chocolate bar premium fusion mushroom bar",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-611",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "description",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Buy Brain High Tolerance X Fusion Chocolate Bar – a premium fusion mushroom bar designed for experienced users. Strong dosing, smooth chocolate, and reliable quality.",
+      "afterValue": "Buy Brain High Tolerance X Fusion Chocolate Bar – a premium fusion mushroom bar designed for experienced users. Strong dosing, smooth chocolate, and reliable quality.",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-9914",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "shortDescription",
+      "decision": "DEFER",
+      "beforeValue": "Buy Brain High Tolerance X Fusion Chocolate Bar – a premium fusion mushroom bar designed for experienced users. Strong dosing, smooth chocolate, and reliable qu",
+      "afterValue": "Buy Brain High Tolerance X Fusion Chocolate Bar – a premium fusion mushroom bar designed for experienced users. Strong dosing, smooth chocolate, and reliable qu",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-8526",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "ingredients",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-3745",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "attributes",
+      "decision": "DEFER",
+      "beforeValue": {},
+      "afterValue": {},
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-3378",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "weight",
+      "decision": "DEFER",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-5322",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "primaryImage",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "https://myfusionbar.com/wp-content/uploads/2026/03/Brain-High-Tolerance-X-Fusion-Chocolate-Bar.jpg",
+      "afterValue": "https://myfusionbar.com/wp-content/uploads/2026/03/Brain-High-Tolerance-X-Fusion-Chocolate-Bar.jpg",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-6475",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "gallery",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516214-9956",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "MEDIA-REPO-A-RAW-REPO-A-0081-0",
+      "decision": "PRIMARY",
+      "beforeValue": null,
+      "afterValue": "PRIMARY",
+      "reason": "Primary image selected from verified source media",
+      "id": "FB-AUD-1790474516214-4953",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "MEDIA-brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar-2",
+      "decision": "GALLERY",
+      "beforeValue": null,
+      "afterValue": "GALLERY",
+      "reason": "Additional verified source image kept in gallery. Raw media retained.",
+      "id": "FB-AUD-1790474516214-5986",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "BATCH_SAVED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "productReview",
+      "decision": "FULLY_REVIEWED",
+      "beforeValue": null,
+      "afterValue": {
+        "productSlug": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+        "productName": "Brain High Tolerance X Fusion Chocolate Bar | Premium Fusion Mushroom Bar",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.214Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "reason": "First-batch data adjudication save",
+      "id": "FB-AUD-1790474516214-441",
+      "timestamp": "2026-09-27T02:01:56.214Z"
+    },
+    {
+      "action": "CONTENT_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "content",
+      "decision": "KEEP_INTERNAL_SOURCE_ONLY",
+      "beforeValue": "PENDING",
+      "afterValue": "KEEP_INTERNAL_SOURCE_ONLY",
+      "reason": "Source claims stay internal. No substitute public claims created.",
+      "id": "FB-AUD-1790474516215-8046",
+      "timestamp": "2026-09-27T02:01:56.215Z"
+    },
+    {
+      "action": "PRICING_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "priceEUR",
+      "decision": "PRICE_REVIEW_PENDING",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "PRICE_REVIEW_PENDING — no approved FusionBars EU price on record",
+      "id": "FB-AUD-1790474516215-8197",
+      "timestamp": "2026-09-27T02:01:56.215Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "name",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Fun Dip High Tolerance X Fusion Chocolate Bar | Premium Fusion Mushroom Bar",
+      "afterValue": "Fun Dip High Tolerance X Fusion Chocolate Bar | Premium Fusion Mushroom Bar",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-164",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "slug",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "afterValue": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-5399",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "sku",
+      "decision": "DEFER",
+      "beforeValue": "",
+      "afterValue": "",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-3049",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "category",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "artisan-chocolate-bars",
+      "afterValue": "artisan-chocolate-bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-4708",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "variant",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "fun dip high tolerance x fusion chocolate bar premium fusion mushroom bar",
+      "afterValue": "fun dip high tolerance x fusion chocolate bar premium fusion mushroom bar",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-9523",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "description",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Discover the Fun Dip High Tolerance X Fusion Chocolate Bar, a premium fusion mushroom bar crafted for experienced users seeking quality, precise dosage, and reliable potency.",
+      "afterValue": "Discover the Fun Dip High Tolerance X Fusion Chocolate Bar, a premium fusion mushroom bar crafted for experienced users seeking quality, precise dosage, and reliable potency.",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-5682",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "shortDescription",
+      "decision": "DEFER",
+      "beforeValue": "Discover the Fun Dip High Tolerance X Fusion Chocolate Bar, a premium fusion mushroom bar crafted for experienced users seeking quality, precise dosage, and rel",
+      "afterValue": "Discover the Fun Dip High Tolerance X Fusion Chocolate Bar, a premium fusion mushroom bar crafted for experienced users seeking quality, precise dosage, and rel",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-6178",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "ingredients",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-6141",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "attributes",
+      "decision": "DEFER",
+      "beforeValue": {},
+      "afterValue": {},
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-83",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "weight",
+      "decision": "DEFER",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-1664",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "primaryImage",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "https://myfusionbar.com/wp-content/uploads/2026/03/Fun-Dip-High-Tolerance-X-Fusion-Chocolate-Bar.jpg",
+      "afterValue": "https://myfusionbar.com/wp-content/uploads/2026/03/Fun-Dip-High-Tolerance-X-Fusion-Chocolate-Bar.jpg",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-4573",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "gallery",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516242-3206",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "MEDIA-REPO-A-RAW-REPO-A-0082-0",
+      "decision": "PRIMARY",
+      "beforeValue": null,
+      "afterValue": "PRIMARY",
+      "reason": "Primary image selected from verified source media",
+      "id": "FB-AUD-1790474516242-9662",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "MEDIA-fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar-2",
+      "decision": "GALLERY",
+      "beforeValue": null,
+      "afterValue": "GALLERY",
+      "reason": "Additional verified source image kept in gallery. Raw media retained.",
+      "id": "FB-AUD-1790474516242-4465",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "BATCH_SAVED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "field": "productReview",
+      "decision": "FULLY_REVIEWED",
+      "beforeValue": null,
+      "afterValue": {
+        "productSlug": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+        "productName": "Fun Dip High Tolerance X Fusion Chocolate Bar | Premium Fusion Mushroom Bar",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.242Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "reason": "First-batch data adjudication save",
+      "id": "FB-AUD-1790474516242-1866",
+      "timestamp": "2026-09-27T02:01:56.242Z"
+    },
+    {
+      "action": "CONTENT_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "content",
+      "decision": "KEEP_INTERNAL_SOURCE_ONLY",
+      "beforeValue": "PENDING",
+      "afterValue": "KEEP_INTERNAL_SOURCE_ONLY",
+      "reason": "Raw source copy kept internal until EU content is explicitly approved.",
+      "id": "FB-AUD-1790474516243-9319",
+      "timestamp": "2026-09-27T02:01:56.243Z"
+    },
+    {
+      "action": "PRICING_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "priceEUR",
+      "decision": "PRICE_REVIEW_PENDING",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "PRICE_REVIEW_PENDING — no approved FusionBars EU price on record",
+      "id": "FB-AUD-1790474516243-325",
+      "timestamp": "2026-09-27T02:01:56.243Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "name",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Fusion 100 Bars Boutique Box 10 Flavors-official fusion bar",
+      "afterValue": "Fusion 100 Bars Boutique Box 10 Flavors-official fusion bar",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-2998",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "slug",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "fusion-100-bars-boutique-box",
+      "afterValue": "fusion-100-bars-boutique-box",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-5462",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "sku",
+      "decision": "DEFER",
+      "beforeValue": "",
+      "afterValue": "",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-8624",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "category",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "artisan-chocolate-bars",
+      "afterValue": "artisan-chocolate-bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-1782",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "variant",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "100 bars boutique box",
+      "afterValue": "100 bars boutique box",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-50",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "description",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Fusion 100 Bars Boutique Box 10 Flavors┬áare the ultimate indulgence for the adventurous chocolate lover! Fusion 100 Bars Boutique Box\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "Fusion 100 Bars Boutique Box 10 Flavors┬áare the ultimate indulgence for the adventurous chocolate lover! Fusion 100 Bars Boutique Box\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-6301",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "shortDescription",
+      "decision": "DEFER",
+      "beforeValue": "Fusion 100 Bars Boutique Box 10 Flavors┬áare the ultimate indulgence for the adventurous chocolate lover! Fusion 100 Bars Boutique Box\n\n[\"Euphoria\",\"Relaxation\"",
+      "afterValue": "Fusion 100 Bars Boutique Box 10 Flavors┬áare the ultimate indulgence for the adventurous chocolate lover! Fusion 100 Bars Boutique Box\n\n[\"Euphoria\",\"Relaxation\"",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-3245",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "ingredients",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-3443",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "attributes",
+      "decision": "DEFER",
+      "beforeValue": {},
+      "afterValue": {},
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-3659",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "weight",
+      "decision": "DEFER",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-6810",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "primaryImage",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2023/08/Screenshot-2023-08-10-082901-e1693692796775.png",
+      "afterValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2023/08/Screenshot-2023-08-10-082901-e1693692796775.png",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-7388",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "gallery",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516271-1861",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "MEDIA-REPO-A-RAW-REPO-A-0042-0",
+      "decision": "PRIMARY",
+      "beforeValue": null,
+      "afterValue": "PRIMARY",
+      "reason": "Primary image selected from verified source media",
+      "id": "FB-AUD-1790474516271-1446",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "MEDIA-fusion-100-bars-boutique-box-2",
+      "decision": "GALLERY",
+      "beforeValue": null,
+      "afterValue": "GALLERY",
+      "reason": "Additional verified source image kept in gallery. Raw media retained.",
+      "id": "FB-AUD-1790474516271-7043",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "BATCH_SAVED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "field": "productReview",
+      "decision": "FULLY_REVIEWED",
+      "beforeValue": null,
+      "afterValue": {
+        "productSlug": "fusion-100-bars-boutique-box",
+        "productName": "Fusion 100 Bars Boutique Box 10 Flavors-official fusion bar",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.271Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "reason": "First-batch data adjudication save",
+      "id": "FB-AUD-1790474516271-4591",
+      "timestamp": "2026-09-27T02:01:56.271Z"
+    },
+    {
+      "action": "CONTENT_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "content",
+      "decision": "KEEP_INTERNAL_SOURCE_ONLY",
+      "beforeValue": "PENDING",
+      "afterValue": "KEEP_INTERNAL_SOURCE_ONLY",
+      "reason": "Raw source copy kept internal until EU content is explicitly approved.",
+      "id": "FB-AUD-1790474516272-1267",
+      "timestamp": "2026-09-27T02:01:56.272Z"
+    },
+    {
+      "action": "PRICING_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "priceEUR",
+      "decision": "PRICE_REVIEW_PENDING",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "PRICE_REVIEW_PENDING — no approved FusionBars EU price on record",
+      "id": "FB-AUD-1790474516272-4083",
+      "timestamp": "2026-09-27T02:01:56.272Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "name",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Fusion Bars Banana Chocolate - Fusion Mushroom Bars",
+      "afterValue": "Fusion Bars Banana Chocolate - Fusion Mushroom Bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-3318",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "slug",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "fusion-bars-banana-chocolate",
+      "afterValue": "fusion-bars-banana-chocolate",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-5671",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "sku",
+      "decision": "DEFER",
+      "beforeValue": "",
+      "afterValue": "",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-5352",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "category",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "artisan-chocolate-bars",
+      "afterValue": "artisan-chocolate-bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-2601",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "variant",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "banana chocolate",
+      "afterValue": "banana chocolate",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-5694",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "description",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Fusion Bars Banana Chocolate, Fusion bar, fusion mushroom bars, fusion shroom bars\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "Fusion Bars Banana Chocolate, Fusion bar, fusion mushroom bars, fusion shroom bars\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-4879",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "shortDescription",
+      "decision": "DEFER",
+      "beforeValue": "Fusion Bars Banana Chocolate, Fusion bar, fusion mushroom bars, fusion shroom bars\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "Fusion Bars Banana Chocolate, Fusion bar, fusion mushroom bars, fusion shroom bars\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-7183",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "ingredients",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-4738",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "attributes",
+      "decision": "DEFER",
+      "beforeValue": {},
+      "afterValue": {},
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-5666",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "weight",
+      "decision": "DEFER",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-532",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "primaryImage",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2023/08/IMG_20230824_001922_631-e1693400560759.jpg",
+      "afterValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2023/08/IMG_20230824_001922_631-e1693400560759.jpg",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-1305",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "gallery",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516296-8885",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "MEDIA-REPO-A-RAW-REPO-A-0039-0",
+      "decision": "PRIMARY",
+      "beforeValue": null,
+      "afterValue": "PRIMARY",
+      "reason": "Primary image selected from verified source media",
+      "id": "FB-AUD-1790474516296-3118",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "MEDIA-fusion-bars-banana-chocolate-2",
+      "decision": "GALLERY",
+      "beforeValue": null,
+      "afterValue": "GALLERY",
+      "reason": "Additional verified source image kept in gallery. Raw media retained.",
+      "id": "FB-AUD-1790474516296-7273",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "BATCH_SAVED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "field": "productReview",
+      "decision": "FULLY_REVIEWED",
+      "beforeValue": null,
+      "afterValue": {
+        "productSlug": "fusion-bars-banana-chocolate",
+        "productName": "Fusion Bars Banana Chocolate - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.296Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "reason": "First-batch data adjudication save",
+      "id": "FB-AUD-1790474516296-2488",
+      "timestamp": "2026-09-27T02:01:56.296Z"
+    },
+    {
+      "action": "CONTENT_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "content",
+      "decision": "KEEP_INTERNAL_SOURCE_ONLY",
+      "beforeValue": "PENDING",
+      "afterValue": "KEEP_INTERNAL_SOURCE_ONLY",
+      "reason": "Raw source copy kept internal until EU content is explicitly approved.",
+      "id": "FB-AUD-1790474516297-1683",
+      "timestamp": "2026-09-27T02:01:56.297Z"
+    },
+    {
+      "action": "PRICING_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "priceEUR",
+      "decision": "PRICE_REVIEW_PENDING",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "PRICE_REVIEW_PENDING — no approved FusionBars EU price on record",
+      "id": "FB-AUD-1790474516297-7857",
+      "timestamp": "2026-09-27T02:01:56.297Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "name",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Fusion Bars Peanut Butter - Fusion Mushroom Bars",
+      "afterValue": "Fusion Bars Peanut Butter - Fusion Mushroom Bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-7534",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "slug",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "fusion-bars-peanut-butter",
+      "afterValue": "fusion-bars-peanut-butter",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-1377",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "sku",
+      "decision": "DEFER",
+      "beforeValue": "",
+      "afterValue": "",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-7283",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "category",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "artisan-chocolate-bars",
+      "afterValue": "artisan-chocolate-bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-4816",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "variant",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "peanut butter",
+      "afterValue": "peanut butter",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-5264",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "description",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Fusion Bars Peanut Butter are the ultimate indulgence for the adventurous chocolate lover!\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "Fusion Bars Peanut Butter are the ultimate indulgence for the adventurous chocolate lover!\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-9964",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "shortDescription",
+      "decision": "DEFER",
+      "beforeValue": "Fusion Bars Peanut Butter are the ultimate indulgence for the adventurous chocolate lover!\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "Fusion Bars Peanut Butter are the ultimate indulgence for the adventurous chocolate lover!\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-4955",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "ingredients",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-9926",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "attributes",
+      "decision": "DEFER",
+      "beforeValue": {},
+      "afterValue": {},
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-5284",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "weight",
+      "decision": "DEFER",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-602",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "primaryImage",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2023/08/WhatsApp-Image-2023-04-28-at-7.28.11-AM-e1693359693825.jpeg",
+      "afterValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2023/08/WhatsApp-Image-2023-04-28-at-7.28.11-AM-e1693359693825.jpeg",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-2622",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "gallery",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516327-8016",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "MEDIA-REPO-A-RAW-REPO-A-0048-0",
+      "decision": "PRIMARY",
+      "beforeValue": null,
+      "afterValue": "PRIMARY",
+      "reason": "Primary image selected from verified source media",
+      "id": "FB-AUD-1790474516327-8111",
+      "timestamp": "2026-09-27T02:01:56.327Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "MEDIA-fusion-bars-peanut-butter-2",
+      "decision": "GALLERY",
+      "beforeValue": null,
+      "afterValue": "GALLERY",
+      "reason": "Additional verified source image kept in gallery. Raw media retained.",
+      "id": "FB-AUD-1790474516328-2242",
+      "timestamp": "2026-09-27T02:01:56.328Z"
+    },
+    {
+      "action": "BATCH_SAVED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "field": "productReview",
+      "decision": "FULLY_REVIEWED",
+      "beforeValue": null,
+      "afterValue": {
+        "productSlug": "fusion-bars-peanut-butter",
+        "productName": "Fusion Bars Peanut Butter - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.328Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "reason": "First-batch data adjudication save",
+      "id": "FB-AUD-1790474516328-7978",
+      "timestamp": "2026-09-27T02:01:56.328Z"
+    },
+    {
+      "action": "CONTENT_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "content",
+      "decision": "KEEP_INTERNAL_SOURCE_ONLY",
+      "beforeValue": "PENDING",
+      "afterValue": "KEEP_INTERNAL_SOURCE_ONLY",
+      "reason": "Raw source copy kept internal until EU content is explicitly approved.",
+      "id": "FB-AUD-1790474516328-4625",
+      "timestamp": "2026-09-27T02:01:56.328Z"
+    },
+    {
+      "action": "PRICING_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "priceEUR",
+      "decision": "PRICE_REVIEW_PENDING",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "PRICE_REVIEW_PENDING — no approved FusionBars EU price on record",
+      "id": "FB-AUD-1790474516328-6044",
+      "timestamp": "2026-09-27T02:01:56.328Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "name",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Fusion Cactus Cooler Gummies - Fusion Mushroom Bars",
+      "afterValue": "Fusion Cactus Cooler Gummies - Fusion Mushroom Bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-6051",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "slug",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "fusion-cactus-cooler-gummies",
+      "afterValue": "fusion-cactus-cooler-gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-5532",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "sku",
+      "decision": "DEFER",
+      "beforeValue": "",
+      "afterValue": "",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-1539",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "category",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Magic Mushroom Gummies",
+      "afterValue": "Magic Mushroom Gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-2754",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "variant",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "cactus cooler gummies",
+      "afterValue": "cactus cooler gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-1655",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "description",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Fusion Cactus Cooler Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "Fusion Cactus Cooler Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-5950",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "shortDescription",
+      "decision": "DEFER",
+      "beforeValue": "Fusion Cactus Cooler Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "Fusion Cactus Cooler Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-5231",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "ingredients",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-5244",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "attributes",
+      "decision": "DEFER",
+      "beforeValue": {},
+      "afterValue": {},
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-8539",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "weight",
+      "decision": "DEFER",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-918",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "primaryImage",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2024/09/fusion-cactus-cooler-gummies-6000mg.jpeg",
+      "afterValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2024/09/fusion-cactus-cooler-gummies-6000mg.jpeg",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-847",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "gallery",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516358-7526",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "MEDIA-REPO-A-RAW-REPO-A-0012-0",
+      "decision": "PRIMARY",
+      "beforeValue": null,
+      "afterValue": "PRIMARY",
+      "reason": "Primary image selected from verified source media",
+      "id": "FB-AUD-1790474516358-5273",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "MEDIA-fusion-cactus-cooler-gummies-2",
+      "decision": "GALLERY",
+      "beforeValue": null,
+      "afterValue": "GALLERY",
+      "reason": "Additional verified source image kept in gallery. Raw media retained.",
+      "id": "FB-AUD-1790474516358-1096",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "BATCH_SAVED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "field": "productReview",
+      "decision": "FULLY_REVIEWED",
+      "beforeValue": null,
+      "afterValue": {
+        "productSlug": "fusion-cactus-cooler-gummies",
+        "productName": "Fusion Cactus Cooler Gummies - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.358Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "reason": "First-batch data adjudication save",
+      "id": "FB-AUD-1790474516358-1430",
+      "timestamp": "2026-09-27T02:01:56.358Z"
+    },
+    {
+      "action": "CONTENT_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "content",
+      "decision": "KEEP_INTERNAL_SOURCE_ONLY",
+      "beforeValue": "PENDING",
+      "afterValue": "KEEP_INTERNAL_SOURCE_ONLY",
+      "reason": "Raw source copy kept internal until EU content is explicitly approved.",
+      "id": "FB-AUD-1790474516359-7549",
+      "timestamp": "2026-09-27T02:01:56.359Z"
+    },
+    {
+      "action": "PRICING_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "priceEUR",
+      "decision": "PRICE_REVIEW_PENDING",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "PRICE_REVIEW_PENDING — no approved FusionBars EU price on record",
+      "id": "FB-AUD-1790474516359-6724",
+      "timestamp": "2026-09-27T02:01:56.359Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "name",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Fusion Cherry Lime Gummies - Fusion Mushroom Bars",
+      "afterValue": "Fusion Cherry Lime Gummies - Fusion Mushroom Bars",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-5300",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "slug",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "fusion-cherry-lime-gummies",
+      "afterValue": "fusion-cherry-lime-gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-5591",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "sku",
+      "decision": "DEFER",
+      "beforeValue": "",
+      "afterValue": "",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-9229",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "category",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Magic Mushroom Gummies",
+      "afterValue": "Magic Mushroom Gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-6373",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "variant",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "cherry lime gummies",
+      "afterValue": "cherry lime gummies",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-1255",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "description",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "Fusion Cherry Lime Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "Fusion Cherry Lime Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-8743",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "shortDescription",
+      "decision": "DEFER",
+      "beforeValue": "Fusion Cherry Lime Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "afterValue": "Fusion Cherry Lime Gummies\n\n[\"Euphoria\",\"Relaxation\"]",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-7239",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "ingredients",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-6063",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "attributes",
+      "decision": "DEFER",
+      "beforeValue": {},
+      "afterValue": {},
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-2290",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "weight",
+      "decision": "DEFER",
+      "beforeValue": null,
+      "afterValue": null,
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-5012",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "primaryImage",
+      "decision": "ACCEPT_CURRENT",
+      "beforeValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2024/09/fusion-cherry-lime-gummies-6000-mg-mushroom.jpeg",
+      "afterValue": "https://i0.wp.com/officialfusionshroombars.com/wp-content/uploads/2024/09/fusion-cherry-lime-gummies-6000-mg-mushroom.jpeg",
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-6533",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "FIELD_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "gallery",
+      "decision": "DEFER",
+      "beforeValue": [],
+      "afterValue": [],
+      "reason": "Reviewer confirmed source-supported catalogue value",
+      "id": "FB-AUD-1790474516391-4663",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "MEDIA-REPO-A-RAW-REPO-A-0013-0",
+      "decision": "PRIMARY",
+      "beforeValue": null,
+      "afterValue": "PRIMARY",
+      "reason": "Primary image selected from verified source media",
+      "id": "FB-AUD-1790474516391-9536",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "MEDIA_DECISION",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "MEDIA-fusion-cherry-lime-gummies-2",
+      "decision": "GALLERY",
+      "beforeValue": null,
+      "afterValue": "GALLERY",
+      "reason": "Additional verified source image kept in gallery. Raw media retained.",
+      "id": "FB-AUD-1790474516391-9970",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    },
+    {
+      "action": "BATCH_SAVED",
+      "actor": "catalogue.reviewer@fusionbars.eu",
+      "actorRole": "CATALOG_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "field": "productReview",
+      "decision": "FULLY_REVIEWED",
+      "beforeValue": null,
+      "afterValue": {
+        "productSlug": "fusion-cherry-lime-gummies",
+        "productName": "Fusion Cherry Lime Gummies - Fusion Mushroom Bars",
+        "fieldsAccepted": 6,
+        "fieldsChanged": 0,
+        "fieldsDeferred": 6,
+        "mediaDecisions": 2,
+        "outstandingBlockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country availability not configured"
+        ],
+        "dataReconciliation": "COMPLETE",
+        "pricing": "PRICING_REVIEW_REQUIRED",
+        "compliance": "REQUIRES_REVIEW",
+        "country": "NOT_CONFIGURED",
+        "publication": "NOT_READY",
+        "reviewStatus": "FULLY_REVIEWED",
+        "savedAt": "2026-09-27T02:01:56.391Z",
+        "actor": "catalogue.reviewer@fusionbars.eu",
+        "statusBoard": {
+          "data": "ADJUDICATED",
+          "pricing": "PRICE_REVIEW_PENDING",
+          "compliance": "REQUIRES_REVIEW",
+          "country": "NOT_CONFIGURED",
+          "content": "INTERNAL_SOURCE_ONLY",
+          "media": "VERIFIED",
+          "translation": "PENDING",
+          "seo": "PENDING",
+          "publication": "NOT_READY"
+        },
+        "completionLevels": [
+          "DATA_ADJUDICATED",
+          "SPECIALIST_REVIEW_REQUIRED"
+        ]
+      },
+      "reason": "First-batch data adjudication save",
+      "id": "FB-AUD-1790474516391-2724",
+      "timestamp": "2026-09-27T02:01:56.391Z"
+    }
+  ]
+}

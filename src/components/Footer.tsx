@@ -93,7 +93,7 @@ export default function Footer() {
             </span>
           </div>
           <p className="text-neutral-400 leading-relaxed max-w-sm">
-            {dict.common.tagline}. Europe&apos;s premier botanical confection atelier, harmonizing single-origin Belgian couverture chocolate with verified functional mycology.
+            {dict.common.tagline}. Europe&apos;s premier botanical confection atelier, harmonizing single-origin Belgian couverture chocolate with verified functional mycology. {dict.payment.cryptoDiscountBody}
           </p>
           <div className="text-neutral-500 space-y-1">
             <p>Direct Inquiries: <a href="mailto:sales@fusionbars.eu" className="text-neutral-300 hover:underline">sales@fusionbars.eu</a></p>

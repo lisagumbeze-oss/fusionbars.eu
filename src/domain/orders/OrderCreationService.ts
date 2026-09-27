@@ -20,6 +20,13 @@ import { HubAllocationService } from '@/domain/inventory/HubAllocationService';
 import { InventoryService } from '@/domain/inventory/InventoryService';
 import { BankTransferPaymentService, CryptoPaymentService, PaymentInstructions } from '@/domain/payments/PaymentService';
 import { PaymentConfigService, CryptoAsset } from '@/domain/payments/PaymentConfig';
+import { getCheckoutCryptoWallets } from '@/domain/payments/CheckoutCryptoWallets';
+import {
+  CRYPTO_PAYMENT_DISCOUNT_PERCENT,
+  calculateCryptoPaymentDiscount,
+  isCryptocurrencyPayment,
+} from '@/domain/payments/CryptoPaymentDiscount';
+import { MoneyEngine } from '@/lib/money';
 import { CommerceRepository, DbOrder } from '@/lib/commerce-repository';
 import { GuestOrderService } from './GuestOrderService';
 import { OrderService } from './OrderService';
@@ -60,6 +67,11 @@ export class OrderCreationService {
       customerNotes,
       discreetPackaging = true,
     } = input;
+
+    const courierPhone = shippingAddress.phone?.trim() || '';
+    if (courierPhone.length < 8) {
+      throw new Error('A telephone number is required for courier delivery.');
+    }
 
     // STEP 1: Validate Cart
     if (!items || items.length === 0) {
@@ -165,13 +177,23 @@ export class OrderCreationService {
       }
     );
 
-    // STEP 9: Calculate Shipping
+    // STEP 9: Calculate Shipping on pre-discount merchandise so the free-shipping threshold is unchanged.
     const shippingInfo = ShippingService.calculateShipping({
       subtotal: pricingQuote.subtotal,
       currency,
       destinationCountry,
       selectedMethodCode: shippingMethodCode,
     });
+
+    const merchandiseAfterCoupons = MoneyEngine.subtract(pricingQuote.subtotal, pricingQuote.discountAmount);
+    const cryptoDiscountAmount = isCryptocurrencyPayment(paymentMethodCode)
+      ? calculateCryptoPaymentDiscount(merchandiseAfterCoupons)
+      : 0;
+    const settlementQuote = {
+      ...pricingQuote,
+      discountAmount: MoneyEngine.add(pricingQuote.discountAmount, cryptoDiscountAmount),
+      totalAmount: MoneyEngine.subtract(pricingQuote.totalAmount, cryptoDiscountAmount),
+    };
 
     // STEP 10: Generate Unique Order Number
     const orderNumber = OrderService.generateOrderNumber();
@@ -199,7 +221,7 @@ export class OrderCreationService {
       paymentInstructions = sepaService.generateInstructions({
         orderId,
         orderNumber,
-        amount: pricingQuote.totalAmount,
+        amount: settlementQuote.totalAmount,
         currency,
       });
       paymentNotificationDetails = {
@@ -215,25 +237,37 @@ export class OrderCreationService {
         throw new Error(`Cryptocurrency asset ${asset} is not currently enabled for checkout.`);
       }
 
-      if (cryptoConfig.minimumAmount && pricingQuote.totalAmount < cryptoConfig.minimumAmount) {
-        throw new Error(`Minimum checkout threshold for ${cryptoConfig.displayName} is ${pricingQuote.totalAmount} cents.`);
+      if (cryptoConfig.minimumAmount && settlementQuote.totalAmount < cryptoConfig.minimumAmount) {
+        throw new Error(`Minimum checkout threshold for ${cryptoConfig.displayName} is ${settlementQuote.totalAmount} cents.`);
       }
 
+      const checkoutWallets = await getCheckoutCryptoWallets({
+        amountMinor: settlementQuote.totalAmount,
+        currency,
+      });
+      const primaryWallet = checkoutWallets.find((wallet) => wallet.symbol === 'BTC') ?? checkoutWallets[0];
       const cryptoService = new CryptoPaymentService({
-        cryptoName: cryptoConfig.displayName,
-        network: cryptoConfig.network,
-        receivingAddress: cryptoConfig.receivingAddress,
+        cryptoName: primaryWallet?.name || cryptoConfig.displayName,
+        network: primaryWallet?.network || cryptoConfig.network,
+        receivingAddress: primaryWallet?.address || cryptoConfig.receivingAddress,
       });
       paymentInstructions = cryptoService.generateInstructions({
         orderId,
         orderNumber,
-        amount: pricingQuote.totalAmount,
+        amount: settlementQuote.totalAmount,
         currency,
       });
+      if (checkoutWallets.length > 0) {
+        paymentInstructions = {
+          ...paymentInstructions,
+          methodName: 'Cryptocurrency',
+          wallets: checkoutWallets,
+        };
+      }
       paymentNotificationDetails = {
-        cryptoName: cryptoConfig.displayName,
-        network: cryptoConfig.network,
-        receivingAddress: cryptoConfig.receivingAddress,
+        cryptoName: primaryWallet?.name || cryptoConfig.displayName,
+        network: primaryWallet?.network || cryptoConfig.network,
+        receivingAddress: primaryWallet?.address || cryptoConfig.receivingAddress,
       };
     }
 
@@ -244,12 +278,12 @@ export class OrderCreationService {
       lookupToken,
       customerId: customerId || null,
       guestEmail: (shippingAddress.email || 'guest@fusionbars.eu').toLowerCase(),
-      guestPhone: shippingAddress.phone || null,
+      guestPhone: courierPhone,
       currency,
-      subtotalAmount: pricingQuote.subtotal,
-      discountAmount: pricingQuote.discountAmount,
-      shippingAmount: pricingQuote.shippingAmount,
-      totalAmount: pricingQuote.totalAmount,
+      subtotalAmount: settlementQuote.subtotal,
+      discountAmount: settlementQuote.discountAmount,
+      shippingAmount: settlementQuote.shippingAmount,
+      totalAmount: settlementQuote.totalAmount,
       status: 'PENDING_PAYMENT',
       shippingOriginHub: chosenHub,
       shippingMethodCode,
@@ -260,9 +294,9 @@ export class OrderCreationService {
         city: shippingAddress.city,
         postalCode: shippingAddress.postalCode,
         countryCode: destinationCountry,
-        phone: shippingAddress.phone,
+        phone: courierPhone,
       },
-      items: pricingQuote.items.map((it) => {
+      items: settlementQuote.items.map((it) => {
         const match = variantProductMap.get(it.variantId);
         return {
           id: `item_${Date.now()}_${it.variantId}`,
@@ -287,7 +321,9 @@ export class OrderCreationService {
           toStatus: 'PENDING_PAYMENT',
           actorRole: 'SYSTEM',
           actorId: 'checkout_engine',
-          note: `Order initiated. Awaiting ${paymentMethodCode} funds. Hub routed to ${chosenHub}.`,
+          note: cryptoDiscountAmount > 0
+            ? `Order initiated with ${CRYPTO_PAYMENT_DISCOUNT_PERCENT}% cryptocurrency payment discount (${cryptoDiscountAmount} minor units). Awaiting ${paymentMethodCode} funds. Hub routed to ${chosenHub}.`
+            : `Order initiated. Awaiting ${paymentMethodCode} funds. Hub routed to ${chosenHub}.`,
           createdAt: new Date().toISOString(),
         },
       ],
@@ -328,6 +364,13 @@ export class OrderCreationService {
           cryptoName: paymentNotificationDetails.cryptoName || 'Bitcoin',
           network: paymentNotificationDetails.network || 'Bitcoin Mainnet',
           receivingAddress: paymentNotificationDetails.receivingAddress || 'bc1q_placeholder_btc_test_only',
+          wallets: (paymentInstructions.wallets ?? []).map((wallet) => ({
+            name: wallet.name,
+            symbol: wallet.symbol,
+            network: wallet.network,
+            address: wallet.address,
+            amount: wallet.amount,
+          })),
         })
       );
     }
@@ -344,7 +387,8 @@ export class OrderCreationService {
       actorId: customerId || 'GUEST',
       metadata: JSON.stringify({
         orderNumber,
-        total: pricingQuote.totalAmount,
+        total: settlementQuote.totalAmount,
+        cryptoDiscountAmount,
         currency,
         hub: chosenHub,
         dest: destinationCountry,

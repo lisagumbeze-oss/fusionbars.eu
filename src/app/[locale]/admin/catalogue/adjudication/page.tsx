@@ -573,6 +573,12 @@ export default function CatalogueAdjudicationPage() {
               Review Center
             </Link>
             <Link
+              href={`/${locale}/admin/catalogue/recommendations`}
+              className="text-xs text-sky-300 hover:text-white px-3 py-1.5 rounded-lg border border-sky-800 bg-sky-950/40"
+            >
+              Recommendations
+            </Link>
+            <Link
               href={`/${locale}/admin/catalogue/imports`}
               className="text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800"
             >

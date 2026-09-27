@@ -116,30 +116,43 @@ Support: ${context.supportEmail}
       cryptoName: string;
       network: string;
       receivingAddress: string;
+      wallets?: Array<{ name: string; symbol: string; network: string; address: string; amount?: string }>;
     }
   ): { subject: string; text: string; html: string } {
     const formattedTotal = MoneyEngine.format(context.totalAmount, context.currency);
-    const subject = `Order Confirmed: ${context.orderNumber} — ${context.cryptoName} Instructions`;
+    const wallets = context.wallets?.filter((wallet) => wallet.address.trim()) ?? [];
+    const subject = `Order Confirmed: ${context.orderNumber} — Cryptocurrency Instructions`;
+    const walletText = wallets.length > 0
+      ? wallets.map((wallet) => `${wallet.name} (${wallet.symbol}) — ${wallet.network}${wallet.amount ? `\nSend exactly: ${wallet.amount} ${wallet.symbol}` : ''}\nReceiving Address: ${wallet.address}`).join('\n\n')
+      : `Asset: ${context.cryptoName}\nNetwork: ${context.network}\nReceiving Address: ${context.receivingAddress}`;
+    const walletRows = wallets.length > 0
+      ? wallets.map((wallet) => [
+          renderDetailRow(wallet.name, `${wallet.symbol} · ${wallet.network}`),
+          ...(wallet.amount ? [renderDetailRow('Send exactly', `${wallet.amount} ${wallet.symbol}`, true)] : []),
+          renderDetailRow('Receiving address', wallet.address, true),
+        ].join('')).join('')
+      : [
+          renderDetailRow('Network', context.network),
+          renderDetailRow('Receiving address', context.receivingAddress, true),
+        ].join('');
     const text = `
 Hello ${context.customerName},
 
 Thank you for your order (${context.orderNumber}).
 
 Total Amount: ${formattedTotal}
+A 10% cryptocurrency payment discount has already been applied to the merchandise subtotal. Shipping is unchanged.
 
-Asset: ${context.cryptoName}
-Network: ${context.network}
-Receiving Address: ${context.receivingAddress}
+${walletText}
 Order Reference: ${context.orderNumber}
 
 Support: ${context.supportEmail}
 `.trim();
 
     const panel = renderAccentPanel(
-      `${context.cryptoName} payment details`,
+      'Cryptocurrency payment details',
       [
-        renderDetailRow('Network', context.network),
-        renderDetailRow('Receiving address', context.receivingAddress, true),
+        walletRows,
         renderDetailRow('Order reference', context.orderNumber, true),
         renderDetailRow('Total equivalent', formattedTotal),
       ].join('')
@@ -152,7 +165,7 @@ Support: ${context.supportEmail}
       bodyHtml: `
         ${renderHeading('Order confirmed')}
         <p>Dear ${escapeHtml(context.customerName)},</p>
-        <p>Your order <strong>${escapeHtml(context.orderNumber)}</strong> is ready for payment.</p>
+        <p>Your order <strong>${escapeHtml(context.orderNumber)}</strong> is ready for payment. A 10% cryptocurrency discount has already been applied to the merchandise subtotal.</p>
         ${panel}
       `,
     });

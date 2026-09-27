@@ -5,6 +5,7 @@ import { CatalogService } from '@/lib/catalog';
 import ProductCard from '@/components/ProductCard';
 import { LocaleCode } from '@/types';
 import { ShieldCheck, Truck, Sparkles, ArrowRight, CheckCircle2, ChevronRight, Lock, Heart, Award, Layers } from 'lucide-react';
+import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
 
 interface HomePageProps {
   params: Promise<{ locale: string }> | { locale: string };
@@ -54,6 +55,8 @@ export default async function HomePage({ params }: HomePageProps) {
                   Curator Tasting Boxes
                 </Link>
               </div>
+
+              <CryptoDiscountNotice locale={locale} />
 
               {/* Trust Indicators (Quiet, unboxed inline metadata) */}
               <div className="pt-6 border-t border-[#E5E3DD]/80 flex flex-wrap items-center justify-center lg:justify-start gap-y-2 gap-x-6 text-xs text-[#5C5852]">
@@ -294,7 +297,7 @@ export default async function HomePage({ params }: HomePageProps) {
           <div className="pt-4">
             <h3 className="font-bold text-sm text-[#121212] mb-1">What payment methods are supported?</h3>
             <p className="text-[#5C5852] leading-relaxed">
-              In accordance with European merchant guidelines, we accept direct Bank Transfer (SEPA / IBAN) and Cryptocurrency (Bitcoin / Altcoins). Credit cards and PayPal are not active on this store.
+              In accordance with European merchant guidelines, we accept direct Bank Transfer (SEPA / IBAN) and cryptocurrency (Bitcoin, Ethereum, and Bitcoin Cash). Paying with cryptocurrency saves 10% on the merchandise subtotal. Shipping is unchanged. Credit cards and PayPal are not active on this store.
             </p>
           </div>
 

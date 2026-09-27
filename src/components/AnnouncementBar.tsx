@@ -10,31 +10,37 @@ import { useRouter, usePathname } from 'next/navigation';
 const ANNOUNCEMENTS: Record<LocaleCode, string[]> = {
   en: [
     'Free European Courier on orders over €300',
+    'Pay with cryptocurrency and save 10%',
     '100% Plain Discreet Packaging',
     'Dispatched from NL, ES, DE, FR',
   ],
   de: [
     'Kostenloser Europa-Versand ab 300 €',
+    'Mit Kryptowährung zahlen und 10% sparen',
     'Diskrete neutrale Verpackung',
     'Versand aus NL, ES, DE, FR',
   ],
   fr: [
     'Livraison européenne offerte dès 300 €',
+    'Payez en cryptomonnaie et économisez 10 %',
     'Expédition 100% discrète',
     'Expédié depuis NL, ES, DE, FR',
   ],
   es: [
     'Envío europeo gratuito a partir de 300 €',
+    'Paga con criptomoneda y ahorra un 10%',
     'Empaque 100% discreto',
     'Enviado desde NL, ES, DE, FR',
   ],
   it: [
     'Spedizione europea gratuita oltre 300 €',
+    'Paga in criptovaluta e risparmia il 10%',
     'Imballaggio 100% discreto',
     'Spedito da NL, ES, DE, FR',
   ],
   nl: [
     'Gratis Europese verzending vanaf €300',
+    'Betaal met cryptocurrency en bespaar 10%',
     '100% discrete verpakking',
     'Verzonden vanuit NL, ES, DE, FR',
   ],

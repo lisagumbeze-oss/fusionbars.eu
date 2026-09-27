@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { useCommerce } from '@/context/CommerceContext';
 import { ShoppingBag, Trash2, ArrowRight, ArrowLeft, ShieldCheck, Truck, Plus, Minus } from 'lucide-react';
 import { getDictionary } from '@/i18n';
+import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
+import { calculateCryptoPaymentDiscount } from '@/domain/payments/CryptoPaymentDiscount';
 
 export default function CartPage() {
   const {
@@ -25,6 +27,8 @@ export default function CartPage() {
   } = useCommerce();
 
   const dict = getDictionary(locale);
+  const cryptoDiscount = calculateCryptoPaymentDiscount(subtotal);
+  const cryptoTotal = Math.max(0, total - cryptoDiscount);
   const threshold = currency === 'EUR' ? 30000 : 26000;
   const progressPercent = Math.min(100, Math.round((subtotal / threshold) * 100));
 
@@ -190,6 +194,7 @@ export default function CartPage() {
               <h2 className="font-serif text-lg font-bold text-[#121212] border-b border-[#E5E3DD] pb-3">
                 Order Summary
               </h2>
+              <CryptoDiscountNotice locale={locale} compact />
 
               <div className="space-y-3 text-xs text-[#5C5852]">
                 <div className="flex justify-between">
@@ -210,6 +215,18 @@ export default function CartPage() {
                   <span>Estimated Total</span>
                   <span className="text-[#4A5D4E] font-mono">{formatMoney(total)}</span>
                 </div>
+                {cryptoDiscount > 0 && (
+                  <>
+                    <div className="flex justify-between text-amber-800">
+                      <span>{dict.payment.cryptoDiscountLine}</span>
+                      <span className="font-mono font-semibold">−{formatMoney(cryptoDiscount)}</span>
+                    </div>
+                    <div className="flex justify-between font-semibold text-[#121212]">
+                      <span>{dict.payment.cryptoDiscountPrice}</span>
+                      <span className="font-mono">{formatMoney(cryptoTotal)}</span>
+                    </div>
+                  </>
+                )}
               </div>
 
               <div className="p-3.5 rounded-xl bg-[#FBFBF9] border border-[#E5E3DD] text-[11px] text-[#5C5852] space-y-1">

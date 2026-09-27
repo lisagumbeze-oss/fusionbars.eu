@@ -20,9 +20,16 @@ import { createOrderAction } from '@/actions/orders';
 import { submitPaymentProofAction } from '@/actions/payments';
 import { CountryRegistry } from '@/domain/countries/CountryRegistry';
 import { ShippingService } from '@/domain/shipping/ShippingService';
+import {
+  calculateCryptoPaymentDiscount,
+  isCryptocurrencyPayment,
+} from '@/domain/payments/CryptoPaymentDiscount';
+import { getDictionary } from '@/i18n';
+import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
 
 export default function CheckoutPage() {
   const { cart, subtotal, formatMoney, currency, locale, clearCart } = useCommerce();
+  const dict = getDictionary(locale);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -53,7 +60,10 @@ export default function CheckoutPage() {
   const standardOption = shippingCalculation.methods.find((m) => m.code === 'STANDARD');
   const expressOption = shippingCalculation.methods.find((m) => m.code === 'EXPRESS');
   const dynamicShippingCost = shippingCalculation.selectedMethod.cost;
-  const dynamicTotal = subtotal + dynamicShippingCost;
+  const cryptoDiscount = isCryptocurrencyPayment(paymentMethodCode)
+    ? calculateCryptoPaymentDiscount(subtotal)
+    : 0;
+  const dynamicTotal = Math.max(0, subtotal - cryptoDiscount + dynamicShippingCost);
 
   // Completed Order State
   const [orderConfirmed, setOrderConfirmed] = useState<{
@@ -97,7 +107,7 @@ export default function CheckoutPage() {
           firstName: formData.firstName,
           lastName: formData.lastName,
           email: formData.email,
-          phone: formData.phone || undefined,
+          phone: formData.phone.trim(),
           streetAddress: formData.streetAddress,
           houseNumber: formData.houseNumber || undefined,
           city: formData.city,
@@ -151,6 +161,19 @@ export default function CheckoutPage() {
   // SUCCESS / CONFIRMATION VIEW
   if (orderConfirmed) {
     const inst = orderConfirmed.paymentInstructions;
+    const cryptoWallets: Array<{ symbol: string; name: string; network: string; address: string; amount?: string; qrDataUrl?: string }> =
+      Array.isArray(inst?.wallets) && inst.wallets.length > 0
+        ? inst.wallets
+        : inst?.details?.receivingAddress
+          ? [
+              {
+                symbol: 'BTC',
+                name: String(inst.details.cryptoName || 'Bitcoin'),
+                network: String(inst.details.network || 'Bitcoin'),
+                address: String(inst.details.receivingAddress),
+              },
+            ]
+          : [];
 
     return (
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-14 space-y-8 animate-fadeIn">
@@ -170,6 +193,92 @@ export default function CheckoutPage() {
           </p>
         </div>
 
+        {isCryptocurrencyPayment(paymentMethodCode) && (
+          <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 sm:p-8 space-y-4 shadow-xs">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2.5">
+                <Coins className="w-5 h-5 text-amber-600" />
+                <h2 className="text-base font-bold text-[#121212]">Cryptocurrency addresses</h2>
+              </div>
+              <span className="font-mono text-sm font-bold text-[#4A5D4E]">
+                {formatMoney(orderConfirmed.totalAmount)}
+              </span>
+            </div>
+            <p className="text-xs text-[#5C5852] leading-relaxed">
+              Send the exact amount listed for the currency you choose. Each amount already includes the 10% cryptocurrency discount and is converted at the market price when the order was placed. After the transfer is sent, paste the transaction hash (TXID) below.
+            </p>
+            {cryptoWallets.length > 0 ? (
+              <ul className="space-y-3">
+                {cryptoWallets.map((wallet) => (
+                  <li
+                    key={`${wallet.symbol}-${wallet.address}`}
+                    className="bg-[#FBFBF9] rounded-xl border border-[#E5E3DD] p-4"
+                  >
+                    <div className="flex flex-col sm:flex-row gap-4">
+                      {wallet.qrDataUrl && (
+                        <img
+                          src={wallet.qrDataUrl}
+                          alt={`${wallet.name} payment QR code`}
+                          className="w-40 h-40 rounded-lg border border-[#E5E3DD] bg-white"
+                        />
+                      )}
+                      <div className="flex-1 space-y-3 min-w-0">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold text-[#121212]">{wallet.name}</p>
+                            <p className="text-[11px] text-[#5C5852]">{wallet.network}</p>
+                          </div>
+                          <span className="text-[11px] font-semibold tracking-wide text-[#4A5D4E]">{wallet.symbol}</span>
+                        </div>
+                        {wallet.amount ? (
+                          <div className="rounded-lg bg-[#F0F4F1] px-3 py-2 space-y-1">
+                            <p className="text-[11px] uppercase tracking-wide font-semibold text-[#4A5D4E]">Send exactly</p>
+                            <div className="flex items-center justify-between gap-3">
+                              <p className="font-mono text-base font-bold text-[#121212]">
+                                {wallet.amount} {wallet.symbol}
+                              </p>
+                              <button
+                                type="button"
+                                onClick={() => copyToClipboard(`${wallet.amount} ${wallet.symbol}`, `${wallet.symbol}-amount`)}
+                                className="shrink-0 text-[#4A5D4E] hover:text-[#121212] text-[11px] font-semibold inline-flex items-center gap-1"
+                                aria-label={`Copy ${wallet.name} amount`}
+                              >
+                                <Copy className="w-3.5 h-3.5" />
+                                {copiedField === `${wallet.symbol}-amount` ? 'Copied' : 'Copy'}
+                              </button>
+                            </div>
+                            <p className="text-[11px] text-[#5C5852]">{formatMoney(orderConfirmed.totalAmount)}</p>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                            The exact {wallet.symbol} amount is unavailable. Do not send funds until it is shown.
+                          </p>
+                        )}
+                        <div className="flex items-start justify-between gap-3">
+                          <code className="text-xs font-mono text-[#121212] break-all">{wallet.address}</code>
+                          <button
+                            type="button"
+                            onClick={() => copyToClipboard(wallet.address, wallet.address)}
+                            className="shrink-0 text-[#4A5D4E] hover:text-[#121212] text-[11px] font-semibold inline-flex items-center gap-1"
+                            aria-label={`Copy ${wallet.name} address`}
+                          >
+                            <Copy className="w-3.5 h-3.5" />
+                            {copiedField === wallet.address ? 'Copied' : 'Copy'}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-xs text-[#5C5852] bg-[#FBFBF9] border border-[#E5E3DD] rounded-xl px-4 py-3">
+                Payment addresses are not listed yet. Contact the store before sending cryptocurrency.
+              </p>
+            )}
+          </div>
+        )}
+
         {/* Payment Instructions Card */}
         <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 sm:p-8 space-y-6 shadow-xs">
           <div className="flex items-center justify-between border-b border-[#E5E3DD] pb-4">
@@ -180,13 +289,18 @@ export default function CheckoutPage() {
                 <Coins className="w-5 h-5 text-amber-600" />
               )}
               <h2 className="text-base font-bold text-[#121212]">
-                {paymentMethodCode === 'SEPA_IBAN' ? 'Bank Transfer (SEPA / IBAN)' : 'Cryptocurrency (Bitcoin BTC)'}
+                {paymentMethodCode === 'SEPA_IBAN' ? 'Bank Transfer (SEPA / IBAN)' : 'Cryptocurrency'}
               </h2>
             </div>
             <span className="font-mono text-base font-bold text-[#4A5D4E]">
               {formatMoney(orderConfirmed.totalAmount)}
             </span>
           </div>
+          {isCryptocurrencyPayment(paymentMethodCode) && (
+            <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+              {dict.payment.cryptoDiscountBody}
+            </p>
+          )}
 
           {paymentMethodCode === 'SEPA_IBAN' ? (
             <div className="space-y-4 text-xs">
@@ -232,34 +346,9 @@ export default function CheckoutPage() {
               </div>
             </div>
           ) : (
-            <div className="space-y-4 text-xs">
-              <p className="text-[#5C5852]">
-                Transfer the exact amount to the designated Bitcoin address below. Once broadcast, paste your transaction hash (TXID).
-              </p>
-
-              <div className="bg-[#FBFBF9] p-4 rounded-xl border border-[#E5E3DD] space-y-2.5 font-mono text-xs">
-                <div className="flex justify-between items-center py-1 border-b border-[#E5E3DD]/60">
-                  <span className="text-[#5C5852] font-sans">Asset:</span>
-                  <span className="text-[#121212] font-semibold">Bitcoin (BTC)</span>
-                </div>
-                <div className="flex justify-between items-center py-1 border-b border-[#E5E3DD]/60">
-                  <span className="text-[#5C5852] font-sans">Receiving Address:</span>
-                  <span className="text-[#121212] font-bold truncate max-w-xs flex items-center gap-1.5">
-                    {inst.details.receivingAddress}
-                    <button
-                      onClick={() => copyToClipboard(inst.details.receivingAddress, 'btc')}
-                      className="text-[#4A5D4E] hover:text-[#121212]"
-                      aria-label="Copy BTC Address"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-                  </span>
-                </div>
-                <div className="py-2 bg-[#F0F4F1] px-3 rounded text-center text-[#4A5D4E] font-bold text-[11px] truncate">
-                  BIP21 URI: {inst.details.qrPayload}
-                </div>
-              </div>
-            </div>
+            <p className="text-xs text-[#5C5852]">
+              Use one of the cryptocurrency addresses above, then submit the transaction hash so the payment can be matched to this order.
+            </p>
           )}
 
           {/* Proof Submission Box */}
@@ -283,7 +372,7 @@ export default function CheckoutPage() {
                     required
                     value={proofReference}
                     onChange={(e) => setProofReference(e.target.value)}
-                    placeholder={paymentMethodCode === 'SEPA_IBAN' ? 'e.g. Bank Reference / Sender Name' : 'e.g. Bitcoin TXID Hash'}
+                    placeholder={paymentMethodCode === 'SEPA_IBAN' ? 'e.g. Bank Reference / Sender Name' : 'e.g. Transaction hash (TXID)'}
                     className="flex-1 bg-[#FBFBF9] border border-[#E5E3DD] px-3 py-2 text-xs rounded-lg text-[#121212] outline-none font-mono focus:border-[#4A5D4E]"
                   />
                   <button
@@ -411,13 +500,18 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <label className="block text-[#5C5852] mb-1 font-medium">Telephone (optional courier updates)</label>
+                <label htmlFor="checkout-phone" className="block text-[#5C5852] mb-1 font-medium">Telephone *</label>
                 <input
+                  id="checkout-phone"
                   type="tel"
+                  required
+                  minLength={8}
+                  autoComplete="tel"
                   name="phone"
                   value={formData.phone}
                   onChange={handleInputChange}
                   placeholder="+49 ..."
+                  aria-required="true"
                   className="w-full bg-[#FBFBF9] border border-[#E5E3DD] rounded-lg px-3 py-2 text-[#121212] outline-none focus:border-[#4A5D4E]"
                 />
               </div>
@@ -563,6 +657,7 @@ export default function CheckoutPage() {
             <h2 className="font-serif text-base font-bold text-[#121212] border-b border-[#E5E3DD] pb-2">
               4. Payment Method
             </h2>
+            <CryptoDiscountNotice locale={locale} compact />
             <div className="space-y-3 text-xs">
               <label
                 className={`p-4 rounded-xl border cursor-pointer block transition ${
@@ -605,12 +700,14 @@ export default function CheckoutPage() {
                       onChange={() => setPaymentMethodCode('CRYPTO_BTC')}
                     />
                     <Coins className="w-4 h-4 text-amber-600" />
-                    <strong className="text-sm text-[#121212]">Cryptocurrency (Bitcoin BTC)</strong>
+                    <strong className="text-sm text-[#121212]">Cryptocurrency</strong>
                   </div>
-                  <span className="text-[11px] text-neutral-500 font-sans">Non-Custodial On-Chain</span>
+                  <span className="text-[11px] font-semibold text-white bg-[#121212] rounded-full px-2 py-0.5">
+                    {dict.payment.cryptoDiscountBadge}
+                  </span>
                 </div>
                 <p className="text-[#5C5852] mt-2 pl-6">
-                  Pay with Bitcoin directly via QR code / BIP21 URI and provide TXID verification.
+                  Pay with cryptocurrency and save 10% on the merchandise subtotal. Wallet addresses are shown after you confirm the order.
                 </p>
               </label>
             </div>
@@ -618,8 +715,8 @@ export default function CheckoutPage() {
         </div>
 
         {/* Right: Order Summary Sidebar */}
-        <div className="lg:col-span-5 space-y-6">
-          <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 space-y-5 shadow-xs sticky top-28">
+        <div className="lg:col-span-5 lg:sticky lg:top-32 lg:self-start">
+          <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 space-y-5 shadow-xs">
             <h3 className="font-serif text-base font-bold text-[#121212] border-b border-[#E5E3DD] pb-3">
               Order Review ({cart.length} Item{cart.length > 1 ? 's' : ''})
             </h3>
@@ -643,6 +740,12 @@ export default function CheckoutPage() {
                 <span>Subtotal</span>
                 <span className="font-mono text-[#121212] font-semibold">{formatMoney(subtotal)}</span>
               </div>
+              {cryptoDiscount > 0 && (
+                <div className="flex justify-between text-amber-800">
+                  <span>{dict.payment.cryptoDiscountLine}</span>
+                  <span className="font-mono font-semibold">−{formatMoney(cryptoDiscount)}</span>
+                </div>
+              )}
               <div className="flex justify-between">
                 <span>European Shipping ({shippingMethodCode})</span>
                 <span className="font-mono text-[#121212]">

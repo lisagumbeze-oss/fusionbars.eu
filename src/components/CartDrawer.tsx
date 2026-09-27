@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { X, Trash2, ShoppingBag, ArrowRight, ShieldCheck, Plus, Minus, Truck } from 'lucide-react';
 import { useCommerce } from '../context/CommerceContext';
 import { getDictionary } from '../i18n';
+import CryptoDiscountNotice from './CryptoDiscountNotice';
+import { calculateCryptoPaymentDiscount } from '../domain/payments/CryptoPaymentDiscount';
 
 export default function CartDrawer() {
   const {
@@ -26,6 +28,8 @@ export default function CartDrawer() {
   } = useCommerce();
 
   const dict = getDictionary(locale);
+  const cryptoDiscount = calculateCryptoPaymentDiscount(subtotal);
+  const cryptoTotal = Math.max(0, total - cryptoDiscount);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -202,7 +206,21 @@ export default function CartDrawer() {
                   <span>{dict.commerce.total}</span>
                   <span className="font-mono text-[#4A5D4E]">{formatMoney(total)}</span>
                 </div>
+                {cryptoDiscount > 0 && (
+                  <>
+                    <div className="flex justify-between text-amber-800">
+                      <span>{dict.payment.cryptoDiscountLine}</span>
+                      <span className="font-mono font-semibold">−{formatMoney(cryptoDiscount)}</span>
+                    </div>
+                    <div className="flex justify-between font-semibold text-[#121212]">
+                      <span>{dict.payment.cryptoDiscountPrice}</span>
+                      <span className="font-mono">{formatMoney(cryptoTotal)}</span>
+                    </div>
+                  </>
+                )}
               </div>
+
+              <CryptoDiscountNotice locale={locale} compact />
 
               <div className="flex items-center gap-2 p-2.5 rounded bg-[#FBFBF9] border border-[#E5E3DD] text-[11px] text-[#5C5852]">
                 <ShieldCheck className="w-4 h-4 text-[#4A5D4E] shrink-0" />

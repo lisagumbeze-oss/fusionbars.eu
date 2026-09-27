@@ -6,6 +6,8 @@ import Image from 'next/image';
 import { Heart, ShoppingBag, Check } from 'lucide-react';
 import { NormalizedProduct, NormalizedVariant } from '../../scripts/consolidate-catalogue';
 import { useCommerce } from '../context/CommerceContext';
+import { getDictionary } from '../i18n';
+import { calculateCryptoPaymentDiscount } from '../domain/payments/CryptoPaymentDiscount';
 
 interface ProductCardProps {
   product: NormalizedProduct;
@@ -13,12 +15,14 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { locale, currency, addToCart, toggleWishlist, isWishlisted, formatMoney } = useCommerce();
+  const dict = getDictionary(locale);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
   const selectedVariant: NormalizedVariant = product.variants[selectedVariantIndex] || product.variants[0];
   const unitPrice = currency === 'EUR' ? selectedVariant.priceEUR : selectedVariant.priceGBP;
+  const cryptoUnitPrice = Math.max(0, unitPrice - calculateCryptoPaymentDiscount(unitPrice));
   const compareAt = currency === 'EUR' ? selectedVariant.compareAtEUR : selectedVariant.compareAtGBP;
 
   const displayImage = isHovered && product.hoverImage ? product.hoverImage : (selectedVariant.image || product.primaryImage);
@@ -136,15 +140,20 @@ export default function ProductCard({ product }: ProductCardProps) {
 
         {/* Pricing & Quick Add Button */}
         <div className="pt-2 border-t border-[#E5E3DD]/60 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-baseline gap-2">
-            <span className="text-sm sm:text-base font-bold text-[#121212] font-mono">
-              {formatMoney(unitPrice)}
-            </span>
-            {compareAt && compareAt > unitPrice && (
-              <span className="text-xs text-[#8E8B85] line-through font-mono">
-                {formatMoney(compareAt)}
+          <div>
+            <div className="flex items-baseline gap-2">
+              <span className="text-sm sm:text-base font-bold text-[#121212] font-mono">
+                {formatMoney(unitPrice)}
               </span>
-            )}
+              {compareAt && compareAt > unitPrice && (
+                <span className="text-xs text-[#8E8B85] line-through font-mono">
+                  {formatMoney(compareAt)}
+                </span>
+              )}
+            </div>
+            <p className="text-[11px] font-medium text-amber-800 mt-0.5">
+              {dict.payment.cryptoDiscountPrice} {formatMoney(cryptoUnitPrice)}
+            </p>
           </div>
 
           <button

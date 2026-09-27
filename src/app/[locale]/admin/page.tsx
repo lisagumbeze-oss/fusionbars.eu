@@ -265,6 +265,24 @@ export default function AdminPage() {
                 Adjudication Workspace
               </Link>
               <Link
+                href={`/${locale}/admin/catalogue/recommendations`}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#2B4C6F] text-[#2B4C6F] hover:bg-[#2B4C6F] hover:text-white"
+              >
+                Decision Recommendations
+              </Link>
+              <Link
+                href={`/${locale}/admin/catalogue/review-workspace`}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#5B3A7A] text-[#5B3A7A] hover:bg-[#5B3A7A] hover:text-white"
+              >
+                Guided Review Workspace
+              </Link>
+              <Link
+                href={`/${locale}/admin/catalogue/review-workspace/first-batch`}
+                className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#0F766E] text-[#0F766E] hover:bg-[#0F766E] hover:text-white"
+              >
+                First Adjudication Batch
+              </Link>
+              <Link
                 href={`/${locale}/admin/catalogue/imports`}
                 className="text-xs font-semibold px-3 py-1.5 rounded-lg border border-[#E5E3DD] text-[#121212] hover:bg-white"
               >

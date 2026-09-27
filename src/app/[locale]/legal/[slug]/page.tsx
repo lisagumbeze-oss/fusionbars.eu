@@ -100,6 +100,7 @@ function getLegalDoc(slug: string, config: ReturnType<typeof EnvironmentService.
             heading: '4. Payment Terms & Settlement',
             content: [
               'Accepted payment mechanisms: Direct European Bank Transfer (SEPA / IBAN) and approved Cryptocurrency settlement rails.',
+              'Cryptocurrency settlement (Bitcoin, Ethereum, and Bitcoin Cash) receives a 10% discount on the merchandise subtotal. The discount is calculated on the server when cryptocurrency is selected and does not change the shipping charge.',
               'Orders remain in PENDING_PAYMENT status until receipt of verifiable transaction reference or banking clearance. Orders without verified payment within 7 calendar days are cancelled and reserved inventory is restored to availability.',
             ],
           },

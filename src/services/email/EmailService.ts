@@ -143,7 +143,12 @@ export class EmailService {
 
   static async sendCryptoOrderConfirmation(
     order: DbOrder,
-    cryptoDetails: { cryptoName: string; network: string; receivingAddress: string }
+    cryptoDetails: {
+      cryptoName: string;
+      network: string;
+      receivingAddress: string;
+      wallets?: Array<{ name: string; symbol: string; network: string; address: string; amount?: string }>;
+    }
   ): Promise<SendEmailResult> {
     this.ensureReady();
     const ctx = this.buildRenderContext(order);

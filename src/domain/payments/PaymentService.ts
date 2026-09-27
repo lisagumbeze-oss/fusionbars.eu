@@ -13,6 +13,15 @@ export interface PaymentInitializationInput {
   currency: CurrencyCode;
 }
 
+export interface CryptoReceivingWallet {
+  symbol: string;
+  name: string;
+  network: string;
+  address: string;
+  amount?: string;
+  qrDataUrl?: string;
+}
+
 export interface PaymentInstructions {
   methodCode: string;
   methodName: string;
@@ -22,6 +31,7 @@ export interface PaymentInstructions {
   currency: CurrencyCode;
   instructions: string;
   details: Record<string, string | number | null | undefined>;
+  wallets?: CryptoReceivingWallet[];
 }
 
 export interface IPaymentProcessor {

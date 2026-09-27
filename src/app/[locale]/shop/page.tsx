@@ -6,6 +6,7 @@ import { LocaleCode } from '@/types';
 import { getDictionary } from '@/i18n';
 import { ArrowLeft } from 'lucide-react';
 import ShopFilters from '@/components/ShopFilters';
+import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
 
 interface ShopPageProps {
   params: Promise<{ locale: string }> | { locale: string };
@@ -77,6 +78,8 @@ export default async function ShopPage({ params, searchParams }: ShopPageProps) 
           productCount: category.productCount,
         }))}
       />
+
+      <CryptoDiscountNotice locale={locale} />
 
       {/* Product Grid */}
       {products.length === 0 ? (

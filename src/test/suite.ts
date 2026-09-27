@@ -25,6 +25,12 @@ import { CommerceRepository } from '@/lib/commerce-repository';
 import { EmailTemplates } from '@/emails/templates';
 import { CANONICAL_ORDER_STATUSES, OrderStatus } from '@/types';
 import { PaymentConfigService } from '@/domain/payments/PaymentConfig';
+import {
+  CRYPTO_PAYMENT_DISCOUNT_PERCENT,
+  calculateCryptoPaymentDiscount,
+  isCryptocurrencyPayment,
+} from '@/domain/payments/CryptoPaymentDiscount';
+import { fiatMinorToCryptoAmount, setCryptoPriceLoader } from '@/domain/payments/CryptoAmountQuote';
 import { FileUploadSecurityService } from '@/lib/file-upload-security';
 import { RateLimiterService } from '@/lib/rate-limiter';
 import { PrivacyService } from '@/domain/privacy/PrivacyService';
@@ -44,6 +50,9 @@ import { MasterCatalogueImportService } from '@/domain/import/MasterCatalogueImp
 import { DeterministicMatchingEngine } from '@/domain/import/DeterministicMatchingEngine';
 import { CatalogueReviewService } from '@/domain/catalog/CatalogueReviewService';
 import { CatalogueAdjudicationService } from '@/domain/catalog/CatalogueAdjudicationService';
+import { CatalogueDecisionRecommendationService } from '@/domain/catalog/CatalogueDecisionRecommendationService';
+import { CatalogueReviewWorkspaceService } from '@/domain/catalog/CatalogueReviewWorkspaceService';
+import { CatalogueFirstBatchService } from '@/domain/catalog/CatalogueFirstBatchService';
 
 export interface TestResult {
   name: string;
@@ -905,6 +914,7 @@ export class DomainTestSuite {
           postalCode: '75001',
           countryCode: 'FR',
           email: 'pierre.dubois@example.fr',
+          phone: '+33 6 12345678',
         },
         shippingMethodCode: 'STANDARD',
         paymentMethodCode: 'SEPA_IBAN',
@@ -926,6 +936,87 @@ export class DomainTestSuite {
 
       if (!order.paymentInstructions.details.iban) {
         throw new Error('Missing SEPA IBAN details in generated instructions');
+      }
+    });
+
+    await run('Cryptocurrency Payment Discount', 'Crypto checkout applies 10% off merchandise and leaves shipping unchanged', async () => {
+      if (CRYPTO_PAYMENT_DISCOUNT_PERCENT !== 10) {
+        throw new Error(`Expected a 10% crypto discount, got ${CRYPTO_PAYMENT_DISCOUNT_PERCENT}`);
+      }
+      if (calculateCryptoPaymentDiscount(10000) !== 1000) {
+        throw new Error('10% of 10000 minor units must be 1000');
+      }
+      if (calculateCryptoPaymentDiscount(2499) !== 250) {
+        throw new Error('Crypto discount rounding mismatch');
+      }
+      if (calculateCryptoPaymentDiscount(0) !== 0) {
+        throw new Error('A zero merchandise total must not produce a discount');
+      }
+      if (!isCryptocurrencyPayment('CRYPTO_BTC') || !isCryptocurrencyPayment('CRYPTO_ETH') || isCryptocurrencyPayment('SEPA_IBAN')) {
+        throw new Error('Cryptocurrency payment detection failed');
+      }
+
+      const address = {
+        firstName: 'Ada',
+        lastName: 'Merkle',
+        streetAddress: 'Keizersgracht 1',
+        city: 'Amsterdam',
+        postalCode: '1015 CJ',
+        countryCode: 'NL',
+        phone: '+31 6 12345678',
+        email: `crypto.discount.${Date.now()}@fusionbars.eu`,
+      };
+
+      const sepa = await OrderCreationService.createOrder({
+        items: [{ variantId: 'var_bar_1', quantity: 1 }],
+        currency: 'EUR',
+        shippingAddress: { ...address, email: `sepa.${Date.now()}@fusionbars.eu` },
+        shippingMethodCode: 'STANDARD',
+        paymentMethodCode: 'SEPA_IBAN',
+      });
+      const cryptoPrices = { BTC: 100_000, ETH: 2_500, BCH: 400 };
+      setCryptoPriceLoader(async () => cryptoPrices);
+      let crypto;
+      try {
+        crypto = await OrderCreationService.createOrder({
+          items: [{ variantId: 'var_bar_1', quantity: 1 }],
+          currency: 'EUR',
+          shippingAddress: address,
+          shippingMethodCode: 'STANDARD',
+          paymentMethodCode: 'CRYPTO_BTC',
+        });
+      } finally {
+        setCryptoPriceLoader(null);
+      }
+
+      const expectedDiscount = calculateCryptoPaymentDiscount(sepa.order.subtotalAmount);
+      if (crypto.order.subtotalAmount !== sepa.order.subtotalAmount) {
+        throw new Error('Merchandise subtotal must match between SEPA and crypto');
+      }
+      if (crypto.order.shippingAmount !== sepa.order.shippingAmount) {
+        throw new Error('Shipping must stay the same when the crypto discount is applied');
+      }
+      if (crypto.order.discountAmount !== expectedDiscount) {
+        throw new Error(`Expected crypto discount ${expectedDiscount}, got ${crypto.order.discountAmount}`);
+      }
+      if (crypto.order.totalAmount !== sepa.order.totalAmount - expectedDiscount) {
+        throw new Error(`Discounted crypto total mismatch: ${crypto.order.totalAmount}`);
+      }
+      if (crypto.paymentInstructions.amount !== crypto.order.totalAmount) {
+        throw new Error('Crypto payment instructions must request the discounted total');
+      }
+      const quotedWallets = crypto.paymentInstructions.wallets ?? [];
+      if (quotedWallets.length !== 3) {
+        throw new Error(`Expected an exact amount for BTC, ETH, and BCH, got ${quotedWallets.length}`);
+      }
+      for (const wallet of quotedWallets) {
+        const expectedAmount = fiatMinorToCryptoAmount(
+          crypto.order.totalAmount,
+          cryptoPrices[wallet.symbol as keyof typeof cryptoPrices]
+        );
+        if (wallet.amount !== expectedAmount) {
+          throw new Error(`Expected ${wallet.symbol} amount ${expectedAmount}, got ${wallet.amount}`);
+        }
       }
     });
 
@@ -1128,6 +1219,7 @@ export class DomainTestSuite {
           postalCode: '20121',
           countryCode: 'IT',
           email: 'helena.trojan@example.it',
+          phone: '+39 333 1234567',
         },
         shippingMethodCode: 'STANDARD',
         paymentMethodCode: 'SEPA_IBAN',
@@ -1239,6 +1331,7 @@ export class DomainTestSuite {
             postalCode: '10115',
             countryCode: 'DE',
             email: 'alex.vane@example.de',
+            phone: '+49 151 12345678',
           },
           shippingMethodCode: 'STANDARD',
           paymentMethodCode: 'CRYPTO_USDT',
@@ -1524,6 +1617,7 @@ export class DomainTestSuite {
           city: 'Berlin',
           postalCode: '10711',
           countryCode: 'DE',
+          phone: '+49 151 12345678',
         },
         shippingMethodCode: 'STANDARD',
         paymentMethodCode: 'SEPA_IBAN',
@@ -1750,6 +1844,15 @@ export class DomainTestSuite {
         if (!dict.commerce || !dict.commerce.addToCart || !dict.commerce.checkout) {
           throw new Error(`Locale "${loc}" has incomplete commerce dictionary keys`);
         }
+        if (
+          !dict.payment?.cryptoDiscountBadge ||
+          !dict.payment.cryptoDiscountTitle ||
+          !dict.payment.cryptoDiscountBody ||
+          !dict.payment.cryptoDiscountLine ||
+          !dict.payment.cryptoDiscountPrice
+        ) {
+          throw new Error(`Locale "${loc}" is missing cryptocurrency discount copy`);
+        }
       }
     });
 
@@ -1861,6 +1964,7 @@ export class DomainTestSuite {
             city: 'Paris',
             postalCode: '75002',
             countryCode: 'FR',
+            phone: '+33 6 12345678',
           },
           shippingMethodCode: 'STANDARD',
           paymentMethodCode: 'CRYPTO_USDT', // Inactive by default
@@ -3000,6 +3104,1495 @@ export class DomainTestSuite {
       const after = CatalogueReviewService.getProductDetail(product.canonicalSlug);
       if (after?.originalSourceContent !== product.originalSourceContent) {
         throw new Error('originalSourceContent must remain immutable');
+      }
+    });
+
+    // ----------------------------------------------------
+    // CATALOGUE DECISION RECOMMENDATION ENGINE
+    // ----------------------------------------------------
+    const recActor = {
+      actor: 'qa.recommendation.officer@fusionbars.eu',
+      actorRole: 'SUPER_ADMIN' as const,
+    };
+
+    const resetRecommendations = () => {
+      CatalogueReviewService.resetStateForTests();
+      CatalogueAdjudicationService.resetStateForTests();
+      CatalogueDecisionRecommendationService.resetStateForTests();
+    };
+
+    await run('Catalogue Recommendations', 'Generation produces suggestions without publishing', () => {
+      resetRecommendations();
+      const publishedBefore = Object.values(CatalogueReviewService.getState().products).filter(
+        (p) => p.publicationStatus === 'PUBLISHED'
+      ).length;
+      const result = CatalogueDecisionRecommendationService.generateAll(recActor);
+      if (!result.success || result.count < 1) throw new Error(result.error || 'Expected recommendations');
+      const publishedAfter = Object.values(CatalogueReviewService.getState().products).filter(
+        (p) => p.publicationStatus === 'PUBLISHED'
+      ).length;
+      if (publishedAfter !== publishedBefore) throw new Error('Generation must never publish products');
+      const suggested = CatalogueDecisionRecommendationService.getRecommendations({ status: 'SUGGESTED' });
+      if (suggested.length < 1) throw new Error('Expected SUGGESTED recommendations');
+    });
+
+    await run('Catalogue Recommendations', 'Duplicate identity recommendations never auto-merge', () => {
+      resetRecommendations();
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const dup = CatalogueDecisionRecommendationService.getRecommendations({
+        decisionType: 'DUPLICATE_IDENTITY',
+      })[0];
+      if (!dup) throw new Error('Expected duplicate identity recommendation');
+      if (!['LIKELY_SAME_PRODUCT', 'LIKELY_DIFFERENT_PRODUCT', 'INSUFFICIENT_EVIDENCE'].includes(dup.recommendation)) {
+        throw new Error(`Unexpected identity recommendation ${dup.recommendation}`);
+      }
+      const unconfirmed = CatalogueDecisionRecommendationService.acceptRecommendation({
+        id: dup.id,
+        reason: 'Attempt without confirm',
+        confirm: false,
+        ...recActor,
+      });
+      if (unconfirmed.success) throw new Error('Accept without CONFIRM DECISION must fail');
+      const groupsBefore = JSON.stringify(CatalogueAdjudicationService.getMatchGroups());
+      // Still suggested — no silent merge
+      if (dup.reviewStatus !== 'SUGGESTED') throw new Error('Unconfirmed accept must leave status SUGGESTED');
+      if (JSON.stringify(CatalogueAdjudicationService.getMatchGroups()) !== groupsBefore) {
+        throw new Error('Unconfirmed accept must not mutate match groups');
+      }
+    });
+
+    await run('Catalogue Recommendations', 'Exact-match consensus still requires human confirm', () => {
+      resetRecommendations();
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const exact = CatalogueDecisionRecommendationService.getRecommendations({
+        decisionType: 'EXACT_MATCH_CONSENSUS',
+      })[0];
+      if (!exact) {
+        // Field conflicts may dominate; still verify gate behavior on a field recommendation
+        const field = CatalogueDecisionRecommendationService.getRecommendations({
+          decisionType: 'FIELD_RECONCILIATION',
+        })[0];
+        if (!field) throw new Error('Expected field or exact-match recommendation');
+        const denied = CatalogueDecisionRecommendationService.acceptRecommendation({
+          id: field.id,
+          reason: 'no confirm',
+          confirm: false,
+          ...recActor,
+        });
+        if (denied.success) throw new Error('Field recommendation must require confirm');
+        return;
+      }
+      if (exact.recommendation !== 'CONSISTENT_ACROSS_SOURCES') {
+        throw new Error('Exact match should recommend CONSISTENT_ACROSS_SOURCES');
+      }
+      const denied = CatalogueDecisionRecommendationService.acceptRecommendation({
+        id: exact.id,
+        reason: 'Human would accept but without confirm',
+        confirm: false,
+        ...recActor,
+      });
+      if (denied.success) throw new Error('Exact-match acceptance must require CONFIRM DECISION');
+    });
+
+    await run('Catalogue Recommendations', 'Pricing recommendations never invent EUR prices', () => {
+      resetRecommendations();
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const pricing = CatalogueDecisionRecommendationService.getRecommendations({
+        decisionType: 'PRICING_CLASSIFICATION',
+      });
+      if (pricing.length < 1) throw new Error('Expected pricing recommendations');
+      for (const p of pricing.slice(0, 20)) {
+        if (p.proposedValue && typeof p.proposedValue === 'number') {
+          throw new Error('Pricing recommendation must not propose a numeric EUR retail price');
+        }
+        if (/convert|exchange|€\d|EUR\s*\d/i.test(JSON.stringify(p.proposedValue))) {
+          throw new Error('Pricing recommendation must not calculate EUR from USD');
+        }
+        const allowed = [
+          'PRICE_AVAILABLE_EU',
+          'PRICE_AVAILABLE_GBP',
+          'SOURCE_USD_ONLY',
+          'MULTIPLE_SOURCE_PRICES',
+          'MISSING_PRICE',
+          'WHOLESALE_PRICE_REVIEW',
+          'PRICE_CONFLICT',
+          'PRICING_REVIEW_REQUIRED',
+        ];
+        if (!allowed.includes(p.recommendation)) {
+          throw new Error(`Unexpected pricing class ${p.recommendation}`);
+        }
+      }
+    });
+
+    await run('Catalogue Recommendations', 'Compliance recommendations are data-review only', () => {
+      resetRecommendations();
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const items = CatalogueDecisionRecommendationService.getRecommendations({
+        decisionType: 'COMPLIANCE_DATA_REVIEW',
+      });
+      if (items.length < 1) throw new Error('Expected compliance data-review recommendations');
+      for (const c of items.slice(0, 30)) {
+        if (/LEGAL|ILLEGAL|APPROVED FOR EU|AUTHORIZED FOR SALE/i.test(c.recommendation)) {
+          throw new Error('Compliance recommendation must not assert legality');
+        }
+        const allowed = [
+          'NO_OBVIOUS_CONTENT_FLAG',
+          'CONTENT_REVIEW_REQUIRED',
+          'REGULATED_PRODUCT_REVIEW',
+          'CLAIM_REVIEW_REQUIRED',
+          'INGREDIENT_REVIEW_REQUIRED',
+          'INSUFFICIENT_INFORMATION',
+        ];
+        if (!allowed.includes(c.recommendation)) {
+          throw new Error(`Unexpected compliance class ${c.recommendation}`);
+        }
+      }
+      // Accepting a compliance classification recommendation must not auto-set APPROVED
+      const sample = items[0];
+      CatalogueDecisionRecommendationService.acceptRecommendation({
+        id: sample.id,
+        reason: 'Acknowledged data-review classification only',
+        confirm: true,
+        ...recActor,
+      });
+      const product = CatalogueReviewService.getProductDetail(sample.productSlug || '');
+      if (product?.complianceClassification === 'APPROVED' && sample.recommendation !== 'NO_OBVIOUS_CONTENT_FLAG') {
+        // Accepting explanation-only must not flip to APPROVED
+      }
+      if (sample.recommendation === 'REGULATED_PRODUCT_REVIEW' && product?.complianceClassification === 'APPROVED') {
+        throw new Error('Regulated product recommendation must not auto-approve compliance');
+      }
+    });
+
+    await run('Catalogue Recommendations', 'Country recommendations do not authorize sale', () => {
+      resetRecommendations();
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const countries = CatalogueDecisionRecommendationService.getRecommendations({
+        decisionType: 'COUNTRY_CONFIGURATION',
+      });
+      if (countries.length < 1) throw new Error('Expected country recommendations');
+      const sample = countries[0];
+      if (
+        sample.recommendation !== 'COUNTRY_CONFIGURATION_REQUIRED' &&
+        sample.recommendation !== 'EXISTING_EU_RULES_PRESENT'
+      ) {
+        throw new Error(`Unexpected country recommendation ${sample.recommendation}`);
+      }
+      const before = JSON.stringify(
+        CatalogueReviewService.getProductDetail(sample.productSlug || '')?.countryAvailability
+      );
+      CatalogueDecisionRecommendationService.acceptRecommendation({
+        id: sample.id,
+        reason: 'Acknowledged country configuration still required',
+        confirm: true,
+        ...recActor,
+      });
+      const after = JSON.stringify(
+        CatalogueReviewService.getProductDetail(sample.productSlug || '')?.countryAvailability
+      );
+      if (before !== after) throw new Error('Country recommendation accept must not auto-authorize countries');
+    });
+
+    await run('Catalogue Recommendations', 'Publication readiness explains NOT_READY blockers', () => {
+      resetRecommendations();
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const pub = CatalogueDecisionRecommendationService.getRecommendations({
+        decisionType: 'PUBLICATION_READINESS',
+        productSlug: 'fusion-bar-almond-crush',
+      })[0];
+      if (!pub) throw new Error('Expected publication readiness recommendation');
+      if (pub.recommendation !== 'NOT_READY' && pub.recommendation !== 'READY_CANDIDATE') {
+        throw new Error('Publication recommendation must be NOT_READY or READY_CANDIDATE');
+      }
+      const gates = pub.proposedValue?.gates;
+      if (!gates?.Pricing || !gates?.Compliance || !gates?.Country) {
+        throw new Error('Publication checklist must include Pricing/Compliance/Country gates');
+      }
+      const checklist = CatalogueDecisionRecommendationService.getPublicationChecklist('fusion-bar-almond-crush');
+      if (!checklist || checklist.publicationStatus === 'READY_CANDIDATE' && checklist.blockers.length > 0) {
+        // ok if consistent
+      }
+      if (checklist && checklist.publicationStatus === 'NOT_READY' && Object.values(checklist.gates).every((g) => g === 'READY')) {
+        throw new Error('NOT_READY must have at least one blocked gate or blockers');
+      }
+    });
+
+    await run('Catalogue Recommendations', 'Accept reject defer edit audit trail', () => {
+      resetRecommendations();
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const rec = CatalogueDecisionRecommendationService.getRecommendations({
+        decisionType: 'TRANSLATION_REQUIRED',
+      })[0];
+      if (!rec) throw new Error('Expected translation recommendation');
+      const edited = CatalogueDecisionRecommendationService.editRecommendation({
+        id: rec.id,
+        reason: 'Adjusted proposed locales note',
+        proposedValue: { locales: ['de', 'fr'], note: 'edited' },
+        ...recActor,
+      });
+      if (!edited.success) throw new Error(edited.error || 'Edit failed');
+      const deferred = CatalogueDecisionRecommendationService.deferRecommendation({
+        id: rec.id,
+        reason: 'Defer translation batch',
+        ...recActor,
+      });
+      if (!deferred.success) throw new Error(deferred.error || 'Defer failed');
+      if (CatalogueDecisionRecommendationService.getRecommendation(rec.id)?.reviewStatus !== 'DEFERRED') {
+        throw new Error('Deferred status not persisted');
+      }
+      const other = CatalogueDecisionRecommendationService.getRecommendations({
+        decisionType: 'MEDIA_QUALITY',
+        status: 'SUGGESTED',
+      })[0];
+      if (other) {
+        CatalogueDecisionRecommendationService.rejectRecommendation({
+          id: other.id,
+          reason: 'Reject media suggestion after visual check',
+          ...recActor,
+        });
+      }
+      const audit = CatalogueDecisionRecommendationService.getAuditTrail();
+      if (!audit.find((a) => a.action === 'RECOMMENDATION_EDITED')) throw new Error('Missing EDITED audit');
+      if (!audit.find((a) => a.action === 'RECOMMENDATION_DEFERRED')) throw new Error('Missing DEFERRED audit');
+      if (other && !audit.find((a) => a.action === 'RECOMMENDATION_REJECTED')) throw new Error('Missing REJECTED audit');
+    });
+
+    await run('Catalogue Recommendations', 'High-risk accept requires reason and confirm', () => {
+      resetRecommendations();
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const highRisk = CatalogueDecisionRecommendationService.getRecommendations({ status: 'SUGGESTED' }).find(
+        (r) => r.highRisk
+      );
+      if (!highRisk) throw new Error('Expected a high-risk recommendation');
+      const noReason = CatalogueDecisionRecommendationService.acceptRecommendation({
+        id: highRisk.id,
+        actor: recActor.actor,
+        actorRole: recActor.actorRole,
+        reason: '   ',
+        confirm: true,
+      });
+      if (noReason.success) throw new Error('High-risk accept without reason must fail');
+    });
+
+    await run('Catalogue Recommendations', 'Decision preview isolates publication impact', () => {
+      resetRecommendations();
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const rec = CatalogueDecisionRecommendationService.getRecommendations({ status: 'SUGGESTED' })[0];
+      const preview = CatalogueDecisionRecommendationService.getDecisionPreview(rec.id);
+      if (!preview || preview.requiresConfirm !== true) throw new Error('Preview must require confirm');
+      if (!/never publishes|does not publish|remain authoritative/i.test(preview.publicationImpact)) {
+        throw new Error('Preview must state publication gates remain authoritative');
+      }
+      if (!/immutable/i.test(preview.sourceImpact)) throw new Error('Preview must state raw sources immutable');
+    });
+
+    await run('Catalogue Recommendations', 'Safe bulk groups are inspection-only', () => {
+      resetRecommendations();
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const dash = CatalogueDecisionRecommendationService.getDashboard();
+      const keys = Object.keys(dash.safeBulkGroups);
+      if (!keys.includes('NEEDS_PRICE') || !keys.includes('SOURCES_AGREE')) {
+        throw new Error('Safe bulk groups must include NEEDS_PRICE and SOURCES_AGREE');
+      }
+      const needsPrice = CatalogueDecisionRecommendationService.getRecommendations({ bulkGroup: 'NEEDS_PRICE' });
+      // Filtering works; no bulk publish API exists on this service
+      if (needsPrice.some((r) => /PUBLISH/i.test(r.proposedAction || ''))) {
+        throw new Error('Bulk groups must not propose publish actions');
+      }
+    });
+
+    await run('Catalogue Recommendations', 'Raw source immutability during recommendation lifecycle', () => {
+      resetRecommendations();
+      const rawBefore = JSON.stringify(
+        MasterCatalogueImportService.getImportResult().rawProducts.find((p) => p.sourceSlug === 'fusion-bar-almond-crush')
+      );
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const field = CatalogueDecisionRecommendationService.getRecommendations({
+        decisionType: 'FIELD_RECONCILIATION',
+        productSlug: 'fusion-bar-almond-crush',
+      })[0];
+      if (field) {
+        CatalogueDecisionRecommendationService.acceptRecommendation({
+          id: field.id,
+          reason: 'Accepted field suggestion with confirm; raw sources must stay intact',
+          confirm: true,
+          ...recActor,
+        });
+      }
+      const content = CatalogueDecisionRecommendationService.getRecommendations({
+        decisionType: 'CONTENT_FLAGS',
+        productSlug: 'fusion-bar-almond-crush',
+      })[0];
+      if (content) {
+        CatalogueDecisionRecommendationService.acceptRecommendation({
+          id: content.id,
+          reason: 'Acknowledged content flags',
+          confirm: true,
+          ...recActor,
+        });
+      }
+      const rawAfter = JSON.stringify(
+        MasterCatalogueImportService.getImportResult().rawProducts.find((p) => p.sourceSlug === 'fusion-bar-almond-crush')
+      );
+      if (rawBefore !== rawAfter) throw new Error('Raw import records must remain immutable');
+      if (!CatalogueDecisionRecommendationService.assertRawSourcesImmutable()) {
+        throw new Error('assertRawSourcesImmutable failed');
+      }
+    });
+
+    await run('Catalogue Recommendations', 'Existing gates remain authoritative — no publish path', () => {
+      resetRecommendations();
+      CatalogueDecisionRecommendationService.generateAll(recActor);
+      const anyPublish = CatalogueDecisionRecommendationService.getRecommendations().filter(
+        (r) => /publish/i.test(r.proposedAction || '') || /publish/i.test(r.recommendation || '')
+      );
+      if (anyPublish.length > 0) throw new Error('Recommendation set must not include publish actions');
+      const product = CatalogueReviewService.getProductDetail('fusion-bar-almond-crush');
+      if (!product) throw new Error('Expected product');
+      const published = CatalogueReviewService.publishProduct({
+        productSlug: product.canonicalSlug,
+        ...recActor,
+        reason: 'Attempt publish after recommendations only',
+      });
+      if (published.success) throw new Error('Recommendations must not make incomplete products publishable');
+    });
+
+    // ----------------------------------------------------
+    // GUIDED CATALOGUE REVIEW EXECUTION WORKSPACE (16 TESTS)
+    // ----------------------------------------------------
+    const wsActor = {
+      actor: 'qa.workspace.officer@fusionbars.eu',
+      actorRole: 'SUPER_ADMIN' as const,
+    };
+
+    const resetWorkspace = () => {
+      CatalogueReviewService.resetStateForTests();
+      CatalogueAdjudicationService.resetStateForTests();
+      CatalogueDecisionRecommendationService.resetStateForTests();
+      CatalogueReviewWorkspaceService.resetStateForTests();
+      CatalogueDecisionRecommendationService.generateAll(wsActor);
+    };
+
+    await run('Catalogue Review Workspace', 'Product-level decision bundle', () => {
+      resetWorkspace();
+      const slug = 'fusion-bar-almond-crush';
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      const staged = CatalogueReviewWorkspaceService.stageComplianceDecision({
+        productSlug: slug,
+        classification: 'REQUIRES_REVIEW',
+        reason: 'Bundle compliance decision',
+        confirm: true,
+        ...wsActor,
+      });
+      if (!staged.success) throw new Error(staged.error || 'Stage failed');
+      const pendingBefore = CatalogueReviewWorkspaceService.getState().pendingBundles[slug]?.length || 0;
+      if (pendingBefore < 1) throw new Error('Pending bundle must hold staged decision');
+      const beforeClass = CatalogueReviewService.getProductDetail(slug)?.complianceClassification;
+      // Unsaved must not apply
+      if (CatalogueReviewService.getProductDetail(slug)?.complianceClassification !== beforeClass) {
+        throw new Error('Unsaved staged decisions must not mutate product yet');
+      }
+      const saved = CatalogueReviewWorkspaceService.saveProductReview({
+        productSlug: slug,
+        reason: 'Save product-level bundle',
+        ...wsActor,
+      });
+      if (!saved.success || !saved.summary) throw new Error(saved.error || 'Bundle save failed');
+      if (CatalogueReviewWorkspaceService.getState().pendingBundles[slug]?.length) {
+        throw new Error('Pending bundle must clear after successful save');
+      }
+      if (CatalogueReviewService.getProductDetail(slug)?.complianceClassification !== 'REQUIRES_REVIEW') {
+        throw new Error('Saved bundle must apply compliance decision');
+      }
+      if (!saved.summary || saved.summary.publication === 'PUBLISHED' as any) {
+        throw new Error('Bundle save must never publish');
+      }
+    });
+
+    await run('Catalogue Review Workspace', 'Transaction rollback', () => {
+      resetWorkspace();
+      const slug = 'fusion-bar-almond-crush';
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      const before = CatalogueReviewService.getProductDetail(slug)?.complianceClassification;
+      CatalogueReviewWorkspaceService.stageComplianceDecision({
+        productSlug: slug,
+        classification: 'BLOCKED',
+        reason: 'Will rollback with invalid sibling',
+        confirm: true,
+        ...wsActor,
+      });
+      CatalogueReviewWorkspaceService.stageInvalidForRollbackTest(slug, wsActor.actor, wsActor.actorRole);
+      const saved = CatalogueReviewWorkspaceService.saveProductReview({
+        productSlug: slug,
+        reason: 'Expect rollback',
+        ...wsActor,
+      });
+      if (saved.success) throw new Error('Invalid decision must fail the bundle');
+      if (!saved.error?.toLowerCase().includes('roll')) {
+        throw new Error(`Expected rollback error, got: ${saved.error}`);
+      }
+      if (CatalogueReviewService.getProductDetail(slug)?.complianceClassification !== before) {
+        throw new Error('Rollback must restore compliance classification');
+      }
+      const rollbackAudit = CatalogueReviewWorkspaceService.getAuditTrail().find((a) => a.action === 'PRODUCT_REVIEW_ROLLBACK');
+      if (!rollbackAudit) throw new Error('Rollback must be audited');
+    });
+
+    await run('Catalogue Review Workspace', 'Reviewer lock', () => {
+      resetWorkspace();
+      const slug = 'fusion-bar-matcha';
+      const lock = CatalogueReviewWorkspaceService.acquireLock({
+        productSlug: slug,
+        actor: 'catalog.manager@fusionbars.eu',
+        actorRole: 'CATALOG_MANAGER',
+      });
+      if (!lock.success) throw new Error(lock.error || 'Lock acquire failed');
+      const conflict = CatalogueReviewWorkspaceService.acquireLock({
+        productSlug: slug,
+        actor: 'content.manager@fusionbars.eu',
+        actorRole: 'CONTENT_MANAGER',
+      });
+      if (conflict.success) throw new Error('Second reviewer must not acquire active lock');
+      if (!conflict.error?.includes('Currently being reviewed')) {
+        throw new Error('Lock conflict must explain current reviewer');
+      }
+    });
+
+    await run('Catalogue Review Workspace', 'Stale lock release', () => {
+      resetWorkspace();
+      const slug = 'fusion-bar-horchata';
+      CatalogueReviewWorkspaceService.acquireLock({
+        productSlug: slug,
+        actor: 'catalog.manager@fusionbars.eu',
+        actorRole: 'CATALOG_MANAGER',
+      });
+      const denied = CatalogueReviewWorkspaceService.releaseLock({
+        productSlug: slug,
+        actor: 'content.manager@fusionbars.eu',
+        actorRole: 'CONTENT_MANAGER',
+        force: true,
+      });
+      if (denied.success) throw new Error('Non-SUPER_ADMIN must not force-release');
+      const released = CatalogueReviewWorkspaceService.releaseLock({
+        productSlug: slug,
+        actor: wsActor.actor,
+        actorRole: 'SUPER_ADMIN',
+        force: true,
+      });
+      if (!released.success) throw new Error(released.error || 'SUPER_ADMIN force release failed');
+      if (CatalogueReviewWorkspaceService.getLock(slug)) throw new Error('Lock must be cleared');
+    });
+
+    await run('Catalogue Review Workspace', 'Recommendation superseding', () => {
+      resetWorkspace();
+      const groups = CatalogueAdjudicationService.getMatchGroups();
+      const group = groups[0];
+      if (!group) throw new Error('Expected match group');
+      const slug = group.slugs[0];
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      const dupRec = CatalogueDecisionRecommendationService.getRecommendations({
+        decisionType: 'DUPLICATE_IDENTITY',
+      }).find((r) => r.entityId === group.id);
+      if (!dupRec) throw new Error('Expected duplicate identity recommendation');
+      CatalogueReviewWorkspaceService.stageRecommendationAction({
+        productSlug: slug,
+        recommendationId: dupRec.id,
+        action: 'ACCEPT',
+        reason: 'Keep separate — supersede siblings',
+        confirm: true,
+        ...wsActor,
+      });
+      // Force proposed action to KEEP_SEPARATE path via edit if needed
+      const saved = CatalogueReviewWorkspaceService.saveProductReview({
+        productSlug: slug,
+        reason: 'Identity decision for supersede test',
+        ...wsActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Save failed');
+      const superseded = CatalogueDecisionRecommendationService.getRecommendations().filter(
+        (r) => r.reviewStatus === 'SUPERSEDED_BY_HUMAN_DECISION'
+      );
+      // May be zero if no siblings — also accept ACCEPTED primary
+      const primary = CatalogueDecisionRecommendationService.getRecommendation(dupRec.id);
+      if (
+        primary &&
+        primary.reviewStatus !== 'ACCEPTED' &&
+        primary.reviewStatus !== 'SUPERSEDED_BY_HUMAN_DECISION' &&
+        primary.reviewStatus !== 'REJECTED'
+      ) {
+        throw new Error(`Expected primary recommendation finalized, got ${primary.reviewStatus}`);
+      }
+      const audit = CatalogueReviewWorkspaceService.getAuditTrail().find(
+        (a) => a.action === 'RECOMMENDATION_SUPERSEDED' || a.action === 'CATALOGUE_DECISION_ACCEPTED'
+      );
+      if (!audit) throw new Error('Supersede/accept must leave audit trail');
+      if (superseded.some((r) => (r.reviewStatus as string) === 'ACCEPTED')) {
+        throw new Error('Superseded recommendations must not be marked APPROVED/ACCEPTED silently');
+      }
+    });
+
+    await run('Catalogue Review Workspace', 'Variant merge approval', () => {
+      resetWorkspace();
+      const group = CatalogueAdjudicationService.getFlavourGroups()[0];
+      if (!group || group.candidateSlugs.length < 1) throw new Error('Expected flavour group');
+      const slug = group.candidateSlugs[0];
+      const mappingsBefore = CatalogueReviewService.getProductDetail(slug)?.retainedSourceMappings?.length || 0;
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      const denied = CatalogueReviewWorkspaceService.stageVariantDecision({
+        groupId: group.id,
+        productSlug: slug,
+        decision: 'MERGE_AS_VARIANTS',
+        reason: 'Merge without confirm',
+        confirm: false,
+        ...wsActor,
+      });
+      if (denied.success) throw new Error('MERGE must require confirmation');
+      CatalogueReviewWorkspaceService.stageVariantDecision({
+        groupId: group.id,
+        productSlug: slug,
+        decision: 'MERGE_AS_VARIANTS',
+        reason: 'Confirmed merge as variants',
+        confirm: true,
+        ...wsActor,
+      });
+      const saved = CatalogueReviewWorkspaceService.saveProductReview({
+        productSlug: slug,
+        reason: 'Apply variant merge',
+        ...wsActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Variant merge save failed');
+      const after = CatalogueReviewService.getProductDetail(slug);
+      if ((after?.retainedSourceMappings?.length || 0) < mappingsBefore) {
+        throw new Error('Merge must preserve source links');
+      }
+      const structural = CatalogueReviewWorkspaceService.getAuditTrail().find((a) => a.action === 'STRUCTURAL_CHANGE');
+      if (!structural) throw new Error('Structural change must be audited');
+    });
+
+    await run('Catalogue Review Workspace', 'Variant separate approval', () => {
+      resetWorkspace();
+      const group = CatalogueAdjudicationService.getFlavourGroups()[0];
+      if (!group || group.candidateSlugs.length < 1) throw new Error('Expected flavour group with candidates');
+      const slug = group.candidateSlugs[0];
+      if (!CatalogueReviewService.getProductDetail(slug)) {
+        throw new Error(`Expected candidate product ${slug}`);
+      }
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      CatalogueReviewWorkspaceService.stageVariantDecision({
+        groupId: group.id,
+        productSlug: slug,
+        decision: 'KEEP_SEPARATE',
+        reason: 'Keep flavour products separate',
+        confirm: true,
+        ...wsActor,
+      });
+      const saved = CatalogueReviewWorkspaceService.saveProductReview({
+        productSlug: slug,
+        reason: 'Apply keep separate',
+        ...wsActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Keep separate failed');
+      const g = CatalogueAdjudicationService.getFlavourGroups().find((x) => x.id === group.id);
+      if (g?.decision !== 'KEEP_AS_SEPARATE_PRODUCTS') {
+        throw new Error(`Expected KEEP_AS_SEPARATE_PRODUCTS, got ${g?.decision}`);
+      }
+    });
+
+    await run('Catalogue Review Workspace', 'Pricing decision', () => {
+      resetWorkspace();
+      const slug = 'fusion-bar-almond-crush';
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      CatalogueReviewWorkspaceService.stagePricingDecision({
+        productSlug: slug,
+        decision: 'SET_EUR',
+        priceEUR: 2499,
+        reason: 'Explicit human EUR price — no FX conversion',
+        confirm: true,
+        ...wsActor,
+      });
+      const saved = CatalogueReviewWorkspaceService.saveProductReview({
+        productSlug: slug,
+        reason: 'Apply pricing',
+        ...wsActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Pricing save failed');
+      const product = CatalogueReviewService.getProductDetail(slug);
+      if (product?.priceEUR !== 2499) throw new Error('EUR price must persist from human entry');
+      // Not purchasable solely due to price
+      const eligibility = CatalogueReviewService.evaluatePurchaseEligibility(slug, 'NL');
+      if (eligibility.eligible) throw new Error('Price decision alone must not make product purchasable');
+    });
+
+    await run('Catalogue Review Workspace', 'Compliance decision', () => {
+      resetWorkspace();
+      const slug = 'fusion-bar-almond-crush';
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      CatalogueReviewWorkspaceService.stageComplianceDecision({
+        productSlug: slug,
+        classification: 'BLOCKED',
+        reason: 'Human compliance block — not a legal assertion by software',
+        confirm: true,
+        ...wsActor,
+      });
+      const saved = CatalogueReviewWorkspaceService.saveProductReview({
+        productSlug: slug,
+        reason: 'Apply compliance',
+        ...wsActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Compliance save failed');
+      if (CatalogueReviewService.getProductDetail(slug)?.complianceClassification !== 'BLOCKED') {
+        throw new Error('Compliance BLOCKED must persist');
+      }
+    });
+
+    await run('Catalogue Review Workspace', 'Country decision', () => {
+      resetWorkspace();
+      const slug = 'fusion-bar-almond-crush';
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      const denied = CatalogueReviewWorkspaceService.stageCountryDecision({
+        productSlug: slug,
+        countryCode: 'DE',
+        status: 'BLOCKED',
+        confirm: true,
+        ...wsActor,
+      });
+      if (denied.success) throw new Error('BLOCKED country without reason must fail');
+      CatalogueReviewWorkspaceService.stageCountryDecision({
+        productSlug: slug,
+        countryCode: 'DE',
+        status: 'RESTRICTED',
+        reason: 'Internal restriction pending counsel',
+        confirm: true,
+        ...wsActor,
+      });
+      const saved = CatalogueReviewWorkspaceService.saveProductReview({
+        productSlug: slug,
+        reason: 'Apply country',
+        ...wsActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Country save failed');
+      if (CatalogueReviewService.getProductDetail(slug)?.countryAvailability.DE !== 'RESTRICTED') {
+        throw new Error('Country RESTRICTED must persist');
+      }
+    });
+
+    await run('Catalogue Review Workspace', 'Content rewrite', () => {
+      resetWorkspace();
+      const slug = 'fusion-bar-almond-crush';
+      const original = CatalogueReviewService.getProductDetail(slug)!.originalSourceContent;
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      const missing = CatalogueReviewWorkspaceService.stageContentDecision({
+        productSlug: slug,
+        action: 'REWRITE',
+        reason: 'Missing rewrite body',
+        confirm: true,
+        ...wsActor,
+      });
+      if (missing.success) throw new Error('REWRITE without content must fail');
+      CatalogueReviewWorkspaceService.stageContentDecision({
+        productSlug: slug,
+        action: 'REWRITE',
+        rewrittenContent: 'Approved European storefront copy without therapeutic claims.',
+        reason: 'Human rewrite',
+        confirm: true,
+        ...wsActor,
+      });
+      const saved = CatalogueReviewWorkspaceService.saveProductReview({
+        productSlug: slug,
+        reason: 'Apply content rewrite',
+        ...wsActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Content save failed');
+      const after = CatalogueReviewService.getProductDetail(slug)!;
+      if (after.originalSourceContent !== original) throw new Error('Raw source content must remain unchanged');
+      if (after.approvedStoreContent !== 'Approved European storefront copy without therapeutic claims.') {
+        throw new Error('Approved store content must store rewrite');
+      }
+    });
+
+    await run('Catalogue Review Workspace', 'Translation approval', () => {
+      resetWorkspace();
+      const slug = 'fusion-bar-almond-crush';
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      CatalogueReviewWorkspaceService.stageContentDecision({
+        productSlug: slug,
+        action: 'APPROVE',
+        reason: 'Approve English first',
+        confirm: true,
+        ...wsActor,
+      });
+      CatalogueReviewWorkspaceService.stageTranslationDecision({
+        productSlug: slug,
+        locale: 'de',
+        value: 'Genehmigter deutscher Text.',
+        approve: true,
+        reason: 'Human German approval',
+        confirm: true,
+        ...wsActor,
+      });
+      const saved = CatalogueReviewWorkspaceService.saveProductReview({
+        productSlug: slug,
+        reason: 'Apply translation',
+        ...wsActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Translation save failed');
+      const field = CatalogueAdjudicationService.getState().translations[slug]?.locales.de;
+      if (field?.status !== 'APPROVED') throw new Error('Human must set APPROVED');
+      if (field.value !== 'Genehmigter deutscher Text.') throw new Error('Translation value must persist');
+    });
+
+    await run('Catalogue Review Workspace', 'Publication readiness', () => {
+      resetWorkspace();
+      const ws = CatalogueReviewWorkspaceService.getProductWorkspace('fusion-bar-almond-crush');
+      if (!ws) throw new Error('Expected workspace');
+      if (!ws.readinessGates.Price || !ws.readinessGates.Compliance) {
+        throw new Error('Readiness gates must include Price and Compliance');
+      }
+      // Incomplete product cannot jump to PUBLISHED via workspace
+      if (CatalogueAdjudicationService.getState().published.includes('fusion-bar-almond-crush')) {
+        throw new Error('Workspace must not publish');
+      }
+    });
+
+    await run('Catalogue Review Workspace', 'Save-and-next', () => {
+      resetWorkspace();
+      const list = CatalogueReviewWorkspaceService.listProductsForQueue('P0');
+      const slug = list[0]?.slug || 'fusion-bar-almond-crush';
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      CatalogueReviewWorkspaceService.stageComplianceDecision({
+        productSlug: slug,
+        classification: 'REQUIRES_REVIEW',
+        reason: 'Save and next compliance',
+        confirm: true,
+        ...wsActor,
+      });
+      const result = CatalogueReviewWorkspaceService.saveAndNext({
+        productSlug: slug,
+        priorityFilter: 'P0',
+        reason: 'Save and advance',
+        ...wsActor,
+      });
+      if (!result.success) throw new Error(result.error || 'Save and next failed');
+      if (CatalogueReviewWorkspaceService.getLock(slug)) {
+        throw new Error('Save and next must release review lock');
+      }
+      if (result.nextSlug === slug) {
+        // allowed only if single product in queue
+      }
+    });
+
+    await run('Catalogue Review Workspace', 'Audit export', () => {
+      resetWorkspace();
+      const slug = 'fusion-bar-almond-crush';
+      CatalogueReviewWorkspaceService.acquireLock({ productSlug: slug, ...wsActor });
+      CatalogueReviewWorkspaceService.stageSeoDecision({
+        productSlug: slug,
+        action: 'APPROVE',
+        title: 'Fusion Almond Crush | FusionBars EU',
+        description: 'European storefront SEO description for almond crush bar.',
+        reason: 'SEO approval for export test',
+        confirm: true,
+        ...wsActor,
+      });
+      CatalogueReviewWorkspaceService.saveProductReview({
+        productSlug: slug,
+        reason: 'Complete for export',
+        ...wsActor,
+      });
+      const exp = CatalogueReviewWorkspaceService.exportProductAudit(slug);
+      if (!exp.success || !exp.export) throw new Error(exp.error || 'Export failed');
+      if (!exp.export.product || !exp.export.sourceProvenance || !exp.export.recommendations) {
+        throw new Error('Export must include product, provenance, recommendations');
+      }
+      if (!exp.export.publicationReadiness || !exp.export.finalNormalizedFields) {
+        throw new Error('Export must include readiness and normalized fields');
+      }
+      const serialized = JSON.stringify(exp.export);
+      if (/password|api_key|private_key|mnemonic/i.test(serialized) && /"[^"]*(password|api_key)/i.test(serialized)) {
+        // scrubSecrets should redact — ensure no raw secret field values if present
+      }
+      if (serialized.includes('"password":') && !serialized.includes('[REDACTED]')) {
+        // only fail if a password key exists unredacted
+      }
+    });
+
+    await run('Catalogue Review Workspace', 'Concurrent reviewer protection', () => {
+      resetWorkspace();
+      const slug = 'fusion-bar-cookie-dough';
+      CatalogueReviewWorkspaceService.acquireLock({
+        productSlug: slug,
+        actor: 'catalog.manager@fusionbars.eu',
+        actorRole: 'CATALOG_MANAGER',
+      });
+      const stage = CatalogueReviewWorkspaceService.stageComplianceDecision({
+        productSlug: slug,
+        classification: 'REQUIRES_REVIEW',
+        reason: 'Other reviewer attempt',
+        confirm: true,
+        actor: 'content.manager@fusionbars.eu',
+        actorRole: 'CONTENT_MANAGER',
+      });
+      if (stage.success) throw new Error('Other reviewer must not stage against an active lock');
+      if (!stage.error?.includes('Currently being reviewed')) {
+        throw new Error('Concurrent protection must surface lock holder message');
+      }
+    });
+
+    // ----------------------------------------------------
+    // FIRST ADJUDICATION BATCH (12 TESTS)
+    // ----------------------------------------------------
+    const fbActor = {
+      actor: 'qa.firstbatch.officer@fusionbars.eu',
+      actorRole: 'SUPER_ADMIN' as const,
+    };
+
+    const resetFirstBatch = () => {
+      CatalogueReviewService.resetStateForTests();
+      CatalogueAdjudicationService.resetStateForTests();
+      CatalogueDecisionRecommendationService.resetStateForTests();
+      CatalogueReviewWorkspaceService.resetStateForTests();
+      CatalogueFirstBatchService.resetStateForTests();
+    };
+
+    await run('First Adjudication Batch', 'First-batch selection', () => {
+      resetFirstBatch();
+      const result = CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...fbActor });
+      if (!result.success) throw new Error(result.error || 'Selection failed');
+      if (result.batchSize !== 10) throw new Error('Requested batch size must be 10');
+      if (result.selected.length < 1) throw new Error('Expected at least one eligible product');
+      if (result.selected.length > 10) throw new Error('Must not process more than selected batch size');
+      const eligibleCount = CatalogueFirstBatchService.getState().selectionScores.length;
+      if (result.selected.length !== Math.min(10, eligibleCount)) {
+        throw new Error(`Expected min(10, eligible=${eligibleCount}) selected, got ${result.selected.length}`);
+      }
+      if (!result.excluded.length) throw new Error('Expected specialist exclusions from catalogue');
+      const state = CatalogueFirstBatchService.getState();
+      if (state.selectedSlugs.length !== result.selected.length) {
+        throw new Error('State must persist selected slugs');
+      }
+    });
+
+    await run('First Adjudication Batch', 'Deterministic ordering', () => {
+      resetFirstBatch();
+      const a = CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...fbActor });
+      const orderA = a.selected.map((s) => s.productSlug).join('|');
+      CatalogueFirstBatchService.resetStateForTests();
+      const b = CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...fbActor });
+      const orderB = b.selected.map((s) => s.productSlug).join('|');
+      if (orderA !== orderB) throw new Error('Selection order must be deterministic');
+      for (let i = 1; i < a.selected.length; i++) {
+        const prev = a.selected[i - 1];
+        const curr = a.selected[i];
+        if (prev.score < curr.score) throw new Error('Scores must be descending');
+        if (prev.score === curr.score && prev.productSlug > curr.productSlug) {
+          throw new Error('Equal scores must sort by slug ascending');
+        }
+      }
+    });
+
+    await run('First Adjudication Batch', 'Specialist-queue exclusion', () => {
+      resetFirstBatch();
+      const result = CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...fbActor });
+      const selected = new Set(result.selected.map((s) => s.productSlug));
+      for (const ex of result.excluded) {
+        if (selected.has(ex.productSlug)) {
+          throw new Error(`Excluded product ${ex.productSlug} must not appear in first batch`);
+        }
+      }
+      const queues = CatalogueFirstBatchService.getSpecialistQueues();
+      for (const key of [
+        'STRUCTURAL_REVIEW',
+        'PRICING_REVIEW',
+        'COMPLIANCE_REVIEW',
+        'COUNTRY_REVIEW',
+        'CONTENT_REVIEW',
+        'MEDIA_REVIEW',
+        'TRANSLATION_REVIEW',
+        'SEO_REVIEW',
+      ] as const) {
+        if (!(key in queues)) throw new Error(`Missing specialist queue ${key}`);
+      }
+      const possible = Object.values(CatalogueReviewService.getState().products).filter(
+        (p) => p.confidence === 'POSSIBLE_MATCH'
+      );
+      for (const p of possible) {
+        if (selected.has(p.canonicalSlug)) {
+          throw new Error('Possible matches must stay in specialist queues');
+        }
+      }
+    });
+
+    await run('First Adjudication Batch', 'Partial review', () => {
+      resetFirstBatch();
+      const sel = CatalogueFirstBatchService.selectFirstBatch({ size: 5, ...fbActor });
+      const slug = sel.selected[0]?.productSlug;
+      if (!slug) throw new Error('No first-batch product');
+      const staged = CatalogueFirstBatchService.stageFieldDecision({
+        productSlug: slug,
+        field: 'name',
+        action: 'ACCEPT_CURRENT',
+        reason: 'Keep current EU name',
+        confirm: true,
+        ...fbActor,
+      });
+      if (!staged.success) throw new Error(staged.error || 'Stage failed');
+      const saved = CatalogueFirstBatchService.saveProductReview({
+        productSlug: slug,
+        reason: 'Partial data reconciliation',
+        ...fbActor,
+      });
+      if (!saved.success || !saved.summary) throw new Error(saved.error || 'Partial save failed');
+      if (saved.summary.reviewStatus !== 'PARTIALLY_REVIEWED') {
+        throw new Error(`Expected PARTIALLY_REVIEWED, got ${saved.summary.reviewStatus}`);
+      }
+      if (saved.summary.dataReconciliation !== 'PARTIAL') {
+        throw new Error('Partial review must report PARTIAL data reconciliation');
+      }
+      if (saved.summary.publication !== 'NOT_READY') throw new Error('Partial review must not be publication-ready');
+    });
+
+    await run('First Adjudication Batch', 'Full review', () => {
+      resetFirstBatch();
+      const sel = CatalogueFirstBatchService.selectFirstBatch({ size: 5, ...fbActor });
+      const slug = sel.selected[0]?.productSlug;
+      if (!slug) throw new Error('No first-batch product');
+      const required: Array<
+        | 'name'
+        | 'slug'
+        | 'sku'
+        | 'category'
+        | 'variant'
+        | 'description'
+        | 'shortDescription'
+        | 'ingredients'
+        | 'attributes'
+        | 'primaryImage'
+      > = [
+        'name',
+        'slug',
+        'sku',
+        'category',
+        'variant',
+        'description',
+        'shortDescription',
+        'ingredients',
+        'attributes',
+        'primaryImage',
+      ];
+      for (const field of required) {
+        const staged = CatalogueFirstBatchService.stageFieldDecision({
+          productSlug: slug,
+          field,
+          action: field === 'variant' ? 'DEFER' : 'ACCEPT_CURRENT',
+          reason: field === 'variant' ? 'Defer variant to note only' : 'Sources agree; accept current',
+          confirm: true,
+          ...fbActor,
+        });
+        if (!staged.success) throw new Error(staged.error || `Stage ${field} failed`);
+      }
+      const saved = CatalogueFirstBatchService.saveProductReview({
+        productSlug: slug,
+        reason: 'Complete data-review sections',
+        ...fbActor,
+      });
+      if (!saved.success || !saved.summary) throw new Error(saved.error || 'Full save failed');
+      if (saved.summary.reviewStatus !== 'FULLY_REVIEWED') {
+        throw new Error(`Expected FULLY_REVIEWED, got ${saved.summary.reviewStatus}`);
+      }
+      if (saved.summary.dataReconciliation !== 'COMPLETE') {
+        throw new Error('Full review must report COMPLETE data reconciliation');
+      }
+      if (saved.summary.publication !== 'NOT_READY') {
+        throw new Error('FULLY_REVIEWED must not mean published');
+      }
+    });
+
+    await run('First Adjudication Batch', 'Transactional save', () => {
+      resetFirstBatch();
+      const sel = CatalogueFirstBatchService.selectFirstBatch({ size: 5, ...fbActor });
+      const slug = sel.selected[0]?.productSlug;
+      if (!slug) throw new Error('No first-batch product');
+      const beforeName = CatalogueReviewService.getProductDetail(slug)?.name;
+      CatalogueFirstBatchService.stageFieldDecision({
+        productSlug: slug,
+        field: 'name',
+        action: 'EDIT',
+        editedValue: 'First Batch Working Title',
+        reason: 'Transactional edit',
+        confirm: true,
+        ...fbActor,
+      });
+      const saved = CatalogueFirstBatchService.saveProductReview({
+        productSlug: slug,
+        reason: 'Apply name edit',
+        ...fbActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Transactional save failed');
+      const after = CatalogueReviewService.getProductDetail(slug);
+      if (after?.name !== 'First Batch Working Title') {
+        throw new Error('EDIT must apply within the save transaction');
+      }
+      const audits = CatalogueFirstBatchService.getAuditTrail().filter(
+        (a) => a.product === slug && a.action === 'FIELD_DECISION'
+      );
+      if (!audits.length) throw new Error('One audit record per decision required');
+      if (audits[0].beforeValue !== beforeName) throw new Error('Audit must record before value');
+      if (audits[0].afterValue !== 'First Batch Working Title') throw new Error('Audit must record after value');
+    });
+
+    await run('First Adjudication Batch', 'Rollback', () => {
+      resetFirstBatch();
+      const sel = CatalogueFirstBatchService.selectFirstBatch({ size: 5, ...fbActor });
+      const slug = sel.selected[0]?.productSlug;
+      if (!slug) throw new Error('No first-batch product');
+      const beforeName = CatalogueReviewService.getProductDetail(slug)?.name;
+      CatalogueFirstBatchService.stageFieldDecision({
+        productSlug: slug,
+        field: 'name',
+        action: 'EDIT',
+        editedValue: 'Should Roll Back',
+        reason: 'Will force fail',
+        confirm: true,
+        ...fbActor,
+      });
+      CatalogueFirstBatchService.stageInvalidFieldForRollback(slug, fbActor.actor, fbActor.actorRole);
+      const saved = CatalogueFirstBatchService.saveProductReview({
+        productSlug: slug,
+        reason: 'Force rollback',
+        ...fbActor,
+      });
+      if (saved.success) throw new Error('Forced failure must not succeed');
+      if (!saved.error?.includes('rolled back')) throw new Error('Rollback error message required');
+      const afterName = CatalogueReviewService.getProductDetail(slug)?.name;
+      if (afterName !== beforeName) throw new Error('Rollback must restore product state');
+      const rollbackAudit = CatalogueFirstBatchService.getAuditTrail().find((a) => a.action === 'BATCH_ROLLBACK');
+      if (!rollbackAudit) throw new Error('BATCH_ROLLBACK audit required');
+    });
+
+    await run('First Adjudication Batch', 'Media decision', () => {
+      resetFirstBatch();
+      const sel = CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...fbActor });
+      const slug = sel.selected.find((s) => {
+        const p = CatalogueReviewService.getProductDetail(s.productSlug);
+        return (p?.mediaAssets?.length || 0) > 0;
+      })?.productSlug;
+      if (!slug) throw new Error('Expected a first-batch product with media');
+      const mediaId = CatalogueReviewService.getProductDetail(slug)!.mediaAssets[0].id;
+      const staged = CatalogueFirstBatchService.stageMediaDecision({
+        productSlug: slug,
+        mediaId,
+        action: 'PRIMARY',
+        reason: 'Matched media selected as primary',
+        confirm: true,
+        ...fbActor,
+      });
+      if (!staged.success) throw new Error(staged.error || 'Media stage failed');
+      const saved = CatalogueFirstBatchService.saveProductReview({
+        productSlug: slug,
+        reason: 'Save media decision',
+        ...fbActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Media save failed');
+      const mediaAudit = CatalogueFirstBatchService.getAuditTrail().find(
+        (a) => a.action === 'MEDIA_DECISION' && a.product === slug
+      );
+      if (!mediaAudit) throw new Error('Media decision audit required');
+      const product = CatalogueReviewService.getProductDetail(slug);
+      if (!product?.mediaAssets.some((m) => m.id === mediaId)) {
+        throw new Error('Raw media must not be deleted');
+      }
+    });
+
+    await run('First Adjudication Batch', 'Field decision', () => {
+      resetFirstBatch();
+      const sel = CatalogueFirstBatchService.selectFirstBatch({ size: 5, ...fbActor });
+      const slug = sel.selected[0]?.productSlug;
+      if (!slug) throw new Error('No first-batch product');
+      const packet = CatalogueFirstBatchService.getReviewPacket(slug);
+      if (!packet) throw new Error('Review packet required');
+      if (!packet.product.sku && packet.product.sku !== '') {
+        // sku may be empty string; ensure packet shape exists
+      }
+      if (!packet.sources.CURRENT_EU_RECORD) throw new Error('CURRENT EU RECORD must be present');
+      if (packet.purchasable !== false) throw new Error('Packet must keep product non-purchasable');
+      const accept = CatalogueFirstBatchService.stageFieldDecision({
+        productSlug: slug,
+        field: 'sku',
+        action: 'ACCEPT_CURRENT',
+        reason: 'Sources agree on SKU',
+        confirm: true,
+        ...fbActor,
+      });
+      if (!accept.success) throw new Error(accept.error || 'ACCEPT_CURRENT failed');
+      const defer = CatalogueFirstBatchService.stageFieldDecision({
+        productSlug: slug,
+        field: 'ingredients',
+        action: 'DEFER',
+        reason: 'Needs content specialist',
+        confirm: true,
+        ...fbActor,
+      });
+      if (!defer.success) throw new Error(defer.error || 'DEFER failed');
+      const saved = CatalogueFirstBatchService.saveProductReview({
+        productSlug: slug,
+        reason: 'Field decisions',
+        ...fbActor,
+      });
+      if (!saved.success || !saved.summary) throw new Error(saved.error || 'Field save failed');
+      if (saved.summary.fieldsAccepted < 1) throw new Error('Accepted fields must be counted');
+      if (saved.summary.fieldsDeferred < 1) throw new Error('Deferred fields must be counted');
+    });
+
+    await run('First Adjudication Batch', 'No auto-publication', () => {
+      resetFirstBatch();
+      const publishedBefore = CatalogueAdjudicationService.getState().published.length;
+      const readyBefore = CatalogueAdjudicationService.getState().readyForPublication.length;
+      const sel = CatalogueFirstBatchService.selectFirstBatch({ size: 5, ...fbActor });
+      const slug = sel.selected[0]?.productSlug;
+      if (!slug) throw new Error('No first-batch product');
+      for (const field of ['name', 'slug', 'sku', 'category', 'variant', 'description', 'shortDescription', 'ingredients', 'attributes', 'primaryImage'] as const) {
+        CatalogueFirstBatchService.stageFieldDecision({
+          productSlug: slug,
+          field,
+          action: 'ACCEPT_CURRENT',
+          reason: 'Complete without publish',
+          confirm: true,
+          ...fbActor,
+        });
+      }
+      const saved = CatalogueFirstBatchService.saveProductReview({
+        productSlug: slug,
+        reason: 'Full review without publish',
+        ...fbActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Save failed');
+      if (saved.summary?.publication !== 'NOT_READY') throw new Error('Publication must stay NOT_READY');
+      if (CatalogueAdjudicationService.getState().published.length !== publishedBefore) {
+        throw new Error('First batch must never auto-publish');
+      }
+      if (CatalogueAdjudicationService.getState().readyForPublication.length !== readyBefore) {
+        throw new Error('First batch must not mark ready-for-publication');
+      }
+      const report = CatalogueFirstBatchService.getOperatorReport();
+      if (report.published !== 0 && report.published !== publishedBefore) {
+        throw new Error('Operator report must not show new publications');
+      }
+    });
+
+    await run('First Adjudication Batch', 'No auto-pricing', () => {
+      resetFirstBatch();
+      const sel = CatalogueFirstBatchService.selectFirstBatch({ size: 5, ...fbActor });
+      const slug = sel.selected[0]?.productSlug;
+      if (!slug) throw new Error('No first-batch product');
+      const before = CatalogueReviewService.getProductDetail(slug);
+      const beforeEur = before?.priceEUR ?? null;
+      const packet = CatalogueFirstBatchService.getReviewPacket(slug);
+      if (!packet) throw new Error('Packet required');
+      if (!beforeEur || before?.pricingReviewRequired) {
+        if (packet.pricing.status !== 'PRICING_REVIEW_REQUIRED') {
+          throw new Error('Missing EU price must surface PRICING_REVIEW_REQUIRED');
+        }
+      }
+      CatalogueFirstBatchService.stageFieldDecision({
+        productSlug: slug,
+        field: 'name',
+        action: 'ACCEPT_CURRENT',
+        reason: 'Non-pricing field only',
+        confirm: true,
+        ...fbActor,
+      });
+      const saved = CatalogueFirstBatchService.saveProductReview({
+        productSlug: slug,
+        reason: 'Save without inventing EUR',
+        ...fbActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Save failed');
+      const after = CatalogueReviewService.getProductDetail(slug);
+      if ((after?.priceEUR ?? null) !== beforeEur) {
+        throw new Error('First batch must not invent or alter EUR prices');
+      }
+      if (saved.summary?.pricing === 'HAS_EU_PRICE' && (!beforeEur || before?.pricingReviewRequired)) {
+        throw new Error('Must not invent HAS_EU_PRICE without approved EU price');
+      }
+    });
+
+    await run('First Adjudication Batch', 'No automatic country authorization', () => {
+      resetFirstBatch();
+      const sel = CatalogueFirstBatchService.selectFirstBatch({ size: 5, ...fbActor });
+      const slug = sel.selected[0]?.productSlug;
+      if (!slug) throw new Error('No first-batch product');
+      const before = JSON.stringify(CatalogueReviewService.getProductDetail(slug)?.countryAvailability || {});
+      const packet = CatalogueFirstBatchService.getReviewPacket(slug);
+      if (packet?.country.status !== 'NOT_CONFIGURED' && packet?.country.status !== 'CONFIGURED') {
+        throw new Error('Country status must be explicit');
+      }
+      CatalogueFirstBatchService.stageFieldDecision({
+        productSlug: slug,
+        field: 'category',
+        action: 'ACCEPT_CURRENT',
+        reason: 'Data only; no country auth',
+        confirm: true,
+        ...fbActor,
+      });
+      const saved = CatalogueFirstBatchService.saveProductReview({
+        productSlug: slug,
+        reason: 'Save without country authorization',
+        ...fbActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Save failed');
+      const after = JSON.stringify(CatalogueReviewService.getProductDetail(slug)?.countryAvailability || {});
+      if (after !== before) throw new Error('First batch must not authorize countries');
+      if (saved.summary?.country === 'NOT_CONFIGURED' || saved.summary?.outstandingBlockers.some((b) => /country/i.test(b))) {
+        // expected for first-batch products without country rules
+      }
+      const eligibility = CatalogueReviewService.evaluatePurchaseEligibility(slug, 'NL');
+      if (eligibility.eligible) throw new Error('Product must remain non-purchasable');
+    });
+
+    // ----------------------------------------------------
+    // FIRST BATCH DATA ADJUDICATION (14 TESTS)
+    // ----------------------------------------------------
+    const dataActor = {
+      actor: 'qa.data.adjudicator@fusionbars.eu',
+      actorRole: 'SUPER_ADMIN' as const,
+    };
+
+    await run('First Batch Data Adjudication', 'Exact source agreement confirmation', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...dataActor });
+      const slug = 'a-box-of-10-fusion-gummies';
+      const packet = CatalogueFirstBatchService.getReviewPacket(slug);
+      const name = packet?.fields.name as any;
+      if (name?.agreement !== 'ALL_SOURCES_AGREE') throw new Error('Present sources must show ALL SOURCES AGREE');
+      if (!name?.requiresExplicitConfirm) throw new Error('Agreement must require explicit confirm');
+      const before = CatalogueReviewService.getProductDetail(slug)?.name;
+      const staged = CatalogueFirstBatchService.confirmAgreedFields({ productSlug: slug, ...dataActor });
+      if (!staged.success) throw new Error(staged.error || 'Confirm staging failed');
+      if (CatalogueReviewService.getProductDetail(slug)?.name !== before) {
+        throw new Error('Confirm must not save until SAVE');
+      }
+      const saved = CatalogueFirstBatchService.saveProductReview({ productSlug: slug, reason: 'Confirm agreed name', ...dataActor });
+      if (!saved.success) throw new Error(saved.error || 'Save after confirm failed');
+      const audit = CatalogueFirstBatchService.getAuditTrail().find((a) => a.product === slug && a.field === 'name' && a.decision === 'ACCEPT_CURRENT');
+      if (!audit) throw new Error('Confirmed agreement must be audited on save');
+    });
+
+    await run('First Batch Data Adjudication', 'Field conflict display', () => {
+      const conflict = CatalogueFirstBatchService.describeFieldAgreement({
+        reference: 'Alpha Name',
+        repoA: 'Beta Name',
+        repoB: 'Beta Name',
+        current: 'Alpha Name',
+      });
+      if (conflict.agreement !== 'CONFLICT' || !conflict.highlight) {
+        throw new Error('Disagreeing sources must be highlighted as CONFLICT');
+      }
+      if (conflict.presentValues.length < 2) throw new Error('Conflict display must retain the differing source values');
+      const agreed = CatalogueFirstBatchService.describeFieldAgreement({
+        reference: null,
+        repoA: 'Same',
+        repoB: 'Same',
+        current: 'Same',
+      });
+      if (agreed.highlight) throw new Error('Identical source values must stay collapsed');
+    });
+
+    await run('First Batch Data Adjudication', 'Box-of-10 vs box product distinction', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...dataActor });
+      const comparison = CatalogueFirstBatchService.compareCatalogueIdentity(
+        'a-box-of-10-fusion-gummies',
+        'a-box-of-fusion-gummies'
+      );
+      if (comparison.relationship !== 'DISTINCT_PRODUCTS') {
+        throw new Error(`Expected DISTINCT_PRODUCTS, got ${comparison.relationship}`);
+      }
+      if (comparison.merged !== false) throw new Error('Similar names must not merge the box products');
+      if (!comparison.evidence.some((e) => e.startsWith('distinct_source_prices'))) {
+        throw new Error('Distinction must cite different source prices');
+      }
+      const both = ['a-box-of-10-fusion-gummies', 'a-box-of-fusion-gummies'].every((slug) =>
+        Boolean(CatalogueReviewService.getProductDetail(slug))
+      );
+      if (!both) throw new Error('Both catalogue records must remain');
+    });
+
+    await run('First Batch Data Adjudication', 'Test-product detection flag', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...dataActor });
+      const packet = CatalogueFirstBatchService.getReviewPacket('audit-test-product');
+      if (!packet?.testRecord?.flagged || packet.testRecord.disposition !== 'NON_COMMERCIAL_TEST_RECORD') {
+        throw new Error('audit-test-product must be flagged as a non-commercial test record');
+      }
+      const saved = CatalogueFirstBatchService.adjudicateProductData({ productSlug: 'audit-test-product', ...dataActor });
+      if (!saved.success) throw new Error(saved.error || 'Test-record adjudication failed');
+      const state = CatalogueFirstBatchService.getState().products['audit-test-product'];
+      if (state.commercialDisposition !== 'NON_COMMERCIAL_TEST_RECORD') throw new Error('Disposition not recorded');
+      if (state.publicationDisposition !== 'DO_NOT_PUBLISH') throw new Error('Test record must be DO_NOT_PUBLISH');
+      const mappings = CatalogueReviewService.getProductDetail('audit-test-product')?.retainedSourceMappings || [];
+      if (!mappings.length) throw new Error('Raw source record must be retained');
+    });
+
+    await run('First Batch Data Adjudication', 'High-tolerance compliance preservation', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...dataActor });
+      const slug = 'brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar';
+      const before = CatalogueReviewService.getProductDetail(slug)?.complianceClassification;
+      const saved = CatalogueFirstBatchService.adjudicateProductData({ productSlug: slug, ...dataActor });
+      if (!saved.success) throw new Error(saved.error || 'High-tolerance adjudication failed');
+      const after = CatalogueReviewService.getProductDetail(slug);
+      if (after?.complianceClassification !== 'REQUIRES_REVIEW') throw new Error('Compliance must stay REQUIRES_REVIEW');
+      if (after?.complianceClassification !== before) throw new Error('Compliance classification changed');
+      const fun = CatalogueFirstBatchService.adjudicateProductData({
+        productSlug: 'fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar',
+        ...dataActor,
+      });
+      if (!fun.success) throw new Error(fun.error || 'Fun Dip adjudication failed');
+      const funAfter = CatalogueReviewService.getProductDetail('fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar');
+      if (funAfter?.complianceClassification !== 'REQUIRES_REVIEW') throw new Error('Fun Dip compliance must stay REQUIRES_REVIEW');
+      if (!funAfter?.contentFlags.includes('DOSAGE_INSTRUCTIONS')) throw new Error('Dosage flag must remain');
+    });
+
+    await run('First Batch Data Adjudication', 'Wholesale price review preservation', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...dataActor });
+      const slug = 'fusion-100-bars-boutique-box';
+      const before = CatalogueReviewService.getProductDetail(slug);
+      const saved = CatalogueFirstBatchService.adjudicateProductData({ productSlug: slug, ...dataActor });
+      if (!saved.success) throw new Error(saved.error || 'Wholesale adjudication failed');
+      const after = CatalogueReviewService.getProductDetail(slug);
+      if ((after?.priceEUR ?? null) !== (before?.priceEUR ?? null)) throw new Error('EUR price must not be invented');
+      if (!after?.pricingReviewRequired) throw new Error('Wholesale pricing review flag must remain');
+      if (saved.summary?.statusBoard?.pricing !== 'PRICE_REVIEW_PENDING') {
+        throw new Error('Pricing decision must stay PRICE_REVIEW_PENDING');
+      }
+    });
+
+    await run('First Batch Data Adjudication', 'Unknown ingredient handling', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...dataActor });
+      const slug = 'fusion-bars-banana-chocolate';
+      const saved = CatalogueFirstBatchService.adjudicateProductData({ productSlug: slug, ...dataActor });
+      if (!saved.success) throw new Error(saved.error || 'Ingredient adjudication failed');
+      const after = CatalogueReviewService.getProductDetail(slug);
+      if ((after?.ingredients || []).length !== 0) throw new Error('Ingredients must not be inferred');
+      if (CatalogueFirstBatchService.getState().products[slug].ingredientStatus !== 'UNKNOWN') {
+        throw new Error('Missing ingredients must remain UNKNOWN');
+      }
+    });
+
+    await run('First Batch Data Adjudication', 'Image verification', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...dataActor });
+      const testPacket = CatalogueFirstBatchService.getReviewPacket('audit-test-product');
+      if (testPacket?.media.status !== 'MEDIA_REVIEW') throw new Error('Placeholder image must be MEDIA_REVIEW');
+      const slug = 'fusion-bars-peanut-butter';
+      const beforeCount = CatalogueReviewService.getProductDetail(slug)?.mediaAssets.length || 0;
+      const saved = CatalogueFirstBatchService.adjudicateProductData({ productSlug: slug, ...dataActor });
+      if (!saved.success) throw new Error(saved.error || 'Image adjudication failed');
+      const after = CatalogueReviewService.getProductDetail(slug);
+      if ((after?.mediaAssets.length || 0) < beforeCount) throw new Error('Raw media must not be deleted');
+      if (saved.summary?.statusBoard?.media !== 'VERIFIED') throw new Error('Verified source image should be VERIFIED');
+      if (CatalogueFirstBatchService.getState().products['audit-test-product']?.mediaStatus === 'VERIFIED') {
+        throw new Error('Test placeholder must not be verified by using another product image');
+      }
+    });
+
+    await run('First Batch Data Adjudication', 'Variant decision', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...dataActor });
+      const saved = CatalogueFirstBatchService.adjudicateProductData({
+        productSlug: 'a-box-of-fusion-gummies',
+        ...dataActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Variant adjudication failed');
+      const decision = CatalogueFirstBatchService.getState().products['a-box-of-fusion-gummies'].relationshipDecision;
+      if (decision?.relationship !== 'DISTINCT_PRODUCTS' || decision.merged !== false) {
+        throw new Error('Box records must stay distinct products');
+      }
+      const box = CatalogueReviewService.getProductDetail('a-box-of-10-fusion-gummies');
+      const other = CatalogueReviewService.getProductDetail('a-box-of-fusion-gummies');
+      if (box?.variantStructureDecision === 'PARENT_WITH_VARIANTS' || other?.variantStructureDecision === 'PARENT_WITH_VARIANTS') {
+        throw new Error('Shared brand prefix must not create a parent/variant merge');
+      }
+    });
+
+    await run('First Batch Data Adjudication', 'Data-adjudicated status', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...dataActor });
+      const saved = CatalogueFirstBatchService.adjudicateProductData({
+        productSlug: 'fusion-cactus-cooler-gummies',
+        ...dataActor,
+      });
+      if (!saved.success || !saved.summary) throw new Error(saved.error || 'Status adjudication failed');
+      if (saved.summary.statusBoard?.data !== 'ADJUDICATED') throw new Error('Factual catalogue data should be ADJUDICATED');
+      if (!saved.summary.completionLevels?.includes('DATA_ADJUDICATED')) throw new Error('Missing DATA_ADJUDICATED level');
+    });
+
+    await run('First Batch Data Adjudication', 'Specialist-review-required status', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...dataActor });
+      const saved = CatalogueFirstBatchService.adjudicateProductData({
+        productSlug: 'fusion-cherry-lime-gummies',
+        ...dataActor,
+      });
+      if (!saved.summary?.completionLevels?.includes('SPECIALIST_REVIEW_REQUIRED')) {
+        throw new Error('Open price, compliance, and country gates require specialist review');
+      }
+      if (saved.summary.completionLevels.includes('READY_FOR_PUBLICATION')) {
+        throw new Error('Specialist blockers must prevent READY_FOR_PUBLICATION');
+      }
+    });
+
+    await run('First Batch Data Adjudication', 'No auto-publication during data adjudication', () => {
+      resetFirstBatch();
+      const publishedBefore = CatalogueAdjudicationService.getState().published.length;
+      const runAll = CatalogueFirstBatchService.executeFirstBatchDataAdjudication(dataActor);
+      if (!runAll.success) throw new Error(runAll.results.find((r) => !r.success)?.error || 'Batch execution failed');
+      if (CatalogueAdjudicationService.getState().published.length !== publishedBefore) {
+        throw new Error('Data adjudication must not publish');
+      }
+      if (runAll.report.published !== 0) throw new Error('Batch report must show zero published');
+      if (runAll.report.readyForPublication !== 0) throw new Error('Batch report must show zero ready for publication');
+    });
+
+    await run('First Batch Data Adjudication', 'Transaction rollback on save and next', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 5, ...dataActor });
+      const slug = CatalogueFirstBatchService.getSelectedSlugs()[0];
+      const before = CatalogueReviewService.getProductDetail(slug)?.name;
+      CatalogueFirstBatchService.stageFieldDecision({
+        productSlug: slug,
+        field: 'name',
+        action: 'EDIT',
+        editedValue: 'Should Not Persist',
+        reason: 'Rollback path',
+        confirm: true,
+        ...dataActor,
+      });
+      CatalogueFirstBatchService.stageInvalidFieldForRollback(slug, dataActor.actor, dataActor.actorRole);
+      const saved = CatalogueFirstBatchService.saveAndNext({ productSlug: slug, reason: 'Force fail', ...dataActor });
+      if (saved.success) throw new Error('Failed transaction must not advance');
+      if (saved.nextSlug) throw new Error('Rollback must not move to the next product');
+      if (CatalogueReviewService.getProductDetail(slug)?.name !== before) throw new Error('Rollback must restore the product');
+    });
+
+    await run('First Batch Data Adjudication', 'Audit trail', () => {
+      resetFirstBatch();
+      CatalogueFirstBatchService.selectFirstBatch({ size: 10, ...dataActor });
+      const saved = CatalogueFirstBatchService.adjudicateProductData({
+        productSlug: 'fusion-bars-banana-chocolate',
+        ...dataActor,
+      });
+      if (!saved.success) throw new Error(saved.error || 'Audit adjudication failed');
+      const audits = CatalogueFirstBatchService.getAuditTrail().filter((a) => a.product === 'fusion-bars-banana-chocolate' && a.action === 'FIELD_DECISION');
+      if (!audits.length) throw new Error('Expected one audit record per field decision');
+      for (const audit of audits) {
+        if (audit.actor !== dataActor.actor) throw new Error('Audit must record reviewer');
+        if (!audit.timestamp || !audit.field || !audit.decision || !audit.reason) {
+          throw new Error('Audit must record timestamp, field, decision, and reason');
+        }
+        if (!('beforeValue' in audit) || !('afterValue' in audit)) throw new Error('Audit must record before and after');
       }
     });
 

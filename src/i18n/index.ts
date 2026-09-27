@@ -57,6 +57,11 @@ export interface Dictionary {
     cryptoInstructions: string;
     submitProof: string;
     proofPlaceholder: string;
+    cryptoDiscountBadge: string;
+    cryptoDiscountTitle: string;
+    cryptoDiscountBody: string;
+    cryptoDiscountLine: string;
+    cryptoDiscountPrice: string;
   };
 }
 
@@ -105,11 +110,16 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
     },
     payment: {
       bankTransfer: 'Bank Transfer (SEPA / IBAN)',
-      cryptoTransfer: 'Cryptocurrency (Bitcoin)',
+      cryptoTransfer: 'Cryptocurrency',
       sepaInstructions: 'Please send funds using your unique Order Reference in the transfer memo.',
       cryptoInstructions: 'Send the exact amount to the designated wallet and enter your transaction hash.',
       submitProof: 'Confirm Payment Transfer',
       proofPlaceholder: 'Enter SEPA Reference or Crypto Transaction Hash (TXID)',
+      cryptoDiscountBadge: 'Save 10%',
+      cryptoDiscountTitle: 'Pay with cryptocurrency and save 10%',
+      cryptoDiscountBody: 'Bitcoin, Ethereum, and Bitcoin Cash take 10% off the merchandise subtotal. Shipping stays the same.',
+      cryptoDiscountLine: 'Cryptocurrency discount (10%)',
+      cryptoDiscountPrice: 'With cryptocurrency',
     },
   },
   de: {
@@ -156,9 +166,14 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
     },
     payment: {
       bankTransfer: 'Banküberweisung (SEPA / IBAN)',
-      cryptoTransfer: 'Kryptowährung (Bitcoin)',
+      cryptoTransfer: 'Kryptowährung',
       sepaInstructions: 'Bitte geben Sie bei der Überweisung Ihre Bestellnummer als Verwendungszweck an.',
       cryptoInstructions: 'Senden Sie den Betrag an die angegebene Adresse und tragen Sie den TXID-Hash ein.',
+      cryptoDiscountBadge: '10% sparen',
+      cryptoDiscountTitle: 'Mit Kryptowährung zahlen und 10% sparen',
+      cryptoDiscountBody: 'Bitcoin, Ethereum und Bitcoin Cash reduzieren die Warensumme um 10%. Die Versandkosten bleiben gleich.',
+      cryptoDiscountLine: 'Kryptowährungsrabatt (10%)',
+      cryptoDiscountPrice: 'Mit Kryptowährung',
       submitProof: 'Zahlung bestätigen',
       proofPlaceholder: 'SEPA-Referenz oder Transaktions-Hash (TXID) eingeben',
     },
@@ -207,9 +222,14 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
     },
     payment: {
       bankTransfer: 'Virement bancaire (SEPA / IBAN)',
-      cryptoTransfer: 'Cryptomonnaie (Bitcoin)',
+      cryptoTransfer: 'Cryptomonnaie',
       sepaInstructions: 'Veuillez indiquer votre référence de commande en libellé de virement.',
       cryptoInstructions: 'Envoyez le montant à l’adresse indiquée puis confirmez le hash de transaction.',
+      cryptoDiscountBadge: '−10 %',
+      cryptoDiscountTitle: 'Payez en cryptomonnaie et économisez 10 %',
+      cryptoDiscountBody: 'Bitcoin, Ethereum et Bitcoin Cash réduisent le sous-total des articles de 10 %. Les frais de livraison ne changent pas.',
+      cryptoDiscountLine: 'Remise cryptomonnaie (10 %)',
+      cryptoDiscountPrice: 'En cryptomonnaie',
       submitProof: 'Confirmer le virement',
       proofPlaceholder: 'Référence de virement ou hash de transaction (TXID)',
     },
@@ -258,9 +278,14 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
     },
     payment: {
       bankTransfer: 'Transferencia bancaria (SEPA / IBAN)',
-      cryptoTransfer: 'Criptomoneda (Bitcoin)',
+      cryptoTransfer: 'Criptomoneda',
       sepaInstructions: 'Indique su referencia de pedido en el concepto de la transferencia.',
       cryptoInstructions: 'Transfiera a la dirección y pegue el hash de transacción (TXID).',
+      cryptoDiscountBadge: 'Ahorra 10%',
+      cryptoDiscountTitle: 'Paga con criptomoneda y ahorra un 10%',
+      cryptoDiscountBody: 'Bitcoin, Ethereum y Bitcoin Cash descuentan un 10% del subtotal de los productos. El envío no cambia.',
+      cryptoDiscountLine: 'Descuento por criptomoneda (10%)',
+      cryptoDiscountPrice: 'Con criptomoneda',
       submitProof: 'Confirmar Pago',
       proofPlaceholder: 'Referencia bancaria o hash TXID',
     },
@@ -309,9 +334,14 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
     },
     payment: {
       bankTransfer: 'Bonifico Bancario (SEPA / IBAN)',
-      cryptoTransfer: 'Criptovaluta (Bitcoin)',
+      cryptoTransfer: 'Criptovaluta',
       sepaInstructions: 'Inserire il riferimento d’ordine nella causale del bonifico.',
       cryptoInstructions: 'Invia l’importo esatto e inserisci l’hash della transazione.',
+      cryptoDiscountBadge: 'Risparmia 10%',
+      cryptoDiscountTitle: 'Paga in criptovaluta e risparmia il 10%',
+      cryptoDiscountBody: 'Bitcoin, Ethereum e Bitcoin Cash riducono il subtotale della merce del 10%. La spedizione resta invariata.',
+      cryptoDiscountLine: 'Sconto criptovaluta (10%)',
+      cryptoDiscountPrice: 'Con criptovaluta',
       submitProof: 'Conferma Pagamento',
       proofPlaceholder: 'Riferimento bonifico o hash TXID',
     },
@@ -360,9 +390,14 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
     },
     payment: {
       bankTransfer: 'Bankoverschrijving (SEPA / IBAN)',
-      cryptoTransfer: 'Cryptocurrency (Bitcoin)',
+      cryptoTransfer: 'Cryptocurrency',
       sepaInstructions: 'Vermeld uw unieke bestelreferentie in de betalingsomschrijving.',
       cryptoInstructions: 'Maak het exacte bedrag over en voer uw transactiehash (TXID) in.',
+      cryptoDiscountBadge: 'Bespaar 10%',
+      cryptoDiscountTitle: 'Betaal met cryptocurrency en bespaar 10%',
+      cryptoDiscountBody: 'Bitcoin, Ethereum en Bitcoin Cash geven 10% korting op het productsubtotaal. Verzendkosten blijven gelijk.',
+      cryptoDiscountLine: 'Cryptokorting (10%)',
+      cryptoDiscountPrice: 'Met cryptocurrency',
       submitProof: 'Betaling Bevestigen',
       proofPlaceholder: 'SEPA-referentie of crypto TXID',
     },

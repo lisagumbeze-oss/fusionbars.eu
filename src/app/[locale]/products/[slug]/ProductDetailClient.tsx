@@ -5,13 +5,17 @@ import Image from 'next/image';
 import { Heart, ShoppingBag, Check, ShieldCheck, Truck, Clock, Sparkles, Plus, Minus, Info, CheckCircle2, ChevronDown } from 'lucide-react';
 import { NormalizedProduct, NormalizedVariant } from '@/types';
 import { useCommerce } from '@/context/CommerceContext';
+import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
+import { getDictionary } from '@/i18n';
+import { calculateCryptoPaymentDiscount } from '@/domain/payments/CryptoPaymentDiscount';
 
 interface ProductDetailClientProps {
   product: NormalizedProduct;
 }
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
-  const { currency, addToCart, toggleWishlist, isWishlisted, formatMoney } = useCommerce();
+  const { currency, addToCart, toggleWishlist, isWishlisted, formatMoney, locale } = useCommerce();
+  const dict = getDictionary(locale);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState<string>(product.primaryImage);
@@ -20,6 +24,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
 
   const selectedVariant: NormalizedVariant = product.variants[selectedVariantIndex] || product.variants[0];
   const unitPrice = currency === 'EUR' ? selectedVariant.priceEUR : selectedVariant.priceGBP;
+  const cryptoUnitPrice = Math.max(0, unitPrice - calculateCryptoPaymentDiscount(unitPrice));
   const compareAt = currency === 'EUR' ? selectedVariant.compareAtEUR : selectedVariant.compareAtGBP;
   const wishlisted = isWishlisted(selectedVariant.id);
 
@@ -134,6 +139,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             )}
           </div>
         </div>
+        <p className="text-xs font-medium text-amber-800">
+          {dict.payment.cryptoDiscountPrice} {formatMoney(cryptoUnitPrice * quantity)} · {dict.payment.cryptoDiscountBadge}
+        </p>
 
         {/* Variant / Flavor Selection (Interactive functional segmented control) */}
         {product.variants.length > 1 && (
@@ -223,6 +231,8 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         </div>
 
         {/* Quick European Shipping Indicator */}
+        <CryptoDiscountNotice locale={locale} compact />
+
         <div className="p-3.5 rounded-xl bg-[#F0F4F1] border border-[#4A5D4E]/20 text-xs text-[#5C5852] flex items-center gap-3">
           <Truck className="w-4 h-4 text-[#4A5D4E] shrink-0" />
           <span>

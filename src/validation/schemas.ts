@@ -32,7 +32,11 @@ export const shippingAddressSchema = z.object({
   stateProvince: z.string().max(100).optional(),
   postalCode: z.string().min(3, 'Valid postal code is required').max(20),
   countryCode: z.string().length(2, 'Country code must be ISO 2-letter format').toUpperCase(),
-  phone: z.string().max(30).optional(),
+  phone: z
+    .string()
+    .trim()
+    .min(8, 'A telephone number is required for courier delivery')
+    .max(30, 'Telephone number is too long'),
   email: z.string().email('Valid email address is required'),
 });
 
