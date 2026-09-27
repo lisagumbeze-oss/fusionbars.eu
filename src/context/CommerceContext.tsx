@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CurrencyCode, LocaleCode } from '../types';
 import { MoneyEngine } from '../lib/money';
+import { AdminOverrides, StoreOperationsSettings } from '@/domain/admin/AdminOverrides';
 
 export interface CartItem {
   id: string; // variantId
@@ -46,10 +47,13 @@ const CommerceContext = createContext<CommerceContextType | undefined>(undefined
 export function CommerceProvider({
   children,
   initialLocale = 'en',
+  operations = null,
 }: {
   children: React.ReactNode;
   initialLocale?: LocaleCode;
+  operations?: StoreOperationsSettings | null;
 }) {
+  if (operations) AdminOverrides.hydrate(operations);
   const [currency, setCurrencyState] = useState<CurrencyCode>('EUR');
   const [locale, setLocaleState] = useState<LocaleCode>(initialLocale);
   const [cart, setCart] = useState<CartItem[]>([]);

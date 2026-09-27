@@ -93,7 +93,7 @@ export default function CatalogueAdjudicationPage() {
   const params = useParams();
   const locale = (params.locale as string) || 'en';
 
-  const [currentRole, setCurrentRole] = useState<RoleName>('SUPER_ADMIN');
+  const currentRole: RoleName = 'SUPER_ADMIN';
   const actorName = `${currentRole.toLowerCase().replace('_', '.')}.officer@fusionbars.eu`;
 
   const [activeQueue, setActiveQueue] = useState<AdjudicationQueue>('POSSIBLE_MATCHES');
@@ -127,7 +127,7 @@ export default function CatalogueAdjudicationPage() {
   const [previewCountry, setPreviewCountry] = useState('NL');
   const [selectedSlugs, setSelectedSlugs] = useState<string[]>([]);
   const [showAudit, setShowAudit] = useState(false);
-  const [assigneeRole, setAssigneeRole] = useState<RoleName>('CATALOG_MANAGER');
+  const assigneeRole: RoleName = 'SUPER_ADMIN';
 
   const authorized = AUTHORIZED.includes(currentRole);
 
@@ -542,30 +542,7 @@ export default function CatalogueAdjudicationPage() {
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs">
-              <span className="text-slate-400">Role:</span>
-              <select
-                value={currentRole}
-                onChange={(e) => setCurrentRole(e.target.value as RoleName)}
-                className="bg-transparent text-emerald-400 font-semibold focus:outline-none cursor-pointer"
-              >
-                <option value="SUPER_ADMIN" className="bg-slate-900">
-                  SUPER_ADMIN
-                </option>
-                <option value="CATALOG_MANAGER" className="bg-slate-900">
-                  CATALOG_MANAGER
-                </option>
-                <option value="CONTENT_MANAGER" className="bg-slate-900">
-                  CONTENT_MANAGER
-                </option>
-                <option value="COMPLIANCE_MANAGER" className="bg-slate-900">
-                  COMPLIANCE_MANAGER
-                </option>
-                <option value="ORDER_MANAGER" className="bg-slate-900">
-                  ORDER_MANAGER (Denied)
-                </option>
-              </select>
-            </div>
+            <span className="text-xs text-emerald-300 border border-slate-700 rounded-lg px-3 py-1.5">Super Admin</span>
             <Link
               href={`/${locale}/admin/catalogue/review`}
               className="text-xs text-slate-300 hover:text-white px-3 py-1.5 rounded-lg border border-slate-700 bg-slate-800"
@@ -702,17 +679,7 @@ export default function CatalogueAdjudicationPage() {
           <div className="flex flex-wrap items-center gap-2">
             <Users className="w-3.5 h-3.5 text-slate-500" />
             <span className="text-slate-400">Assign reviewer</span>
-            <select
-              value={assigneeRole}
-              onChange={(e) => setAssigneeRole(e.target.value as RoleName)}
-              className="bg-slate-950 border border-slate-700 rounded px-2 py-1"
-            >
-              {AUTHORIZED.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
+            <span className="border border-slate-700 rounded px-2 py-1 text-emerald-300">Super Admin</span>
             <button
               onClick={() => handleSafeBulk('ASSIGN_REVIEWER')}
               className="px-2 py-1 border border-slate-700 rounded text-slate-300"

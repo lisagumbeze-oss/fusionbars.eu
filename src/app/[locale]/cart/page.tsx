@@ -7,7 +7,7 @@ import { useCommerce } from '@/context/CommerceContext';
 import { ShoppingBag, Trash2, ArrowRight, ArrowLeft, ShieldCheck, Truck, Plus, Minus } from 'lucide-react';
 import { getDictionary } from '@/i18n';
 import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
-import { calculateCryptoPaymentDiscount } from '@/domain/payments/CryptoPaymentDiscount';
+import { applyCryptoDiscountCopy, calculateCryptoPaymentDiscount } from '@/domain/payments/CryptoPaymentDiscount';
 
 export default function CartPage() {
   const {
@@ -218,7 +218,7 @@ export default function CartPage() {
                 {cryptoDiscount > 0 && (
                   <>
                     <div className="flex justify-between text-amber-800">
-                      <span>{dict.payment.cryptoDiscountLine}</span>
+                      <span>{applyCryptoDiscountCopy(dict.payment.cryptoDiscountLine)}</span>
                       <span className="font-mono font-semibold">−{formatMoney(cryptoDiscount)}</span>
                     </div>
                     <div className="flex justify-between font-semibold text-[#121212]">

@@ -9,6 +9,7 @@ import { RBACService } from '../domain/auth/RBACService';
 import { AuthService } from '../domain/auth/AuthService';
 import { CommerceRepository, DbOrder } from '../lib/commerce-repository';
 import { OrderStatus, RoleName } from '../types';
+import { ensureAdminOverridesLoaded } from '@/domain/admin/AdminOverrideStore';
 
 /**
  * Server Action: Atomically creates an order with full server-authoritative calculations,
@@ -16,6 +17,7 @@ import { OrderStatus, RoleName } from '../types';
  */
 export async function createOrderAction(rawInput: unknown) {
   try {
+    ensureAdminOverridesLoaded();
     const validated = createOrderSchema.parse(rawInput);
     const result = await OrderCreationService.createOrder({
       items: validated.items,

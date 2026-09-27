@@ -79,3 +79,18 @@ export async function createCouponAction(rawInput: unknown, actorRole: RoleName 
     return { success: false, error: error.message || 'Failed to create coupon' };
   }
 }
+
+export async function setCouponActiveAction(code: string, isActive: boolean, actorRole: RoleName = 'SUPER_ADMIN') {
+  try {
+    const hasPermission = RBACService.hasPermission(actorRole, 'settings:write') || actorRole === 'SUPER_ADMIN';
+    if (!hasPermission) {
+      return { success: false as const, error: 'Unauthorized to configure promotions.' };
+    }
+    const existing = await CommerceRepository.findCoupon(code);
+    if (!existing) return { success: false as const, error: 'Coupon not found.' };
+    const saved = await CommerceRepository.saveCoupon({ ...existing, isActive });
+    return { success: true as const, coupon: saved };
+  } catch (error: any) {
+    return { success: false as const, error: error.message || 'Failed to update coupon' };
+  }
+}

@@ -7,7 +7,7 @@ import { X, Trash2, ShoppingBag, ArrowRight, ShieldCheck, Plus, Minus, Truck } f
 import { useCommerce } from '../context/CommerceContext';
 import { getDictionary } from '../i18n';
 import CryptoDiscountNotice from './CryptoDiscountNotice';
-import { calculateCryptoPaymentDiscount } from '../domain/payments/CryptoPaymentDiscount';
+import { applyCryptoDiscountCopy, calculateCryptoPaymentDiscount } from '../domain/payments/CryptoPaymentDiscount';
 
 export default function CartDrawer() {
   const {
@@ -209,7 +209,7 @@ export default function CartDrawer() {
                 {cryptoDiscount > 0 && (
                   <>
                     <div className="flex justify-between text-amber-800">
-                      <span>{dict.payment.cryptoDiscountLine}</span>
+                      <span>{applyCryptoDiscountCopy(dict.payment.cryptoDiscountLine)}</span>
                       <span className="font-mono font-semibold">−{formatMoney(cryptoDiscount)}</span>
                     </div>
                     <div className="flex justify-between font-semibold text-[#121212]">

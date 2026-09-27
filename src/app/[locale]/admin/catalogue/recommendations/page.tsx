@@ -36,7 +36,7 @@ const BULK_GROUPS: SafeBulkGroupKey[] = [
 export default function CatalogueRecommendationsPage() {
   const params = useParams();
   const locale = (params.locale as string) || 'en';
-  const [currentRole, setCurrentRole] = useState<RoleName>('SUPER_ADMIN');
+  const currentRole: RoleName = 'SUPER_ADMIN';
   const actorName = `${currentRole.toLowerCase().replace('_', '.')}.officer@fusionbars.eu`;
 
   const [dashboard, setDashboard] = useState<RecommendationDashboard | null>(null);
@@ -193,17 +193,7 @@ export default function CatalogueRecommendationsPage() {
             </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap text-xs">
-            <select
-              value={currentRole}
-              onChange={(e) => setCurrentRole(e.target.value as RoleName)}
-              className="bg-slate-800 border border-slate-700 rounded px-2 py-1.5 text-sky-300"
-            >
-              {AUTHORIZED.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
+            <span className="border border-slate-700 rounded px-2 py-1.5 text-sky-300">Super Admin</span>
             <button onClick={handleGenerate} className="px-3 py-1.5 border border-sky-700 bg-sky-950/40 rounded text-sky-200 flex items-center gap-1">
               <RotateCw className="w-3.5 h-3.5" /> Generate / refresh
             </button>

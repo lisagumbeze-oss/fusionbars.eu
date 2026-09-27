@@ -18,6 +18,7 @@ import { CountryRegistry } from '@/domain/countries/CountryRegistry';
 import { ProductPurchaseEligibilityService } from '@/domain/catalog/ProductPurchaseEligibilityService';
 import { ProductQualityAuditService } from '@/domain/catalog/ProductQualityAuditService';
 import { CustomerAuthService } from '@/domain/auth/CustomerAuthService';
+import { AdminAuthService } from '@/domain/auth/AdminAuthService';
 import { GuestOrderService } from '@/domain/orders/GuestOrderService';
 import { OrderCreationService } from '@/domain/orders/OrderCreationService';
 import { HubAllocationService } from '@/domain/inventory/HubAllocationService';
@@ -61,7 +62,15 @@ import { AdminNotificationCenter } from '@/domain/admin/AdminNotificationCenter'
 import { EmailTemplateRegistry } from '@/domain/admin/EmailTemplateRegistry';
 import { deliveryLogExposesSecrets, projectDeliveryLog } from '@/domain/admin/EmailDeliveryLog';
 import { CatalogService } from '@/lib/catalog';
+import { PublicationReadinessService, ReadinessInput } from '@/domain/catalog/PublicationReadinessService';
+import { CatalogueRolloutService } from '@/domain/catalog/CatalogueRolloutService';
+import { CommercialConfigurationService } from '@/domain/commercial/CommercialConfigurationService';
+import { PricingEngine } from '@/domain/commercial/PricingEngine';
+import { TaxEngine } from '@/domain/commercial/TaxEngine';
+import { CurrencyConversionService } from '@/domain/commercial/CurrencyConversionService';
+import rolloutState from '@/data/catalogue-rollout-state.json';
 import firstBatchState from '@/data/catalogue-first-batch-state.json';
+import specialistExecution from '@/data/catalogue-specialist-review-state.json';
 
 export interface TestResult {
   name: string;
@@ -1197,7 +1206,29 @@ export class DomainTestSuite {
         bankName: 'European Merchant Bank',
         accountHolder: 'Fusion EU Logistics B.V.',
       });
-      if (!sepa.html.includes('NL91ABNA0417164300')) throw new Error('SEPA template missing IBAN');
+      if (sepa.html.includes('NL91ABNA0417164300') || sepa.text.includes('NL91ABNA0417164300')) throw new Error('SEPA template must not include an IBAN');
+      if (sepa.html.includes('ABNANL2A') || sepa.html.includes('Fusion EU Logistics')) throw new Error('SEPA template must not include bank coordinates');
+      if (!sepa.html.includes('Contact the admin for SEPA / IBAN payment details')) throw new Error('SEPA template must ask the customer to contact admin');
+
+      const alert = EmailTemplates.renderAdminOrderAlert({
+        ...sampleContext,
+        firstName: 'Klaus',
+        lastName: 'Weber',
+        paymentMethodName: 'Bank Transfer (SEPA / IBAN)',
+        email: 'klaus.weber@example.com',
+        phone: '+49 151 2345678',
+        streetAddress: 'Friedrichstraße',
+        houseNumber: '42B',
+        postalCode: '10117',
+        city: 'Berlin',
+        country: 'Germany (DE)',
+        shippingMethod: 'Standard Discreet Courier',
+      });
+      for (const detail of ['Klaus', 'Weber', 'klaus.weber@example.com', '+49 151 2345678', 'Friedrichstraße', '42B', '10117', 'Berlin', 'Germany (DE)', 'Standard Discreet Courier']) {
+        if (!alert.html.includes(detail) || !alert.text.includes(detail)) {
+          throw new Error(`Admin order alert missing checkout detail: ${detail}`);
+        }
+      }
 
       const crypto = EmailTemplates.renderCryptoOrderConfirmation({
         ...sampleContext,
@@ -1792,6 +1823,14 @@ export class DomainTestSuite {
         reference: 'FB-EU-2026-99999',
       });
       if (!confirmRes.success) throw new Error('SEPA confirmation email failed to dispatch');
+      const sepaMessage = mockProvider.sentMessages[0];
+      const sepaBody = `${sepaMessage?.html || ''} ${sepaMessage?.text || ''}`;
+      if (sepaBody.includes('NL91ABNA0000000000') || sepaBody.includes('ABNANL2A') || sepaBody.includes('ABN AMRO')) {
+        throw new Error('SEPA confirmation email must not include bank details');
+      }
+      if (!sepaBody.includes('Contact the admin for SEPA / IBAN payment details')) {
+        throw new Error('SEPA confirmation email must tell the customer to contact admin');
+      }
 
       // 2. Send Payment Verified
       const verifiedRes = await EmailService.sendPaymentVerified(mockOrder);
@@ -4935,10 +4974,13 @@ export class DomainTestSuite {
       }
       if (!snapshot.available) throw new Error(snapshot.error || 'Catalogue snapshot unavailable');
       if (snapshot.batchSize !== 10) throw new Error(`Expected 10 specialist products, saw ${snapshot.batchSize}`);
-      if (snapshot.pricingPending !== 10) throw new Error(`Pricing pending ${snapshot.pricingPending}`);
-      if (snapshot.compliancePending !== 10) throw new Error(`Compliance pending ${snapshot.compliancePending}`);
+      if (snapshot.pricingPending !== 0) throw new Error(`Pricing pending ${snapshot.pricingPending}`);
+      if (snapshot.pricingDeferred !== 9) throw new Error(`Pricing deferred ${snapshot.pricingDeferred}`);
+      if (snapshot.compliancePending !== 0) throw new Error(`Compliance pending ${snapshot.compliancePending}`);
+      if (snapshot.complianceDeferred !== 9) throw new Error(`Compliance deferred ${snapshot.complianceDeferred}`);
       if (snapshot.countryPending !== 10) throw new Error(`Country pending ${snapshot.countryPending}`);
-      if (snapshot.contentInternal !== 10) throw new Error(`Content internal ${snapshot.contentInternal}`);
+      if (snapshot.contentInternal !== 0) throw new Error(`Content internal ${snapshot.contentInternal}`);
+      if (snapshot.contentDeferred !== 9) throw new Error(`Content deferred ${snapshot.contentDeferred}`);
       if (snapshot.mediaVerified !== 9 || snapshot.mediaReview !== 1) throw new Error(`Media ${snapshot.mediaVerified}/${snapshot.mediaReview}`);
       if (snapshot.translationPending !== 10) throw new Error(`Translations ${snapshot.translationPending}`);
       if (snapshot.publicationReady !== 0 || snapshot.published !== 0) throw new Error('Publication counts were invented');
@@ -5001,6 +5043,797 @@ export class DomainTestSuite {
       }]);
       if (deliveryLogExposesSecrets(log)) throw new Error('Delivery log exposed provider payload');
       if ('html' in log[0] || log[0].recipient !== 'customer@example.com') throw new Error('Delivery log shape is wrong');
+    });
+
+    await run('Specialist Execution', 'Deferred pricing stays blocking and is not a conversion', () => {
+      resetSpecialist();
+      const slug = 'fusion-bars-banana-chocolate';
+      const before = CatalogueReviewService.getProductDetail(slug);
+      const saved = CatalogueSpecialistReviewService.recordPricingDecision({
+        productSlug: slug,
+        state: 'PRICE_DEFERRED',
+        rationale: 'No approved selling price',
+        evidence: 'Source USD only',
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+      });
+      if (!saved.success) throw new Error(saved.error || 'Defer failed');
+      const gate = CatalogueSpecialistReviewService.evaluatePublication(slug);
+      if (gate.ready || !gate.blockers.some((item) => /pricing/i.test(item))) throw new Error('Deferred pricing must block publication');
+      const after = CatalogueReviewService.getProductDetail(slug);
+      if ((after?.priceEUR ?? null) !== (before?.priceEUR ?? null)) throw new Error('Deferred pricing must not write EUR');
+      if (after?.sourcePriceUSD !== before?.sourcePriceUSD) throw new Error('Source USD must stay unchanged');
+    });
+
+    await run('Specialist Execution', 'Rejected compliance and restricted country block publication', () => {
+      resetSpecialist();
+      const slug = 'fusion-bars-peanut-butter';
+      const rejected = CatalogueSpecialistReviewService.recordComplianceDecision({
+        productSlug: slug,
+        state: 'REJECTED',
+        rationale: 'Evidence does not support publication',
+        evidence: 'No authorization on file',
+        actor: 'compliance.review@fusionbars.eu',
+        actorRole: 'COMPLIANCE_MANAGER',
+      });
+      if (!rejected.success) throw new Error(rejected.error || 'Rejection failed');
+      const restricted = CatalogueSpecialistReviewService.recordCountryDecision({
+        productSlug: slug,
+        country: 'DE',
+        decision: 'RESTRICTED',
+        effectiveDate: '2026-09-27',
+        rationale: 'Restriction recorded explicitly',
+        evidence: 'Reviewer restriction, not a shipping inference',
+        actor: 'compliance.review@fusionbars.eu',
+        actorRole: 'COMPLIANCE_MANAGER',
+      });
+      if (!restricted.success) throw new Error(restricted.error || 'Restriction failed');
+      const deferredOnly = CatalogueSpecialistReviewService.evaluatePublication(slug);
+      if (deferredOnly.ready || deferredOnly.blockers.length === 0) throw new Error('Rejected compliance and a restricted country must not clear the gate');
+      if (CatalogueSpecialistReviewService.getReview(slug).countries.some((row) => row.decision === 'ALLOWED')) {
+        throw new Error('A restricted country must not become an allowance');
+      }
+    });
+
+    await run('Specialist Execution', 'Section roles stay separated', () => {
+      resetSpecialist();
+      const slug = 'fusion-cactus-cooler-gummies';
+      const financeCompliance = CatalogueSpecialistReviewService.recordComplianceDecision({
+        productSlug: slug,
+        state: 'DEFERRED',
+        rationale: 'Finance cannot make this decision',
+        evidence: 'Role check',
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+      });
+      if (financeCompliance.success) throw new Error('Finance must not record compliance');
+      const contentPrice = CatalogueSpecialistReviewService.recordPricingDecision({
+        productSlug: slug,
+        state: 'PRICE_DEFERRED',
+        rationale: 'Content cannot price',
+        evidence: 'Role check',
+        actor: 'content.review@fusionbars.eu',
+        actorRole: 'CONTENT_MANAGER',
+      });
+      if (contentPrice.success) throw new Error('Content must not record pricing');
+      const complianceContent = CatalogueSpecialistReviewService.recordContentDecision({
+        productSlug: slug,
+        state: 'CONTENT_DEFERRED',
+        rationale: 'Compliance cannot approve copy',
+        actor: 'compliance.review@fusionbars.eu',
+        actorRole: 'COMPLIANCE_MANAGER',
+      });
+      if (complianceContent.success) throw new Error('Compliance must not record content');
+      const priced = CatalogueSpecialistReviewService.recordPricingDecision({
+        productSlug: slug,
+        state: 'PRICE_DEFERRED',
+        rationale: 'No approved price',
+        evidence: 'Source only',
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+      });
+      if (!priced.success) throw new Error(priced.error || 'Finance defer failed');
+      const audit = CatalogueSpecialistReviewService.getAuditTrail().find((row) => row.product === slug && row.section === 'pricing' && row.decision === 'PRICE_DEFERRED');
+      if (!audit?.reason || !audit.timestamp || audit.actorRole !== 'FINANCE_MANAGER') throw new Error('Pricing defer must be audited');
+    });
+
+    await run('Specialist Execution', 'First 10 recorded decisions stay unpublished', () => {
+      const execution = specialistExecution as {
+        products: Record<string, any>;
+        auditTrail: Array<{ product: string; section: string; decision: string; reason: string; actor: string; actorRole: string; timestamp: string }>;
+      };
+      const slugs = [
+        'a-box-of-10-fusion-gummies',
+        'a-box-of-fusion-gummies',
+        'audit-test-product',
+        'brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar',
+        'fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar',
+        'fusion-100-bars-boutique-box',
+        'fusion-bars-banana-chocolate',
+        'fusion-bars-peanut-butter',
+        'fusion-cactus-cooler-gummies',
+        'fusion-cherry-lime-gummies',
+      ];
+      if (Object.keys(execution.products).length !== 10) throw new Error('Specialist execution must cover only the first 10');
+      const boxes = ['a-box-of-10-fusion-gummies', 'a-box-of-fusion-gummies'].map((slug) => (firstBatchState as any).products[slug]);
+      if (boxes.some((row) => row?.relationship !== 'DISTINCT_PRODUCTS' && row?.lastSummary?.relationship !== 'DISTINCT_PRODUCTS')) {
+        const relationships = boxes.map((row) => JSON.stringify(row).includes('DISTINCT_PRODUCTS'));
+        if (relationships.some((ok) => !ok)) throw new Error('The two gummies records must remain distinct');
+      }
+      let approvals = 0;
+      for (const slug of slugs) {
+        const review = execution.products[slug];
+        if (!review) throw new Error(`Missing execution for ${slug}`);
+        if (review.pricing.approvedPrice != null) throw new Error(`${slug} has a fabricated price`);
+        if (review.pricing.state === 'PRICE_APPROVED') approvals += 1;
+        if (review.compliance.state === 'APPROVED_FOR_PUBLICATION' || review.compliance.state === 'APPROVED_WITH_RESTRICTIONS') approvals += 1;
+        if (review.content.approvedPublicContent) throw new Error(`${slug} published source content`);
+        if (review.countries.some((row: { decision: string }) => row.decision === 'ALLOWED')) approvals += 1;
+        if (Object.values(review.translations).some((slot: any) => slot.state !== 'PENDING' || slot.draft)) {
+          throw new Error(`${slug} has a generated translation`);
+        }
+        if (slug === 'audit-test-product') {
+          if (review.publication !== 'DO_NOT_PUBLISH' || review.media.state !== 'MEDIA_REVIEW' || review.compliance.state !== 'DO_NOT_PUBLISH') {
+            throw new Error('Audit Test Product must remain DO_NOT_PUBLISH and MEDIA_REVIEW');
+          }
+        } else if (review.media.state !== 'VERIFIED' || review.publication !== 'NOT_READY') {
+          throw new Error(`${slug} media or publication changed unexpectedly`);
+        }
+      }
+      if (approvals !== 0) throw new Error('Execution recorded an approval');
+      const priced = execution.auditTrail.filter((row) => row.section === 'pricing');
+      if (priced.length !== 10 || priced.some((row) => !row.reason || !row.timestamp || !row.actor || !row.actorRole)) {
+        throw new Error('Each pricing decision must be audited');
+      }
+      if (execution.auditTrail.some((row) => row.decision === 'PRICE_APPROVED' || row.decision.includes('ALLOWED'))) {
+        throw new Error('Audit contains an approval');
+      }
+      if (CatalogueAdjudicationService.getState().published.length !== 0 && execution.products['audit-test-product'].publication !== 'DO_NOT_PUBLISH') {
+        throw new Error('Publication state drifted');
+      }
+    });
+
+    const publicationActor = { actor: 'publisher@fusionbars.eu', role: 'SUPER_ADMIN' as const };
+    const approvedFixture = (slug = 'fixture-commercial-bar'): ReadinessInput => {
+      const locales = ['en', 'de', 'fr', 'es', 'it', 'nl'];
+      const translations: Record<string, { state: 'APPROVED'; draft: string; reviewer: string; timestamp: string }> = {};
+      for (const locale of locales) {
+        translations[locale] = {
+          state: 'APPROVED',
+          draft: `Public ${locale} copy.`,
+          reviewer: 'content.review@fusionbars.eu',
+          timestamp: '2026-09-27T00:00:00.000Z',
+        };
+      }
+      return {
+        slug,
+        dataStatus: 'ADJUDICATED',
+        testRecord: false,
+        review: {
+          productSlug: slug,
+          reviewer: 'content.review@fusionbars.eu',
+          updatedAt: '2026-09-27T00:00:00.000Z',
+          pricing: {
+            state: 'PRICE_APPROVED',
+            approvedCurrency: 'EUR',
+            approvedPrice: 18,
+            rationale: 'Approved EUR shelf price.',
+            evidence: 'Finance worksheet FX-1',
+            reviewer: 'finance.review@fusionbars.eu',
+            timestamp: '2026-09-27T00:00:00.000Z',
+          },
+          compliance: {
+            state: 'APPROVED_FOR_PUBLICATION',
+            rationale: 'Permitted as a confection.',
+            evidence: 'Compliance file CF-1',
+            reviewer: 'compliance.review@fusionbars.eu',
+            timestamp: '2026-09-27T00:00:00.000Z',
+          },
+          countries: [{
+            country: 'NL',
+            decision: 'ALLOWED',
+            rationale: 'Launch destination.',
+            evidence: 'Country file NL-1',
+            reviewer: 'compliance.review@fusionbars.eu',
+            timestamp: '2026-09-27T00:00:00.000Z',
+          }],
+          content: {
+            state: 'CONTENT_APPROVED',
+            candidatePublicContent: 'A mushroom chocolate bar.',
+            approvedPublicContent: 'A mushroom chocolate bar.',
+            reviewer: 'content.review@fusionbars.eu',
+            timestamp: '2026-09-27T00:00:00.000Z',
+          },
+          translations,
+          media: { state: 'VERIFIED', reviewer: 'catalogue.review@fusionbars.eu', timestamp: '2026-09-27T00:00:00.000Z', note: 'Primary image verified.' },
+          publication: 'NOT_READY',
+        },
+      };
+    };
+
+    await run('Publication Control', 'First 10 stay unpublished and match saved decisions', () => {
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const beforeSpecialist = JSON.stringify(specialistExecution);
+      PublicationReadinessService.resetForTests();
+      const report = PublicationReadinessService.cohortReport();
+      if (report.total !== 10) throw new Error(`Expected 10 governed products, saw ${report.total}`);
+      if (report.readyForPublication !== 0 || report.published !== 0) throw new Error('No saved product is ready or published');
+      if (report.doNotPublish !== 1 || report.notReady !== 9) throw new Error(`Expected 1 do-not-publish and 9 not-ready, saw ${report.doNotPublish}/${report.notReady}`);
+      const audit = report.rows.find((row) => row.slug === 'audit-test-product');
+      if (!audit || audit.readiness !== 'DO_NOT_PUBLISH' || PublicationReadinessService.isPubliclyVisible(audit.slug)) {
+        throw new Error('Audit Test Product must stay DO_NOT_PUBLISH and private');
+      }
+      for (const row of report.rows) {
+        if (row.slug !== 'audit-test-product' && row.readiness !== 'NOT_READY') throw new Error(`${row.slug} was forced ready`);
+        if (PublicationReadinessService.isPubliclyVisible(row.slug)) throw new Error(`${row.slug} is publicly visible`);
+        if (!row.summary.includes('Blocking:')) throw new Error(`${row.slug} did not return structured blockers`);
+      }
+      if (JSON.stringify(firstBatchState) !== beforeBatch || JSON.stringify(specialistExecution) !== beforeSpecialist) {
+        throw new Error('Publication reporting changed saved decisions');
+      }
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production must stay paused');
+    });
+
+    await run('Publication Control', 'Every gate blocks an otherwise complete fixture', () => {
+      PublicationReadinessService.resetForTests();
+      const expectBlocked = (name: string, mutate: (input: ReadinessInput) => void, gateName: string) => {
+        const input = approvedFixture(`fixture-${name}`);
+        mutate(input);
+        PublicationReadinessService.installFixture(input);
+        const report = PublicationReadinessService.evaluateCurrent(input.slug);
+        if (report.readiness !== 'NOT_READY') throw new Error(`${name} became ${report.readiness}`);
+        if (!report.blockers.some((item) => item.gate === gateName)) throw new Error(`${name} did not block ${gateName}`);
+        if (PublicationReadinessService.isPubliclyVisible(input.slug)) throw new Error(`${name} was visible`);
+      };
+      expectBlocked('pricing', (input) => { input.review!.pricing = { state: 'PRICE_DEFERRED', rationale: 'No price', evidence: 'Source only', reviewer: 'finance.review@fusionbars.eu', timestamp: '2026-09-27T00:00:00.000Z' }; }, 'pricing');
+      expectBlocked('compliance', (input) => { input.review!.compliance = { state: 'DEFERRED', rationale: 'No determination', evidence: 'No legal file', reviewer: 'compliance.review@fusionbars.eu', timestamp: '2026-09-27T00:00:00.000Z' }; }, 'compliance');
+      expectBlocked('country', (input) => { input.review!.countries = []; }, 'country');
+      expectBlocked('content', (input) => { input.review!.content = { state: 'INTERNAL_SOURCE_ONLY', candidatePublicContent: '', approvedPublicContent: '', reviewer: 'content.review@fusionbars.eu', timestamp: '2026-09-27T00:00:00.000Z' }; }, 'content');
+      expectBlocked('media', (input) => { input.review!.media = { state: 'MEDIA_REVIEW', reviewer: 'catalogue.review@fusionbars.eu', timestamp: '2026-09-27T00:00:00.000Z', note: 'Needs a replacement' }; }, 'media');
+      expectBlocked('translation', (input) => { input.review!.translations.de = { state: 'PENDING', draft: '' }; }, 'translation');
+      expectBlocked('audit', (input) => { input.review!.pricing.evidence = ''; input.review!.pricing.rationale = ''; }, 'audit');
+      const prohibited = approvedFixture('fixture-do-not-publish');
+      prohibited.review!.compliance.state = 'DO_NOT_PUBLISH';
+      PublicationReadinessService.installFixture(prohibited);
+      const banned = PublicationReadinessService.evaluateCurrent(prohibited.slug);
+      if (banned.readiness !== 'DO_NOT_PUBLISH') throw new Error('DO_NOT_PUBLISH fixture was not prohibited');
+    });
+
+    await run('Publication Control', 'Authorized publish is revalidated, audited, idempotent, and reversible', async () => {
+      PublicationReadinessService.resetForTests();
+      const input = approvedFixture();
+      PublicationReadinessService.installFixture(input);
+      if (PublicationReadinessService.evaluateCurrent(input.slug).readiness !== 'READY_FOR_PUBLICATION') {
+        throw new Error('Complete fixture should be ready and still unpublished');
+      }
+      if (PublicationReadinessService.isPubliclyVisible(input.slug)) throw new Error('Ready is not published');
+      const unconfirmed = await PublicationReadinessService.publish({ ...publicationActor, slug: input.slug, confirm: false, expectedReady: true });
+      if (unconfirmed.success) throw new Error('Opening a confirmation must not publish');
+      const denied = await PublicationReadinessService.publish({ slug: input.slug, actor: 'finance.review@fusionbars.eu', role: 'FINANCE_MANAGER', confirm: true, expectedReady: true });
+      if (denied.success || !/403|Unauthorized|authorization/i.test(denied.error || '')) throw new Error(denied.error || 'Finance publish was allowed');
+      const contentDenied = await PublicationReadinessService.publish({ slug: input.slug, actor: 'content.review@fusionbars.eu', role: 'CONTENT_MANAGER', confirm: true });
+      if (contentDenied.success) throw new Error('Content publish permission must not publish a product');
+      const published = await PublicationReadinessService.publish({ ...publicationActor, slug: input.slug, confirm: true, expectedReady: true });
+      if (!published.success || published.report.publicationStatus !== 'PUBLISHED' || !PublicationReadinessService.isPubliclyVisible(input.slug)) {
+        throw new Error(published.error || 'Authorized publish failed');
+      }
+      const again = await PublicationReadinessService.publish({ ...publicationActor, slug: input.slug, confirm: true, expectedReady: true });
+      if (!again.idempotent) throw new Error('Repeat publish must be idempotent');
+      const publishEvents = PublicationReadinessService.getAuditEvents().filter((event) => event.method === 'EXPLICIT_ADMIN_PUBLISH' && event.productId === input.slug);
+      if (publishEvents.length !== 1 || publishEvents[0].role !== 'SUPER_ADMIN' || publishEvents[0].previousState !== 'NOT_PUBLISHED' || publishEvents[0].newState !== 'PUBLISHED') {
+        throw new Error('Publication audit was missing or duplicated');
+      }
+      if (!PublicationReadinessService.getRevalidationLog().some((path) => path.includes('/sitemap.xml') && path.includes(input.slug) === false || path.includes(`/products/${input.slug}`))) {
+        throw new Error('Publish did not revalidate the product route');
+      }
+      const hidden = await PublicationReadinessService.unpublish({ ...publicationActor, slug: input.slug, confirm: true });
+      if (!hidden.success || PublicationReadinessService.isPubliclyVisible(input.slug)) throw new Error('Unpublish left the product visible');
+      const hiddenAgain = await PublicationReadinessService.unpublish({ ...publicationActor, slug: input.slug, confirm: true });
+      if (!hiddenAgain.idempotent) throw new Error('Repeat unpublish must be idempotent');
+      const unpublishEvents = PublicationReadinessService.getAuditEvents().filter((event) => event.method === 'EXPLICIT_ADMIN_UNPUBLISH');
+      if (unpublishEvents.length !== 1) throw new Error('Unpublish audit was duplicated');
+    });
+
+    await run('Publication Control', 'A changed approval blocks a stale publish', async () => {
+      PublicationReadinessService.resetForTests();
+      const input = approvedFixture('fixture-race');
+      PublicationReadinessService.installFixture(input);
+      if (PublicationReadinessService.evaluateCurrent(input.slug).readiness !== 'READY_FOR_PUBLICATION') throw new Error('Race fixture was not ready');
+      input.review!.compliance.state = 'DEFERRED';
+      PublicationReadinessService.installFixture(input);
+      const blocked = await PublicationReadinessService.publish({ ...publicationActor, slug: input.slug, confirm: true, expectedReady: true });
+      if (blocked.success || blocked.error !== "Publication blocked. The product's approval state changed before publication.") {
+        throw new Error(blocked.error || 'Stale publish was accepted');
+      }
+      if (PublicationReadinessService.publicationStatus(input.slug) === 'PUBLISHED') throw new Error('Stale publish wrote a published state');
+    });
+
+    await run('Publication Control', 'Audit Test Product cannot be published', async () => {
+      PublicationReadinessService.resetForTests();
+      const blocked = await PublicationReadinessService.publish({
+        ...publicationActor,
+        slug: 'audit-test-product',
+        confirm: true,
+        expectedReady: true,
+      });
+      if (blocked.success || PublicationReadinessService.publicationStatus('audit-test-product') === 'PUBLISHED') {
+        throw new Error('Audit Test Product was published');
+      }
+      if (!/DO_NOT_PUBLISH/.test(blocked.error || '')) throw new Error(blocked.error || 'Missing prohibition');
+    });
+
+    await run('Publication Control', 'Unpublished products stay out of public catalogue and checkout', async () => {
+      PublicationReadinessService.resetForTests();
+      const slug = 'fusion-artisan-mushroom-chocolate-bar';
+      const publicBefore = CatalogService.getPublicProducts().some((product) => product.slug === slug);
+      if (!publicBefore) throw new Error('Legacy published catalogue product should remain visible before an unpublish');
+      for (const cohortSlug of PublicationReadinessService.cohortSlugs()) {
+        if (CatalogService.getPublicProducts().some((product) => product.slug === cohortSlug)) {
+          throw new Error(`${cohortSlug} leaked into the public catalogue`);
+        }
+      }
+      const created = await OrderCreationService.createOrder({
+        items: [{ variantId: 'var_bar_1', quantity: 5 }],
+        currency: 'EUR',
+        shippingAddress: {
+          firstName: 'Ada',
+          lastName: 'Merkle',
+          streetAddress: 'Keizersgracht 1',
+          city: 'Amsterdam',
+          postalCode: '1015 CJ',
+          countryCode: 'NL',
+          email: `publication.guard.${Date.now()}@fusionbars.eu`,
+          phone: '+31 6 12345678',
+        },
+        shippingMethodCode: 'STANDARD',
+        paymentMethodCode: 'SEPA_IBAN',
+      });
+      const priceBefore = created.order.items[0].unitPrice;
+      try {
+        await PublicationReadinessService.unpublish({ ...publicationActor, slug, confirm: true });
+        if (CatalogService.getPublicProductBySlug(slug)) throw new Error('Unpublished product remained on the public product route');
+        if (CatalogService.getPublicProducts().some((product) => product.slug === slug)) throw new Error('Unpublished product remained in search and categories');
+        let purchased = false;
+        try {
+          await OrderCreationService.createOrder({
+            items: [{ variantId: 'var_bar_1', quantity: 5 }],
+            currency: 'EUR',
+            shippingAddress: {
+              firstName: 'Ada',
+              lastName: 'Merkle',
+              streetAddress: 'Keizersgracht 1',
+              city: 'Amsterdam',
+              postalCode: '1015 CJ',
+              countryCode: 'NL',
+              email: `publication.guard.retry.${Date.now()}@fusionbars.eu`,
+              phone: '+31 6 12345678',
+            },
+            shippingMethodCode: 'STANDARD',
+            paymentMethodCode: 'SEPA_IBAN',
+          });
+          purchased = true;
+        } catch (err: any) {
+          if (!/not available for purchase/i.test(err.message || '')) throw err;
+        }
+        if (purchased) throw new Error('Unpublished product entered checkout');
+        const stored = await CommerceRepository.findOrderByIdOrNumber(created.order.orderNumber);
+        if (!stored || stored.items[0].unitPrice !== priceBefore || stored.items[0].quantity !== 5) {
+          throw new Error('Unpublishing rewrote a historical order');
+        }
+      } finally {
+        PublicationReadinessService.resetForTests();
+      }
+      if (!PublicationReadinessService.isPubliclyVisible(slug)) throw new Error('Reset did not restore the legacy catalogue product');
+    });
+
+    await run('Admin Login', 'Only the configured super admin email and password open an admin session', () => {
+      const previousEmail = process.env.ADMIN_EMAIL;
+      const previousPassword = process.env.ADMIN_PASSWORD;
+      process.env.ADMIN_EMAIL = 'admin@fusionbars.eu';
+      process.env.ADMIN_PASSWORD = 'correct-horse-battery';
+      try {
+        const wrong = AdminAuthService.authenticate('admin@fusionbars.eu', 'wrong-password-value');
+        if (wrong) throw new Error('Wrong password must not create a session');
+        const other = AdminAuthService.authenticate('other@fusionbars.eu', 'correct-horse-battery');
+        if (other) throw new Error('A different email must not create a session');
+        const session = AdminAuthService.authenticate('Admin@Fusionbars.eu', 'correct-horse-battery');
+        if (!session) throw new Error('Configured admin credentials must sign in');
+        const user = AuthService.verifySessionToken(session.token);
+        if (!user || user.role !== 'SUPER_ADMIN' || user.email !== 'admin@fusionbars.eu') {
+          throw new Error('Admin session must be the super admin');
+        }
+        if (AdminAuthService.sessionFromToken(session.token)?.role !== 'SUPER_ADMIN') {
+          throw new Error('Admin cookie token must resolve to super admin');
+        }
+        process.env.ADMIN_PASSWORD = 'short';
+        if (AdminAuthService.authenticate('admin@fusionbars.eu', 'short')) {
+          throw new Error('A short password must not be accepted as configuration');
+        }
+      } finally {
+        if (previousEmail === undefined) delete process.env.ADMIN_EMAIL;
+        else process.env.ADMIN_EMAIL = previousEmail;
+        if (previousPassword === undefined) delete process.env.ADMIN_PASSWORD;
+        else process.env.ADMIN_PASSWORD = previousPassword;
+      }
+    });
+
+    await run('Catalogue Rollout', 'The next batch excludes the pilot and records no approvals', () => {
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const beforeSpecialist = JSON.stringify(specialistExecution);
+      CatalogueRolloutService.resetForTests();
+      const batch = CatalogueRolloutService.createBatch({
+        size: 10,
+        actor: 'catalogue.manager@fusionbars.eu',
+        actorRole: 'CATALOG_MANAGER',
+        name: 'Review batch 2',
+      });
+      const pilot = new Set(CatalogueRolloutService.protectedSlugs());
+      if (batch.size !== 10 || batch.productSlugs.some((slug) => pilot.has(slug))) throw new Error('Batch included a pilot product or the wrong size');
+      if (batch.id !== 'RB-002') throw new Error(`Expected RB-002, saw ${batch.id}`);
+      const state = CatalogueRolloutService.getState();
+      if (state.audit.some((event) => /APPROVED|PUBLISH/.test(event.action))) throw new Error('Batch creation recorded an approval');
+      const page = CatalogueRolloutService.query({ queue: 'unreviewed', page: 1, pageSize: 20, sort: 'name' });
+      const page2 = CatalogueRolloutService.query({ queue: 'unreviewed', page: 2, pageSize: 20, sort: 'name' });
+      if (page.rows.length !== 20 || page2.rows.some((row) => page.rows.some((first) => first.slug === row.slug))) {
+        throw new Error('Pagination did not return distinct pages');
+      }
+      if (page.rows.some((row) => row.protectedPilot || 'description' in row || 'sources' in row)) {
+        throw new Error('Queue rows leaked pilot products or full source payloads');
+      }
+      const category = page.rows[0].category;
+      const filtered = CatalogueRolloutService.query({ queue: 'unreviewed', category, pageSize: 20 });
+      if (!filtered.rows.length || filtered.rows.some((row) => row.category !== category)) throw new Error('Category filter failed');
+      const versions = Object.fromEntries(batch.productSlugs.map((slug) => [slug, 1]));
+      const deferred = CatalogueRolloutService.deferProducts({
+        slugs: [batch.productSlugs[0]],
+        reason: 'Awaiting commercial price',
+        actor: 'catalogue.manager@fusionbars.eu',
+        actorRole: 'CATALOG_MANAGER',
+        expectedVersions: versions,
+      });
+      if (!deferred.success) throw new Error(deferred.error || 'Deferral failed');
+      const stale = CatalogueRolloutService.deferProducts({
+        slugs: [batch.productSlugs[0]],
+        reason: 'Second writer',
+        actor: 'catalogue.manager@fusionbars.eu',
+        actorRole: 'CATALOG_MANAGER',
+        expectedVersions: versions,
+      });
+      if (stale.success || !/Reload before saving/.test(stale.error || '')) throw new Error(stale.error || 'Stale review write was accepted');
+      let denied = false;
+      try {
+        CatalogueRolloutService.createBatch({ size: 10, actor: 'finance.review@fusionbars.eu', actorRole: 'FINANCE_MANAGER' });
+      } catch (err: any) {
+        denied = /Unauthorized/.test(err.message || '');
+      }
+      if (!denied) throw new Error('Finance was allowed to create a review batch');
+      let bulkBlocked = false;
+      try {
+        CatalogueRolloutService.applyBulk({ action: 'APPROVE_ALL' });
+      } catch (err: any) {
+        bulkBlocked = /not available/.test(err.message || '');
+      }
+      if (!bulkBlocked) throw new Error('Bulk approval was available');
+      const audit = PublicationReadinessService.evaluateSaved('audit-test-product');
+      if (audit.readiness !== 'DO_NOT_PUBLISH') throw new Error('Rollout changed Audit Test Product');
+      if (JSON.stringify(firstBatchState) !== beforeBatch || JSON.stringify(specialistExecution) !== beforeSpecialist) {
+        throw new Error('Rollout changed saved pilot decisions');
+      }
+      const saved = rolloutState as { batches?: Array<{ productSlugs: string[] }> };
+      const savedSlugs = saved.batches?.[0]?.productSlugs || [];
+      if (savedSlugs.length !== 10 || savedSlugs.some((slug) => pilot.has(slug))) {
+        throw new Error('Saved review batch 2 is missing or includes the pilot');
+      }
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production must stay paused');
+    });
+
+    await run('Commercial Pricing', 'Money, approval, currency, tax, shipping, and audit stay explicit', () => {
+      CommercialConfigurationService.resetForTests();
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const beforeSpecialist = JSON.stringify(specialistExecution);
+      if (PricingEngine.round(1002, 'NEAREST_0_05') !== 1000) throw new Error('Five-cent rounding drifted');
+      if (PricingEngine.round(2499, 'NEAREST_0_01') !== 2499) throw new Error('Cent rounding changed an integer minor amount');
+      if (PricingEngine.blocksPublication('PRICE_REVIEW_PENDING') !== true || PricingEngine.blocksPublication('PRICE_APPROVED') !== false) {
+        throw new Error('Publication block for unapproved prices is wrong');
+      }
+      const cohort = PricingEngine.cohortReport();
+      if (cohort.deferred !== 9 || cohort.notApplicable !== 1 || cohort.approvedEur !== 0 || cohort.approvedGbp !== 0) {
+        throw new Error(`Pilot pricing was rewritten: ${JSON.stringify(cohort)}`);
+      }
+      let pilotBlocked = false;
+      try {
+        PricingEngine.resolveUnitPrice({ slug: 'audit-test-product', catalogue: { priceEUR: 1000, priceGBP: 1000 }, currency: 'EUR' });
+      } catch (err: any) {
+        pilotBlocked = /CONFIGURATION_REQUIRED/.test(err.message || '');
+      }
+      if (!pilotBlocked) throw new Error('Audit Test Product received a commercial price');
+      const draft = CommercialConfigurationService.draftPrice({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        productSlug: 'fixture-commercial-bar',
+        currency: 'EUR',
+        amountMinor: 1800,
+        effectiveFrom: '2020-01-01T00:00:00.000Z',
+        effectiveTo: '2026-01-01T00:00:00.000Z',
+        rationale: 'Fixture approved selling price',
+        evidence: 'Test fixture, not a catalogue product',
+        taxClass: 'STANDARD',
+      });
+      const approved = CommercialConfigurationService.approvePrice({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        priceId: draft.id,
+        rationale: 'Fixture approval',
+        evidence: 'Isolated fixture',
+      });
+      const current = PricingEngine.resolveUnitPrice({
+        slug: 'fixture-commercial-bar',
+        catalogue: { priceEUR: 9999, priceGBP: null },
+        currency: 'EUR',
+        at: '2025-06-01T00:00:00.000Z',
+      });
+      if (current.amountMinor !== 1800 || current.basis !== 'COMMERCIAL') throw new Error('Approved EUR price was not used');
+      const laterDraft = CommercialConfigurationService.draftPrice({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        productSlug: 'fixture-commercial-bar',
+        currency: 'EUR',
+        amountMinor: 2200,
+        effectiveFrom: '2026-01-01T00:00:00.000Z',
+        rationale: 'Scheduled fixture price',
+        evidence: 'Isolated fixture',
+        taxClass: 'STANDARD',
+      });
+      CommercialConfigurationService.approvePrice({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        priceId: laterDraft.id,
+        rationale: 'Scheduled fixture approval',
+        evidence: 'Isolated fixture',
+      });
+      const future = PricingEngine.activeApprovedPrice('fixture-commercial-bar', null, 'EUR', '2026-06-01T00:00:00.000Z');
+      if (future?.amountMinor !== 2200) throw new Error('Future price was not selected');
+      if (approved.amountMinor !== 1800) throw new Error('Historical commercial price was overwritten');
+      if (PricingEngine.structuredOffer('fixture-commercial-bar', null, '2025-06-01T00:00:00.000Z')?.price !== '18.00') {
+        throw new Error('Structured data did not use the approved EUR price');
+      }
+      if (PricingEngine.structuredOffer('fusion-artisan-mushroom-chocolate-bar', null) != null) {
+        throw new Error('Structured data invented an approved price');
+      }
+      const gbp = CommercialConfigurationService.draftPrice({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        productSlug: 'fixture-commercial-bar',
+        currency: 'GBP',
+        amountMinor: 1600,
+        effectiveFrom: '2020-01-01T00:00:00.000Z',
+        rationale: 'Independent GBP fixture',
+        evidence: 'Not converted from EUR',
+        taxClass: 'STANDARD',
+      });
+      CommercialConfigurationService.approvePrice({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        priceId: gbp.id,
+        rationale: 'Independent GBP approval',
+        evidence: 'Separate amount',
+      });
+      const gbpPrice = PricingEngine.resolveUnitPrice({
+        slug: 'fixture-commercial-bar',
+        catalogue: { priceEUR: 1800, priceGBP: null },
+        currency: 'GBP',
+        at: '2025-06-01T00:00:00.000Z',
+      });
+      if (gbpPrice.amountMinor !== 1600) throw new Error('Independent GBP price was converted');
+      let unsupported = false;
+      try {
+        PricingEngine.resolveUnitPrice({ slug: 'fixture-commercial-bar', catalogue: { priceEUR: 1800 }, currency: 'USD' as 'EUR' });
+      } catch (err: any) {
+        unsupported = /Unsupported currency/.test(err.message || '');
+      }
+      if (!unsupported) throw new Error('USD was accepted as a selling currency');
+      let missingGbp = false;
+      try {
+        PricingEngine.resolveUnitPrice({ slug: 'fixture-no-gbp', catalogue: { priceEUR: 10000, priceGBP: null }, currency: 'GBP' });
+      } catch (err: any) {
+        missingGbp = /CONFIGURATION_REQUIRED/.test(err.message || '');
+      }
+      if (!missingGbp) throw new Error('Missing GBP was converted without an FX policy');
+      CommercialConfigurationService.updatePolicy({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        rationale: 'Enable stored FX for a fixture',
+        evidence: 'Test only',
+        pricingMode: 'FX_DERIVED',
+        fxMaxAgeHours: 24,
+      });
+      CommercialConfigurationService.addFxRate({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        sourceCurrency: 'EUR',
+        targetCurrency: 'GBP',
+        rateScaled: 850000,
+        provider: 'fixture-rate',
+        rateTimestamp: '2026-09-26T00:00:00.000Z',
+        markupBps: 0,
+        evidence: 'Stored fixture rate',
+        effectiveFrom: '2026-09-26T00:00:00.000Z',
+      });
+      const converted = CurrencyConversionService.convert({
+        amountMinor: 10000,
+        sourceCurrency: 'EUR',
+        targetCurrency: 'GBP',
+        at: '2026-09-26T12:00:00.000Z',
+      });
+      if (converted.amountMinor !== 8500) throw new Error(`FX conversion expected 8500, got ${converted.amountMinor}`);
+      let stale = false;
+      try {
+        CurrencyConversionService.convert({ amountMinor: 10000, sourceCurrency: 'EUR', targetCurrency: 'GBP', at: '2026-09-28T00:00:00.000Z' });
+      } catch (err: any) {
+        stale = err.message === 'FX_RATE_STALE';
+      }
+      if (!stale) throw new Error('A stale FX rate was used');
+      CommercialConfigurationService.resetForTests();
+      CommercialConfigurationService.updatePolicy({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        rationale: 'Fixture exclusive VAT',
+        evidence: 'Test jurisdiction only',
+        taxDisplayMode: 'TAX_EXCLUDED',
+      });
+      CommercialConfigurationService.addVatRate({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        country: 'DE',
+        taxClass: 'STANDARD',
+        rateBps: 1900,
+        effectiveFrom: '2026-01-01T00:00:00.000Z',
+        evidence: 'Fixture rate, not a business registration',
+      });
+      CommercialConfigurationService.assignTaxClass({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        productSlug: 'fixture-tax-bar',
+        taxClass: 'STANDARD',
+        evidence: 'Explicit fixture class',
+      });
+      const taxed = PricingEngine.finalize({
+        subtotal: 10000,
+        discountAmount: 0,
+        shippingAmount: 1500,
+        currency: 'EUR',
+        destinationCountry: 'DE',
+        productSlug: 'fixture-tax-bar',
+        at: '2026-06-01T00:00:00.000Z',
+      });
+      if (taxed.taxAmount !== 1900 || taxed.totalAmount !== 13400) throw new Error(`Exclusive VAT was not applied: ${taxed.taxAmount}/${taxed.totalAmount}`);
+      const untaxed = PricingEngine.finalize({
+        subtotal: 10000,
+        discountAmount: 0,
+        shippingAmount: 1500,
+        currency: 'EUR',
+        destinationCountry: 'FR',
+        productSlug: 'fixture-tax-bar',
+        at: '2026-06-01T00:00:00.000Z',
+      });
+      if (untaxed.taxStatus !== 'TAX_CONFIGURATION_REQUIRED') throw new Error('Missing VAT configuration was guessed');
+      let settlementBlocked = false;
+      try {
+        PricingEngine.assertSettlementReady(untaxed);
+      } catch (err: any) {
+        settlementBlocked = err.message === 'TAX_CONFIGURATION_REQUIRED';
+      }
+      if (!settlementBlocked) throw new Error('Unconfigured tax was allowed through strict settlement');
+      const early = TaxEngine.resolve({ country: 'DE', taxClass: 'STANDARD', taxableMinor: 10000, at: '2025-01-01T00:00:00.000Z' });
+      if (early.status !== 'TAX_CONFIGURATION_REQUIRED') throw new Error('A future VAT rate was applied early');
+      CommercialConfigurationService.assignTaxClass({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        productSlug: 'fixture-reduced',
+        taxClass: 'REDUCED',
+        evidence: 'Different fixture class',
+      });
+      const reduced = PricingEngine.finalize({
+        subtotal: 10000,
+        discountAmount: 0,
+        shippingAmount: 0,
+        currency: 'EUR',
+        destinationCountry: 'DE',
+        productSlug: 'fixture-reduced',
+        at: '2026-06-01T00:00:00.000Z',
+      });
+      if (reduced.taxStatus !== 'TAX_CONFIGURATION_REQUIRED') throw new Error('STANDARD rate was applied to a REDUCED class');
+      const stacked = PricingEngine.applyPromotions(10000, [
+        { id: 'a', kind: 'PERCENT', percent: 10, active: true },
+        { id: 'b', kind: 'FIXED', amountMinor: 500, active: true },
+      ]);
+      if (stacked !== 1000) throw new Error(`Single stacking should apply one promotion, got ${stacked}`);
+      CommercialConfigurationService.updatePolicy({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        rationale: 'Sequential fixture stacking',
+        evidence: 'Test only',
+        stacking: 'SEQUENTIAL',
+      });
+      const sequential = PricingEngine.applyPromotions(10000, [
+        { id: 'a', kind: 'PERCENT', percent: 10, active: true },
+        { id: 'b', kind: 'FIXED', amountMinor: 500, active: true },
+      ]);
+      if (sequential !== 1500) throw new Error(`Sequential discount expected 1500, got ${sequential}`);
+      const standardShip = ShippingService.calculateShipping({ subtotal: 1000, currency: 'EUR', destinationCountry: 'DE', selectedMethodCode: 'STANDARD' });
+      const expressShip = ShippingService.calculateShipping({ subtotal: 1000, currency: 'EUR', destinationCountry: 'DE', selectedMethodCode: 'EXPRESS' });
+      const freeShip = ShippingService.calculateShipping({ subtotal: 30000, currency: 'EUR', destinationCountry: 'DE', selectedMethodCode: 'STANDARD' });
+      const gbpShip = ShippingService.calculateShipping({ subtotal: 1000, currency: 'GBP', destinationCountry: 'GB', selectedMethodCode: 'STANDARD' });
+      if (standardShip.selectedMethod.cost !== 1500 || expressShip.selectedMethod.cost !== 2000 || freeShip.selectedMethod.cost !== 0) {
+        throw new Error('EUR shipping policy changed');
+      }
+      if (gbpShip.selectedMethod.cost !== 1300) throw new Error('GBP shipping was copied from EUR');
+      CommercialConfigurationService.updatePolicy({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        rationale: 'Canonical threshold fixture',
+        evidence: 'Test only',
+        thresholdBasis: 'CANONICAL_EUR',
+        pricingMode: 'INDEPENDENT',
+      });
+      let thresholdBlocked = false;
+      try {
+        ShippingService.calculateShipping({ subtotal: 1000, currency: 'GBP', destinationCountry: 'GB' });
+      } catch (err: any) {
+        thresholdBlocked = /CONFIGURATION_REQUIRED/.test(err.message || '');
+      }
+      if (!thresholdBlocked) throw new Error('Canonical EUR threshold was converted without an FX policy');
+      const snapshot = { unitPrice: 1800, total: 1800 };
+      CommercialConfigurationService.draftPrice({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        productSlug: 'fixture-snapshot',
+        currency: 'EUR',
+        amountMinor: 2500,
+        effectiveFrom: '2026-01-01T00:00:00.000Z',
+        rationale: 'Later price',
+        evidence: 'Must not rewrite the snapshot',
+        taxClass: 'NOT_CONFIGURED',
+      });
+      if (snapshot.unitPrice !== 1800) throw new Error('A later price rewrote a stored order snapshot');
+      let contentDenied = false;
+      try {
+        CommercialConfigurationService.draftPrice({
+          actor: 'content.review@fusionbars.eu',
+          actorRole: 'CONTENT_MANAGER',
+          productSlug: 'fixture-denied',
+          currency: 'EUR',
+          amountMinor: 1000,
+          effectiveFrom: '2026-01-01T00:00:00.000Z',
+          rationale: 'Should fail',
+          evidence: 'Should fail',
+          taxClass: 'NOT_CONFIGURED',
+        });
+      } catch (err: any) {
+        contentDenied = /Unauthorized/.test(err.message || '');
+      }
+      if (!contentDenied) throw new Error('Content manager changed a price');
+      if (!CommercialConfigurationService.canWrite('FINANCE_MANAGER') || !CommercialConfigurationService.canWrite('SUPER_ADMIN')) {
+        throw new Error('Finance or Super Admin lost commercial write access');
+      }
+      if (CommercialConfigurationService.canWrite('CATALOG_MANAGER') || AdminAccess.can('CONTENT_MANAGER', 'pricing') || AdminAccess.can('CUSTOMER', 'pricing')) {
+        throw new Error('Pricing authority leaked to an unauthorised role');
+      }
+      let bulkDenied = false;
+      try {
+        CommercialConfigurationService.rejectUnsafeBulk('CONVERT_ALL_USD_TO_EUR');
+      } catch (err: any) {
+        bulkDenied = /not available/.test(err.message || '');
+      }
+      if (!bulkDenied) throw new Error('USD to EUR bulk conversion was available');
+      if (CommercialConfigurationService.get().audit.length < 1) throw new Error('Commercial changes were not audited');
+      const metrics = PricingEngine.metricsFromOrders([{ currency: 'EUR', subtotalAmount: 1800, discountAmount: 0, shippingAmount: 1500, totalAmount: 3300, commercialSnapshot: { taxAmount: null } }]);
+      if (metrics.EUR.revenue !== 3300) throw new Error('Revenue was not taken from the order snapshot');
+      if (JSON.stringify(firstBatchState) !== beforeBatch || JSON.stringify(specialistExecution) !== beforeSpecialist) {
+        throw new Error('Commercial configuration changed the pilot files');
+      }
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production must stay paused');
+      CommercialConfigurationService.resetForTests();
     });
 
     const passedCount = results.filter((r) => r.passed).length;

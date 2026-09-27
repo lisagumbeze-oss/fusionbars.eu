@@ -150,7 +150,7 @@ export default function AdminDashboard() {
           <div className="grid gap-3">
             <Metric href={`${base}/compliance`} label="Compliance reviews pending" value={catalogue.compliancePending} />
             <Metric href={`${base}/compliance/countries`} label="Country decisions pending" value={catalogue.countryPending} />
-            <Metric href={`${base}/content`} label="Content reviews pending" value={catalogue.contentInternal} />
+            <Metric href={`${base}/content`} label="Content reviews pending" value={catalogue.contentInternal + catalogue.contentDeferred} />
             <Metric href={`${base}/catalogue/translations`} label="Translation reviews pending" value={catalogue.translationPending} />
           </div>
         </div>

@@ -12,6 +12,7 @@ import {
   ValidatedLineItem,
 } from '@/types';
 import { CatalogService } from '@/lib/catalog';
+import { PublicationReadinessService } from '@/domain/catalog/PublicationReadinessService';
 import { CountryRegistry } from '@/domain/countries/CountryRegistry';
 import { ProductPurchaseEligibilityService } from '@/domain/catalog/ProductPurchaseEligibilityService';
 import { OrderPricingService } from './OrderPricingService';
@@ -22,12 +23,13 @@ import { BankTransferPaymentService, CryptoPaymentService, PaymentInstructions }
 import { PaymentConfigService, CryptoAsset } from '@/domain/payments/PaymentConfig';
 import { getCheckoutCryptoWallets } from '@/domain/payments/CheckoutCryptoWallets';
 import {
-  CRYPTO_PAYMENT_DISCOUNT_PERCENT,
+  cryptoDiscountPercent,
   calculateCryptoPaymentDiscount,
   isBankTransferAvailable,
   isCryptocurrencyPayment,
 } from '@/domain/payments/CryptoPaymentDiscount';
 import { MoneyEngine } from '@/lib/money';
+import { PricingEngine } from '@/domain/commercial/PricingEngine';
 import { CommerceRepository, DbOrder } from '@/lib/commerce-repository';
 import { GuestOrderService } from './GuestOrderService';
 import { OrderService } from './OrderService';
@@ -130,6 +132,10 @@ export class OrderCreationService {
 
       if (!decision.eligible) {
         throw new Error(decision.customerMessage || `Product ${product.name} is ineligible for destination.`);
+      }
+      const publication = PublicationReadinessService.customerPurchaseDecision(product.slug);
+      if (!publication.allowed) {
+        throw new Error(publication.customerMessage);
       }
     }
 
@@ -295,6 +301,7 @@ export class OrderCreationService {
         firstName: shippingAddress.firstName,
         lastName: shippingAddress.lastName,
         streetAddress: shippingAddress.streetAddress,
+        houseNumber: shippingAddress.houseNumber,
         city: shippingAddress.city,
         postalCode: shippingAddress.postalCode,
         countryCode: destinationCountry,
@@ -326,13 +333,37 @@ export class OrderCreationService {
           actorRole: 'SYSTEM',
           actorId: 'checkout_engine',
           note: cryptoDiscountAmount > 0
-            ? `Order initiated with ${CRYPTO_PAYMENT_DISCOUNT_PERCENT}% cryptocurrency payment discount (${cryptoDiscountAmount} minor units). Awaiting ${paymentMethodCode} funds. Hub routed to ${chosenHub}.`
+            ? `Order initiated with ${cryptoDiscountPercent()}% cryptocurrency payment discount (${cryptoDiscountAmount} minor units). Awaiting ${paymentMethodCode} funds. Hub routed to ${chosenHub}.`
             : `Order initiated. Awaiting ${paymentMethodCode} funds. Hub routed to ${chosenHub}.`,
           createdAt: new Date().toISOString(),
         },
       ],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
+    };
+    const commercial = PricingEngine.finalize({
+      subtotal: dbOrder.subtotalAmount,
+      discountAmount: dbOrder.discountAmount,
+      shippingAmount: dbOrder.shippingAmount,
+      currency,
+      destinationCountry,
+      at: dbOrder.createdAt,
+    });
+    dbOrder.commercialSnapshot = {
+      currency,
+      subtotal: dbOrder.subtotalAmount,
+      discount: dbOrder.discountAmount,
+      taxableAmount: commercial.taxableAmount,
+      taxAmount: commercial.taxAmount,
+      taxTreatment: commercial.taxTreatment,
+      taxClass: commercial.taxClass,
+      taxRateBps: commercial.taxRateBps,
+      shipping: dbOrder.shippingAmount,
+      total: dbOrder.totalAmount,
+      pricingVersion: 'CATALOGUE_UNAPPROVED',
+      configurationVersion: commercial.configurationVersion,
+      destinationCountry,
+      capturedAt: dbOrder.createdAt,
     };
 
     // STEP 14: Persist Order & Deduct Reservation

@@ -1,5 +1,8 @@
 import catalogueData from '../data/consolidated-catalogue.json';
 import { NormalizedProduct, NormalizedVariant } from '@/types';
+import { PublicationReadinessService } from '@/domain/catalog/PublicationReadinessService';
+import { AdminOverrides } from '@/domain/admin/AdminOverrides';
+import '@/domain/catalog/CatalogueSpecialistReviewService';
 
 export type { NormalizedProduct, NormalizedVariant };
 
@@ -41,8 +44,28 @@ export class CatalogService {
   /**
    * Returns filtered, searched, and sorted products for storefront display.
    */
+  private static withAdminEdits(product: NormalizedProduct): NormalizedProduct {
+    const edit = AdminOverrides.product(product.slug);
+    if (!edit) return product;
+    return {
+      ...product,
+      name: edit.name || product.name,
+      headline: edit.headline !== undefined ? edit.headline : product.headline,
+      description: edit.description !== undefined ? edit.description : product.description,
+      variants: edit.priceEUR == null
+        ? product.variants
+        : product.variants.map((variant) => {
+            const priceEUR = edit.priceEUR as number;
+            const priceGBP = variant.priceEUR > 0
+              ? Math.round(variant.priceGBP * (priceEUR / variant.priceEUR))
+              : variant.priceGBP;
+            return { ...variant, priceEUR, priceGBP };
+          }),
+    };
+  }
+
   static getProducts(options: CatalogFilterOptions = {}): NormalizedProduct[] {
-    let result = [...this.products];
+    let result = this.products.map((product) => this.withAdminEdits(product));
 
     // Filter by Category
     if (options.categorySlug && options.categorySlug !== 'all') {
@@ -85,11 +108,23 @@ export class CatalogService {
     return result;
   }
 
+  /** Storefront catalogue. Unpublished and not-yet-published governance records are excluded. */
+  static getPublicProducts(options: CatalogFilterOptions = {}): NormalizedProduct[] {
+    return this.getProducts(options).filter((product) => PublicationReadinessService.isPubliclyVisible(product.slug));
+  }
+
+  static getPublicProductBySlug(slug: string): NormalizedProduct | undefined {
+    const product = this.getProductBySlug(slug);
+    if (!product || !PublicationReadinessService.isPubliclyVisible(product.slug)) return undefined;
+    return product;
+  }
+
   /**
    * Finds a single product by slug.
    */
   static getProductBySlug(slug: string): NormalizedProduct | undefined {
-    return this.products.find((p) => p.slug === slug);
+    const product = this.products.find((p) => p.slug === slug);
+    return product ? this.withAdminEdits(product) : undefined;
   }
 
   /**
@@ -97,8 +132,8 @@ export class CatalogService {
    */
   static getRelatedProducts(slug: string, limit = 3): NormalizedProduct[] {
     const current = this.getProductBySlug(slug);
-    if (!current) return this.products.slice(0, limit);
-    return this.products
+    if (!current) return this.getPublicProducts().slice(0, limit);
+    return this.getPublicProducts()
       .filter((p) => p.slug !== slug && p.categorySlug === current.categorySlug)
       .slice(0, limit);
   }
@@ -112,6 +147,6 @@ export class CatalogService {
       this.getProductBySlug('fusion-10-bar-boutique-box')!,
       this.getProductBySlug('fusion-mushroom-fruit-gummies')!,
       this.getProductBySlug('laughing-gas-x-fusion-artisan-chocolate-bar')!,
-    ].filter(Boolean);
+    ].filter((product) => product && PublicationReadinessService.isPubliclyVisible(product.slug));
   }
 }

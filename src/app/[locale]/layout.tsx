@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation';
 import { SUPPORTED_LOCALES } from '@/i18n';
 import { LocaleCode } from '@/types';
 import { CommerceProvider } from '@/context/CommerceContext';
+import { AdminOverrides } from '@/domain/admin/AdminOverrides';
+import { ensureAdminOverridesLoaded } from '@/domain/admin/AdminOverrideStore';
 import SiteChrome from '@/components/site/SiteChrome';
 
 export function generateStaticParams() {
@@ -22,8 +24,11 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
     notFound();
   }
 
+  ensureAdminOverridesLoaded();
+  const operations = AdminOverrides.settingsSaved() ? AdminOverrides.settings() : null;
+
   return (
-    <CommerceProvider initialLocale={locale}>
+    <CommerceProvider initialLocale={locale} operations={operations}>
       <SiteChrome>{children}</SiteChrome>
     </CommerceProvider>
   );

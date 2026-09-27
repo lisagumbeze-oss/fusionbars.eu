@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
       priceEUR,
       priceGBP,
     });
+    if (!result.success) return NextResponse.json({ error: result.error }, { status: 400 });
     return NextResponse.json(result.data);
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 400 });

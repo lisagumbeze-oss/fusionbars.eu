@@ -5,11 +5,15 @@ import Link from 'next/link';
 import { Mail, Shield, Check, ArrowRight } from 'lucide-react';
 import { useCommerce } from '../context/CommerceContext';
 import { getDictionary } from '../i18n';
+import { AdminOverrides } from '@/domain/admin/AdminOverrides';
+import { applyCryptoDiscountCopy } from '@/domain/payments/CryptoPaymentDiscount';
 import { subscribeNewsletterAction } from '@/actions/contact';
 
 export default function Footer() {
   const { locale } = useCommerce();
   const dict = getDictionary(locale);
+  const supportEmail = AdminOverrides.settings().supportEmail;
+  const storeName = AdminOverrides.settings().storeName;
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [subscribeError, setSubscribeError] = useState<string | null>(null);
@@ -89,14 +93,14 @@ export default function Footer() {
               F
             </div>
             <span className="font-serif text-lg tracking-wider font-bold text-neutral-100">
-              FUSION MUSHROOM BARS EU
+              {storeName.toUpperCase()}
             </span>
           </div>
           <p className="text-neutral-400 leading-relaxed max-w-sm">
-            {dict.common.tagline}. Europe&apos;s premier botanical confection atelier, harmonizing single-origin Belgian couverture chocolate with verified functional mycology. {dict.payment.cryptoDiscountBody}
+            {dict.common.tagline}. Europe&apos;s premier botanical confection atelier, harmonizing single-origin Belgian couverture chocolate with verified functional mycology. {applyCryptoDiscountCopy(dict.payment.cryptoDiscountBody)}
           </p>
           <div className="text-neutral-500 space-y-1">
-            <p>Direct Inquiries: <a href="mailto:sales@fusionbars.eu" className="text-neutral-300 hover:underline">sales@fusionbars.eu</a></p>
+            <p>Direct Inquiries: <a href={`mailto:${supportEmail}`} className="text-neutral-300 hover:underline">{supportEmail}</a></p>
             <p>Customer Support Hours: Mon &ndash; Fri (09:00 &ndash; 18:00 CET)</p>
           </div>
         </div>

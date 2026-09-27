@@ -19,7 +19,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   ];
 
   const categories = CatalogService.getCategories();
-  const products = CatalogService.getProducts();
+  const products = CatalogService.getPublicProducts();
 
   const sitemapEntries: MetadataRoute.Sitemap = [];
 

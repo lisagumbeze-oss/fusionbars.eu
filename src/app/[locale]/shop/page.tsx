@@ -23,7 +23,7 @@ export default async function ShopPage({ params, searchParams }: ShopPageProps) 
   const searchQuery = resolvedQuery.search || '';
 
   const categories = CatalogService.getCategories();
-  const products = CatalogService.getProducts({
+  const products = CatalogService.getPublicProducts({
     categorySlug: currentCategorySlug,
     sortBy: currentSort,
     search: searchQuery,
@@ -71,7 +71,7 @@ export default async function ShopPage({ params, searchParams }: ShopPageProps) 
         currentCategory={currentCategorySlug}
         currentSort={currentSort}
         searchQuery={searchQuery}
-        totalCount={CatalogService.getProducts().length}
+        totalCount={products.length}
         categories={categories.map((category) => ({
           name: category.name,
           slug: category.slug,

@@ -20,7 +20,6 @@ import {
 import { MasterCatalogueImportService, MasterImportResult } from '@/domain/import/MasterCatalogueImportService';
 import { ProductPublicationGuard } from '@/domain/catalog/ProductPublicationGuard';
 import { ProductPurchaseEligibilityService } from '@/domain/catalog/ProductPurchaseEligibilityService';
-import { CurrencyService } from '@/domain/currency/CurrencyService';
 
 function getFs(): any {
   try {
@@ -1164,9 +1163,8 @@ export class CatalogueReviewService {
     );
   }
 
-  static previewGbpFallback(priceEUR: MinorUnits | null | undefined): MinorUnits | null {
-    if (!priceEUR || priceEUR <= 0) return null;
-    return CurrencyService.getPriceForCurrency({ priceEUR, priceGBP: null }, 'GBP');
+  static previewGbpFallback(_priceEUR: MinorUnits | null | undefined): MinorUnits | null {
+    return null;
   }
 
   static approveFieldDecision(params: {

@@ -7,7 +7,7 @@ import { NormalizedProduct, NormalizedVariant } from '@/types';
 import { useCommerce } from '@/context/CommerceContext';
 import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
 import { getDictionary } from '@/i18n';
-import { calculateCryptoPaymentDiscount } from '@/domain/payments/CryptoPaymentDiscount';
+import { applyCryptoDiscountCopy, calculateCryptoPaymentDiscount } from '@/domain/payments/CryptoPaymentDiscount';
 
 interface ProductDetailClientProps {
   product: NormalizedProduct;
@@ -140,7 +140,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </div>
         </div>
         <p className="text-xs font-medium text-amber-800">
-          {dict.payment.cryptoDiscountPrice} {formatMoney(cryptoUnitPrice * quantity)} · {dict.payment.cryptoDiscountBadge}
+          {dict.payment.cryptoDiscountPrice} {formatMoney(cryptoUnitPrice * quantity)} · {applyCryptoDiscountCopy(dict.payment.cryptoDiscountBadge)}
         </p>
 
         {/* Variant / Flavor Selection (Interactive functional segmented control) */}

@@ -17,12 +17,10 @@ import {
   recordSpecialistTranslationAction,
 } from '@/actions/catalogue-specialist-review';
 
-const ROLES: RoleName[] = ['SUPER_ADMIN', 'CATALOG_MANAGER', 'COMPLIANCE_MANAGER', 'CONTENT_MANAGER', 'FINANCE_MANAGER'];
-
 export default function SpecialistReviewPage() {
   const params = useParams();
   const locale = (params.locale as string) || 'en';
-  const [role, setRole] = useState<RoleName>('SUPER_ADMIN');
+  const role: RoleName = 'SUPER_ADMIN';
   const actor = `${role.toLowerCase().replace('_', '.')}@fusionbars.eu`;
   const [queue, setQueue] = useState<any[]>([]);
   const [slug, setSlug] = useState<string | null>(null);
@@ -82,11 +80,7 @@ export default function SpecialistReviewPage() {
             </div>
           </div>
           <div className="flex gap-2 text-xs items-center">
-            <select value={role} onChange={(e) => setRole(e.target.value as RoleName)} className="bg-slate-900 border border-slate-700 rounded px-2 py-1">
-              {ROLES.map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
+            <span className="border border-slate-700 rounded px-2 py-1 text-amber-200">Super Admin</span>
             <Link href={`/${locale}/admin/catalogue/review-workspace/first-batch`} className="border border-slate-700 rounded px-2 py-1">
               Data adjudication record
             </Link>
@@ -110,6 +104,9 @@ export default function SpecialistReviewPage() {
           ) : (
             <>
               <div className="border border-amber-900/60 bg-amber-950/20 rounded p-3">{detail.banner}</div>
+              {detail.testRecordWarning && (
+                <div className="border border-rose-600 bg-rose-950/40 rounded p-3 font-semibold text-rose-100">{detail.testRecordWarning}</div>
+              )}
               <div className="border border-slate-800 rounded p-3 space-y-1">
                 <h2 className="font-semibold">Product identity · read only</h2>
                 <div>{detail.identity.name}</div>
@@ -130,7 +127,7 @@ export default function SpecialistReviewPage() {
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <button className="border border-slate-600 rounded px-2 py-1" onClick={() => run(recordSpecialistPricingAction({ productSlug: slug!, state: 'PRICE_DEFERRED', rationale, evidence, actor, actorRole: role }))}>PRICE_DEFERRED</button>
-                  <button className="border border-emerald-700 rounded px-2 py-1" onClick={() => run(recordSpecialistPricingAction({ productSlug: slug!, state: 'PRICE_APPROVED', approvedCurrency: currency, approvedPrice: Number(price), rationale, evidence, actor, actorRole: role }))}>PRICE_APPROVED</button>
+                  <button disabled={Boolean(detail.testRecordWarning)} className="border border-emerald-700 rounded px-2 py-1 disabled:opacity-40" onClick={() => run(recordSpecialistPricingAction({ productSlug: slug!, state: 'PRICE_APPROVED', approvedCurrency: currency, approvedPrice: Number(price), rationale, evidence, actor, actorRole: role }))}>PRICE_APPROVED</button>
                   <button className="border border-slate-600 rounded px-2 py-1" onClick={() => run(recordSpecialistPricingAction({ productSlug: slug!, state: 'PRICE_NOT_APPLICABLE', rationale: rationale || 'Not a commercial price', evidence: evidence || 'Reviewer decision', actor, actorRole: role }))}>PRICE_NOT_APPLICABLE</button>
                 </div>
               </div>

@@ -2,7 +2,8 @@
 
 import React, { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import { useParams, usePathname } from 'next/navigation';
+import { useParams, usePathname, useRouter } from 'next/navigation';
+import { logoutAdminAction } from '@/actions/admin-auth';
 import { Menu, X, Bell, ChevronLeft } from 'lucide-react';
 import { AdminAccess, AdminSection } from '@/domain/admin/AdminAccess';
 import { RoleName } from '@/types';
@@ -20,6 +21,7 @@ const GROUPS: Array<{ label: string; items: NavItem[] }> = [
     items: [
       { section: 'orders', label: 'Orders', href: '/admin/orders' },
       { section: 'payments', label: 'Payments', href: '/admin/payments' },
+      { section: 'pricing', label: 'Pricing', href: '/admin/pricing' },
       { section: 'customers', label: 'Customers', href: '/admin/customers' },
       { section: 'promotions', label: 'Promotions', href: '/admin/promotions' },
       { section: 'inventory', label: 'Inventory', href: '/admin/inventory' },
@@ -30,7 +32,9 @@ const GROUPS: Array<{ label: string; items: NavItem[] }> = [
     items: [
       { section: 'products', label: 'Products', href: '/admin/products' },
       { section: 'catalogue-review', label: 'Catalogue Review', href: '/admin/catalogue' },
+      { section: 'catalogue-review', label: 'Review Queue', href: '/admin/catalogue/review-queue' },
       { section: 'specialist-review', label: 'Specialist Review', href: '/admin/catalogue/review-workspace/specialist-review' },
+      { section: 'publication', label: 'Publication', href: '/admin/catalogue/publication' },
       { section: 'media-review', label: 'Media Review', href: '/admin/catalogue/media' },
       { section: 'translation-review', label: 'Translation Review', href: '/admin/catalogue/translations' },
     ],
@@ -64,6 +68,7 @@ const GROUPS: Array<{ label: string; items: NavItem[] }> = [
     label: 'System',
     items: [
       { section: 'settings', label: 'Settings', href: '/admin/system/settings' },
+      { section: 'commercial-settings', label: 'Commercial settings', href: '/admin/settings/commercial' },
       { section: 'roles', label: 'Roles & Permissions', href: '/admin/system/roles' },
       { section: 'launch', label: 'Launch Control', href: '/admin/system/launch' },
     ],
@@ -74,12 +79,16 @@ const TITLES: Array<{ test: (path: string) => boolean; title: string; descriptio
   { test: (path) => path.endsWith('/admin'), title: 'Operations dashboard', description: 'Live commerce, catalogue, and governance workload.' },
   { test: (path) => path.includes('/admin/orders'), title: 'Orders', description: 'Canonical order lifecycle and fulfilment.' },
   { test: (path) => path.includes('/admin/payments'), title: 'Payment verification', description: 'Bank transfer and crypto evidence awaiting a human decision.' },
+  { test: (path) => path.includes('/admin/pricing'), title: 'Commercial pricing', description: 'Approved selling prices stay separate from source prices. Missing prices stay unconfigured.' },
+  { test: (path) => path.includes('/admin/settings/commercial'), title: 'Commercial settings', description: 'Currency, tax, shipping, and promotion policy. Production stays paused.' },
   { test: (path) => path.includes('/admin/customers'), title: 'Customers', description: 'Directory of checkout contacts. Authentication secrets are not shown.' },
   { test: (path) => path.includes('/admin/promotions'), title: 'Promotions', description: 'Coupons and discount rules that sit on top of approved prices.' },
   { test: (path) => path.includes('/admin/inventory'), title: 'Inventory', description: 'Hub stock, reservations, and low-stock thresholds.' },
   { test: (path) => path.includes('/admin/products/'), title: 'Product administration', description: 'Source facts and human decisions, kept visually distinct.' },
   { test: (path) => path.includes('/admin/products'), title: 'Products', description: 'Catalogue identities available to authorised roles.' },
   { test: (path) => path.includes('/specialist-review'), title: 'Specialist review', description: 'Existing specialist workspace. Decisions are not made from the dashboard.' },
+  { test: (path) => path.includes('/admin/catalogue/publication'), title: 'Publication control', description: 'Readiness is not publication. A product goes live only after an authorised publish action.' },
+  { test: (path) => path.includes('/admin/catalogue/review-queue'), title: 'Catalogue review queue', description: 'Paginated human review. Priority is review order, not approval.' },
   { test: (path) => path.includes('/admin/catalogue/media'), title: 'Media review', description: 'Products whose media still needs a human check.' },
   { test: (path) => path.includes('/admin/catalogue/translations'), title: 'Translation review', description: 'Locale workflow still waiting for human text.' },
   { test: (path) => path.includes('/admin/catalogue'), title: 'Catalogue operations', description: 'Data, specialist, and publication state for the current review batch.' },
@@ -94,41 +103,34 @@ const TITLES: Array<{ test: (path: string) => boolean; title: string; descriptio
   { test: (path) => path.includes('/reports/catalogue'), title: 'Catalogue reports', description: 'Current specialist and publication counts.' },
   { test: (path) => path.includes('/reports/operations'), title: 'Operational reports', description: 'Launch, inventory, and fulfilment workload.' },
   { test: (path) => path.includes('/system/settings'), title: 'System settings', description: 'Store configuration status. Secret values are not rendered.' },
-  { test: (path) => path.includes('/system/roles'), title: 'Roles and permissions', description: 'What each role can see. Editing a role here does not grant access.' },
+  { test: (path) => path.includes('/system/roles'), title: 'Roles and permissions', description: 'Super Admin is the only admin account and can open every section.' },
   { test: (path) => path.includes('/system/launch'), title: 'Launch control', description: 'Production stays paused until every blocker is actually cleared.' },
 ];
 
-const AdminRoleContext = createContext<{ role: RoleName; setRole: (role: RoleName) => void }>({
-  role: 'SUPER_ADMIN',
-  setRole: () => undefined,
+const ADMIN_ROLE: RoleName = 'SUPER_ADMIN';
+
+const AdminRoleContext = createContext<{ role: RoleName }>({
+  role: ADMIN_ROLE,
 });
 
 export function useAdminRole() {
   return useContext(AdminRoleContext);
 }
 
-const ROLES: RoleName[] = ['SUPER_ADMIN', 'CATALOG_MANAGER', 'ORDER_MANAGER', 'FINANCE_MANAGER', 'CONTENT_MANAGER', 'COMPLIANCE_MANAGER', 'CUSTOMER'];
-
 export default function AdminShell({ children }: { children: React.ReactNode }) {
   const params = useParams<{ locale: string }>();
   const pathname = usePathname() || '';
+  const router = useRouter();
   const locale = params?.locale || 'en';
-  const [role, setRole] = useState<RoleName>('SUPER_ADMIN');
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [accountOpen, setAccountOpen] = useState(false);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem('fusion-admin-role') as RoleName | null;
-    if (stored && ROLES.includes(stored)) setRole(stored);
+    window.localStorage.removeItem('fusion-admin-role');
     setCollapsed(window.localStorage.getItem('fusion-admin-nav') === 'collapsed');
   }, []);
 
-  useEffect(() => {
-    window.localStorage.setItem('fusion-admin-role', role);
-  }, [role]);
-
-  const visible = useMemo(() => new Set(AdminAccess.sections(role)), [role]);
+  const visible = useMemo(() => new Set(AdminAccess.sections(ADMIN_ROLE)), []);
   const meta = TITLES.find((item) => item.test(pathname)) || TITLES[0];
   const crumbs = pathname.split('/').filter((part) => part && part !== locale);
 
@@ -164,7 +166,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
   );
 
   return (
-    <AdminRoleContext.Provider value={{ role, setRole }}>
+    <AdminRoleContext.Provider value={{ role: ADMIN_ROLE }}>
       <div className="min-h-screen bg-[#F4F3EF] text-[#121212] md:flex">
         <aside className={`hidden md:flex md:flex-col shrink-0 bg-[#171715] text-white ${collapsed ? 'w-16' : 'w-64'} min-h-screen p-3`}>
           <div className="flex items-center justify-between px-2 py-2 mb-4">
@@ -216,25 +218,18 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
               <Link href={`/${locale}/admin/notifications`} className="rounded-md border border-[#E5E3DD] p-2" aria-label="Notification center">
                 <Bell className="w-4 h-4" />
               </Link>
-              <div className="relative">
-                <button type="button" className="rounded-md border border-[#E5E3DD] px-3 py-2 text-xs font-semibold" onClick={() => setAccountOpen((open) => !open)}>
-                  {role}
-                </button>
-                {accountOpen && (
-                  <div className="absolute right-0 mt-2 w-56 rounded-xl border border-[#E5E3DD] bg-white p-3 shadow-lg">
-                    <label className="text-[11px] font-semibold text-[#5C5852]" htmlFor="admin-role">Acting role</label>
-                    <select
-                      id="admin-role"
-                      value={role}
-                      onChange={(event) => setRole(event.target.value as RoleName)}
-                      className="mt-1 w-full rounded-lg border border-[#E5E3DD] px-2 py-1.5 text-xs"
-                    >
-                      {ROLES.map((item) => <option key={item} value={item}>{item}</option>)}
-                    </select>
-                    <p className="mt-2 text-[11px] text-[#5C5852]">The server still rejects actions this role cannot perform.</p>
-                  </div>
-                )}
-              </div>
+              <span className="rounded-md border border-[#E5E3DD] px-3 py-2 text-xs font-semibold">Super Admin</span>
+              <button
+                type="button"
+                className="rounded-md border border-[#E5E3DD] px-3 py-2 text-xs font-semibold"
+                onClick={async () => {
+                  await logoutAdminAction();
+                  router.replace(`/${locale}/admin/login`);
+                  router.refresh();
+                }}
+              >
+                Sign out
+              </button>
             </div>
           </header>
           <div className="p-4 sm:p-6">{children}</div>

@@ -5,6 +5,8 @@
 
 import { CurrencyCode, FulfilmentHubCode, MinorUnits, ShippingMethodOption } from '@/types';
 import { MoneyEngine } from '@/lib/money';
+import { AdminOverrides } from '@/domain/admin/AdminOverrides';
+import { CommercialConfigurationService } from '@/domain/commercial/CommercialConfigurationService';
 
 export interface ShippingCalculationRequest {
   subtotal: MinorUnits;
@@ -63,7 +65,19 @@ export class ShippingService {
    */
   static calculateShipping(request: ShippingCalculationRequest): ShippingCalculationResponse {
     const currency = request.currency;
-    const rates = this.RATES[currency] || this.RATES.EUR;
+    const policy = CommercialConfigurationService.get();
+    if (policy.shipping.thresholdBasis === 'CANONICAL_EUR' && currency !== 'EUR' && policy.currency.pricingMode !== 'FX_DERIVED') {
+      throw new Error('CONFIGURATION_REQUIRED: the free-shipping threshold is canonical EUR and no FX strategy is configured.');
+    }
+    const baseRates = CommercialConfigurationService.shippingRates(currency);
+    const saved = currency === 'EUR' && AdminOverrides.settingsSaved() ? AdminOverrides.settings() : null;
+    const rates = saved
+      ? {
+          STANDARD: saved.standardShippingCents,
+          EXPRESS: saved.expressShippingCents,
+          FREE_THRESHOLD: saved.freeShippingThresholdCents,
+        }
+      : baseRates;
     const threshold = rates.FREE_THRESHOLD;
 
     const qualifiesForFreeShipping = request.subtotal >= threshold;

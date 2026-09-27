@@ -7,7 +7,7 @@ import { Heart, ShoppingBag, Check } from 'lucide-react';
 import { NormalizedProduct, NormalizedVariant } from '../../scripts/consolidate-catalogue';
 import { useCommerce } from '../context/CommerceContext';
 import { getDictionary } from '../i18n';
-import { calculateCryptoPaymentDiscount } from '../domain/payments/CryptoPaymentDiscount';
+import { applyCryptoDiscountCopy, calculateCryptoPaymentDiscount } from '../domain/payments/CryptoPaymentDiscount';
 
 interface ProductCardProps {
   product: NormalizedProduct;
@@ -152,7 +152,7 @@ export default function ProductCard({ product }: ProductCardProps) {
               )}
             </div>
             <p className="text-[11px] font-medium text-amber-800 mt-0.5">
-              {dict.payment.cryptoDiscountPrice} {formatMoney(cryptoUnitPrice)}
+              {applyCryptoDiscountCopy(dict.payment.cryptoDiscountPrice)} {formatMoney(cryptoUnitPrice)}
             </p>
           </div>
 

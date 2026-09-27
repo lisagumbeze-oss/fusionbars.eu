@@ -7,6 +7,7 @@ import {
   getAdminAuditAction,
   getAdminCustomersAction,
   getAdminDashboardAction,
+  getCatalogueRolloutAction,
   getAdminPaymentsAction,
   getAdminProductListAction,
   getAdminPromotionsAction,
@@ -16,14 +17,15 @@ import {
   markAdminNotificationReadAction,
   markAllAdminNotificationsReadAction,
   previewEmailTemplateAction,
+  saveAdminCustomerAction,
+  saveAdminSettingsAction,
 } from '@/actions/admin-center';
+import { createCouponAction, setCouponActiveAction } from '@/actions/coupons';
 import { updateOrderStatusAdminAction } from '@/actions/orders';
 import { verifyPaymentStatusAction } from '@/actions/payments';
 import { sendTestEmailAction } from '@/actions/launch';
 import { AdminAccess } from '@/domain/admin/AdminAccess';
 import { useAdminRole } from '@/components/admin/AdminShell';
-import { RoleName } from '@/types';
-
 type ModuleId =
   | 'payments'
   | 'customers'
@@ -94,6 +96,10 @@ export default function AdminModule({ module }: { module: ModuleId }) {
       else if (module === 'settings') result = await getAdminSettingsAction(role);
       else if (['catalogue', 'media', 'translations', 'compliance', 'countries', 'content', 'sales', 'catalogue-report', 'operations'].includes(module)) {
         result = await getAdminDashboardAction(role, locale);
+        if ((module === 'catalogue' || module === 'catalogue-report') && result?.success !== false) {
+          const rollout = await getCatalogueRolloutAction(role);
+          if (rollout.success) result = { ...result, rollout };
+        }
       } else if (module === 'roles') {
         result = { success: true };
       }
@@ -133,46 +139,67 @@ export default function AdminModule({ module }: { module: ModuleId }) {
   if (error) return <StateMessage message={error} onRetry={load} />;
 
   if (module === 'roles') {
-    const roles: RoleName[] = ['SUPER_ADMIN', 'CATALOG_MANAGER', 'ORDER_MANAGER', 'FINANCE_MANAGER', 'CONTENT_MANAGER', 'COMPLIANCE_MANAGER', 'CUSTOMER'];
     return (
-      <Panel title="Visible sections">
-        <p className="text-xs text-[#5C5852] mb-4">This matrix describes navigation. It does not grant a permission the server withholds.</p>
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
-            <thead><tr className="text-[#5C5852]"><th className="py-2 pr-4">Role</th><th className="py-2">Sections</th></tr></thead>
-            <tbody>
-              {roles.map((item) => (
-                <tr key={item} className="border-t border-[#E5E3DD]">
-                  <td className="py-2 pr-4 font-semibold whitespace-nowrap">{item}</td>
-                  <td className="py-2">{AdminAccess.sections(item).join(', ') || 'No admin sections'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+      <Panel title="Super Admin">
+        <p className="text-xs text-[#5C5852] mb-4">There is one admin account. Super Admin can open every section.</p>
+        <p className="text-sm">{AdminAccess.sections('SUPER_ADMIN').join(', ')}</p>
       </Panel>
     );
   }
 
   if (module === 'settings' && payload?.settings) {
     const settings = payload.settings;
+    const field = 'w-full rounded-lg border border-[#E5E3DD] px-3 py-2 text-sm';
     return (
-      <div className="grid lg:grid-cols-2 gap-4">
+      <form
+        className="grid lg:grid-cols-2 gap-4"
+        onSubmit={async (event) => {
+          event.preventDefault();
+          const data = new FormData(event.currentTarget);
+          const result = await saveAdminSettingsAction(role, {
+            storeName: String(data.get('storeName') || ''),
+            supportEmail: String(data.get('supportEmail') || ''),
+            standardShippingEuros: Number(data.get('standardShipping')),
+            expressShippingEuros: Number(data.get('expressShipping')),
+            freeShippingEuros: Number(data.get('freeShipping')),
+            cryptoDiscountPercent: Number(data.get('cryptoDiscount')),
+          });
+          if (!result.success) setNotice(result.error);
+          else {
+            setNotice('Store settings saved. Checkout shipping and the cryptocurrency discount use these values.');
+            router.refresh();
+            load();
+          }
+        }}
+      >
         <Panel title="Store">
-          <dl className="text-sm space-y-2">
-            <div><dt className="text-[#5C5852]">Display name</dt><dd>{settings.storeName}</dd></div>
-            <div><dt className="text-[#5C5852]">Support email</dt><dd>{settings.supportEmail}</dd></div>
-            <div><dt className="text-[#5C5852]">Currencies</dt><dd>{settings.currencies.join(', ')}</dd></div>
-            <div><dt className="text-[#5C5852]">Languages</dt><dd>{settings.languages.join(', ')}</dd></div>
-          </dl>
+          <div className="space-y-3 text-sm">
+            <label className="block">Display name
+              <input name="storeName" defaultValue={settings.storeName} className={`${field} mt-1`} required minLength={2} maxLength={80} />
+            </label>
+            <label className="block">Support email
+              <input name="supportEmail" type="email" defaultValue={settings.supportEmail} className={`${field} mt-1`} required />
+            </label>
+            <p className="text-[#5C5852]">Currencies: {settings.currencies.join(', ')}</p>
+            <p className="text-[#5C5852]">Languages: {settings.languages.join(', ')}</p>
+          </div>
         </Panel>
-        <Panel title="Shipping">
-          <dl className="text-sm space-y-2">
-            <div><dt className="text-[#5C5852]">Standard</dt><dd>€{(settings.shipping.standardCents / 100).toFixed(2)}</dd></div>
-            <div><dt className="text-[#5C5852]">Express</dt><dd>€{(settings.shipping.expressCents / 100).toFixed(2)}</dd></div>
-            <div><dt className="text-[#5C5852]">Free-shipping threshold</dt><dd>€{(settings.shipping.freeThresholdCents / 100).toFixed(2)}</dd></div>
-            <div><dt className="text-[#5C5852]">Fulfilment hubs</dt><dd>{settings.shipping.hubs.join(', ')}</dd></div>
-          </dl>
+        <Panel title="Shipping and cryptocurrency discount">
+          <div className="space-y-3 text-sm">
+            <label className="block">Standard shipping (€)
+              <input name="standardShipping" type="number" min="0" max="10000" step="0.01" defaultValue={(settings.shipping.standardCents / 100).toFixed(2)} className={`${field} mt-1`} required />
+            </label>
+            <label className="block">Express shipping (€)
+              <input name="expressShipping" type="number" min="0" max="10000" step="0.01" defaultValue={(settings.shipping.expressCents / 100).toFixed(2)} className={`${field} mt-1`} required />
+            </label>
+            <label className="block">Free-shipping threshold (€)
+              <input name="freeShipping" type="number" min="0" max="10000" step="0.01" defaultValue={(settings.shipping.freeThresholdCents / 100).toFixed(2)} className={`${field} mt-1`} required />
+            </label>
+            <label className="block">Cryptocurrency merchandise discount (%)
+              <input name="cryptoDiscount" type="number" min="0" max="50" step="1" defaultValue={settings.cryptoDiscountPercent} className={`${field} mt-1`} required />
+            </label>
+            <p className="text-[#5C5852]">Fulfilment hubs: {settings.shipping.hubs.join(', ')}</p>
+          </div>
         </Panel>
         <Panel title="Payments">
           <p className="text-sm">Bank transfer configuration: {settings.payments.bankConfigured ? 'Configured' : 'Not configured'}</p>
@@ -191,7 +218,11 @@ export default function AdminModule({ module }: { module: ModuleId }) {
           <p className="text-sm">Rate limit: {settings.security.distributedRateLimit ? 'Distributed' : 'Local'}</p>
           <p className="text-sm mt-2">Production: {payload.productionState}</p>
         </Panel>
-      </div>
+        <div className="lg:col-span-2 flex flex-wrap items-center gap-3">
+          <button type="submit" className="rounded-lg bg-[#4A5D4E] text-white px-4 py-2 text-sm font-semibold">Save store settings</button>
+          {notice && <p className="text-sm">{notice}</p>}
+        </div>
+      </form>
     );
   }
 
@@ -393,20 +424,57 @@ export default function AdminModule({ module }: { module: ModuleId }) {
               <thead><tr className="text-[#5C5852]"><th className="py-2">Customer</th><th>Email</th><th>Country</th><th>Account</th><th>Orders</th><th>Last order</th><th>Registered</th></tr></thead>
               <tbody>
                 {rows.map((row: any) => (
-                  <tr key={row.email} className="border-t border-[#E5E3DD]">
-                    <td className="py-2">{row.name || '—'}</td>
-                    <td>{row.email}</td>
-                    <td>{row.country}</td>
-                    <td>{row.accountStatus}</td>
-                    <td>{row.orderCount}</td>
-                    <td>{row.lastOrder}</td>
-                    <td>{row.registeredAt || '—'}</td>
-                  </tr>
+                  <React.Fragment key={row.email}>
+                    <tr className="border-t border-[#E5E3DD]">
+                      <td className="py-2">{row.name || '—'}</td>
+                      <td>{row.email}</td>
+                      <td>{row.country}</td>
+                      <td>{row.accountStatus}</td>
+                      <td>{row.orderCount}</td>
+                      <td>{row.lastOrder}</td>
+                      <td>{row.registeredAt || '—'}</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={7} className="pb-3">
+                        {payload?.canEdit ? (
+                          <form
+                            className="grid sm:grid-cols-[1fr_1fr_1.4fr_auto] gap-2"
+                            onSubmit={async (event) => {
+                              event.preventDefault();
+                              const data = new FormData(event.currentTarget);
+                              const result = await saveAdminCustomerAction(role, row.email, {
+                                name: String(data.get('name') || ''),
+                                phone: String(data.get('phone') || ''),
+                                note: String(data.get('note') || ''),
+                              });
+                              if (!result.success) {
+                                setNotice('error' in result ? result.error : 'Customer could not be saved.');
+                                return;
+                              }
+                              setNotice(`Saved ${row.email}.`);
+                              if (result.success) {
+                                router.refresh();
+                                load();
+                              }
+                            }}
+                          >
+                            <input name="name" defaultValue={row.name || ''} aria-label="Customer name" placeholder="Name" className="rounded-lg border border-[#E5E3DD] px-2 py-1.5" />
+                            <input name="phone" defaultValue={row.phone || ''} aria-label="Telephone" placeholder="Telephone" className="rounded-lg border border-[#E5E3DD] px-2 py-1.5" />
+                            <input name="note" defaultValue={row.note || ''} aria-label="Directory note" placeholder="Directory note" className="rounded-lg border border-[#E5E3DD] px-2 py-1.5" />
+                            <button type="submit" className="rounded-lg bg-[#4A5D4E] text-white px-3 py-1.5">Save</button>
+                          </form>
+                        ) : (
+                          <p className="text-[#5C5852]">{[row.phone, row.note].filter(Boolean).join(' · ') || 'Directory note is empty.'}</p>
+                        )}
+                      </td>
+                    </tr>
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
           </div>
         )}
+        {notice && <p className="mt-3 text-sm">{notice}</p>}
       </Panel>
     );
   }
@@ -415,15 +483,72 @@ export default function AdminModule({ module }: { module: ModuleId }) {
     const coupons = payload?.coupons || [];
     return (
       <div className="space-y-4">
-        <Panel title="Pricing boundary">
-          <p className="text-sm">Promotions apply at checkout as an order discount. They do not approve, convert, or replace a product price.</p>
-          <Link href={`/${locale}/admin/orders`} className="mt-3 inline-block text-sm underline">Open coupon tools in commerce operations</Link>
+        <Panel title="Create a coupon">
+          <p className="text-sm mb-3">Promotions apply at checkout as an order discount. They do not replace a product price.</p>
+          <form
+            className="grid sm:grid-cols-2 gap-3 text-sm"
+            onSubmit={async (event) => {
+              event.preventDefault();
+              const data = new FormData(event.currentTarget);
+              const result = await createCouponAction({
+                code: String(data.get('code') || ''),
+                discount: Number(data.get('discount')),
+                isPercent: data.get('kind') === 'percent',
+                minSpendEUR: Math.round(Number(data.get('minSpend') || 0) * 100),
+              }, role);
+              if (!result.success) setNotice(result.error || 'Coupon could not be created.');
+              else {
+                setNotice(result.message || 'Coupon activated.');
+                event.currentTarget.reset();
+                router.refresh();
+                load();
+              }
+            }}
+          >
+            <label>Code
+              <input name="code" required minLength={3} className="mt-1 w-full rounded-lg border border-[#E5E3DD] px-3 py-2 uppercase" />
+            </label>
+            <label>Discount
+              <input name="discount" type="number" required min={1} defaultValue={10} className="mt-1 w-full rounded-lg border border-[#E5E3DD] px-3 py-2" />
+            </label>
+            <label>Kind
+              <select name="kind" defaultValue="percent" className="mt-1 w-full rounded-lg border border-[#E5E3DD] px-3 py-2">
+                <option value="percent">Percent</option>
+                <option value="fixed">Fixed cents</option>
+              </select>
+            </label>
+            <label>Minimum spend (€)
+              <input name="minSpend" type="number" min={0} step="0.01" defaultValue={0} className="mt-1 w-full rounded-lg border border-[#E5E3DD] px-3 py-2" />
+            </label>
+            <button type="submit" className="sm:col-span-2 w-fit rounded-lg bg-[#4A5D4E] text-white px-4 py-2 font-semibold">Activate coupon</button>
+          </form>
+          {notice && <p className="mt-3 text-sm">{notice}</p>}
         </Panel>
         <Panel title="Recorded coupons">
           {coupons.length === 0 ? <p className="text-sm text-[#5C5852]">No coupons are stored in the current operations ledger.</p> : (
             <ul className="text-sm space-y-2">
               {coupons.map((coupon: any) => (
-                <li key={coupon.code} className="border-t border-[#E5E3DD] pt-2">{coupon.code} · {coupon.isPercent ? `${coupon.discount}%` : coupon.discount} · {coupon.active ? 'Active' : 'Inactive'} · used {coupon.usedCount}{coupon.maxUses ? ` / ${coupon.maxUses}` : ''} · {coupon.expiresAt || 'No expiry recorded'}</li>
+                <li key={coupon.code} className="border-t border-[#E5E3DD] pt-2 flex flex-wrap items-center justify-between gap-2">
+                  <span>{coupon.code} · {coupon.isPercent ? `${coupon.discount}%` : coupon.discount} · {coupon.active ? 'Active' : 'Inactive'} · used {coupon.usedCount}{coupon.maxUses ? ` / ${coupon.maxUses}` : ''} · {coupon.expiresAt || 'No expiry recorded'}</span>
+                  <button
+                    type="button"
+                    className="rounded-lg border border-[#E5E3DD] px-3 py-1 text-xs font-semibold"
+                    onClick={async () => {
+                      const result = await setCouponActiveAction(coupon.code, !coupon.active, role);
+                      if (!result.success) {
+                        setNotice('error' in result ? result.error : 'Coupon could not be updated.');
+                        return;
+                      }
+                      setNotice(`${coupon.code} is now ${coupon.active ? 'inactive' : 'active'}.`);
+                      if (result.success) {
+                        router.refresh();
+                        load();
+                      }
+                    }}
+                  >
+                    {coupon.active ? 'Deactivate' : 'Activate'}
+                  </button>
+                </li>
               ))}
             </ul>
           )}
@@ -510,25 +635,45 @@ export default function AdminModule({ module }: { module: ModuleId }) {
     if (!catalogue?.available) return <StateMessage message={catalogue?.error || 'Catalogue operations are unavailable.'} onRetry={load} />;
     return (
       <div className="space-y-4">
-        <Panel title="Data review">
+        <Panel title="Pilot data review">
           <div className="grid grid-cols-3 gap-3 text-sm">
             <Link href={`/${locale}/admin/catalogue/review-workspace/first-batch`}>Pending {catalogue.dataPending}</Link>
             <Link href={`/${locale}/admin/catalogue/review-workspace/first-batch`}>Adjudicated {catalogue.dataAdjudicated}</Link>
             <Link href={`/${locale}/admin/catalogue/review-workspace/first-batch`}>Deferred {catalogue.dataDeferred}</Link>
           </div>
         </Panel>
-        <Panel title="Specialist review">
+        <Panel title="Pilot specialist review">
           <div className="grid sm:grid-cols-2 gap-2 text-sm">
-            <Link href={specialistHref}>Pricing pending {catalogue.pricingPending}</Link>
-            <Link href={`${specialistHref}`}>Compliance pending {catalogue.compliancePending}</Link>
+            <Link href={specialistHref}>Pricing pending {catalogue.pricingPending} · deferred {catalogue.pricingDeferred}</Link>
+            <Link href={`${specialistHref}`}>Compliance pending {catalogue.compliancePending} · deferred {catalogue.complianceDeferred}</Link>
             <Link href={`/${locale}/admin/compliance/countries`}>Country not configured {catalogue.countryPending}</Link>
-            <Link href={`/${locale}/admin/content`}>Content internal-only {catalogue.contentInternal}</Link>
+            <Link href={`/${locale}/admin/content`}>Content internal-only {catalogue.contentInternal} · deferred {catalogue.contentDeferred}</Link>
             <Link href={`/${locale}/admin/catalogue/media`}>Media verified {catalogue.mediaVerified} · review {catalogue.mediaReview}</Link>
             <Link href={`/${locale}/admin/catalogue/translations`}>Translations pending {catalogue.translationPending}</Link>
           </div>
           <p className="mt-3 text-sm font-semibold">{catalogue.specialistPending} products in specialist review</p>
         </Panel>
-        <Panel title="Publication">
+        {payload?.rollout?.snapshot && (
+          <Panel title="Full catalogue">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
+              <Link href={`/${locale}/admin/catalogue/review-queue`}>Imported {payload.rollout.snapshot.totalImported}</Link>
+              <Link href={`/${locale}/admin/catalogue/review-queue?queue=pilot`}>Pilot {payload.rollout.snapshot.pilotProducts}</Link>
+              <Link href={`/${locale}/admin/catalogue/review-queue`}>Unbatched {payload.rollout.snapshot.remainingUnreviewed}</Link>
+              <Link href={`/${locale}/admin/catalogue/review-queue?queue=deferred`}>Deferred {payload.rollout.snapshot.dataDeferred}</Link>
+              <Link href={`/${locale}/admin/catalogue/review-queue?blocker=PRICING`}>Pricing blocked {payload.rollout.snapshot.blockersByGate.PRICING || 0}</Link>
+              <Link href={`/${locale}/admin/catalogue/review-queue?blocker=COMPLIANCE`}>Compliance blocked {payload.rollout.snapshot.blockersByGate.COMPLIANCE || 0}</Link>
+              <Link href={`/${locale}/admin/catalogue/review-queue?blocker=COUNTRY`}>Country blocked {payload.rollout.snapshot.blockersByGate.COUNTRY || 0}</Link>
+              <Link href={`/${locale}/admin/catalogue/review-queue?doNotPublish=1`}>Do not publish {payload.rollout.snapshot.doNotPublish}</Link>
+            </div>
+            <ul className="mt-3 text-sm space-y-1">
+              {payload.rollout.batches.map((batch: any) => (
+                <li key={batch.id}>{batch.id} · {batch.name} · {batch.size} products · deferred {batch.deferred} · published {batch.published}</li>
+              ))}
+            </ul>
+            <p className="mt-2 text-xs text-[#5C5852]">Production {payload.rollout.production}. Open import issues {payload.rollout.snapshot.importIssuesOpen}. These counts are calculated from catalogue state. This screen does not approve products.</p>
+          </Panel>
+        )}
+        <Panel title="Pilot publication">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-sm">
             <span>Not ready {catalogue.publicationNotReady}</span>
             <span>Ready {catalogue.publicationReady}</span>

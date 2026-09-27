@@ -39,15 +39,14 @@ export async function submitContactInquiryAction(rawInput: unknown) {
       locale: validated.locale,
     });
 
-    if (!result.customer.success) {
-      return { success: false, error: result.customer.error || 'Failed to send confirmation email.' };
+    if (!result.customer.success || !result.ops.success) {
+      return {
+        success: false,
+        error: 'The message could not be delivered. Please try again, or email sales@fusionbars.eu directly.',
+      };
     }
 
-    if (!result.ops.success) {
-      console.error('[Contact] Ops alert email failed:', result.ops.error);
-    }
-
-    return { success: true, message: 'Inquiry received. We will respond within 24 business hours.' };
+    return { success: true, message: 'Inquiry received. A confirmation was sent to you and to the support desk.' };
   } catch (error: any) {
     return { success: false, error: error.message || 'Contact submission failed.' };
   }
@@ -71,12 +70,15 @@ export async function subscribeNewsletterAction(rawInput: unknown) {
       granted: true,
     });
 
-    const result = await EmailService.sendNewsletterConfirmation(email);
-    if (!result.success) {
-      return { success: false, error: result.error || 'Failed to send subscription confirmation.' };
+    const result = await EmailService.sendNewsletterConfirmation(email, validated.locale);
+    if (!result.subscriber.success || !result.ops.success) {
+      return {
+        success: false,
+        error: 'The subscription could not be delivered. Please try again, or email sales@fusionbars.eu directly.',
+      };
     }
 
-    return { success: true, message: 'Subscription confirmed.' };
+    return { success: true, message: 'Subscription confirmed. A confirmation was sent to you and to the support desk.' };
   } catch (error: any) {
     return { success: false, error: error.message || 'Newsletter subscription failed.' };
   }

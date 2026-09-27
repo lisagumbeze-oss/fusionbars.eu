@@ -10,6 +10,7 @@ export type AdminSection =
   | 'inventory'
   | 'products'
   | 'catalogue-review'
+  | 'publication'
   | 'specialist-review'
   | 'media-review'
   | 'translation-review'
@@ -24,33 +25,35 @@ export type AdminSection =
   | 'catalogue-reports'
   | 'ops-reports'
   | 'settings'
+  | 'pricing'
+  | 'commercial-settings'
   | 'roles'
   | 'launch';
 
 const ALL: AdminSection[] = [
   'dashboard', 'orders', 'payments', 'customers', 'promotions', 'inventory',
-  'products', 'catalogue-review', 'specialist-review', 'media-review', 'translation-review',
+  'products', 'catalogue-review', 'publication', 'specialist-review', 'media-review', 'translation-review',
   'compliance', 'countries', 'content-review', 'audit',
   'notifications', 'email-templates', 'email-delivery',
   'sales-reports', 'catalogue-reports', 'ops-reports',
-  'settings', 'roles', 'launch',
+  'settings', 'pricing', 'commercial-settings', 'roles', 'launch',
 ];
 
 const ROLE_SECTIONS: Record<RoleName, AdminSection[] | '*'> = {
   SUPER_ADMIN: '*',
   SYSTEM: '*',
   ORDER_MANAGER: ['dashboard', 'orders', 'customers', 'inventory', 'notifications', 'ops-reports'],
-  FINANCE_MANAGER: ['dashboard', 'orders', 'payments', 'customers', 'notifications', 'sales-reports', 'email-delivery'],
+  FINANCE_MANAGER: ['dashboard', 'orders', 'payments', 'customers', 'notifications', 'sales-reports', 'email-delivery', 'pricing', 'commercial-settings'],
   CATALOG_MANAGER: [
-    'dashboard', 'products', 'catalogue-review', 'specialist-review', 'media-review',
-    'inventory', 'notifications', 'catalogue-reports', 'audit',
+    'dashboard', 'products', 'catalogue-review', 'publication', 'specialist-review', 'media-review',
+    'inventory', 'notifications', 'catalogue-reports', 'audit', 'pricing', 'commercial-settings',
   ],
   CONTENT_MANAGER: [
-    'dashboard', 'products', 'content-review', 'translation-review', 'specialist-review',
+    'dashboard', 'products', 'content-review', 'translation-review', 'specialist-review', 'publication',
     'email-templates', 'notifications', 'catalogue-reports',
   ],
   COMPLIANCE_MANAGER: [
-    'dashboard', 'compliance', 'countries', 'specialist-review', 'audit', 'notifications', 'catalogue-reports',
+    'dashboard', 'compliance', 'countries', 'specialist-review', 'publication', 'audit', 'notifications', 'catalogue-reports',
   ],
   CUSTOMER: [],
 };

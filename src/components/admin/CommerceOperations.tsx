@@ -44,8 +44,7 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
   const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<'orders' | 'inventory' | 'coupons' | 'reporting' | 'catalog' | 'restrictions'>(initialTab);
 
-  // Admin Actor Role — shared with the admin shell
-  const [currentRole, setCurrentRole] = useState<RoleName>('SUPER_ADMIN');
+  const currentRole: RoleName = 'SUPER_ADMIN';
 
   // Orders State
   const [orders, setOrders] = useState<any[]>([]);
@@ -95,8 +94,6 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
   const [selectedProduct, setSelectedProduct] = useState<NormalizedProduct | null>(null);
 
   useEffect(() => {
-    const stored = window.localStorage.getItem('fusion-admin-role');
-    if (stored) setCurrentRole(stored as RoleName);
     const status = searchParams.get('status');
     if (status) setOrderStatusFilter(status);
     const q = searchParams.get('q');
@@ -104,10 +101,6 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
     const hub = searchParams.get('hub');
     if (hub) setHubOrderFilter(hub);
   }, [searchParams]);
-
-  useEffect(() => {
-    window.localStorage.setItem('fusion-admin-role', currentRole);
-  }, [currentRole]);
 
   useEffect(() => {
     loadOrders();
@@ -333,20 +326,6 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
             </div>
           </div>
 
-          {/* RBAC Role Selector */}
-          <div className="bg-white p-2.5 rounded-xl border border-[#E5E3DD] text-xs flex items-center gap-2 shadow-xs">
-            <span className="text-[#5C5852] font-semibold">Active Role:</span>
-            <select
-              value={currentRole}
-              onChange={(e) => setCurrentRole(e.target.value as any)}
-              className="font-bold text-[#121212] bg-[#FAF9F5] px-2.5 py-1 rounded border border-[#E5E3DD] focus:outline-none"
-            >
-              <option value="SUPER_ADMIN">SUPER_ADMIN (Full Governance)</option>
-              <option value="FINANCE_MANAGER">FINANCE_MANAGER (Payment Audit)</option>
-              <option value="ORDER_MANAGER">ORDER_MANAGER (Hub &amp; Dispatch)</option>
-              <option value="CATALOG_MANAGER">CATALOG_MANAGER (Catalogue &amp; Stock)</option>
-            </select>
-          </div>
         </div>
 
         {/* Tab Bar */}

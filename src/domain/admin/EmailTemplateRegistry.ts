@@ -32,7 +32,7 @@ const ORDER = {
 };
 
 const TEMPLATES: EmailTemplateSummary[] = [
-  { id: 'sepa-order-confirmation', name: 'SEPA / IBAN order confirmation', purpose: 'Give the customer bank-transfer instructions after checkout.', trigger: 'Order placed with bank transfer', recipient: 'Customer', audience: 'CUSTOMER', variables: ['customerName', 'orderNumber', 'totalAmount', 'currency', 'items', 'iban', 'bic', 'bankName', 'accountHolder'], active: true, lastUpdated: UPDATED },
+  { id: 'sepa-order-confirmation', name: 'SEPA / IBAN order confirmation', purpose: 'Confirm a bank-transfer order and ask the customer to contact admin for payment details.', trigger: 'Order placed with bank transfer', recipient: 'Customer', audience: 'CUSTOMER', variables: ['customerName', 'orderNumber', 'totalAmount', 'currency', 'items', 'supportEmail'], active: true, lastUpdated: UPDATED },
   { id: 'crypto-order-confirmation', name: 'Crypto order confirmation', purpose: 'Give the customer cryptocurrency payment instructions after checkout.', trigger: 'Order placed with cryptocurrency', recipient: 'Customer', audience: 'CUSTOMER', variables: ['customerName', 'orderNumber', 'totalAmount', 'currency', 'cryptoName', 'network', 'receivingAddress'], active: true, lastUpdated: UPDATED },
   { id: 'payment-proof-submitted', name: 'Payment proof submitted', purpose: 'Acknowledge that payment evidence was received.', trigger: 'Customer submits payment proof', recipient: 'Customer', audience: 'CUSTOMER', variables: ['customerName', 'orderNumber', 'referenceOrTxid'], active: true, lastUpdated: UPDATED },
   { id: 'payment-verified', name: 'Payment verified', purpose: 'Tell the customer finance verified the payment.', trigger: 'Finance verifies a payment', recipient: 'Customer', audience: 'CUSTOMER', variables: ['customerName', 'orderNumber'], active: true, lastUpdated: UPDATED },
@@ -45,7 +45,7 @@ const TEMPLATES: EmailTemplateSummary[] = [
   { id: 'customer-welcome', name: 'Customer welcome', purpose: 'Welcome a newly registered customer.', trigger: 'Account registration', recipient: 'Customer', audience: 'CUSTOMER', variables: ['customerName', 'accountUrl'], active: true, lastUpdated: UPDATED },
   { id: 'password-reset', name: 'Password reset', purpose: 'Send a password reset link.', trigger: 'Customer requests a password reset', recipient: 'Customer', audience: 'CUSTOMER', variables: ['customerName', 'resetUrl'], active: true, lastUpdated: UPDATED },
   { id: 'email-verification', name: 'Email verification', purpose: 'Ask the customer to verify an email address.', trigger: 'Account email verification', recipient: 'Customer', audience: 'CUSTOMER', variables: ['customerName', 'verifyUrl'], active: true, lastUpdated: UPDATED },
-  { id: 'admin-operational-alert', name: 'Admin operational alert', purpose: 'Notify staff that a new order needs attention.', trigger: 'New order created', recipient: 'Operations', audience: 'ADMIN', variables: ['customerName', 'orderNumber', 'totalAmount', 'currency', 'paymentMethodName'], active: true, lastUpdated: UPDATED },
+  { id: 'admin-operational-alert', name: 'Admin operational alert', purpose: 'Notify staff of a new order with the checkout details the customer entered.', trigger: 'New order created', recipient: 'Operations', audience: 'ADMIN', variables: ['firstName', 'lastName', 'email', 'phone', 'streetAddress', 'houseNumber', 'postalCode', 'city', 'country', 'shippingMethod', 'paymentMethodName', 'orderNumber', 'totalAmount', 'items'], active: true, lastUpdated: UPDATED },
 ];
 
 function render(id: string): { subject: string; text: string; html: string } {
@@ -88,7 +88,20 @@ function render(id: string): { subject: string; text: string; html: string } {
     case 'email-verification':
       return EmailTemplates.renderEmailVerificationEmail({ customerName: ORDER.customerName, verifyUrl: 'https://fusionbars.eu/en/account/verify/preview', supportEmail: ORDER.supportEmail });
     case 'admin-operational-alert':
-      return EmailTemplates.renderAdminOrderAlert({ ...ORDER, paymentMethodName: 'Bank transfer' });
+      return EmailTemplates.renderAdminOrderAlert({
+        ...ORDER,
+        firstName: 'Klaus',
+        lastName: 'Weber',
+        paymentMethodName: 'Bank Transfer (SEPA / IBAN)',
+        email: 'klaus.weber@example.com',
+        phone: '+49 151 2345678',
+        streetAddress: 'Friedrichstraße',
+        houseNumber: '42B',
+        postalCode: '10117',
+        city: 'Berlin',
+        country: 'Germany (DE)',
+        shippingMethod: 'Standard Discreet Courier',
+      });
     default:
       throw new Error('Unknown email template');
   }

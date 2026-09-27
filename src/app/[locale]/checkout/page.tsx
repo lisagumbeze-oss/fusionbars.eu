@@ -21,6 +21,7 @@ import { submitPaymentProofAction } from '@/actions/payments';
 import { CountryRegistry } from '@/domain/countries/CountryRegistry';
 import { ShippingService } from '@/domain/shipping/ShippingService';
 import {
+  applyCryptoDiscountCopy,
   calculateCryptoPaymentDiscount,
   isBankTransferAvailable,
   isCryptocurrencyPayment,
@@ -307,52 +308,18 @@ export default function CheckoutPage() {
           </div>
           {isCryptocurrencyPayment(paymentMethodCode) && (
             <p className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-              {dict.payment.cryptoDiscountBody}
+              {applyCryptoDiscountCopy(dict.payment.cryptoDiscountBody)}
             </p>
           )}
 
           {paymentMethodCode === 'SEPA_IBAN' ? (
-            <div className="space-y-4 text-xs">
-              <p className="text-[#5C5852]">
-                Please initiate a transfer from your banking portal. <strong>You must include the Reference Number</strong> below in your transfer memo for automatic matching.
+            <div className="space-y-3 text-sm">
+              <p className="text-[#121212]">
+                Contact the admin for SEPA / IBAN payment details. Quote order <strong className="font-mono">{orderConfirmed.orderNumber}</strong> when you write.
               </p>
-
-              <div className="bg-[#FBFBF9] p-4 rounded-xl border border-[#E5E3DD] space-y-2.5 font-mono text-xs">
-                <div className="flex justify-between items-center py-1 border-b border-[#E5E3DD]/60">
-                  <span className="text-[#5C5852] font-sans">Beneficiary:</span>
-                  <span className="text-[#121212] font-semibold">{inst.details.accountHolder || 'Fusion EU Logistics B.V.'}</span>
-                </div>
-                <div className="flex justify-between items-center py-1 border-b border-[#E5E3DD]/60">
-                  <span className="text-[#5C5852] font-sans">IBAN:</span>
-                  <span className="text-[#121212] font-bold flex items-center gap-1.5">
-                    {inst.details.iban}
-                    <button
-                      onClick={() => copyToClipboard(inst.details.iban || '', 'iban')}
-                      className="text-[#4A5D4E] hover:text-[#121212]"
-                      aria-label="Copy IBAN"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-                  </span>
-                </div>
-                <div className="flex justify-between items-center py-1 border-b border-[#E5E3DD]/60">
-                  <span className="text-[#5C5852] font-sans">BIC / SWIFT:</span>
-                  <span className="text-[#121212] font-semibold">{inst.details.bicSwift || ''}</span>
-                </div>
-                <div className="flex justify-between items-center py-1.5 bg-[#F0F4F1] px-3 rounded text-[#4A5D4E] font-bold">
-                  <span className="font-sans">Mandatory Transfer Memo:</span>
-                  <span className="flex items-center gap-1.5">
-                    {orderConfirmed.orderNumber}
-                    <button
-                      onClick={() => copyToClipboard(orderConfirmed.orderNumber, 'memo')}
-                      className="hover:underline cursor-pointer"
-                      aria-label="Copy Reference"
-                    >
-                      <Copy className="w-3.5 h-3.5" />
-                    </button>
-                  </span>
-                </div>
-              </div>
+              <p className="text-xs text-[#5C5852]">
+                Email <a className="underline" href="mailto:sales@fusionbars.eu">sales@fusionbars.eu</a>. Bank account details are not shown on this page.
+              </p>
             </div>
           ) : (
             <p className="text-xs text-[#5C5852]">
@@ -719,7 +686,7 @@ export default function CheckoutPage() {
                     <strong className="text-sm text-[#121212]">Cryptocurrency</strong>
                   </div>
                   <span className="text-[11px] font-semibold text-white bg-[#121212] rounded-full px-2 py-0.5">
-                    {dict.payment.cryptoDiscountBadge}
+                    {applyCryptoDiscountCopy(dict.payment.cryptoDiscountBadge)}
                   </span>
                 </div>
                 <p className="text-[#5C5852] mt-2 pl-6">
@@ -758,10 +725,14 @@ export default function CheckoutPage() {
               </div>
               {cryptoDiscount > 0 && (
                 <div className="flex justify-between text-amber-800">
-                  <span>{dict.payment.cryptoDiscountLine}</span>
+                  <span>{applyCryptoDiscountCopy(dict.payment.cryptoDiscountLine)}</span>
                   <span className="font-mono font-semibold">−{formatMoney(cryptoDiscount)}</span>
                 </div>
               )}
+              <div className="flex justify-between">
+                <span>Tax/VAT</span>
+                <span className="font-mono text-[#121212]">Not configured</span>
+              </div>
               <div className="flex justify-between">
                 <span>European Shipping ({shippingMethodCode})</span>
                 <span className="font-mono text-[#121212]">
@@ -779,7 +750,7 @@ export default function CheckoutPage() {
                 <ShieldCheck className="w-4 h-4 text-[#4A5D4E]" />
                 <span>Zero Trust Architecture</span>
               </div>
-              <p>Prices are authoritatively re-verified on PostgreSQL. No card data is stored.</p>
+              <p>The server recalculates price, discount, tax, and shipping before the order is saved. Tax treatment is not configured, so no VAT amount is added. No card data is stored.</p>
             </div>
 
             <button

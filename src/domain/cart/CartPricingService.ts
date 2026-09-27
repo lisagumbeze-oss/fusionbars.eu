@@ -12,7 +12,8 @@ import {
   ValidatedLineItem,
 } from '@/types';
 import { MoneyEngine } from '@/lib/money';
-import { CurrencyService, VariantPricingSource } from '@/domain/currency/CurrencyService';
+import { VariantPricingSource } from '@/domain/currency/CurrencyService';
+import { PricingEngine } from '@/domain/commercial/PricingEngine';
 import { ShippingService } from '@/domain/shipping/ShippingService';
 import { ProductAvailabilityService } from '@/domain/catalog/ProductAvailabilityService';
 import { ProductPurchaseEligibilityService } from '@/domain/catalog/ProductPurchaseEligibilityService';
@@ -96,6 +97,7 @@ export class CartPricingService {
 
     let subtotal: MinorUnits = 0;
     const validatedItems: ValidatedLineItem[] = [];
+    const slugs = new Set<string>();
 
     for (const item of items) {
       if (
@@ -132,8 +134,13 @@ export class CartPricingService {
         );
       }
 
-      // Authoritative unit price in requested currency
-      const authoritativeUnitPrice = CurrencyService.getPriceForCurrency(variant, currency);
+      slugs.add(variant.product.slug);
+      const authoritativeUnitPrice = PricingEngine.resolveUnitPrice({
+        slug: variant.product.slug,
+        variantId: variant.id,
+        catalogue: variant,
+        currency,
+      }).amountMinor;
       const lineTotal = MoneyEngine.multiply(authoritativeUnitPrice, item.quantity);
 
       subtotal = MoneyEngine.add(subtotal, lineTotal);
@@ -156,24 +163,9 @@ export class CartPricingService {
     let discountAmount: MinorUnits = 0;
     let appliedCouponInfo: CartCalculationResult['appliedCoupon'] = undefined;
 
-    if (coupon && coupon.isActive) {
-      const notExpired = !coupon.expiresAt || new Date(coupon.expiresAt) > new Date();
-      const meetsMinSpend = subtotal >= coupon.minSpendEUR;
-
-      if (notExpired && meetsMinSpend) {
-        if (coupon.isPercent) {
-          discountAmount = MoneyEngine.applyPercentageDiscount(subtotal, coupon.discount);
-        } else {
-          discountAmount = Math.min(subtotal, coupon.discount);
-        }
-
-        appliedCouponInfo = {
-          code: coupon.code,
-          discount: coupon.discount,
-          isPercent: coupon.isPercent,
-        };
-      }
-    }
+    const couponResult = PricingEngine.applySingleCoupon(subtotal, coupon || null);
+    discountAmount = couponResult.discountAmount;
+    appliedCouponInfo = couponResult.applied;
 
     const subtotalAfterDiscount = MoneyEngine.subtract(subtotal, discountAmount);
 
@@ -186,9 +178,14 @@ export class CartPricingService {
     });
 
     const shippingAmount = shippingResponse.selectedMethod.cost;
-
-    // 4. Grand Total
-    const totalAmount = MoneyEngine.add(subtotalAfterDiscount, shippingAmount);
+    const commercial = PricingEngine.finalize({
+      subtotal,
+      discountAmount,
+      shippingAmount,
+      currency,
+      destinationCountry,
+      productSlug: slugs.size === 1 ? [...slugs][0] : undefined,
+    });
 
     return {
       items: validatedItems,
@@ -196,7 +193,12 @@ export class CartPricingService {
       subtotal,
       discountAmount,
       shippingAmount,
-      totalAmount,
+      totalAmount: commercial.totalAmount,
+      taxAmount: commercial.taxAmount,
+      taxStatus: commercial.taxStatus,
+      taxTreatment: commercial.taxTreatment,
+      taxableAmount: commercial.taxableAmount,
+      configurationVersion: commercial.configurationVersion,
       qualifiesForFreeShipping: shippingResponse.qualifiesForFreeShipping,
       freeShippingThreshold: shippingResponse.freeShippingThreshold,
       amountNeededForFreeShipping: shippingResponse.amountNeededForFreeShipping,

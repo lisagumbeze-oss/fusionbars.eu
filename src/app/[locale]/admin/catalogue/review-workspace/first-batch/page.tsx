@@ -48,7 +48,7 @@ const SPECIALISTS: SpecialistQueue[] = [
 export default function FirstBatchReviewPage() {
   const params = useParams();
   const locale = (params.locale as string) || 'en';
-  const [currentRole, setCurrentRole] = useState<RoleName>('SUPER_ADMIN');
+  const currentRole: RoleName = 'SUPER_ADMIN';
   const actorName = `${currentRole.toLowerCase().replace('_', '.')}.officer@fusionbars.eu`;
 
   const [batchSize, setBatchSize] = useState(10);
@@ -224,17 +224,7 @@ export default function FirstBatchReviewPage() {
             </div>
           </div>
           <div className="flex items-center gap-2 text-xs flex-wrap">
-            <select
-              value={currentRole}
-              onChange={(e) => setCurrentRole(e.target.value as RoleName)}
-              className="bg-slate-800 border border-slate-700 rounded px-2 py-1 text-teal-300"
-            >
-              {AUTHORIZED.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
+            <span className="border border-slate-700 rounded px-2 py-1 text-teal-300">Super Admin</span>
             {[5, 10, 20].map((s) => (
               <button
                 key={s}

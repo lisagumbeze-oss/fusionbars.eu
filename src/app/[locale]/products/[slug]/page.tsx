@@ -2,6 +2,7 @@ import React from 'react';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { CatalogService } from '@/lib/catalog';
+import { PricingEngine } from '@/domain/commercial/PricingEngine';
 import ProductDetailClient from './ProductDetailClient';
 import ProductCard from '@/components/ProductCard';
 import { LocaleCode } from '@/types';
@@ -13,7 +14,7 @@ interface ProductDetailPageProps {
 
 export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
   const resolved = await params;
-  const product = CatalogService.getProductBySlug(resolved.slug);
+  const product = CatalogService.getPublicProductBySlug(resolved.slug);
   if (!product) return { title: 'Product Not Found | Fusion EU' };
 
   return {
@@ -45,7 +46,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const locale = resolvedParams.locale as LocaleCode;
   const slug = resolvedParams.slug;
 
-  const product = CatalogService.getProductBySlug(slug);
+  const product = CatalogService.getPublicProductBySlug(slug);
   if (!product) {
     notFound();
   }
@@ -53,6 +54,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const relatedProducts = CatalogService.getRelatedProducts(slug, 4);
 
   // Schema.org Product JSON-LD structured data
+  const offer = PricingEngine.structuredOffer(product.slug, product.variants[0]?.id || null);
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -63,13 +65,15 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       '@type': 'Brand',
       name: product.brand,
     },
-    offers: {
-      '@type': 'Offer',
-      priceCurrency: 'EUR',
-      price: (product.variants[0]?.priceEUR || 2000) / 100,
-      availability: 'https://schema.org/InStock',
-      url: `https://fusionbars.eu/${locale}/products/${product.slug}`,
-    },
+    ...(offer
+      ? {
+          offers: {
+            ...offer,
+            availability: 'https://schema.org/InStock',
+            url: `https://fusionbars.eu/${locale}/products/${product.slug}`,
+          },
+        }
+      : {}),
   };
 
   return (

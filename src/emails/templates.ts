@@ -59,7 +59,7 @@ export class EmailTemplates {
     }
   ): { subject: string; text: string; html: string } {
     const formattedTotal = MoneyEngine.format(context.totalAmount, context.currency);
-    const subject = `Order Confirmed: ${context.orderNumber} — Bank Transfer Details`;
+    const subject = `Order Confirmed: ${context.orderNumber} — Contact us for bank transfer details`;
     const text = `
 Hello ${context.customerName},
 
@@ -70,14 +70,12 @@ Total Amount Due: ${formattedTotal}
 Items Ordered:
 ${itemsTextBlock(context.items, context.currency)}
 
-=== SEPA / IBAN PAYMENT INSTRUCTIONS ===
-Beneficiary: ${context.accountHolder}
-Bank: ${context.bankName}
-IBAN: ${context.iban}
-BIC / SWIFT: ${context.bic}
-Mandatory Reference: ${context.orderNumber}
+=== SEPA / IBAN PAYMENT DETAILS ===
+Bank account details are not included in this email.
+Contact the admin for SEPA / IBAN payment details and quote order ${context.orderNumber}.
 
-IMPORTANT: Include "${context.orderNumber}" in your transfer description so we can match your payment.
+Payment reference: ${context.orderNumber}
+Total due: ${formattedTotal}
 
 Support: ${context.supportEmail}
 `.trim();
@@ -85,23 +83,21 @@ Support: ${context.supportEmail}
     const panel = renderAccentPanel(
       'SEPA / IBAN Payment Details',
       [
-        renderDetailRow('Beneficiary', context.accountHolder),
-        renderDetailRow('Bank', context.bankName),
-        renderDetailRow('IBAN', context.iban, true),
-        renderDetailRow('BIC / SWIFT', context.bic, true),
+        `<p style="margin:0 0 12px;font-size:14px;line-height:1.5;">Contact the admin for SEPA / IBAN payment details. Quote your order number when you write. Bank account details are not included here.</p>`,
         renderDetailRow('Payment reference', context.orderNumber, true),
         renderDetailRow('Total due', formattedTotal),
+        `<p style="margin:12px 0 0;font-size:14px;line-height:1.5;">Email <a href="mailto:${escapeHtml(context.supportEmail)}">${escapeHtml(context.supportEmail)}</a>.</p>`,
       ].join('')
     );
 
     const html = renderEmailShell({
       title: subject,
-      preheader: `Complete your bank transfer for order ${context.orderNumber}.`,
+      preheader: `Contact us for the bank transfer details for order ${context.orderNumber}.`,
       supportEmail: context.supportEmail,
       bodyHtml: `
         ${renderHeading('Order confirmed')}
         <p>Dear ${escapeHtml(context.customerName)},</p>
-        <p>Thank you for placing order <strong>${escapeHtml(context.orderNumber)}</strong>. Please complete your bank transfer using the details below.</p>
+        <p>Thank you for placing order <strong>${escapeHtml(context.orderNumber)}</strong>. Contact the admin for the SEPA / IBAN payment details.</p>
         ${panel}
         <p style="font-size:14px;color:#5C5852;margin:0 0 8px;"><strong>Items ordered</strong></p>
         ${itemsHtmlBlock(context.items, context.currency)}
@@ -174,11 +170,45 @@ Support: ${context.supportEmail}
   }
 
   static renderAdminOrderAlert(
-    context: EmailRenderContext & { paymentMethodName: string }
+    context: EmailRenderContext & {
+      firstName: string;
+      lastName: string;
+      paymentMethodName: string;
+      email: string;
+      phone: string;
+      streetAddress: string;
+      houseNumber?: string;
+      postalCode: string;
+      city: string;
+      country: string;
+      shippingMethod: string;
+    }
   ): { subject: string; text: string; html: string } {
     const formattedTotal = MoneyEngine.format(context.totalAmount, context.currency);
     const subject = `[NEW ORDER] ${context.orderNumber} — ${formattedTotal} (${context.paymentMethodName})`;
-    const text = `New order ${context.orderNumber} for ${formattedTotal} by ${context.customerName}. Payment: ${context.paymentMethodName}.`;
+    const houseLine = context.houseNumber?.trim() ? `House / unit: ${context.houseNumber.trim()}\n` : '';
+    const text = `
+New order ${context.orderNumber} for ${formattedTotal}.
+
+Customer
+First name: ${context.firstName}
+Last name: ${context.lastName}
+Email: ${context.email}
+Telephone: ${context.phone}
+
+Delivery
+Street: ${context.streetAddress}
+${houseLine}Postal code: ${context.postalCode}
+City: ${context.city}
+Country: ${context.country}
+Courier: ${context.shippingMethod}
+
+Payment: ${context.paymentMethodName}
+Total: ${formattedTotal}
+
+Items:
+${itemsTextBlock(context.items, context.currency)}
+`.trim();
     const html = renderEmailShell({
       title: subject,
       preheader: subject,
@@ -186,14 +216,24 @@ Support: ${context.supportEmail}
       bodyHtml: `
         ${renderHeading('New order received', 'success')}
         ${renderAccentPanel(
-          'Operations summary',
+          'Checkout details',
           [
             renderDetailRow('Order', context.orderNumber, true),
-            renderDetailRow('Customer', context.customerName),
-            renderDetailRow('Total', formattedTotal),
+            renderDetailRow('First name', context.firstName),
+            renderDetailRow('Last name', context.lastName),
+            renderDetailRow('Email', context.email),
+            renderDetailRow('Telephone', context.phone || '—'),
+            renderDetailRow('Street', context.streetAddress),
+            context.houseNumber?.trim() ? renderDetailRow('House / unit', context.houseNumber.trim()) : '',
+            renderDetailRow('Postal code', context.postalCode),
+            renderDetailRow('City', context.city),
+            renderDetailRow('Country', context.country),
+            renderDetailRow('Courier', context.shippingMethod),
             renderDetailRow('Payment method', context.paymentMethodName),
+            renderDetailRow('Total', formattedTotal),
           ].join('')
         )}
+        <p style="font-size:14px;color:#5C5852;margin:16px 0 8px;"><strong>Items ordered</strong></p>
         ${itemsHtmlBlock(context.items, context.currency)}
       `,
     });
@@ -517,6 +557,29 @@ ${context.message}
           ].join('')
         )}
         <p style="font-size:14px;white-space:pre-wrap;margin:0;">${escapeHtml(context.message)}</p>
+      `,
+    });
+    return { subject, text, html };
+  }
+
+  static renderNewsletterOpsAlert(context: {
+    email: string;
+    locale: string;
+  }): { subject: string; text: string; html: string } {
+    const subject = `[NEWSLETTER] ${context.email}`;
+    const text = `New newsletter subscription (${context.locale}): ${context.email}`;
+    const html = renderEmailShell({
+      title: subject,
+      supportEmail: 'sales@fusionbars.eu',
+      bodyHtml: `
+        ${renderHeading('New newsletter subscription')}
+        ${renderAccentPanel(
+          'Subscriber',
+          [
+            renderDetailRow('Email', context.email),
+            renderDetailRow('Locale', context.locale),
+          ].join('')
+        )}
       `,
     });
     return { subject, text, html };

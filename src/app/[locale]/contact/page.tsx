@@ -6,10 +6,12 @@ import { useParams } from 'next/navigation';
 import { Mail, Clock, ShieldCheck, Send, CheckCircle2, AlertCircle, Building2, MapPin } from 'lucide-react';
 import { LocaleCode } from '@/types';
 import { submitContactInquiryAction } from '@/actions/contact';
+import { AdminOverrides } from '@/domain/admin/AdminOverrides';
 
 export default function ContactPage() {
   const params = useParams();
   const locale = (params.locale as LocaleCode) || 'en';
+  const supportEmail = AdminOverrides.settings().supportEmail;
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -170,10 +172,10 @@ export default function ContactPage() {
               For general client support, bank proof submissions, and laboratory certificates:
             </p>
             <a
-              href="mailto:sales@fusionbars.eu"
+              href={`mailto:${supportEmail}`}
               className="font-mono text-sm font-bold text-[#4A5D4E] hover:underline block"
             >
-              sales@fusionbars.eu
+              {supportEmail}
             </a>
           </div>
 

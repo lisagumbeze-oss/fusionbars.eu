@@ -1,7 +1,10 @@
 import firstBatchState from '@/data/catalogue-first-batch-state.json';
+import specialistState from '@/data/catalogue-specialist-review-state.json';
+import { PublicationReadinessService } from '@/domain/catalog/PublicationReadinessService';
 import { CatalogService } from '@/lib/catalog';
 import { CommerceRepository } from '@/lib/commerce-repository';
 import { ShippingService } from '@/domain/shipping/ShippingService';
+import { AdminOverrides } from '@/domain/admin/AdminOverrides';
 import { PaymentConfigService } from '@/domain/payments/PaymentConfig';
 import { CANONICAL_ORDER_STATUSES, OrderStatus } from '@/types';
 import { SUPPORTED_LOCALES } from '@/i18n';
@@ -17,9 +20,12 @@ export interface CatalogueOperationsSnapshot {
   dataAdjudicated: number;
   dataDeferred: number;
   pricingPending: number;
+  pricingDeferred: number;
   compliancePending: number;
+  complianceDeferred: number;
   countryPending: number;
   contentInternal: number;
+  contentDeferred: number;
   mediaVerified: number;
   mediaReview: number;
   translationPending: number;
@@ -63,6 +69,7 @@ export interface AdminSettingsSnapshot {
     sender: string;
     keyConfigured: boolean;
   };
+  cryptoDiscountPercent: number;
   security: {
     sessionSecretConfigured: boolean;
     authSecretConfigured: boolean;
@@ -94,9 +101,12 @@ export class AdminDashboardService {
         dataAdjudicated: 0,
         dataDeferred: 0,
         pricingPending: 0,
+        pricingDeferred: 0,
         compliancePending: 0,
+        complianceDeferred: 0,
         countryPending: 0,
         contentInternal: 0,
+        contentDeferred: 0,
         mediaVerified: 0,
         mediaReview: 0,
         translationPending: 0,
@@ -112,18 +122,31 @@ export class AdminDashboardService {
     const products = (state.selectedSlugs as string[]).map((slug) => {
       const record = state.products?.[slug] || {};
       const board = boardOf(record) || {};
+      const specialist = (specialistState as { products?: Record<string, any> }).products?.[slug];
       const catalogue = CatalogService.getProductBySlug(slug);
+      const country = specialist
+        ? specialist.countries?.some((row: { decision: string }) => row.decision === 'ALLOWED')
+          ? 'CONFIGURED'
+          : specialist.countries?.length
+            ? 'DEFERRED'
+            : 'NOT_CONFIGURED'
+        : board.country || 'UNKNOWN';
+      const translation = specialist
+        ? Object.values(specialist.translations || {}).every((slot: any) => slot.state === 'APPROVED')
+          ? 'APPROVED'
+          : 'PENDING'
+        : board.translation || 'UNKNOWN';
       return {
         slug,
         name: catalogue?.name || record.packet?.name || slug,
         data: board.data || 'UNKNOWN',
-        pricing: board.pricing || 'UNKNOWN',
-        compliance: board.compliance || 'UNKNOWN',
-        country: board.country || 'UNKNOWN',
-        content: board.content || 'UNKNOWN',
-        media: board.media || 'UNKNOWN',
-        translation: board.translation || 'UNKNOWN',
-        publication: board.publication || record.publicationDisposition || 'UNKNOWN',
+        pricing: specialist?.pricing?.state || board.pricing || 'UNKNOWN',
+        compliance: specialist?.compliance?.state || board.compliance || 'UNKNOWN',
+        country,
+        content: specialist?.content?.state || board.content || 'UNKNOWN',
+        media: specialist?.media?.state || board.media || 'UNKNOWN',
+        translation,
+        publication: specialist?.publication || board.publication || record.publicationDisposition || 'UNKNOWN',
         deferred: Array.isArray(record.deferredSections) && record.deferredSections.length > 0,
       };
     });
@@ -139,9 +162,12 @@ export class AdminDashboardService {
       dataAdjudicated: count((row) => row.data === 'ADJUDICATED'),
       dataDeferred: count((row) => row.deferred),
       pricingPending: count((row) => row.pricing === 'PRICE_REVIEW_PENDING'),
+      pricingDeferred: count((row) => row.pricing === 'PRICE_DEFERRED'),
       compliancePending: count((row) => row.compliance === 'REQUIRES_REVIEW'),
+      complianceDeferred: count((row) => row.compliance === 'DEFERRED'),
       countryPending: count((row) => row.country === 'NOT_CONFIGURED'),
       contentInternal: count((row) => row.content === 'INTERNAL_SOURCE_ONLY'),
+      contentDeferred: count((row) => row.content === 'CONTENT_DEFERRED'),
       mediaVerified: count((row) => row.media === 'VERIFIED'),
       mediaReview: count((row) => row.media === 'MEDIA_REVIEW'),
       translationPending: count((row) => row.translation === 'PENDING'),
@@ -178,16 +204,17 @@ export class AdminDashboardService {
   }
 
   static settingsSnapshot(): AdminSettingsSnapshot {
+    const saved = AdminOverrides.settings();
     const rates = ShippingService.RATES.EUR;
     return {
-      storeName: 'Fusion Mushroom Bars EU',
-      supportEmail: 'sales@fusionbars.eu',
+      storeName: saved.storeName,
+      supportEmail: saved.supportEmail,
       currencies: ['EUR', 'GBP'],
       languages: [...SUPPORTED_LOCALES],
       shipping: {
-        standardCents: rates.STANDARD,
-        expressCents: rates.EXPRESS,
-        freeThresholdCents: rates.FREE_THRESHOLD,
+        standardCents: AdminOverrides.settingsSaved() ? saved.standardShippingCents : rates.STANDARD,
+        expressCents: AdminOverrides.settingsSaved() ? saved.expressShippingCents : rates.EXPRESS,
+        freeThresholdCents: AdminOverrides.settingsSaved() ? saved.freeShippingThresholdCents : rates.FREE_THRESHOLD,
         hubs: Object.keys(ShippingService.FULFILMENT_HUBS),
       },
       payments: {
@@ -197,9 +224,10 @@ export class AdminDashboardService {
       },
       email: {
         provider: process.env.EMAIL_PROVIDER || 'mock',
-        sender: 'sales@fusionbars.eu',
+        sender: saved.supportEmail,
         keyConfigured: Boolean(process.env.EMAIL_PROVIDER_KEY),
       },
+      cryptoDiscountPercent: AdminOverrides.settingsSaved() ? saved.cryptoDiscountPercent : 10,
       security: {
         sessionSecretConfigured: Boolean(process.env.SESSION_SECRET),
         authSecretConfigured: Boolean(process.env.AUTH_SECRET),
@@ -242,6 +270,7 @@ export class AdminDashboardService {
     const state = readJson();
     const record = state?.products?.[slug] || null;
     const board = boardOf(record);
+    const specialist = (specialistState as { products?: Record<string, any> }).products?.[slug];
     const audits = Array.isArray(state?.auditTrail)
       ? state.auditTrail.filter((entry: any) => entry.product === slug).slice(0, 40)
       : [];
@@ -250,6 +279,7 @@ export class AdminDashboardService {
       slug,
       identity: {
         name: product?.name || slug,
+        headline: product?.headline || '',
         brand: product?.brand || '',
         category: product?.categoryName || '',
         importStatus: product?.status || '',
@@ -263,34 +293,39 @@ export class AdminDashboardService {
       media: {
         primary: product?.primaryImage || '',
         gallery: product?.galleryImages || [],
-        governance: board?.media || 'UNKNOWN',
+        governance: specialist?.media?.state || board?.media || 'UNKNOWN',
       },
       pricing: {
         cataloguePriceEUR: product?.variants?.[0]?.priceEUR ?? null,
-        governance: board?.pricing || 'UNKNOWN',
-        approvedCommercialPrice: null as number | null,
+        governance: specialist?.pricing?.state || board?.pricing || 'UNKNOWN',
+        approvedCommercialPrice: specialist?.pricing?.state === 'PRICE_APPROVED' ? specialist.pricing.approvedPrice ?? null : null,
       },
       compliance: {
         catalogueClassification: product?.complianceClassification || 'REQUIRES_REVIEW',
-        governance: board?.compliance || 'UNKNOWN',
+        governance: specialist?.compliance?.state || board?.compliance || 'UNKNOWN',
       },
       countries: {
         availabilityType: product?.availabilityType || 'NOT_CONFIGURED',
         allowedCountries: product?.allowedCountries || [],
-        governance: board?.country || 'UNKNOWN',
+        governance: specialist ? (specialist.countries?.some((row: { decision: string }) => row.decision === 'ALLOWED') ? 'CONFIGURED' : 'NOT_CONFIGURED') : board?.country || 'UNKNOWN',
       },
       content: {
         sourceDescription: product?.description || '',
-        governance: board?.content || 'UNKNOWN',
-        approvedPublicContent: '',
+        governance: specialist?.content?.state || board?.content || 'UNKNOWN',
+        approvedPublicContent: specialist?.content?.approvedPublicContent || '',
       },
       translations: {
-        governance: board?.translation || 'UNKNOWN',
+        governance: specialist
+          ? Object.values(specialist.translations || {}).every((slot: any) => slot?.state === 'APPROVED')
+            ? 'APPROVED'
+            : 'PENDING'
+          : board?.translation || 'UNKNOWN',
         locales: ['en', 'de', 'fr', 'es', 'it', 'nl'],
       },
       publication: {
-        governance: board?.publication || record?.publicationDisposition || 'UNKNOWN',
-        published: false,
+        governance: specialist?.publication || board?.publication || record?.publicationDisposition || 'UNKNOWN',
+        published: PublicationReadinessService.publicationStatus(slug) === 'PUBLISHED',
+        checklist: PublicationReadinessService.evaluateSaved(slug),
       },
       audit: audits.map((entry: any) => ({
         id: entry.id,

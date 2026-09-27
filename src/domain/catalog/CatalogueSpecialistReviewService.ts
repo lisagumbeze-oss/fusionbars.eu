@@ -7,6 +7,8 @@ import { CatalogueReviewService } from '@/domain/catalog/CatalogueReviewService'
 import { CatalogueAdjudicationService } from '@/domain/catalog/CatalogueAdjudicationService';
 import { CatalogueFirstBatchService, TRANSLATION_LOCALES } from '@/domain/catalog/CatalogueFirstBatchService';
 import { RBACService } from '@/domain/auth/RBACService';
+import specialistSeed from '@/data/catalogue-specialist-review-state.json';
+import { PublicationReadinessService } from '@/domain/catalog/PublicationReadinessService';
 
 function getFs(): any {
   try {
@@ -22,6 +24,14 @@ function getPath(): any {
 }
 function cloneJson<T>(value: T): T {
   return value == null ? value : JSON.parse(JSON.stringify(value));
+}
+
+function packetDataStatus(slug: string): string {
+  const packet = CatalogueFirstBatchService.getReviewPacket(slug);
+  const live = packet?.batchProduct?.lastSummary?.statusBoard?.data;
+  const saved = PublicationReadinessService.savedDataStatus(slug);
+  if (live === 'ADJUDICATED' || saved === 'ADJUDICATED') return 'ADJUDICATED';
+  return live || saved || 'PENDING';
 }
 
 const CLAIM_PATTERN =
@@ -170,6 +180,10 @@ export class CatalogueSpecialistReviewService {
         } catch {}
       }
     }
+    if ((specialistSeed as { version?: number }).version === 1) {
+      this.cached = cloneJson(specialistSeed as SpecialistState);
+      return this.cached;
+    }
     this.cached = { version: 1, products: {}, auditTrail: [] };
     return this.cached;
   }
@@ -280,7 +294,8 @@ export class CatalogueSpecialistReviewService {
     const packet = CatalogueFirstBatchService.getReviewPacket(slug);
     if (!product || !packet) return null;
     return {
-      banner: 'FIRST BATCH — SPECIALIST REVIEW. Data adjudication is complete. Specialist decisions remain unresolved. Nothing is published automatically.',
+      banner: 'FIRST BATCH — SPECIALIST REVIEW. Data adjudication is complete. Recorded decisions stay on this record. Nothing is published automatically.',
+      testRecordWarning: packet.testRecord?.flagged ? 'NON-COMMERCIAL TEST RECORD — DO NOT PUBLISH' : null,
       identity: {
         name: product.name,
         slug: product.canonicalSlug,
@@ -345,6 +360,10 @@ export class CatalogueSpecialistReviewService {
       this.requireSectionRole(params.actorRole, 'pricing');
       if (!this.firstBatchSlugs().includes(params.productSlug)) throw new Error('Product is outside the first batch.');
       const review = this.getReview(params.productSlug);
+      const pricingPacket = CatalogueFirstBatchService.getReviewPacket(params.productSlug);
+      if (pricingPacket?.testRecord?.flagged && params.state === 'PRICE_APPROVED') {
+        throw new Error('NON_COMMERCIAL_TEST_RECORD cannot receive a commercial price.');
+      }
       if (params.state === 'PRICE_APPROVED') {
         if (!params.approvedCurrency || !['EUR', 'GBP', 'USD'].includes(params.approvedCurrency)) {
           throw new Error('PRICE_APPROVED requires an explicit currency. USD is not converted.');
@@ -468,6 +487,10 @@ export class CatalogueSpecialistReviewService {
       if ((params.decision === 'ALLOWED' || params.decision === 'RESTRICTED') && !params.effectiveDate?.trim()) {
         throw new Error('ALLOWED and RESTRICTED require an effective date.');
       }
+      const countryPacket = CatalogueFirstBatchService.getReviewPacket(params.productSlug);
+      if (countryPacket?.testRecord?.flagged && (params.decision === 'ALLOWED' || params.decision === 'RESTRICTED')) {
+        throw new Error('NON_COMMERCIAL_TEST_RECORD cannot be authorized for sale in a country.');
+      }
       const review = this.getReview(params.productSlug);
       const entry: CountryDecision = {
         country: params.country.toUpperCase(),
@@ -519,6 +542,13 @@ export class CatalogueSpecialistReviewService {
     try {
       this.requireSectionRole(params.actorRole, 'content');
       const review = this.getReview(params.productSlug);
+      const contentPacket = CatalogueFirstBatchService.getReviewPacket(params.productSlug);
+      if (
+        contentPacket?.testRecord?.flagged &&
+        (params.state === 'CONTENT_APPROVED' || params.state === 'CONTENT_APPROVED_WITH_RESTRICTIONS')
+      ) {
+        throw new Error('NON_COMMERCIAL_TEST_RECORD cannot be approved as public content.');
+      }
       const source = CatalogueReviewService.getProductDetail(params.productSlug)?.originalSourceContent || '';
       const candidate = params.candidatePublicContent ?? review.content.candidatePublicContent;
       if ((params.state === 'CONTENT_APPROVED' || params.state === 'CONTENT_APPROVED_WITH_RESTRICTIONS') && !candidate.trim()) {
@@ -529,6 +559,12 @@ export class CatalogueSpecialistReviewService {
       }
       if (params.state === 'CONTENT_APPROVED' && CLAIM_PATTERN.test(candidate)) {
         throw new Error('Claim-bearing text cannot be approved without restrictions.');
+      }
+      if (params.state === 'CONTENT_APPROVED' || params.state === 'CONTENT_APPROVED_WITH_RESTRICTIONS') {
+        const dataStatus = packetDataStatus(params.productSlug);
+        if (dataStatus !== 'ADJUDICATED') {
+          throw new Error('Public content cannot be approved before data adjudication is complete.');
+        }
       }
       if (params.state === 'CONTENT_APPROVED_WITH_RESTRICTIONS' && !params.restrictions?.trim()) {
         throw new Error('Restricted content approval requires reviewer-entered restrictions.');
@@ -587,6 +623,9 @@ export class CatalogueSpecialistReviewService {
       }
       if (params.state === 'APPROVED' && slot.state !== 'DRAFTED' && slot.state !== 'APPROVED') {
         throw new Error('A locale must be drafted before approval.');
+      }
+      if (params.state === 'APPROVED' && review.content.state !== 'CONTENT_APPROVED' && review.content.state !== 'CONTENT_APPROVED_WITH_RESTRICTIONS') {
+        throw new Error('A translation cannot be approved before public content is approved.');
       }
       slot.state = params.state;
       slot.reviewer = params.actor;
@@ -662,25 +701,22 @@ export class CatalogueSpecialistReviewService {
   static evaluatePublication(slug: string): { publication: PublicationGateState; ready: boolean; blockers: string[]; published: false } {
     const review = this.getReview(slug);
     const packet = CatalogueFirstBatchService.getReviewPacket(slug);
-    const blockers: string[] = [];
-    if (packet?.testRecord?.flagged) {
-      return { publication: 'DO_NOT_PUBLISH', ready: false, blockers: ['NON_COMMERCIAL_TEST_RECORD'], published: false };
-    }
-    if (review.compliance.state === 'DO_NOT_PUBLISH' || review.content.state === 'DO_NOT_PUBLISH') {
-      return { publication: 'DO_NOT_PUBLISH', ready: false, blockers: ['DO_NOT_PUBLISH'], published: false };
-    }
-    if (review.pricing.state !== 'PRICE_APPROVED' && review.pricing.state !== 'PRICE_NOT_APPLICABLE') blockers.push('Pricing pending');
-    if (review.compliance.state !== 'APPROVED_FOR_PUBLICATION' && review.compliance.state !== 'APPROVED_WITH_RESTRICTIONS') {
-      blockers.push('Compliance review required');
-    }
-    if (!review.countries.some((c) => c.decision === 'ALLOWED')) blockers.push('Country eligibility not configured');
-    if (review.content.state !== 'CONTENT_APPROVED' && review.content.state !== 'CONTENT_APPROVED_WITH_RESTRICTIONS') {
-      blockers.push('Public content not approved');
-    }
-    if (TRANSLATION_LOCALES.some((locale) => review.translations[locale]?.state !== 'APPROVED')) blockers.push('Translation pending');
-    if (review.media.state !== 'VERIFIED') blockers.push('Media review required');
-    const ready = blockers.length === 0;
-    return { publication: ready ? 'READY_FOR_PUBLICATION' : 'NOT_READY', ready, blockers, published: false };
+    const liveData = packet?.batchProduct?.lastSummary?.statusBoard?.data
+      || (packet?.batchProduct?.completionLevels?.includes('DATA_ADJUDICATED') ? 'ADJUDICATED' : undefined);
+    const savedData = PublicationReadinessService.savedDataStatus(slug);
+    const dataStatus = liveData === 'ADJUDICATED' || savedData === 'ADJUDICATED' ? 'ADJUDICATED' : (liveData || savedData || 'PENDING');
+    const report = PublicationReadinessService.evaluate({
+      slug,
+      review,
+      dataStatus,
+      testRecord: Boolean(packet?.testRecord?.flagged) || PublicationReadinessService.savedTestRecord(slug),
+    });
+    return {
+      publication: report.readiness,
+      ready: report.ready,
+      blockers: report.blockers.flatMap((item) => item.reason.split('; ')),
+      published: false,
+    };
   }
 
   /** Records the gate result. Never publishes and never adds the product to the published catalogue. */
@@ -721,3 +757,19 @@ export class CatalogueSpecialistReviewService {
     return [...this.getState().auditTrail].reverse();
   }
 }
+
+PublicationReadinessService.registerSource({
+  getReview(slug) {
+    return CatalogueSpecialistReviewService.getState().products[slug] || null;
+  },
+  getContext(slug) {
+    const packet = CatalogueFirstBatchService.getReviewPacket(slug);
+    const liveData = packet?.batchProduct?.lastSummary?.statusBoard?.data
+      || (packet?.batchProduct?.completionLevels?.includes('DATA_ADJUDICATED') ? 'ADJUDICATED' : undefined);
+    const savedData = PublicationReadinessService.savedDataStatus(slug);
+    return {
+      dataStatus: liveData === 'ADJUDICATED' || savedData === 'ADJUDICATED' ? 'ADJUDICATED' : (liveData || savedData || 'PENDING'),
+      testRecord: Boolean(packet?.testRecord?.flagged) || PublicationReadinessService.savedTestRecord(slug),
+    };
+  },
+});

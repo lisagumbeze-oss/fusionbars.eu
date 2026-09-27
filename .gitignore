@@ -10,3 +10,4 @@ coverage/
 .vercel/
 *.tsbuildinfo
 data-source-cache/
+data/admin-overrides.json

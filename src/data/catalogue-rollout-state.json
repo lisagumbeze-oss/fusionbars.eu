@@ -1,0 +1,171 @@
+{
+  "version": 1,
+  "batches": [
+    {
+      "id": "RB-002",
+      "name": "Review batch 2",
+      "createdAt": "2026-09-27T04:16:38.089Z",
+      "createdBy": "catalogue.manager@fusionbars.eu",
+      "createdByRole": "CATALOG_MANAGER",
+      "reviewers": [],
+      "productSlugs": [
+        "fusion-bar-almond-crush",
+        "fusion-bar-birthday-cake",
+        "fusion-bar-cookie-dough",
+        "fusion-bar-fruit-loops",
+        "fusion-bar-lemon-blueberry",
+        "fusion-bar-matcha",
+        "fusion-bar-milk-chocolate",
+        "fusion-mocha-chocolate-bar",
+        "fusion-thin-mint-chocolate-bar",
+        "fusion-twixy-chocolate-bar"
+      ],
+      "size": 10
+    }
+  ],
+  "products": {
+    "fusion-bar-almond-crush": {
+      "slug": "fusion-bar-almond-crush",
+      "batchId": "RB-002",
+      "stage": "DATA_REVIEW",
+      "version": 1,
+      "reviewer": null,
+      "reviewerRole": null,
+      "assignedAt": null,
+      "updatedAt": "2026-09-27T04:16:38.089Z",
+      "deferral": null
+    },
+    "fusion-bar-birthday-cake": {
+      "slug": "fusion-bar-birthday-cake",
+      "batchId": "RB-002",
+      "stage": "DATA_REVIEW",
+      "version": 1,
+      "reviewer": null,
+      "reviewerRole": null,
+      "assignedAt": null,
+      "updatedAt": "2026-09-27T04:16:38.089Z",
+      "deferral": null
+    },
+    "fusion-bar-cookie-dough": {
+      "slug": "fusion-bar-cookie-dough",
+      "batchId": "RB-002",
+      "stage": "DATA_REVIEW",
+      "version": 1,
+      "reviewer": null,
+      "reviewerRole": null,
+      "assignedAt": null,
+      "updatedAt": "2026-09-27T04:16:38.089Z",
+      "deferral": null
+    },
+    "fusion-bar-fruit-loops": {
+      "slug": "fusion-bar-fruit-loops",
+      "batchId": "RB-002",
+      "stage": "DATA_REVIEW",
+      "version": 1,
+      "reviewer": null,
+      "reviewerRole": null,
+      "assignedAt": null,
+      "updatedAt": "2026-09-27T04:16:38.089Z",
+      "deferral": null
+    },
+    "fusion-bar-lemon-blueberry": {
+      "slug": "fusion-bar-lemon-blueberry",
+      "batchId": "RB-002",
+      "stage": "DATA_REVIEW",
+      "version": 1,
+      "reviewer": null,
+      "reviewerRole": null,
+      "assignedAt": null,
+      "updatedAt": "2026-09-27T04:16:38.089Z",
+      "deferral": null
+    },
+    "fusion-bar-matcha": {
+      "slug": "fusion-bar-matcha",
+      "batchId": "RB-002",
+      "stage": "DATA_REVIEW",
+      "version": 1,
+      "reviewer": null,
+      "reviewerRole": null,
+      "assignedAt": null,
+      "updatedAt": "2026-09-27T04:16:38.089Z",
+      "deferral": null
+    },
+    "fusion-bar-milk-chocolate": {
+      "slug": "fusion-bar-milk-chocolate",
+      "batchId": "RB-002",
+      "stage": "DATA_REVIEW",
+      "version": 1,
+      "reviewer": null,
+      "reviewerRole": null,
+      "assignedAt": null,
+      "updatedAt": "2026-09-27T04:16:38.089Z",
+      "deferral": null
+    },
+    "fusion-mocha-chocolate-bar": {
+      "slug": "fusion-mocha-chocolate-bar",
+      "batchId": "RB-002",
+      "stage": "DATA_REVIEW",
+      "version": 1,
+      "reviewer": null,
+      "reviewerRole": null,
+      "assignedAt": null,
+      "updatedAt": "2026-09-27T04:16:38.089Z",
+      "deferral": null
+    },
+    "fusion-thin-mint-chocolate-bar": {
+      "slug": "fusion-thin-mint-chocolate-bar",
+      "batchId": "RB-002",
+      "stage": "DATA_REVIEW",
+      "version": 1,
+      "reviewer": null,
+      "reviewerRole": null,
+      "assignedAt": null,
+      "updatedAt": "2026-09-27T04:16:38.089Z",
+      "deferral": null
+    },
+    "fusion-twixy-chocolate-bar": {
+      "slug": "fusion-twixy-chocolate-bar",
+      "batchId": "RB-002",
+      "stage": "DATA_REVIEW",
+      "version": 1,
+      "reviewer": null,
+      "reviewerRole": null,
+      "assignedAt": null,
+      "updatedAt": "2026-09-27T04:16:38.089Z",
+      "deferral": null
+    }
+  },
+  "audit": [
+    {
+      "action": "REVIEW_BATCH_CREATED",
+      "product": "RB-002",
+      "category": "queue",
+      "beforeValue": null,
+      "afterValue": {
+        "slugs": [
+          "fusion-bar-almond-crush",
+          "fusion-bar-birthday-cake",
+          "fusion-bar-cookie-dough",
+          "fusion-bar-fruit-loops",
+          "fusion-bar-lemon-blueberry",
+          "fusion-bar-matcha",
+          "fusion-bar-milk-chocolate",
+          "fusion-mocha-chocolate-bar",
+          "fusion-thin-mint-chocolate-bar",
+          "fusion-twixy-chocolate-bar"
+        ],
+        "size": 10
+      },
+      "actor": "catalogue.manager@fusionbars.eu",
+      "role": "CATALOG_MANAGER",
+      "rationale": "Operational batch. No approval decisions were recorded.",
+      "evidence": "Review priority is ordering only.",
+      "source": "catalogue-rollout",
+      "batchId": "RB-002",
+      "id": "RB-AUD-1",
+      "timestamp": "2026-09-27T04:16:38.089Z"
+    }
+  ],
+  "duplicateDecisions": [],
+  "issueResolutions": []
+}

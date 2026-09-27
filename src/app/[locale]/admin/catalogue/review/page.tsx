@@ -79,7 +79,7 @@ export default function CatalogueReviewCenterPage() {
   const locale = (params.locale as string) || 'en';
 
   // Role Gate & Actor
-  const [currentRole, setCurrentRole] = useState<RoleName>('SUPER_ADMIN');
+  const currentRole: RoleName = 'SUPER_ADMIN';
   const actorName = `${currentRole.toLowerCase().replace('_', '.')}.officer@fusionbars.eu`;
 
   // Active View Tabs
@@ -547,20 +547,7 @@ export default function CatalogueReviewCenterPage() {
 
           {/* Role Switcher & Navigation Links */}
           <div className="flex items-center gap-3 flex-wrap">
-            <div className="flex items-center gap-2 bg-slate-800/80 border border-slate-700 rounded-lg px-3 py-1.5 text-xs">
-              <span className="text-slate-400">Role:</span>
-              <select
-                value={currentRole}
-                onChange={(e) => setCurrentRole(e.target.value as RoleName)}
-                className="bg-transparent text-amber-400 font-semibold focus:outline-none cursor-pointer"
-              >
-                <option value="SUPER_ADMIN" className="bg-slate-900 text-slate-100">SUPER_ADMIN (Full Clearance)</option>
-                <option value="CATALOG_MANAGER" className="bg-slate-900 text-slate-100">CATALOG_MANAGER</option>
-                <option value="CONTENT_MANAGER" className="bg-slate-900 text-slate-100">CONTENT_MANAGER</option>
-                <option value="COMPLIANCE_MANAGER" className="bg-slate-900 text-slate-100">COMPLIANCE_MANAGER</option>
-                <option value="ORDER_MANAGER" className="bg-slate-900 text-slate-100">ORDER_MANAGER (Denied)</option>
-              </select>
-            </div>
+            <span className="text-xs text-amber-300 border border-slate-700 rounded-lg px-3 py-1.5">Super Admin</span>
 
             <Link
               href={`/${locale}/admin/catalogue/adjudication`}

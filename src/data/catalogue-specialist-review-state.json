@@ -1,0 +1,1333 @@
+{
+  "version": 1,
+  "products": {
+    "a-box-of-10-fusion-gummies": {
+      "productSlug": "a-box-of-10-fusion-gummies",
+      "reviewer": "content.review@fusionbars.eu",
+      "updatedAt": "2026-09-27T03:49:18.704Z",
+      "pricing": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 200; repoB USD 200. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.702Z"
+      },
+      "compliance": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.703Z"
+      },
+      "countries": [],
+      "content": {
+        "state": "CONTENT_DEFERRED",
+        "candidatePublicContent": "",
+        "approvedPublicContent": "",
+        "reviewer": "content.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.703Z"
+      },
+      "translations": {
+        "en": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "de": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "fr": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "es": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "it": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "nl": {
+          "state": "PENDING",
+          "draft": ""
+        }
+      },
+      "media": {
+        "state": "VERIFIED"
+      },
+      "publication": "NOT_READY"
+    },
+    "a-box-of-fusion-gummies": {
+      "productSlug": "a-box-of-fusion-gummies",
+      "reviewer": "content.review@fusionbars.eu",
+      "updatedAt": "2026-09-27T03:49:18.705Z",
+      "pricing": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 30; repoB USD 30. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.704Z"
+      },
+      "compliance": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.704Z"
+      },
+      "countries": [],
+      "content": {
+        "state": "CONTENT_DEFERRED",
+        "candidatePublicContent": "",
+        "approvedPublicContent": "",
+        "reviewer": "content.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.705Z"
+      },
+      "translations": {
+        "en": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "de": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "fr": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "es": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "it": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "nl": {
+          "state": "PENDING",
+          "draft": ""
+        }
+      },
+      "media": {
+        "state": "VERIFIED"
+      },
+      "publication": "NOT_READY"
+    },
+    "audit-test-product": {
+      "productSlug": "audit-test-product",
+      "reviewer": "content.review@fusionbars.eu",
+      "updatedAt": "2026-09-27T03:49:18.706Z",
+      "pricing": {
+        "state": "PRICE_NOT_APPLICABLE",
+        "rationale": "This record is already classified NON_COMMERCIAL_TEST_RECORD. No commercial selling price applies, and none was entered.",
+        "evidence": "Observed source pricing only: repoA USD 19.99; repoB USD 19.99. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.705Z"
+      },
+      "compliance": {
+        "state": "DO_NOT_PUBLISH",
+        "rationale": "NON_COMMERCIAL_TEST_RECORD remains DO_NOT_PUBLISH. This review does not convert it into a commercial product.",
+        "evidence": "Saved data-adjudication classification NON_COMMERCIAL_TEST_RECORD and placeholder media. No commercial authorization exists.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.705Z"
+      },
+      "countries": [],
+      "content": {
+        "state": "DO_NOT_PUBLISH",
+        "candidatePublicContent": "",
+        "approvedPublicContent": "",
+        "reviewer": "content.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.706Z"
+      },
+      "translations": {
+        "en": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "de": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "fr": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "es": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "it": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "nl": {
+          "state": "PENDING",
+          "draft": ""
+        }
+      },
+      "media": {
+        "state": "MEDIA_REVIEW"
+      },
+      "publication": "DO_NOT_PUBLISH"
+    },
+    "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar": {
+      "productSlug": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "reviewer": "content.review@fusionbars.eu",
+      "updatedAt": "2026-09-27T03:49:18.707Z",
+      "pricing": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. The high-tolerance source price was not converted or rewritten into a store price.",
+        "evidence": "Observed source pricing only: repoA USD 25; repoB USD 25. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.707Z"
+      },
+      "compliance": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination is on file. High-tolerance source wording was not treated as legal approval and was not rewritten.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.707Z"
+      },
+      "countries": [],
+      "content": {
+        "state": "CONTENT_DEFERRED",
+        "candidatePublicContent": "",
+        "approvedPublicContent": "",
+        "reviewer": "content.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.707Z"
+      },
+      "translations": {
+        "en": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "de": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "fr": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "es": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "it": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "nl": {
+          "state": "PENDING",
+          "draft": ""
+        }
+      },
+      "media": {
+        "state": "VERIFIED"
+      },
+      "publication": "NOT_READY"
+    },
+    "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar": {
+      "productSlug": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "reviewer": "content.review@fusionbars.eu",
+      "updatedAt": "2026-09-27T03:49:18.711Z",
+      "pricing": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. The high-tolerance source price was not converted or rewritten into a store price.",
+        "evidence": "Observed source pricing only: repoA USD 25; repoB USD 25. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.708Z"
+      },
+      "compliance": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination is on file. High-tolerance source wording was not treated as legal approval and was not rewritten.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.710Z"
+      },
+      "countries": [],
+      "content": {
+        "state": "CONTENT_DEFERRED",
+        "candidatePublicContent": "",
+        "approvedPublicContent": "",
+        "reviewer": "content.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.711Z"
+      },
+      "translations": {
+        "en": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "de": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "fr": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "es": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "it": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "nl": {
+          "state": "PENDING",
+          "draft": ""
+        }
+      },
+      "media": {
+        "state": "VERIFIED"
+      },
+      "publication": "NOT_READY"
+    },
+    "fusion-100-bars-boutique-box": {
+      "productSlug": "fusion-100-bars-boutique-box",
+      "reviewer": "content.review@fusionbars.eu",
+      "updatedAt": "2026-09-27T03:49:18.712Z",
+      "pricing": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 1350; repoB USD 1350. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.711Z"
+      },
+      "compliance": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.711Z"
+      },
+      "countries": [],
+      "content": {
+        "state": "CONTENT_DEFERRED",
+        "candidatePublicContent": "",
+        "approvedPublicContent": "",
+        "reviewer": "content.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.712Z"
+      },
+      "translations": {
+        "en": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "de": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "fr": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "es": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "it": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "nl": {
+          "state": "PENDING",
+          "draft": ""
+        }
+      },
+      "media": {
+        "state": "VERIFIED"
+      },
+      "publication": "NOT_READY"
+    },
+    "fusion-bars-banana-chocolate": {
+      "productSlug": "fusion-bars-banana-chocolate",
+      "reviewer": "content.review@fusionbars.eu",
+      "updatedAt": "2026-09-27T03:49:18.713Z",
+      "pricing": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 24.99; repoB USD 24.99. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.712Z"
+      },
+      "compliance": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.712Z"
+      },
+      "countries": [],
+      "content": {
+        "state": "CONTENT_DEFERRED",
+        "candidatePublicContent": "",
+        "approvedPublicContent": "",
+        "reviewer": "content.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.713Z"
+      },
+      "translations": {
+        "en": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "de": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "fr": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "es": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "it": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "nl": {
+          "state": "PENDING",
+          "draft": ""
+        }
+      },
+      "media": {
+        "state": "VERIFIED"
+      },
+      "publication": "NOT_READY"
+    },
+    "fusion-bars-peanut-butter": {
+      "productSlug": "fusion-bars-peanut-butter",
+      "reviewer": "content.review@fusionbars.eu",
+      "updatedAt": "2026-09-27T03:49:18.714Z",
+      "pricing": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 24.99; repoB USD 24.99. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.713Z"
+      },
+      "compliance": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.714Z"
+      },
+      "countries": [],
+      "content": {
+        "state": "CONTENT_DEFERRED",
+        "candidatePublicContent": "",
+        "approvedPublicContent": "",
+        "reviewer": "content.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.714Z"
+      },
+      "translations": {
+        "en": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "de": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "fr": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "es": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "it": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "nl": {
+          "state": "PENDING",
+          "draft": ""
+        }
+      },
+      "media": {
+        "state": "VERIFIED"
+      },
+      "publication": "NOT_READY"
+    },
+    "fusion-cactus-cooler-gummies": {
+      "productSlug": "fusion-cactus-cooler-gummies",
+      "reviewer": "content.review@fusionbars.eu",
+      "updatedAt": "2026-09-27T03:49:18.715Z",
+      "pricing": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 30; repoB USD 30. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.715Z"
+      },
+      "compliance": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.715Z"
+      },
+      "countries": [],
+      "content": {
+        "state": "CONTENT_DEFERRED",
+        "candidatePublicContent": "",
+        "approvedPublicContent": "",
+        "reviewer": "content.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.715Z"
+      },
+      "translations": {
+        "en": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "de": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "fr": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "es": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "it": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "nl": {
+          "state": "PENDING",
+          "draft": ""
+        }
+      },
+      "media": {
+        "state": "VERIFIED"
+      },
+      "publication": "NOT_READY"
+    },
+    "fusion-cherry-lime-gummies": {
+      "productSlug": "fusion-cherry-lime-gummies",
+      "reviewer": "content.review@fusionbars.eu",
+      "updatedAt": "2026-09-27T03:49:18.717Z",
+      "pricing": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 30; repoB USD 30. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.716Z"
+      },
+      "compliance": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.716Z"
+      },
+      "countries": [],
+      "content": {
+        "state": "CONTENT_DEFERRED",
+        "candidatePublicContent": "",
+        "approvedPublicContent": "",
+        "reviewer": "content.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.717Z"
+      },
+      "translations": {
+        "en": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "de": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "fr": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "es": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "it": {
+          "state": "PENDING",
+          "draft": ""
+        },
+        "nl": {
+          "state": "PENDING",
+          "draft": ""
+        }
+      },
+      "media": {
+        "state": "VERIFIED"
+      },
+      "publication": "NOT_READY"
+    }
+  },
+  "auditTrail": [
+    {
+      "actor": "finance.review@fusionbars.eu",
+      "actorRole": "FINANCE_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "section": "pricing",
+      "decision": "PRICE_DEFERRED",
+      "beforeValue": {
+        "state": "PRICE_REVIEW_PENDING"
+      },
+      "afterValue": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 200; repoB USD 200. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.702Z"
+      },
+      "reason": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+      "id": "SR-1790480958703-2851",
+      "timestamp": "2026-09-27T03:49:18.703Z"
+    },
+    {
+      "actor": "compliance.review@fusionbars.eu",
+      "actorRole": "COMPLIANCE_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "section": "compliance",
+      "decision": "DEFERRED",
+      "beforeValue": {
+        "state": "REQUIRES_REVIEW"
+      },
+      "afterValue": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.703Z"
+      },
+      "reason": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+      "id": "SR-1790480958703-7253",
+      "timestamp": "2026-09-27T03:49:18.703Z"
+    },
+    {
+      "actor": "content.review@fusionbars.eu",
+      "actorRole": "CONTENT_MANAGER",
+      "product": "a-box-of-10-fusion-gummies",
+      "section": "content",
+      "decision": "CONTENT_DEFERRED",
+      "beforeValue": null,
+      "afterValue": {
+        "state": "CONTENT_DEFERRED",
+        "hasApproved": false
+      },
+      "reason": "No reviewer-authored public copy is on file. Internal source text was not copied to the storefront.",
+      "id": "SR-1790480958703-9149",
+      "timestamp": "2026-09-27T03:49:18.703Z"
+    },
+    {
+      "actor": "operations.review@fusionbars.eu",
+      "actorRole": "SUPER_ADMIN",
+      "product": "a-box-of-10-fusion-gummies",
+      "section": "publication",
+      "decision": "NOT_READY",
+      "beforeValue": null,
+      "afterValue": {
+        "blockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country eligibility not configured",
+          "Public content not approved",
+          "Translation pending"
+        ],
+        "published": false
+      },
+      "reason": "Publication gate evaluated without publishing",
+      "id": "SR-1790480958704-186",
+      "timestamp": "2026-09-27T03:49:18.704Z"
+    },
+    {
+      "actor": "finance.review@fusionbars.eu",
+      "actorRole": "FINANCE_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "section": "pricing",
+      "decision": "PRICE_DEFERRED",
+      "beforeValue": {
+        "state": "PRICE_REVIEW_PENDING"
+      },
+      "afterValue": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 30; repoB USD 30. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.704Z"
+      },
+      "reason": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+      "id": "SR-1790480958704-3109",
+      "timestamp": "2026-09-27T03:49:18.704Z"
+    },
+    {
+      "actor": "compliance.review@fusionbars.eu",
+      "actorRole": "COMPLIANCE_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "section": "compliance",
+      "decision": "DEFERRED",
+      "beforeValue": {
+        "state": "REQUIRES_REVIEW"
+      },
+      "afterValue": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.704Z"
+      },
+      "reason": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+      "id": "SR-1790480958704-8383",
+      "timestamp": "2026-09-27T03:49:18.704Z"
+    },
+    {
+      "actor": "content.review@fusionbars.eu",
+      "actorRole": "CONTENT_MANAGER",
+      "product": "a-box-of-fusion-gummies",
+      "section": "content",
+      "decision": "CONTENT_DEFERRED",
+      "beforeValue": null,
+      "afterValue": {
+        "state": "CONTENT_DEFERRED",
+        "hasApproved": false
+      },
+      "reason": "No reviewer-authored public copy is on file. Internal source text was not copied to the storefront.",
+      "id": "SR-1790480958705-9669",
+      "timestamp": "2026-09-27T03:49:18.705Z"
+    },
+    {
+      "actor": "operations.review@fusionbars.eu",
+      "actorRole": "SUPER_ADMIN",
+      "product": "a-box-of-fusion-gummies",
+      "section": "publication",
+      "decision": "NOT_READY",
+      "beforeValue": null,
+      "afterValue": {
+        "blockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country eligibility not configured",
+          "Public content not approved",
+          "Translation pending"
+        ],
+        "published": false
+      },
+      "reason": "Publication gate evaluated without publishing",
+      "id": "SR-1790480958705-2800",
+      "timestamp": "2026-09-27T03:49:18.705Z"
+    },
+    {
+      "actor": "finance.review@fusionbars.eu",
+      "actorRole": "FINANCE_MANAGER",
+      "product": "audit-test-product",
+      "section": "pricing",
+      "decision": "PRICE_NOT_APPLICABLE",
+      "beforeValue": {
+        "state": "PRICE_REVIEW_PENDING"
+      },
+      "afterValue": {
+        "state": "PRICE_NOT_APPLICABLE",
+        "rationale": "This record is already classified NON_COMMERCIAL_TEST_RECORD. No commercial selling price applies, and none was entered.",
+        "evidence": "Observed source pricing only: repoA USD 19.99; repoB USD 19.99. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.705Z"
+      },
+      "reason": "This record is already classified NON_COMMERCIAL_TEST_RECORD. No commercial selling price applies, and none was entered.",
+      "id": "SR-1790480958705-3059",
+      "timestamp": "2026-09-27T03:49:18.705Z"
+    },
+    {
+      "actor": "compliance.review@fusionbars.eu",
+      "actorRole": "COMPLIANCE_MANAGER",
+      "product": "audit-test-product",
+      "section": "compliance",
+      "decision": "DO_NOT_PUBLISH",
+      "beforeValue": {
+        "state": "DO_NOT_PUBLISH"
+      },
+      "afterValue": {
+        "state": "DO_NOT_PUBLISH",
+        "rationale": "NON_COMMERCIAL_TEST_RECORD remains DO_NOT_PUBLISH. This review does not convert it into a commercial product.",
+        "evidence": "Saved data-adjudication classification NON_COMMERCIAL_TEST_RECORD and placeholder media. No commercial authorization exists.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.705Z"
+      },
+      "reason": "NON_COMMERCIAL_TEST_RECORD remains DO_NOT_PUBLISH. This review does not convert it into a commercial product.",
+      "id": "SR-1790480958705-2752",
+      "timestamp": "2026-09-27T03:49:18.705Z"
+    },
+    {
+      "actor": "content.review@fusionbars.eu",
+      "actorRole": "CONTENT_MANAGER",
+      "product": "audit-test-product",
+      "section": "content",
+      "decision": "DO_NOT_PUBLISH",
+      "beforeValue": null,
+      "afterValue": {
+        "state": "DO_NOT_PUBLISH",
+        "hasApproved": false
+      },
+      "reason": "NON-COMMERCIAL TEST RECORD — DO NOT PUBLISH. Internal source text stays internal.",
+      "id": "SR-1790480958706-6297",
+      "timestamp": "2026-09-27T03:49:18.706Z"
+    },
+    {
+      "actor": "operations.review@fusionbars.eu",
+      "actorRole": "SUPER_ADMIN",
+      "product": "audit-test-product",
+      "section": "publication",
+      "decision": "DO_NOT_PUBLISH",
+      "beforeValue": null,
+      "afterValue": {
+        "blockers": [
+          "NON_COMMERCIAL_TEST_RECORD"
+        ],
+        "published": false
+      },
+      "reason": "Publication gate evaluated without publishing",
+      "id": "SR-1790480958706-6763",
+      "timestamp": "2026-09-27T03:49:18.706Z"
+    },
+    {
+      "actor": "finance.review@fusionbars.eu",
+      "actorRole": "FINANCE_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "section": "pricing",
+      "decision": "PRICE_DEFERRED",
+      "beforeValue": {
+        "state": "PRICE_REVIEW_PENDING"
+      },
+      "afterValue": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. The high-tolerance source price was not converted or rewritten into a store price.",
+        "evidence": "Observed source pricing only: repoA USD 25; repoB USD 25. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.707Z"
+      },
+      "reason": "No finance-approved selling price is on file. The high-tolerance source price was not converted or rewritten into a store price.",
+      "id": "SR-1790480958707-8527",
+      "timestamp": "2026-09-27T03:49:18.707Z"
+    },
+    {
+      "actor": "compliance.review@fusionbars.eu",
+      "actorRole": "COMPLIANCE_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "section": "compliance",
+      "decision": "DEFERRED",
+      "beforeValue": {
+        "state": "REQUIRES_REVIEW"
+      },
+      "afterValue": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination is on file. High-tolerance source wording was not treated as legal approval and was not rewritten.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.707Z"
+      },
+      "reason": "No compliance determination is on file. High-tolerance source wording was not treated as legal approval and was not rewritten.",
+      "id": "SR-1790480958707-1690",
+      "timestamp": "2026-09-27T03:49:18.707Z"
+    },
+    {
+      "actor": "content.review@fusionbars.eu",
+      "actorRole": "CONTENT_MANAGER",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "section": "content",
+      "decision": "CONTENT_DEFERRED",
+      "beforeValue": null,
+      "afterValue": {
+        "state": "CONTENT_DEFERRED",
+        "hasApproved": false
+      },
+      "reason": "No reviewer-authored public copy is on file. High-tolerance source claims were not softened, copied, or approved.",
+      "id": "SR-1790480958707-9625",
+      "timestamp": "2026-09-27T03:49:18.707Z"
+    },
+    {
+      "actor": "operations.review@fusionbars.eu",
+      "actorRole": "SUPER_ADMIN",
+      "product": "brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "section": "publication",
+      "decision": "NOT_READY",
+      "beforeValue": null,
+      "afterValue": {
+        "blockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country eligibility not configured",
+          "Public content not approved",
+          "Translation pending"
+        ],
+        "published": false
+      },
+      "reason": "Publication gate evaluated without publishing",
+      "id": "SR-1790480958707-2497",
+      "timestamp": "2026-09-27T03:49:18.707Z"
+    },
+    {
+      "actor": "finance.review@fusionbars.eu",
+      "actorRole": "FINANCE_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "section": "pricing",
+      "decision": "PRICE_DEFERRED",
+      "beforeValue": {
+        "state": "PRICE_REVIEW_PENDING"
+      },
+      "afterValue": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. The high-tolerance source price was not converted or rewritten into a store price.",
+        "evidence": "Observed source pricing only: repoA USD 25; repoB USD 25. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.708Z"
+      },
+      "reason": "No finance-approved selling price is on file. The high-tolerance source price was not converted or rewritten into a store price.",
+      "id": "SR-1790480958710-4876",
+      "timestamp": "2026-09-27T03:49:18.710Z"
+    },
+    {
+      "actor": "compliance.review@fusionbars.eu",
+      "actorRole": "COMPLIANCE_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "section": "compliance",
+      "decision": "DEFERRED",
+      "beforeValue": {
+        "state": "REQUIRES_REVIEW"
+      },
+      "afterValue": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination is on file. High-tolerance source wording was not treated as legal approval and was not rewritten.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.710Z"
+      },
+      "reason": "No compliance determination is on file. High-tolerance source wording was not treated as legal approval and was not rewritten.",
+      "id": "SR-1790480958710-1184",
+      "timestamp": "2026-09-27T03:49:18.710Z"
+    },
+    {
+      "actor": "content.review@fusionbars.eu",
+      "actorRole": "CONTENT_MANAGER",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "section": "content",
+      "decision": "CONTENT_DEFERRED",
+      "beforeValue": null,
+      "afterValue": {
+        "state": "CONTENT_DEFERRED",
+        "hasApproved": false
+      },
+      "reason": "No reviewer-authored public copy is on file. High-tolerance source claims were not softened, copied, or approved.",
+      "id": "SR-1790480958711-6410",
+      "timestamp": "2026-09-27T03:49:18.711Z"
+    },
+    {
+      "actor": "operations.review@fusionbars.eu",
+      "actorRole": "SUPER_ADMIN",
+      "product": "fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar",
+      "section": "publication",
+      "decision": "NOT_READY",
+      "beforeValue": null,
+      "afterValue": {
+        "blockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country eligibility not configured",
+          "Public content not approved",
+          "Translation pending"
+        ],
+        "published": false
+      },
+      "reason": "Publication gate evaluated without publishing",
+      "id": "SR-1790480958711-6305",
+      "timestamp": "2026-09-27T03:49:18.711Z"
+    },
+    {
+      "actor": "finance.review@fusionbars.eu",
+      "actorRole": "FINANCE_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "section": "pricing",
+      "decision": "PRICE_DEFERRED",
+      "beforeValue": {
+        "state": "PRICE_REVIEW_PENDING"
+      },
+      "afterValue": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 1350; repoB USD 1350. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.711Z"
+      },
+      "reason": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+      "id": "SR-1790480958711-497",
+      "timestamp": "2026-09-27T03:49:18.711Z"
+    },
+    {
+      "actor": "compliance.review@fusionbars.eu",
+      "actorRole": "COMPLIANCE_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "section": "compliance",
+      "decision": "DEFERRED",
+      "beforeValue": {
+        "state": "REQUIRES_REVIEW"
+      },
+      "afterValue": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.711Z"
+      },
+      "reason": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+      "id": "SR-1790480958712-1326",
+      "timestamp": "2026-09-27T03:49:18.712Z"
+    },
+    {
+      "actor": "content.review@fusionbars.eu",
+      "actorRole": "CONTENT_MANAGER",
+      "product": "fusion-100-bars-boutique-box",
+      "section": "content",
+      "decision": "CONTENT_DEFERRED",
+      "beforeValue": null,
+      "afterValue": {
+        "state": "CONTENT_DEFERRED",
+        "hasApproved": false
+      },
+      "reason": "No reviewer-authored public copy is on file. Internal source text was not copied to the storefront.",
+      "id": "SR-1790480958712-2196",
+      "timestamp": "2026-09-27T03:49:18.712Z"
+    },
+    {
+      "actor": "operations.review@fusionbars.eu",
+      "actorRole": "SUPER_ADMIN",
+      "product": "fusion-100-bars-boutique-box",
+      "section": "publication",
+      "decision": "NOT_READY",
+      "beforeValue": null,
+      "afterValue": {
+        "blockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country eligibility not configured",
+          "Public content not approved",
+          "Translation pending"
+        ],
+        "published": false
+      },
+      "reason": "Publication gate evaluated without publishing",
+      "id": "SR-1790480958712-2775",
+      "timestamp": "2026-09-27T03:49:18.712Z"
+    },
+    {
+      "actor": "finance.review@fusionbars.eu",
+      "actorRole": "FINANCE_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "section": "pricing",
+      "decision": "PRICE_DEFERRED",
+      "beforeValue": {
+        "state": "PRICE_REVIEW_PENDING"
+      },
+      "afterValue": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 24.99; repoB USD 24.99. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.712Z"
+      },
+      "reason": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+      "id": "SR-1790480958712-4283",
+      "timestamp": "2026-09-27T03:49:18.712Z"
+    },
+    {
+      "actor": "compliance.review@fusionbars.eu",
+      "actorRole": "COMPLIANCE_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "section": "compliance",
+      "decision": "DEFERRED",
+      "beforeValue": {
+        "state": "REQUIRES_REVIEW"
+      },
+      "afterValue": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.712Z"
+      },
+      "reason": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+      "id": "SR-1790480958713-2541",
+      "timestamp": "2026-09-27T03:49:18.713Z"
+    },
+    {
+      "actor": "content.review@fusionbars.eu",
+      "actorRole": "CONTENT_MANAGER",
+      "product": "fusion-bars-banana-chocolate",
+      "section": "content",
+      "decision": "CONTENT_DEFERRED",
+      "beforeValue": null,
+      "afterValue": {
+        "state": "CONTENT_DEFERRED",
+        "hasApproved": false
+      },
+      "reason": "No reviewer-authored public copy is on file. Internal source text was not copied to the storefront.",
+      "id": "SR-1790480958713-418",
+      "timestamp": "2026-09-27T03:49:18.713Z"
+    },
+    {
+      "actor": "operations.review@fusionbars.eu",
+      "actorRole": "SUPER_ADMIN",
+      "product": "fusion-bars-banana-chocolate",
+      "section": "publication",
+      "decision": "NOT_READY",
+      "beforeValue": null,
+      "afterValue": {
+        "blockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country eligibility not configured",
+          "Public content not approved",
+          "Translation pending"
+        ],
+        "published": false
+      },
+      "reason": "Publication gate evaluated without publishing",
+      "id": "SR-1790480958713-1465",
+      "timestamp": "2026-09-27T03:49:18.713Z"
+    },
+    {
+      "actor": "finance.review@fusionbars.eu",
+      "actorRole": "FINANCE_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "section": "pricing",
+      "decision": "PRICE_DEFERRED",
+      "beforeValue": {
+        "state": "PRICE_REVIEW_PENDING"
+      },
+      "afterValue": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 24.99; repoB USD 24.99. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.713Z"
+      },
+      "reason": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+      "id": "SR-1790480958713-2987",
+      "timestamp": "2026-09-27T03:49:18.713Z"
+    },
+    {
+      "actor": "compliance.review@fusionbars.eu",
+      "actorRole": "COMPLIANCE_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "section": "compliance",
+      "decision": "DEFERRED",
+      "beforeValue": {
+        "state": "REQUIRES_REVIEW"
+      },
+      "afterValue": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.714Z"
+      },
+      "reason": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+      "id": "SR-1790480958714-7315",
+      "timestamp": "2026-09-27T03:49:18.714Z"
+    },
+    {
+      "actor": "content.review@fusionbars.eu",
+      "actorRole": "CONTENT_MANAGER",
+      "product": "fusion-bars-peanut-butter",
+      "section": "content",
+      "decision": "CONTENT_DEFERRED",
+      "beforeValue": null,
+      "afterValue": {
+        "state": "CONTENT_DEFERRED",
+        "hasApproved": false
+      },
+      "reason": "No reviewer-authored public copy is on file. Internal source text was not copied to the storefront.",
+      "id": "SR-1790480958714-9637",
+      "timestamp": "2026-09-27T03:49:18.714Z"
+    },
+    {
+      "actor": "operations.review@fusionbars.eu",
+      "actorRole": "SUPER_ADMIN",
+      "product": "fusion-bars-peanut-butter",
+      "section": "publication",
+      "decision": "NOT_READY",
+      "beforeValue": null,
+      "afterValue": {
+        "blockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country eligibility not configured",
+          "Public content not approved",
+          "Translation pending"
+        ],
+        "published": false
+      },
+      "reason": "Publication gate evaluated without publishing",
+      "id": "SR-1790480958714-6869",
+      "timestamp": "2026-09-27T03:49:18.714Z"
+    },
+    {
+      "actor": "finance.review@fusionbars.eu",
+      "actorRole": "FINANCE_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "section": "pricing",
+      "decision": "PRICE_DEFERRED",
+      "beforeValue": {
+        "state": "PRICE_REVIEW_PENDING"
+      },
+      "afterValue": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 30; repoB USD 30. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.715Z"
+      },
+      "reason": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+      "id": "SR-1790480958715-1897",
+      "timestamp": "2026-09-27T03:49:18.715Z"
+    },
+    {
+      "actor": "compliance.review@fusionbars.eu",
+      "actorRole": "COMPLIANCE_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "section": "compliance",
+      "decision": "DEFERRED",
+      "beforeValue": {
+        "state": "REQUIRES_REVIEW"
+      },
+      "afterValue": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.715Z"
+      },
+      "reason": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+      "id": "SR-1790480958715-7286",
+      "timestamp": "2026-09-27T03:49:18.715Z"
+    },
+    {
+      "actor": "content.review@fusionbars.eu",
+      "actorRole": "CONTENT_MANAGER",
+      "product": "fusion-cactus-cooler-gummies",
+      "section": "content",
+      "decision": "CONTENT_DEFERRED",
+      "beforeValue": null,
+      "afterValue": {
+        "state": "CONTENT_DEFERRED",
+        "hasApproved": false
+      },
+      "reason": "No reviewer-authored public copy is on file. Internal source text was not copied to the storefront.",
+      "id": "SR-1790480958715-8998",
+      "timestamp": "2026-09-27T03:49:18.715Z"
+    },
+    {
+      "actor": "operations.review@fusionbars.eu",
+      "actorRole": "SUPER_ADMIN",
+      "product": "fusion-cactus-cooler-gummies",
+      "section": "publication",
+      "decision": "NOT_READY",
+      "beforeValue": null,
+      "afterValue": {
+        "blockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country eligibility not configured",
+          "Public content not approved",
+          "Translation pending"
+        ],
+        "published": false
+      },
+      "reason": "Publication gate evaluated without publishing",
+      "id": "SR-1790480958715-3109",
+      "timestamp": "2026-09-27T03:49:18.715Z"
+    },
+    {
+      "actor": "finance.review@fusionbars.eu",
+      "actorRole": "FINANCE_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "section": "pricing",
+      "decision": "PRICE_DEFERRED",
+      "beforeValue": {
+        "state": "PRICE_REVIEW_PENDING"
+      },
+      "afterValue": {
+        "state": "PRICE_DEFERRED",
+        "rationale": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+        "evidence": "Observed source pricing only: repoA USD 30; repoB USD 30. No finance-approved EUR or GBP selling price is on file. The source amount was not converted.",
+        "reviewer": "finance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.716Z"
+      },
+      "reason": "No finance-approved selling price is on file. Source currency amounts were not converted into EUR or GBP.",
+      "id": "SR-1790480958716-2639",
+      "timestamp": "2026-09-27T03:49:18.716Z"
+    },
+    {
+      "actor": "compliance.review@fusionbars.eu",
+      "actorRole": "COMPLIANCE_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "section": "compliance",
+      "decision": "DEFERRED",
+      "beforeValue": {
+        "state": "REQUIRES_REVIEW"
+      },
+      "afterValue": {
+        "state": "DEFERRED",
+        "rationale": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+        "evidence": "Inspected the saved first-batch review packet and source provenance. No separate compliance decision or legal reference is recorded.",
+        "reviewer": "compliance.review@fusionbars.eu",
+        "timestamp": "2026-09-27T03:49:18.716Z"
+      },
+      "reason": "No compliance determination, legal opinion, or regulatory authorization is on file. The source record was not treated as approval.",
+      "id": "SR-1790480958716-6701",
+      "timestamp": "2026-09-27T03:49:18.716Z"
+    },
+    {
+      "actor": "content.review@fusionbars.eu",
+      "actorRole": "CONTENT_MANAGER",
+      "product": "fusion-cherry-lime-gummies",
+      "section": "content",
+      "decision": "CONTENT_DEFERRED",
+      "beforeValue": null,
+      "afterValue": {
+        "state": "CONTENT_DEFERRED",
+        "hasApproved": false
+      },
+      "reason": "No reviewer-authored public copy is on file. Internal source text was not copied to the storefront.",
+      "id": "SR-1790480958717-5831",
+      "timestamp": "2026-09-27T03:49:18.717Z"
+    },
+    {
+      "actor": "operations.review@fusionbars.eu",
+      "actorRole": "SUPER_ADMIN",
+      "product": "fusion-cherry-lime-gummies",
+      "section": "publication",
+      "decision": "NOT_READY",
+      "beforeValue": null,
+      "afterValue": {
+        "blockers": [
+          "Pricing pending",
+          "Compliance review required",
+          "Country eligibility not configured",
+          "Public content not approved",
+          "Translation pending"
+        ],
+        "published": false
+      },
+      "reason": "Publication gate evaluated without publishing",
+      "id": "SR-1790480958717-5164",
+      "timestamp": "2026-09-27T03:49:18.717Z"
+    }
+  ]
+}

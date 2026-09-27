@@ -121,6 +121,11 @@ export interface CartCalculationResult {
   qualifiesForFreeShipping: boolean;
   freeShippingThreshold: MinorUnits;
   amountNeededForFreeShipping: MinorUnits;
+  taxAmount?: MinorUnits | null;
+  taxStatus?: string;
+  taxTreatment?: string;
+  taxableAmount?: MinorUnits | null;
+  configurationVersion?: number;
   appliedCoupon?: {
     code: string;
     discount: number;

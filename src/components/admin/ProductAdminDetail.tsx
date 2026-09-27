@@ -2,8 +2,8 @@
 
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useParams } from 'next/navigation';
-import { getAdminProductDetailAction } from '@/actions/admin-center';
+import { useParams, useRouter } from 'next/navigation';
+import { getAdminProductDetailAction, publishProductAction, saveAdminProductCommercialAction, unpublishProductAction } from '@/actions/admin-center';
 import { useAdminRole } from '@/components/admin/AdminShell';
 
 function Badge({ kind, children }: { kind: string; children: React.ReactNode }) {
@@ -26,11 +26,18 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 export default function ProductAdminDetail({ slug }: { slug: string }) {
   const { role } = useAdminRole();
+  const router = useRouter();
   const params = useParams<{ locale: string }>();
   const locale = params?.locale || 'en';
   const [state, setState] = useState<'loading' | 'ready' | 'error'>('loading');
   const [error, setError] = useState('');
   const [product, setProduct] = useState<any>(null);
+  const [canPublish, setCanPublish] = useState(false);
+  const [confirming, setConfirming] = useState<'publish' | 'unpublish' | null>(null);
+  const [actionError, setActionError] = useState('');
+  const [actionMessage, setActionMessage] = useState('');
+  const [canEditCommercial, setCanEditCommercial] = useState(false);
+  const [canEditPrice, setCanEditPrice] = useState(false);
 
   async function load() {
     setState('loading');
@@ -41,6 +48,9 @@ export default function ProductAdminDetail({ slug }: { slug: string }) {
       return;
     }
     setProduct(result.product);
+    setCanPublish(Boolean(result.canPublish));
+    setCanEditCommercial(Boolean(result.canEditCommercial));
+    setCanEditPrice(Boolean(result.canEditPrice));
     setState('ready');
   }
 
@@ -56,7 +66,28 @@ export default function ProductAdminDetail({ slug }: { slug: string }) {
     );
   }
 
-  const publicationBlocked = product.publication.governance === 'DO_NOT_PUBLISH';
+  const checklist = product.publication.checklist;
+  const ready = checklist?.readiness === 'READY_FOR_PUBLICATION';
+  const prohibited = checklist?.readiness === 'DO_NOT_PUBLISH';
+  const published = checklist?.publicationStatus === 'PUBLISHED';
+
+  async function confirmAction() {
+    setActionError('');
+    setActionMessage('');
+    const result = confirming === 'unpublish'
+      ? await unpublishProductAction(role, slug, true)
+      : await publishProductAction(role, slug, true);
+    if (!result.success) {
+      setActionError('error' in result ? result.error : 'Publication blocked.');
+      setConfirming(null);
+      await load();
+      return;
+    }
+    setActionMessage(confirming === 'unpublish' ? 'Removed from the public storefront.' : 'Published to the public storefront.');
+    setConfirming(null);
+    await load();
+  }
+
   return (
     <div className="space-y-4">
       <p className="text-sm text-[#5C5852]">
@@ -66,6 +97,52 @@ export default function ProductAdminDetail({ slug }: { slug: string }) {
         <Badge kind="blocked">Blocked</Badge>{' '}
         <Badge kind="public">Public</Badge>
       </p>
+      {canEditCommercial && (
+        <Section title="Storefront edits">
+          <form
+            key={`${product.identity.name}-${product.identity.headline}-${product.pricing.cataloguePriceEUR}`}
+            className="grid gap-3 text-sm"
+            onSubmit={async (event) => {
+              event.preventDefault();
+              setActionError('');
+              setActionMessage('');
+              const data = new FormData(event.currentTarget);
+              const result = await saveAdminProductCommercialAction(role, slug, {
+                name: String(data.get('name') || ''),
+                headline: String(data.get('headline') || ''),
+                description: String(data.get('description') || ''),
+                priceEuros: Number(data.get('priceEuros')),
+              });
+              if (!result.success) {
+                setActionError('error' in result ? result.error : 'Product could not be saved.');
+                return;
+              }
+              setActionMessage('Product copy and price saved. The shop and checkout use these values.');
+              router.refresh();
+              await load();
+            }}
+          >
+            <label>Name
+              <input name="name" required minLength={2} maxLength={160} defaultValue={product.identity.name} className="mt-1 w-full rounded-lg border border-[#E5E3DD] px-3 py-2" />
+            </label>
+            <label>Headline
+              <input name="headline" maxLength={220} defaultValue={product.identity.headline || ''} className="mt-1 w-full rounded-lg border border-[#E5E3DD] px-3 py-2" />
+            </label>
+            <label>Description
+              <textarea name="description" maxLength={4000} rows={5} defaultValue={product.content.sourceDescription || ''} className="mt-1 w-full rounded-lg border border-[#E5E3DD] px-3 py-2" />
+            </label>
+            <label>Price (EUR)
+              {!canEditPrice && (
+                <input type="hidden" name="priceEuros" value={product.pricing.cataloguePriceEUR == null ? '' : (product.pricing.cataloguePriceEUR / 100).toFixed(2)} />
+              )}
+              <input name={canEditPrice ? 'priceEuros' : 'pricePreview'} type="number" required={canEditPrice} min="0.01" max="10000" step="0.01" disabled={!canEditPrice} defaultValue={product.pricing.cataloguePriceEUR == null ? '' : (product.pricing.cataloguePriceEUR / 100).toFixed(2)} className="mt-1 w-full rounded-lg border border-[#E5E3DD] px-3 py-2 disabled:bg-[#F6F5F2]" />
+            </label>
+            <button type="submit" className="w-fit rounded-lg bg-[#4A5D4E] text-white px-4 py-2 font-semibold">Save product</button>
+          </form>
+          {actionError && <p className="text-sm text-rose-800">{actionError}</p>}
+          {actionMessage && <p className="text-sm text-emerald-800">{actionMessage}</p>}
+        </Section>
+      )}
       <Section title="Identity">
         <p className="font-semibold">{product.identity.name}</p>
         <p className="text-sm text-[#5C5852]">{product.identity.brand} · {product.identity.category} · {product.slug}</p>
@@ -101,19 +178,69 @@ export default function ProductAdminDetail({ slug }: { slug: string }) {
         <p className="text-sm">Workflow <Badge kind="unresolved">{product.translations.governance}</Badge></p>
         <p className="text-sm">{product.translations.locales.join(', ')} remain pending until a person writes each locale.</p>
       </Section>
-      <Section title="Publication">
-        <p className="text-sm">Decision <Badge kind={publicationBlocked ? 'blocked' : 'unresolved'}>{product.publication.governance}</Badge></p>
-        <p className="text-sm">Live publication <Badge kind="blocked">{product.publication.published ? 'Published' : 'Not published'}</Badge></p>
-        <ul className="text-sm space-y-1">
-          <li>Pricing {product.pricing.governance}</li>
-          <li>Compliance {product.compliance.governance}</li>
-          <li>Country {product.countries.governance}</li>
-          <li>Content {product.content.governance}</li>
-          <li>Media {product.media.governance}</li>
-          <li>Translation {product.translations.governance}</li>
-        </ul>
-        <Link className="text-sm underline" href={`/${locale}/admin/catalogue/review-workspace/specialist-review`}>Open specialist review</Link>
+      <Section title="Publication readiness">
+        <p className="text-sm">Readiness <Badge kind={prohibited ? 'blocked' : ready ? 'approved' : 'unresolved'}>{checklist?.readiness || 'NOT_READY'}</Badge></p>
+        <p className="text-sm">Storefront <Badge kind={published ? 'public' : 'blocked'}>{published ? 'PUBLISHED' : checklist?.publicationStatus || 'NOT_PUBLISHED'}</Badge></p>
+        <p className="text-xs whitespace-pre-wrap text-[#5C5852]">{checklist?.summary}</p>
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm">
+            <thead className="text-left text-[11px] uppercase tracking-wider text-[#8E8B85]">
+              <tr>
+                <th className="py-2 pr-3">Gate</th>
+                <th className="py-2 pr-3">Status</th>
+                <th className="py-2 pr-3 text-right">Blocking</th>
+                <th className="py-2">Responsible</th>
+              </tr>
+            </thead>
+            <tbody>
+              {(checklist?.gates || []).map((item: any) => (
+                <tr key={item.gate} className="border-t border-[#E5E3DD]">
+                  <td className="py-2 pr-3 capitalize">{item.gate}</td>
+                  <td className="py-2 pr-3"><Badge kind={item.visual === 'COMPLETE' ? 'approved' : item.visual === 'DO_NOT_PUBLISH' || item.visual === 'REJECTED' || item.visual === 'BLOCKED' ? 'blocked' : 'unresolved'}>{item.visual}</Badge></td>
+                  <td className="py-2 pr-3 text-right">{item.blocking ? 'Yes' : 'No'}</td>
+                  <td className="py-2">{item.responsibleRole}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        {canPublish && !published && (
+          <button
+            type="button"
+            disabled={!ready || prohibited}
+            onClick={() => { setActionError(''); setConfirming('publish'); }}
+            className="rounded-lg bg-[#121212] text-white px-3 py-2 text-sm disabled:opacity-40"
+          >
+            Publish Product
+          </button>
+        )}
+        {canPublish && published && (
+          <button type="button" onClick={() => { setActionError(''); setConfirming('unpublish'); }} className="rounded-lg border border-[#121212] px-3 py-2 text-sm">
+            Unpublish Product
+          </button>
+        )}
+        {actionError && <p className="text-sm text-rose-800">{actionError}</p>}
+        {actionMessage && <p className="text-sm text-emerald-800">{actionMessage}</p>}
+        <Link className="text-sm underline" href={`/${locale}/admin/catalogue/publication`}>Open publication dashboard</Link>
+        <Link className="text-sm underline block" href={`/${locale}/admin/catalogue/review-workspace/specialist-review`}>Open specialist review</Link>
       </Section>
+      {confirming && (
+        <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="max-w-lg rounded-2xl bg-white p-5 space-y-3">
+            {confirming === 'publish' ? (
+              <p className="text-sm">Publish this product to the public storefront? The product has passed all required publication gates. Once published, it may become visible in storefront search, category pages, product pages and other public surfaces.</p>
+            ) : (
+              <p className="text-sm">Unpublish this product? It will leave public search, categories, and product pages. The catalogue record, source provenance, and historical decisions stay in place.</p>
+            )}
+            <div className="flex gap-2">
+              <button type="button" className="rounded-lg bg-[#121212] text-white px-3 py-2 text-sm" onClick={confirmAction}>
+                {confirming === 'publish' ? 'Publish Product' : 'Unpublish Product'}
+              </button>
+              <button type="button" className="rounded-lg border border-[#E5E3DD] px-3 py-2 text-sm" onClick={() => setConfirming(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
       <Section title="Audit">
         {product.audit.length === 0 ? <p className="text-sm text-[#5C5852]">No saved decisions are recorded for this product.</p> : (
           <ul className="text-xs space-y-2">

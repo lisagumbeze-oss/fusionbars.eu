@@ -70,6 +70,7 @@ export interface DbOrder {
     firstName: string;
     lastName: string;
     streetAddress: string;
+    houseNumber?: string;
     city: string;
     postalCode: string;
     countryCode: string;
@@ -108,6 +109,22 @@ export interface DbOrder {
   }>;
   createdAt: string;
   updatedAt: string;
+  commercialSnapshot?: {
+    currency: CurrencyCode;
+    subtotal: MinorUnits;
+    discount: MinorUnits;
+    taxableAmount: MinorUnits | null;
+    taxAmount: MinorUnits | null;
+    taxTreatment: string;
+    taxClass: string;
+    taxRateBps: number | null;
+    shipping: MinorUnits;
+    total: MinorUnits;
+    pricingVersion: string;
+    configurationVersion: number;
+    destinationCountry: string;
+    capturedAt: string;
+  };
 }
 
 export interface DbInventoryRecord {
@@ -725,6 +742,7 @@ export class CommerceRepository {
                   firstName: order.shippingAddress.firstName,
                   lastName: order.shippingAddress.lastName,
                   streetAddress: order.shippingAddress.streetAddress,
+                  houseNumber: order.shippingAddress.houseNumber || null,
                   city: order.shippingAddress.city,
                   postalCode: order.shippingAddress.postalCode,
                   countryCode: order.shippingAddress.countryCode,

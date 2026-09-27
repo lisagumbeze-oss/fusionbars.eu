@@ -27,6 +27,20 @@ export interface ITransactionalEmailProvider {
  * Mock email provider for local development, test environments, and CI.
  * Keeps an in-memory queue of dispatched messages for verification assertions.
  */
+const deliveryJournal: Array<Record<string, unknown>> = [];
+
+export function recordDelivery(entry: Record<string, unknown>): void {
+  deliveryJournal.unshift({
+    ...entry,
+    sentAt: new Date().toISOString(),
+  });
+  if (deliveryJournal.length > 50) deliveryJournal.pop();
+}
+
+export function recentDeliveries(): Array<Record<string, unknown>> {
+  return deliveryJournal.slice();
+}
+
 export class MockEmailProvider implements ITransactionalEmailProvider {
   name = 'mock';
   public sentMessages: SendEmailOptions[] = [];
@@ -72,10 +86,28 @@ export class ResendEmailProvider implements ITransactionalEmailProvider {
 
       if (!response.ok) {
         const errText = await response.text();
-        return { success: false, error: `Resend HTTP ${response.status}: ${errText}` };
+        const error = `Resend HTTP ${response.status}: ${errText}`;
+        recordDelivery({
+          to: options.to,
+          subject: options.subject,
+          tags: options.tags,
+          provider: 'resend',
+          status: 'failed',
+          error,
+          messageId: `failed-${Date.now()}`,
+        });
+        return { success: false, error };
       }
 
       const data = (await response.json()) as { id: string };
+      recordDelivery({
+        to: options.to,
+        subject: options.subject,
+        tags: options.tags,
+        provider: 'resend',
+        status: 'success',
+        messageId: data.id,
+      });
       return { success: true, messageId: data.id };
     } catch (e: any) {
       return { success: false, error: e.message || 'Resend request failed' };

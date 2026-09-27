@@ -12,6 +12,8 @@ import {
   SendEmailResult,
 } from './EmailProvider';
 import { DbOrder } from '@/lib/commerce-repository';
+import { CountryRegistry } from '@/domain/countries/CountryRegistry';
+
 export class EmailService {
   private static provider: ITransactionalEmailProvider = new MockEmailProvider();
   private static defaultFrom: string = 'Fusion Mushroom Bars EU <sales@fusionbars.eu>';
@@ -171,9 +173,21 @@ export class EmailService {
   ): Promise<SendEmailResult> {
     this.ensureReady();
     const ctx = this.buildRenderContext(order);
+    const address = order.shippingAddress;
+    const country = CountryRegistry.getCountry(address.countryCode);
     const rendered = EmailTemplates.renderAdminOrderAlert({
       ...ctx,
+      firstName: address.firstName,
+      lastName: address.lastName,
       paymentMethodName,
+      email: order.guestEmail,
+      phone: address.phone || order.guestPhone || '',
+      streetAddress: address.streetAddress,
+      houseNumber: address.houseNumber,
+      postalCode: address.postalCode,
+      city: address.city,
+      country: country ? `${country.name} (${address.countryCode})` : address.countryCode,
+      shippingMethod: order.shippingMethodCode === 'EXPRESS' ? 'Express Priority Courier' : 'Standard Discreet Courier',
     });
 
     return this.provider.sendEmail({
@@ -439,6 +453,7 @@ export class EmailService {
       subject: customerRendered.subject,
       html: customerRendered.html,
       text: customerRendered.text,
+      tags: [{ name: 'template', value: 'contact-confirmation' }],
     });
 
     const ops = await this.provider.sendEmail({
@@ -448,26 +463,50 @@ export class EmailService {
       subject: opsRendered.subject,
       html: opsRendered.html,
       text: opsRendered.text,
+      tags: [{ name: 'template', value: 'contact-ops-alert' }],
     });
+
+    if (!customer.success) {
+      console.error('[EmailService] contact confirmation failed:', customer.error);
+    }
+    if (!ops.success) {
+      console.error('[EmailService] contact ops alert failed:', ops.error);
+    }
 
     return { customer, ops };
   }
 
-  static async sendNewsletterConfirmation(email: string): Promise<SendEmailResult> {
+  static async sendNewsletterConfirmation(email: string, locale = 'en'): Promise<{ subscriber: SendEmailResult; ops: SendEmailResult }> {
     this.ensureReady();
     const rendered = EmailTemplates.renderNewsletterConfirmation({
       email,
       supportEmail: this.defaultReplyTo,
     });
+    const opsRendered = EmailTemplates.renderNewsletterOpsAlert({ email, locale });
 
-    return this.provider.sendEmail({
+    const subscriber = await this.provider.sendEmail({
       to: email,
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
       subject: rendered.subject,
       html: rendered.html,
       text: rendered.text,
+      tags: [{ name: 'template', value: 'newsletter-confirmation' }],
     });
+    const ops = await this.provider.sendEmail({
+      to: this.opsInbox,
+      from: this.defaultFrom,
+      replyTo: email,
+      subject: opsRendered.subject,
+      html: opsRendered.html,
+      text: opsRendered.text,
+      tags: [{ name: 'template', value: 'newsletter-ops-alert' }],
+    });
+
+    if (!subscriber.success) console.error('[EmailService] newsletter confirmation failed:', subscriber.error);
+    if (!ops.success) console.error('[EmailService] newsletter ops alert failed:', ops.error);
+
+    return { subscriber, ops };
   }
 
   static async sendTestProbe(input: {

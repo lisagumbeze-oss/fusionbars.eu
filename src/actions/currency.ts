@@ -2,6 +2,7 @@
 
 import { CurrencyCode } from '../types';
 import { CurrencyService } from '../domain/currency/CurrencyService';
+import { PricingEngine } from '@/domain/commercial/PricingEngine';
 
 export interface ResolveCurrencyInput {
   targetCurrency: CurrencyCode;
@@ -10,20 +11,22 @@ export interface ResolveCurrencyInput {
 }
 
 export async function resolveCurrencyPriceAction(input: ResolveCurrencyInput) {
-  const price = CurrencyService.getPriceForCurrency(
-    {
-      priceEUR: input.priceEUR,
-      priceGBP: input.priceGBP,
-    },
-    input.targetCurrency
-  );
-
-  return {
-    success: true,
-    data: {
+  try {
+    const resolved = PricingEngine.resolveUnitPrice({
+      slug: 'currency-display',
+      catalogue: { priceEUR: input.priceEUR, priceGBP: input.priceGBP },
       currency: input.targetCurrency,
-      price,
-      formatted: CurrencyService.format(price, input.targetCurrency),
-    },
-  };
+    });
+    return {
+      success: true as const,
+      data: {
+        currency: input.targetCurrency,
+        price: resolved.amountMinor,
+        basis: resolved.basis,
+        formatted: CurrencyService.format(resolved.amountMinor, input.targetCurrency),
+      },
+    };
+  } catch (err: any) {
+    return { success: false as const, error: err.message || 'CONFIGURATION_REQUIRED' };
+  }
 }

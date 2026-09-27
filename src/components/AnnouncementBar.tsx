@@ -3,6 +3,7 @@
 import React from 'react';
 import { useCommerce } from '../context/CommerceContext';
 import { SUPPORTED_LOCALES } from '../i18n';
+import { applyCryptoDiscountCopy } from '@/domain/payments/CryptoPaymentDiscount';
 import { LocaleCode } from '../types';
 import { Globe, Truck } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -63,7 +64,7 @@ export default function AnnouncementBar() {
   const { currency, setCurrency, locale } = useCommerce();
   const router = useRouter();
   const pathname = usePathname();
-  const messages = ANNOUNCEMENTS[locale] || ANNOUNCEMENTS.en;
+  const messages = (ANNOUNCEMENTS[locale] || ANNOUNCEMENTS.en).map((message) => applyCryptoDiscountCopy(message));
 
   const handleLocaleChange = (newLocale: LocaleCode) => {
     const segments = pathname.split('/');
