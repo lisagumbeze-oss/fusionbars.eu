@@ -28,6 +28,7 @@ import { PaymentConfigService } from '@/domain/payments/PaymentConfig';
 import {
   CRYPTO_PAYMENT_DISCOUNT_PERCENT,
   calculateCryptoPaymentDiscount,
+  isBankTransferAvailable,
   isCryptocurrencyPayment,
 } from '@/domain/payments/CryptoPaymentDiscount';
 import { fiatMinorToCryptoAmount, setCryptoPriceLoader } from '@/domain/payments/CryptoAmountQuote';
@@ -905,7 +906,7 @@ export class DomainTestSuite {
     // ----------------------------------------------------
     await run('Order Creation Pipeline', 'Should atomically create order with unique FB-EU-YYYY-XXXXX reference and price snapshots', async () => {
       const order = await OrderCreationService.createOrder({
-        items: [{ variantId: 'var_bar_1', quantity: 2 }],
+        items: [{ variantId: 'var_bar_1', quantity: 5 }],
         currency: 'EUR',
         shippingAddress: {
           firstName: 'Pierre',
@@ -931,7 +932,7 @@ export class DomainTestSuite {
 
       // Check item snapshot
       const item = order.order.items[0];
-      if (item.unitPrice !== 2000 || item.lineTotal !== 4000) {
+      if (item.unitPrice !== 2000 || item.lineTotal !== 10000) {
         throw new Error(`Authoritative line total snapshot incorrect: ${item.lineTotal}`);
       }
 
@@ -968,8 +969,28 @@ export class DomainTestSuite {
         email: `crypto.discount.${Date.now()}@fusionbars.eu`,
       };
 
+      if (!isBankTransferAvailable(10000) || isBankTransferAvailable(9999)) {
+        throw new Error('Bank transfer must be available only from 100.00');
+      }
+
+      let sepaRejected = false;
+      try {
+        await OrderCreationService.createOrder({
+          items: [{ variantId: 'var_bar_1', quantity: 1 }],
+          currency: 'EUR',
+          shippingAddress: { ...address, email: `sepa.small.${Date.now()}@fusionbars.eu` },
+          shippingMethodCode: 'STANDARD',
+          paymentMethodCode: 'SEPA_IBAN',
+        });
+      } catch (error: any) {
+        sepaRejected = /100 and above/.test(error.message || '');
+      }
+      if (!sepaRejected) {
+        throw new Error('Orders under 100 must reject bank transfer');
+      }
+
       const sepa = await OrderCreationService.createOrder({
-        items: [{ variantId: 'var_bar_1', quantity: 1 }],
+        items: [{ variantId: 'var_bar_1', quantity: 5 }],
         currency: 'EUR',
         shippingAddress: { ...address, email: `sepa.${Date.now()}@fusionbars.eu` },
         shippingMethodCode: 'STANDARD',
@@ -980,7 +1001,7 @@ export class DomainTestSuite {
       let crypto;
       try {
         crypto = await OrderCreationService.createOrder({
-          items: [{ variantId: 'var_bar_1', quantity: 1 }],
+          items: [{ variantId: 'var_bar_1', quantity: 5 }],
           currency: 'EUR',
           shippingAddress: address,
           shippingMethodCode: 'STANDARD',
@@ -1210,7 +1231,7 @@ export class DomainTestSuite {
     await run('Carrier Tracking Unavailable', 'Public order lookup must not expose carrier APIs or internal logistics hub routing', async () => {
       // Create a test order
       const orderRes = await OrderCreationService.createOrder({
-        items: [{ variantId: 'var_bar_1', quantity: 1 }],
+        items: [{ variantId: 'var_bar_1', quantity: 5 }],
         currency: 'EUR',
         shippingAddress: {
           firstName: 'Helena',
@@ -1608,7 +1629,7 @@ export class DomainTestSuite {
     await run('Object Storage Authorization & Presigned URL Gates', 'Should securely store proof and authorize only owner or admin', async () => {
       // Create a test order
       const orderRes = await OrderCreationService.createOrder({
-        items: [{ variantId: 'var_bar_1', quantity: 1 }],
+        items: [{ variantId: 'var_bar_1', quantity: 5 }],
         currency: 'EUR',
         shippingAddress: {
           firstName: 'Klaus',

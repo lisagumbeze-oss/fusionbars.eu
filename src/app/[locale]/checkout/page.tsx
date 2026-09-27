@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useCommerce } from '@/context/CommerceContext';
 import {
@@ -22,6 +22,7 @@ import { CountryRegistry } from '@/domain/countries/CountryRegistry';
 import { ShippingService } from '@/domain/shipping/ShippingService';
 import {
   calculateCryptoPaymentDiscount,
+  isBankTransferAvailable,
   isCryptocurrencyPayment,
 } from '@/domain/payments/CryptoPaymentDiscount';
 import { getDictionary } from '@/i18n';
@@ -45,7 +46,7 @@ export default function CheckoutPage() {
   });
 
   const [shippingMethodCode, setShippingMethodCode] = useState<'STANDARD' | 'EXPRESS'>('STANDARD');
-  const [paymentMethodCode, setPaymentMethodCode] = useState<'SEPA_IBAN' | 'CRYPTO_BTC'>('SEPA_IBAN');
+  const [paymentMethodCode, setPaymentMethodCode] = useState<'SEPA_IBAN' | 'CRYPTO_BTC'>('CRYPTO_BTC');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -60,6 +61,14 @@ export default function CheckoutPage() {
   const standardOption = shippingCalculation.methods.find((m) => m.code === 'STANDARD');
   const expressOption = shippingCalculation.methods.find((m) => m.code === 'EXPRESS');
   const dynamicShippingCost = shippingCalculation.selectedMethod.cost;
+  const bankTransferAvailable = isBankTransferAvailable(subtotal);
+
+  useEffect(() => {
+    if (!bankTransferAvailable && paymentMethodCode === 'SEPA_IBAN') {
+      setPaymentMethodCode('CRYPTO_BTC');
+    }
+  }, [bankTransferAvailable, paymentMethodCode]);
+
   const cryptoDiscount = isCryptocurrencyPayment(paymentMethodCode)
     ? calculateCryptoPaymentDiscount(subtotal)
     : 0;
@@ -658,7 +667,13 @@ export default function CheckoutPage() {
               4. Payment Method
             </h2>
             <CryptoDiscountNotice locale={locale} compact />
+            {!bankTransferAvailable && (
+              <p className="text-xs text-[#5C5852]">
+                Orders under {formatMoney(10000)} can be paid with cryptocurrency. Bank transfer is available from {formatMoney(10000)}.
+              </p>
+            )}
             <div className="space-y-3 text-xs">
+              {bankTransferAvailable && (
               <label
                 className={`p-4 rounded-xl border cursor-pointer block transition ${
                   paymentMethodCode === 'SEPA_IBAN'
@@ -683,6 +698,7 @@ export default function CheckoutPage() {
                   Direct transfer to our Dutch/German merchant accounts with automated Order Reference reconciliation.
                 </p>
               </label>
+              )}
 
               <label
                 className={`p-4 rounded-xl border cursor-pointer block transition ${

@@ -8,6 +8,13 @@ export function isCryptocurrencyPayment(paymentMethodCode: string): boolean {
   return paymentMethodCode.startsWith('CRYPTO_');
 }
 
+/** Bank transfer is offered only when merchandise is at least 100.00 in the order currency. */
+export const BANK_TRANSFER_MINIMUM_MINOR = 10_000;
+
+export function isBankTransferAvailable(merchandiseSubtotalMinor: MinorUnits): boolean {
+  return merchandiseSubtotalMinor >= BANK_TRANSFER_MINIMUM_MINOR;
+}
+
 /**
  * 10% of the merchandise subtotal after any coupon, in minor units.
  * Shipping is excluded so the courier charge and free-shipping threshold stay unchanged.

@@ -24,6 +24,7 @@ import { getCheckoutCryptoWallets } from '@/domain/payments/CheckoutCryptoWallet
 import {
   CRYPTO_PAYMENT_DISCOUNT_PERCENT,
   calculateCryptoPaymentDiscount,
+  isBankTransferAvailable,
   isCryptocurrencyPayment,
 } from '@/domain/payments/CryptoPaymentDiscount';
 import { MoneyEngine } from '@/lib/money';
@@ -186,6 +187,9 @@ export class OrderCreationService {
     });
 
     const merchandiseAfterCoupons = MoneyEngine.subtract(pricingQuote.subtotal, pricingQuote.discountAmount);
+    if (paymentMethodCode === 'SEPA_IBAN' && !isBankTransferAvailable(merchandiseAfterCoupons)) {
+      throw new Error('Bank transfer is available for orders of 100 and above. Please pay with cryptocurrency.');
+    }
     const cryptoDiscountAmount = isCryptocurrencyPayment(paymentMethodCode)
       ? calculateCryptoPaymentDiscount(merchandiseAfterCoupons)
       : 0;
