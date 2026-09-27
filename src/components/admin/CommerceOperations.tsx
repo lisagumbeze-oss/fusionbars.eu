@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
   Search,
   Shield,
@@ -29,7 +30,7 @@ import {
   AlertCircle,
 } from 'lucide-react';
 import catalogueData from '@/data/consolidated-catalogue.json';
-import { NormalizedProduct, OrderStatus, RoleName } from '@/types';
+import { CANONICAL_ORDER_STATUSES, NormalizedProduct, OrderStatus, RoleName } from '@/types';
 import { useCommerce } from '@/context/CommerceContext';
 import { CountryRegistry } from '@/domain/countries/CountryRegistry';
 import { ProductPurchaseEligibilityService } from '@/domain/catalog/ProductPurchaseEligibilityService';
@@ -40,16 +41,25 @@ import { createCouponAction } from '@/actions/coupons';
 
 export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'orders' | 'inventory' | 'coupons' | 'reporting' | 'catalog' | 'restrictions' }) {
   const { locale, formatMoney } = useCommerce();
+  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState<'orders' | 'inventory' | 'coupons' | 'reporting' | 'catalog' | 'restrictions'>(initialTab);
 
-  // Admin Actor Role
+  // Admin Actor Role — shared with the admin shell
   const [currentRole, setCurrentRole] = useState<RoleName>('SUPER_ADMIN');
 
   // Orders State
   const [orders, setOrders] = useState<any[]>([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
+  const [ordersError, setOrdersError] = useState('');
   const [orderStatusFilter, setOrderStatusFilter] = useState<string>('ALL');
   const [orderSearch, setOrderSearch] = useState('');
+  const [paymentMethodFilter, setPaymentMethodFilter] = useState('ALL');
+  const [hubOrderFilter, setHubOrderFilter] = useState('ALL');
+  const [dateFrom, setDateFrom] = useState('');
+  const [dateTo, setDateTo] = useState('');
+  const [amountMin, setAmountMin] = useState('');
+  const [amountMax, setAmountMax] = useState('');
+  const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
 
   // Status Transition Modal
@@ -85,17 +95,39 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
   const [selectedProduct, setSelectedProduct] = useState<NormalizedProduct | null>(null);
 
   useEffect(() => {
+    const stored = window.localStorage.getItem('fusion-admin-role');
+    if (stored) setCurrentRole(stored as RoleName);
+    const status = searchParams.get('status');
+    if (status) setOrderStatusFilter(status);
+    const q = searchParams.get('q');
+    if (q) setOrderSearch(q);
+    const hub = searchParams.get('hub');
+    if (hub) setHubOrderFilter(hub);
+  }, [searchParams]);
+
+  useEffect(() => {
+    window.localStorage.setItem('fusion-admin-role', currentRole);
+  }, [currentRole]);
+
+  useEffect(() => {
     loadOrders();
     loadInventory();
   }, [currentRole]);
 
   async function loadOrders() {
     setOrdersLoading(true);
+    setOrdersError('');
     try {
       const res = await getAllOrdersAdminAction(currentRole);
       if (res.success && res.orders) {
         setOrders(res.orders);
+      } else {
+        setOrders([]);
+        setOrdersError(res.error || 'Orders are unavailable.');
       }
+    } catch (err: any) {
+      setOrders([]);
+      setOrdersError(err.message || 'Orders are unavailable.');
     } finally {
       setOrdersLoading(false);
     }
@@ -206,8 +238,18 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
       orderSearch === '' ||
       o.orderNumber?.toLowerCase().includes(orderSearch.toLowerCase()) ||
       o.guestEmail?.toLowerCase().includes(orderSearch.toLowerCase()) ||
-      o.shippingAddress?.lastName?.toLowerCase().includes(orderSearch.toLowerCase());
-    return matchesStatus && matchesSearch;
+      o.shippingAddress?.lastName?.toLowerCase().includes(orderSearch.toLowerCase()) ||
+      o.shippingAddress?.firstName?.toLowerCase().includes(orderSearch.toLowerCase());
+    const matchesPayment = paymentMethodFilter === 'ALL' || o.paymentMethodCode === paymentMethodFilter;
+    const matchesHub = hubOrderFilter === 'ALL' || o.shippingOriginHub === hubOrderFilter;
+    const created = o.createdAt ? new Date(o.createdAt).getTime() : 0;
+    const matchesFrom = !dateFrom || created >= new Date(dateFrom).getTime();
+    const matchesTo = !dateTo || created <= new Date(`${dateTo}T23:59:59`).getTime();
+    const min = amountMin === '' ? null : Math.round(Number(amountMin) * 100);
+    const max = amountMax === '' ? null : Math.round(Number(amountMax) * 100);
+    const matchesMin = min === null || Number.isNaN(min) || (o.totalAmount || 0) >= min;
+    const matchesMax = max === null || Number.isNaN(max) || (o.totalAmount || 0) <= max;
+    return matchesStatus && matchesSearch && matchesPayment && matchesHub && matchesFrom && matchesTo && matchesMin && matchesMax;
   });
 
   // Filtered Inventory
@@ -381,19 +423,10 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
           </div>
 
           {/* Filters & Search */}
-          <div className="flex flex-col sm:flex-row gap-3 items-center justify-between bg-white p-4 rounded-xl border border-[#E5E3DD]">
+          <div className="space-y-3 bg-white p-4 rounded-xl border border-[#E5E3DD]">
             <div className="flex flex-wrap items-center gap-2 text-xs">
               <span className="font-semibold text-[#5C5852]">Status:</span>
-              {[
-                'ALL',
-                'PENDING_PAYMENT',
-                'PAYMENT_SUBMITTED',
-                'PAYMENT_VERIFIED',
-                'PROCESSING',
-                'SHIPPED',
-                'DELIVERED',
-                'CANCELLED',
-              ].map((st) => (
+              {['ALL', ...CANONICAL_ORDER_STATUSES].map((st) => (
                 <button
                   key={st}
                   onClick={() => setOrderStatusFilter(st)}
@@ -403,21 +436,37 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
                       : 'bg-neutral-100 text-[#5C5852] hover:bg-neutral-200'
                   }`}
                 >
-                  {st.replace('_', ' ')}
+                  {st.replaceAll('_', ' ')}
                 </button>
               ))}
             </div>
-
-            <div className="relative w-full sm:w-64">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-3 text-[#5C5852]" />
-              <input
-                type="text"
-                placeholder="Search orders, emails, names..."
-                value={orderSearch}
-                onChange={(e) => setOrderSearch(e.target.value)}
-                className="w-full pl-8 pr-3 py-1.5 text-xs rounded-lg border border-[#E5E3DD]"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-2">
+              <input type="search" placeholder="Order, customer, email" value={orderSearch} onChange={(e) => setOrderSearch(e.target.value)} className="px-3 py-1.5 text-xs rounded-lg border border-[#E5E3DD]" />
+              <select value={paymentMethodFilter} onChange={(e) => setPaymentMethodFilter(e.target.value)} className="px-3 py-1.5 text-xs rounded-lg border border-[#E5E3DD]">
+                <option value="ALL">All payment methods</option>
+                <option value="SEPA_IBAN">SEPA / IBAN</option>
+                <option value="CRYPTO_BTC">Bitcoin</option>
+                <option value="CRYPTO_USDT">USDT</option>
+              </select>
+              <select value={hubOrderFilter} onChange={(e) => setHubOrderFilter(e.target.value)} className="px-3 py-1.5 text-xs rounded-lg border border-[#E5E3DD]">
+                <option value="ALL">All hubs</option>
+                <option value="NL">NL</option>
+                <option value="ES">ES</option>
+                <option value="DE">DE</option>
+                <option value="FR">FR</option>
+              </select>
+              <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="px-3 py-1.5 text-xs rounded-lg border border-[#E5E3DD]" aria-label="From date" />
+              <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="px-3 py-1.5 text-xs rounded-lg border border-[#E5E3DD]" aria-label="To date" />
+              <div className="flex gap-2">
+                <input type="number" min="0" step="0.01" placeholder="Min" value={amountMin} onChange={(e) => setAmountMin(e.target.value)} className="w-full px-2 py-1.5 text-xs rounded-lg border border-[#E5E3DD]" />
+                <input type="number" min="0" step="0.01" placeholder="Max" value={amountMax} onChange={(e) => setAmountMax(e.target.value)} className="w-full px-2 py-1.5 text-xs rounded-lg border border-[#E5E3DD]" />
+              </div>
             </div>
+            {selectedOrderIds.length > 0 && (
+              <p className="text-xs text-[#5C5852]">
+                {selectedOrderIds.length} selected. Bulk status changes stay disabled so every transition remains individually auditable.
+              </p>
+            )}
           </div>
 
           {/* Orders Table */}
@@ -426,6 +475,7 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
               <table className="w-full text-left text-xs">
                 <thead className="bg-[#FAF9F5] border-b border-[#E5E3DD] text-[#5C5852] uppercase font-bold text-[10px] tracking-wider">
                   <tr>
+                    <th className="py-3 px-4">Select</th>
                     <th className="py-3 px-4">Order Ref</th>
                     <th className="py-3 px-4">Customer</th>
                     <th className="py-3 px-4">Destination</th>
@@ -433,19 +483,38 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
                     <th className="py-3 px-4">Total</th>
                     <th className="py-3 px-4">Payment</th>
                     <th className="py-3 px-4">Canonical Status</th>
+                    <th className="py-3 px-4">Placed</th>
+                    <th className="py-3 px-4">Updated</th>
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[#E5E3DD]">
-                  {filteredOrders.length === 0 ? (
+                  {ordersLoading ? (
+                    <tr><td colSpan={11} className="py-8 text-center text-[#5C5852]">Loading orders…</td></tr>
+                  ) : ordersError ? (
                     <tr>
-                      <td colSpan={8} className="py-8 text-center text-[#5C5852]">
+                      <td colSpan={11} className="py-8 text-center text-[#5C5852]">
+                        <p>{ordersError}</p>
+                        <button type="button" onClick={loadOrders} className="mt-2 text-xs font-semibold text-[#4A5D4E] underline">Retry</button>
+                      </td>
+                    </tr>
+                  ) : filteredOrders.length === 0 ? (
+                    <tr>
+                      <td colSpan={11} className="py-8 text-center text-[#5C5852]">
                         No orders matching the active criteria.
                       </td>
                     </tr>
                   ) : (
                     filteredOrders.map((ord) => (
                       <tr key={ord.id} className="hover:bg-neutral-50 transition">
+                        <td className="py-3 px-4">
+                          <input
+                            type="checkbox"
+                            aria-label={`Select ${ord.orderNumber}`}
+                            checked={selectedOrderIds.includes(ord.id)}
+                            onChange={(e) => setSelectedOrderIds((ids) => e.target.checked ? [...ids, ord.id] : ids.filter((id) => id !== ord.id))}
+                          />
+                        </td>
                         <td className="py-3 px-4 font-mono font-bold text-[#121212]">{ord.orderNumber}</td>
                         <td className="py-3 px-4">
                           <p className="font-semibold text-[#121212]">
@@ -491,6 +560,8 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
                             {ord.status}
                           </span>
                         </td>
+                        <td className="py-3 px-4 text-[11px] text-[#5C5852]">{ord.createdAt ? new Date(ord.createdAt).toLocaleString() : '—'}</td>
+                        <td className="py-3 px-4 text-[11px] text-[#5C5852]">{ord.updatedAt ? new Date(ord.updatedAt).toLocaleString() : '—'}</td>
                         <td className="py-3 px-4 text-right space-x-2">
                           <button
                             onClick={() => {
@@ -618,6 +689,9 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
             <h3 className="font-serif font-bold text-lg text-[#121212] flex items-center gap-2">
               <Plus className="w-5 h-5 text-[#4A5D4E]" /> Create Promotional Coupon
             </h3>
+            <p className="text-xs text-[#5C5852]">
+              Coupons discount an order total. They do not replace or convert an approved product price.
+            </p>
 
             {couponSuccess && (
               <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs flex items-center gap-2">

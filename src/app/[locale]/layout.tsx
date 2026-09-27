@@ -3,11 +3,7 @@ import { notFound } from 'next/navigation';
 import { SUPPORTED_LOCALES } from '@/i18n';
 import { LocaleCode } from '@/types';
 import { CommerceProvider } from '@/context/CommerceContext';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
-import MobileBottomNav from '@/components/MobileBottomNav';
-import CartDrawer from '@/components/CartDrawer';
-import CookieConsentBanner from '@/components/CookieConsentBanner';
+import SiteChrome from '@/components/site/SiteChrome';
 
 export function generateStaticParams() {
   return SUPPORTED_LOCALES.map((locale) => ({ locale }));
@@ -28,14 +24,7 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   return (
     <CommerceProvider initialLocale={locale}>
-      <div className="flex min-h-screen flex-col bg-[#FBFBF9] text-[#121212]">
-        <Header />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <MobileBottomNav />
-        <CartDrawer />
-        <CookieConsentBanner />
-      </div>
+      <SiteChrome>{children}</SiteChrome>
     </CommerceProvider>
   );
 }

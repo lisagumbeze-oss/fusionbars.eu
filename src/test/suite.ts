@@ -55,6 +55,13 @@ import { CatalogueDecisionRecommendationService } from '@/domain/catalog/Catalog
 import { CatalogueReviewWorkspaceService } from '@/domain/catalog/CatalogueReviewWorkspaceService';
 import { CatalogueFirstBatchService } from '@/domain/catalog/CatalogueFirstBatchService';
 import { CatalogueSpecialistReviewService } from '@/domain/catalog/CatalogueSpecialistReviewService';
+import { AdminAccess } from '@/domain/admin/AdminAccess';
+import { AdminDashboardService, PRODUCTION_CONTROL_STATE } from '@/domain/admin/AdminDashboardService';
+import { AdminNotificationCenter } from '@/domain/admin/AdminNotificationCenter';
+import { EmailTemplateRegistry } from '@/domain/admin/EmailTemplateRegistry';
+import { deliveryLogExposesSecrets, projectDeliveryLog } from '@/domain/admin/EmailDeliveryLog';
+import { CatalogService } from '@/lib/catalog';
+import firstBatchState from '@/data/catalogue-first-batch-state.json';
 
 export interface TestResult {
   name: string;
@@ -4901,6 +4908,99 @@ export class DomainTestSuite {
       }
       const audit = CatalogueSpecialistReviewService.getAuditTrail().find((row) => row.product === slug && row.decision === 'PRICE_APPROVED');
       if (audit) throw new Error('Rolled-back decision must not be audited as approved');
+    });
+
+    await run('Admin Control Center', 'Navigation respects RBAC', () => {
+      if (AdminAccess.sections('CUSTOMER').length !== 0) throw new Error('Customers must not receive admin navigation');
+      if (AdminAccess.can('CONTENT_MANAGER', 'payments')) throw new Error('Content managers must not see payment verification');
+      if (!AdminAccess.can('FINANCE_MANAGER', 'payments')) throw new Error('Finance managers must see payment verification');
+      if (AdminAccess.can('ORDER_MANAGER', 'email-templates')) throw new Error('Order managers must not modify email templates');
+      if (!AdminAccess.canModifyTemplates('SUPER_ADMIN')) throw new Error('Super admin can manage templates');
+      if (AdminAccess.canModifyTemplates('ORDER_MANAGER')) throw new Error('Order managers cannot modify templates');
+      if (!CANONICAL_ORDER_STATUSES.includes('DRAFT') || CANONICAL_ORDER_STATUSES.includes('REJECTED' as OrderStatus)) {
+        throw new Error('Canonical order statuses changed');
+      }
+      if (CANONICAL_ORDER_STATUSES.join(',') !== 'DRAFT,PENDING_PAYMENT,PAYMENT_SUBMITTED,PAYMENT_VERIFIED,PROCESSING,SHIPPED,DELIVERED,CANCELLED,REFUNDED') {
+        throw new Error('Canonical order lifecycle drifted');
+      }
+    });
+
+    await run('Admin Control Center', 'Dashboard reads saved catalogue state', () => {
+      const before = JSON.stringify(firstBatchState);
+      const priceBefore = CatalogService.getProductBySlug('audit-test-product')?.variants[0]?.priceEUR;
+      const snapshot = AdminDashboardService.catalogueSnapshot();
+      if (JSON.stringify(firstBatchState) !== before) throw new Error('Dashboard read changed the catalogue review file');
+      if (CatalogService.getProductBySlug('audit-test-product')?.variants[0]?.priceEUR !== priceBefore) {
+        throw new Error('Dashboard changed a catalogue price');
+      }
+      if (!snapshot.available) throw new Error(snapshot.error || 'Catalogue snapshot unavailable');
+      if (snapshot.batchSize !== 10) throw new Error(`Expected 10 specialist products, saw ${snapshot.batchSize}`);
+      if (snapshot.pricingPending !== 10) throw new Error(`Pricing pending ${snapshot.pricingPending}`);
+      if (snapshot.compliancePending !== 10) throw new Error(`Compliance pending ${snapshot.compliancePending}`);
+      if (snapshot.countryPending !== 10) throw new Error(`Country pending ${snapshot.countryPending}`);
+      if (snapshot.contentInternal !== 10) throw new Error(`Content internal ${snapshot.contentInternal}`);
+      if (snapshot.mediaVerified !== 9 || snapshot.mediaReview !== 1) throw new Error(`Media ${snapshot.mediaVerified}/${snapshot.mediaReview}`);
+      if (snapshot.translationPending !== 10) throw new Error(`Translations ${snapshot.translationPending}`);
+      if (snapshot.publicationReady !== 0 || snapshot.published !== 0) throw new Error('Publication counts were invented');
+      if (snapshot.doNotPublish !== 1) throw new Error(`Do not publish ${snapshot.doNotPublish}`);
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production control state changed');
+      const publication = ProductPublicationGuard.evaluateProductForPublication({ id: 'admin-ui', status: 'DRAFT' });
+      if (publication.canPublish) throw new Error('Draft products must stay unpublished');
+    });
+
+    await run('Admin Control Center', 'Notifications filter and mark read', () => {
+      AdminNotificationCenter.resetReads();
+      const items = AdminNotificationCenter.build({
+        generatedAt: '2026-09-27T00:00:00.000Z',
+        specialistPending: 10,
+        countryPending: 10,
+        compliancePending: 10,
+        translationPending: 10,
+        paymentsAwaiting: 0,
+        lowStock: 0,
+        productionPaused: true,
+      });
+      if (items.some((item) => item.title.includes('payment') && item.id === 'payments-awaiting-verification')) {
+        throw new Error('A payment alert was created without awaiting payments');
+      }
+      const specialist = items.find((item) => item.id === 'catalogue-specialist-pending');
+      if (!specialist || !specialist.title.startsWith('10 products')) throw new Error('Specialist alert missing');
+      const catalogueOnly = items.filter((item) => item.category === 'Catalogue');
+      if (catalogueOnly.length < 1) throw new Error('Catalogue filter would be empty');
+      AdminNotificationCenter.markRead(specialist.id);
+      if (!AdminNotificationCenter.isRead(specialist.id)) throw new Error('Mark as read failed');
+      AdminNotificationCenter.markAllRead(items.map((item) => item.id));
+      if (items.some((item) => !AdminNotificationCenter.isRead(item.id))) throw new Error('Mark all as read failed');
+    });
+
+    await run('Admin Control Center', 'Email templates preview without secrets', () => {
+      const templates = EmailTemplateRegistry.list();
+      const required = [
+        'sepa-order-confirmation', 'crypto-order-confirmation', 'payment-proof-submitted', 'payment-verified',
+        'payment-rejected', 'order-processing', 'order-shipped', 'order-delivered', 'order-cancelled',
+        'order-refunded', 'customer-welcome', 'password-reset', 'email-verification', 'admin-operational-alert',
+      ];
+      for (const id of required) {
+        const preview = EmailTemplateRegistry.preview(id);
+        if (!preview) throw new Error(`Missing template ${id}`);
+        if (preview.variables.length === 0) throw new Error(`${id} has no variables`);
+        if (!preview.subject || !preview.html) throw new Error(`${id} preview did not render`);
+        if (preview.audience !== 'ADMIN' && preview.audience !== 'CUSTOMER') throw new Error(`${id} audience missing`);
+        if (deliveryLogExposesSecrets(preview)) throw new Error(`${id} preview exposed a secret`);
+      }
+      if (templates.length < required.length) throw new Error('Template registry dropped a transactional template');
+      const admin = templates.find((template) => template.id === 'admin-operational-alert');
+      const customer = templates.find((template) => template.id === 'customer-welcome');
+      if (admin?.audience !== 'ADMIN' || customer?.audience !== 'CUSTOMER') throw new Error('Audience labels drifted');
+      const log = projectDeliveryLog([{
+        to: 'customer@example.com',
+        subject: 'Order Confirmed',
+        html: '<p>sk_live_should_not_leak</p>',
+        text: 'SMTP_PASSWORD=secret',
+        status: 'success',
+      }]);
+      if (deliveryLogExposesSecrets(log)) throw new Error('Delivery log exposed provider payload');
+      if ('html' in log[0] || log[0].recipient !== 'customer@example.com') throw new Error('Delivery log shape is wrong');
     });
 
     const passedCount = results.filter((r) => r.passed).length;

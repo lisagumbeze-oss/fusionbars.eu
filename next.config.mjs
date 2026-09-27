@@ -50,7 +50,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https: ws: wss:; frame-ancestors 'self' https:;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.smartsuppchat.com https://*.smartsuppcdn.com; style-src 'self' 'unsafe-inline' https://*.smartsuppcdn.com; img-src 'self' data: https: blob:; font-src 'self' data: https://*.smartsuppcdn.com; media-src 'self' https://*.smartsuppcdn.com; connect-src 'self' https: ws: wss:; frame-src 'self' https://*.smartsupp.com https://*.smartsuppcdn.com; frame-ancestors 'self' https:;",
           },
         ],
       },

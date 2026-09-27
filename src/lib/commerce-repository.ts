@@ -1022,6 +1022,10 @@ export class CommerceRepository {
     return store.coupons.get(code.toUpperCase().trim()) || null;
   }
 
+  static async listCoupons(): Promise<DbCoupon[]> {
+    return Array.from(store.coupons.values());
+  }
+
   static async saveCoupon(coupon: DbCoupon): Promise<DbCoupon> {
     store.coupons.set(coupon.code.toUpperCase(), coupon);
     this.logAudit({
