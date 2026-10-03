@@ -1,9 +1,13 @@
 import { PaymentProductionReadinessService } from '@/domain/payments/PaymentProductionReadinessService';
+import { PaymentConfigService } from '@/domain/payments/PaymentConfig';
+import { paymentProofUploadChoice } from '@/domain/launch/operator-configuration';
 
 export const dynamic = 'force-dynamic';
 
 export default function PaymentSettingsPage() {
   const report = PaymentProductionReadinessService.report();
+  const fields = PaymentConfigService.configurationPresence();
+  const proofChoice = paymentProofUploadChoice();
   return (
     <div className="space-y-4 text-sm text-[#1C1917]">
       <section className="rounded-2xl border border-[#E5E3DD] bg-white p-4">
@@ -39,6 +43,17 @@ export default function PaymentSettingsPage() {
         <p>Verified: {report.operations.verified}</p>
         <p>Evidence storage: {report.evidenceStorage}</p>
         <p>Notifications: {report.notifications}</p>
+      </section>
+      <section className="rounded-2xl border border-[#E5E3DD] bg-white p-4">
+        <h2 className="font-semibold">Operator entry</h2>
+        <p>Manual payment instructions: {report.bank.verification === 'VERIFIED' && report.bank.format === 'FORMAT_VALID' ? 'READY' : 'CONFIGURATION_REQUIRED'}</p>
+        <p>Payment proof upload: {proofChoice}</p>
+        <ul className="mt-2 space-y-1">
+          {fields.map((field) => (
+            <li key={`${field.env}-${field.field}`}>{field.field} ({field.env}): {field.state}</li>
+          ))}
+        </ul>
+        <p className="mt-2 text-[#5C5852]">Set the named environment variables. This screen does not accept or display account numbers, wallet addresses, or networks. A missing field stays MISSING until a non-placeholder value is present and business verification is recorded.</p>
       </section>
       <p className="text-[#5C5852]">Account numbers, wallet addresses, private keys, and secrets are not shown. Saving configuration does not activate a method. Format validation does not prove the account belongs to the business.</p>
     </div>

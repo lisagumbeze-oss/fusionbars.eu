@@ -1,6 +1,7 @@
 import QRCode from 'qrcode';
 import { CurrencyCode } from '@/types';
 import { cryptoAmountToBaseUnits, quoteCryptoAmounts } from '@/domain/payments/CryptoAmountQuote';
+import { isPlaceholderCustomerPaymentDetail } from '@/domain/payments/payment-format';
 
 export interface CheckoutCryptoWallet {
   symbol: string;
@@ -13,29 +14,29 @@ export interface CheckoutCryptoWallet {
 }
 
 /**
- * Wallets shown under the order-success message when the customer pays
- * with cryptocurrency. Add one entry at a time.
+ * Customer wallets come from operator environment configuration.
+ * No wallet address is compiled into the application.
  */
-export const CHECKOUT_CRYPTO_WALLETS: CheckoutCryptoWallet[] = [
-  {
-    symbol: 'BTC',
-    name: 'Bitcoin',
-    network: 'Bitcoin',
-    address: 'bc1qzsn5djk2pklr49hepvpu4ckzwj9tujkxtdlqma',
-  },
-  {
-    symbol: 'ETH',
-    name: 'Ethereum',
-    network: 'Ethereum',
-    address: '0x5fad5A80927C763C4037A7c07051910747E8179d',
-  },
-  {
-    symbol: 'BCH',
-    name: 'Bitcoin Cash',
-    network: 'Bitcoin Cash',
-    address: 'qptpfw320hvdrk0xutpg2kdhauruwle65uxzz7p57v',
-  },
+const WALLET_ENV: Array<{ symbol: string; name: string; networkEnv: string; addressEnv: string }> = [
+  { symbol: 'BTC', name: 'Bitcoin', networkEnv: 'CRYPTO_BTC_NETWORK', addressEnv: 'CRYPTO_BTC_ADDRESS' },
+  { symbol: 'ETH', name: 'Ethereum', networkEnv: 'CRYPTO_ETH_NETWORK', addressEnv: 'CRYPTO_ETH_ADDRESS' },
+  { symbol: 'BCH', name: 'Bitcoin Cash', networkEnv: 'CRYPTO_BCH_NETWORK', addressEnv: 'CRYPTO_BCH_ADDRESS' },
 ];
+
+let testWallets: CheckoutCryptoWallet[] | null = null;
+
+export function setCheckoutCryptoWalletsForTests(wallets: CheckoutCryptoWallet[] | null): void {
+  testWallets = wallets;
+}
+
+function walletsFromEnvironment(): CheckoutCryptoWallet[] {
+  return WALLET_ENV.flatMap((row) => {
+    const network = process.env[row.networkEnv]?.trim() || '';
+    const address = process.env[row.addressEnv]?.trim() || '';
+    if (isPlaceholderCustomerPaymentDetail(network) || isPlaceholderCustomerPaymentDetail(address)) return [];
+    return [{ symbol: row.symbol, name: row.name, network, address }];
+  });
+}
 
 function paymentUri(wallet: CheckoutCryptoWallet): string {
   if (wallet.symbol === 'BTC') {
@@ -60,7 +61,8 @@ export async function getCheckoutCryptoWallets(quote: {
   amountMinor: number;
   currency: CurrencyCode;
 }): Promise<CheckoutCryptoWallet[]> {
-  const wallets = CHECKOUT_CRYPTO_WALLETS.filter(
+  const source = testWallets ?? walletsFromEnvironment();
+  const wallets = source.filter(
     (wallet) => wallet.symbol.trim() && wallet.name.trim() && wallet.network.trim() && wallet.address.trim()
   ).map((wallet) => ({
     symbol: wallet.symbol.trim(),

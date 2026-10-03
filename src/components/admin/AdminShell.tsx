@@ -220,7 +220,7 @@ export default function AdminShell({ children }: { children: React.ReactNode }) 
 
         <div className="flex-1 min-w-0">
           <header className="sticky top-0 z-30 border-b border-[#E5E3DD] bg-[#FBFBF9]/95 backdrop-blur">
-            <div className="flex items-center gap-3 px-4 py-3">
+            <div className="flex flex-wrap items-center gap-3 px-4 py-3 min-w-0">
               <button type="button" className="md:hidden rounded-md border border-[#E5E3DD] p-2" aria-label="Open navigation" onClick={() => setMobileOpen(true)}>
                 <Menu className="w-4 h-4" />
               </button>

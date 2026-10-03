@@ -1,3 +1,5 @@
+import { isPlaceholderCustomerPaymentDetail } from '@/domain/payments/payment-format';
+
 // ===================================================
 // FUSION MUSHROOM BARS EU - PAYMENT CONFIGURATION SERVICE
 // Safe, Configurable Payment Rails Architecture
@@ -35,44 +37,62 @@ export interface PublicPaymentOption {
   minimumAmount?: number;
 }
 
+function configuredDetail(name: string): string {
+  const value = process.env[name]?.trim() || '';
+  return isPlaceholderCustomerPaymentDetail(value) ? '' : value;
+}
+
+function configuredStatus(statusName: string, detail: string): PaymentMethodStatus {
+  const explicit = process.env[statusName];
+  if (explicit === 'INACTIVE') return 'INACTIVE';
+  if (explicit === 'ACTIVE') return detail ? 'ACTIVE' : 'INACTIVE';
+  return detail ? 'ACTIVE' : 'INACTIVE';
+}
+
 export class PaymentConfigService {
-  // In-memory or env-backed configurations (No production secrets committed)
+  private static forcedActive = new Set<string>();
+
+  static forceMethodActiveForTests(codes: string[]): void {
+    this.forcedActive = new Set(codes);
+  }
+
+  // Environment-backed configuration. Missing values stay empty. No account or wallet is invented.
   private static cryptoConfigs: Record<CryptoAsset, CryptoPaymentConfig> = {
     BTC: {
       asset: 'BTC',
       displayName: 'Bitcoin (BTC)',
-      network: 'Bitcoin Mainnet',
-      receivingAddress: process.env.CRYPTO_BTC_ADDRESS || 'bc1q_placeholder_btc_test_only',
-      status: (process.env.CRYPTO_BTC_STATUS as PaymentMethodStatus) || 'ACTIVE',
+      network: configuredDetail('CRYPTO_BTC_NETWORK'),
+      receivingAddress: configuredDetail('CRYPTO_BTC_ADDRESS'),
+      status: configuredStatus('CRYPTO_BTC_STATUS', configuredDetail('CRYPTO_BTC_ADDRESS')),
       minimumAmount: 2000,
-      confirmationPolicy: '1 confirmation on Bitcoin network',
+      confirmationPolicy: '',
     },
     USDT: {
       asset: 'USDT',
-      displayName: 'Tether (USDT - TRC20)',
-      network: 'Tron TRC-20',
-      receivingAddress: process.env.CRYPTO_USDT_ADDRESS || 'T_placeholder_usdt_test_only',
-      status: (process.env.CRYPTO_USDT_STATUS as PaymentMethodStatus) || 'INACTIVE',
+      displayName: 'Tether (USDT)',
+      network: configuredDetail('CRYPTO_USDT_NETWORK'),
+      receivingAddress: configuredDetail('CRYPTO_USDT_ADDRESS'),
+      status: configuredStatus('CRYPTO_USDT_STATUS', configuredDetail('CRYPTO_USDT_ADDRESS')),
       minimumAmount: 2500,
-      confirmationPolicy: '12 confirmations',
+      confirmationPolicy: '',
     },
     ETH: {
       asset: 'ETH',
       displayName: 'Ethereum (ETH)',
-      network: 'Ethereum Mainnet',
-      receivingAddress: process.env.CRYPTO_ETH_ADDRESS || '0x000000000000000000000000000000000000dEaD',
-      status: (process.env.CRYPTO_ETH_STATUS as PaymentMethodStatus) || 'INACTIVE',
+      network: configuredDetail('CRYPTO_ETH_NETWORK'),
+      receivingAddress: configuredDetail('CRYPTO_ETH_ADDRESS'),
+      status: configuredStatus('CRYPTO_ETH_STATUS', configuredDetail('CRYPTO_ETH_ADDRESS')),
       minimumAmount: 3000,
-      confirmationPolicy: '12 confirmations on Ethereum network',
+      confirmationPolicy: '',
     },
   };
 
   private static bankConfig: BankPaymentConfig = {
-    accountHolder: process.env.BANK_ACCOUNT_HOLDER || 'Fusion EU Logistics B.V.',
-    bankName: process.env.BANK_NAME || 'European Merchant Bank',
-    iban: process.env.BANK_IBAN || 'NL00TEST0000000000',
-    bicSwift: process.env.BANK_BIC_SWIFT || 'TESTNL2A',
-    status: (process.env.BANK_STATUS as PaymentMethodStatus) || 'ACTIVE',
+    accountHolder: configuredDetail('BANK_ACCOUNT_HOLDER'),
+    bankName: configuredDetail('BANK_NAME'),
+    iban: configuredDetail('BANK_IBAN'),
+    bicSwift: configuredDetail('BANK_BIC_SWIFT'),
+    status: configuredStatus('BANK_STATUS', configuredDetail('BANK_IBAN') && configuredDetail('BANK_BIC_SWIFT') ? 'set' : ''),
   };
 
   /**
@@ -116,8 +136,15 @@ export class PaymentConfigService {
     }
   }
 
+  static setCryptoNetwork(asset: CryptoAsset, network: string): void {
+    if (this.cryptoConfigs[asset] && network.trim()) {
+      this.cryptoConfigs[asset].network = network.trim();
+    }
+  }
+
   static snapshotForTests(): () => void {
     const bank = { ...this.bankConfig };
+    const forced = new Set(this.forcedActive);
     const crypto = {
       BTC: { ...this.cryptoConfigs.BTC },
       USDT: { ...this.cryptoConfigs.USDT },
@@ -125,6 +152,7 @@ export class PaymentConfigService {
     };
     return () => {
       this.bankConfig = bank;
+      this.forcedActive = forced;
       this.cryptoConfigs = crypto;
     };
   }
@@ -140,7 +168,7 @@ export class PaymentConfigService {
   static getPublicPaymentOptions(): PublicPaymentOption[] {
     const options: PublicPaymentOption[] = [];
 
-    if (this.bankConfig.status === 'ACTIVE') {
+    if (this.bankConfig.status === 'ACTIVE' && !isPlaceholderCustomerPaymentDetail(this.bankConfig.iban) && !isPlaceholderCustomerPaymentDetail(this.bankConfig.bicSwift)) {
       options.push({
         code: 'SEPA_IBAN',
         name: 'Bank Transfer (SEPA / IBAN)',
@@ -150,6 +178,7 @@ export class PaymentConfigService {
 
     const activeCryptos = this.getActiveCryptoConfigs();
     for (const c of activeCryptos) {
+      if (isPlaceholderCustomerPaymentDetail(c.receivingAddress)) continue;
       options.push({
         code: `CRYPTO_${c.asset}`,
         name: c.displayName,
@@ -168,16 +197,42 @@ export class PaymentConfigService {
    * Checks whether a given payment method code is valid and currently ACTIVE.
    */
   static isPaymentMethodActive(methodCode: string): boolean {
+    if (this.forcedActive.has(methodCode)) return true;
     if (methodCode === 'SEPA_IBAN') {
-      return this.bankConfig.status === 'ACTIVE';
+      return this.bankConfig.status === 'ACTIVE'
+        && !isPlaceholderCustomerPaymentDetail(this.bankConfig.iban)
+        && !isPlaceholderCustomerPaymentDetail(this.bankConfig.bicSwift)
+        && !isPlaceholderCustomerPaymentDetail(this.bankConfig.accountHolder)
+        && !isPlaceholderCustomerPaymentDetail(this.bankConfig.bankName);
     }
 
     if (methodCode.startsWith('CRYPTO_')) {
       const asset = methodCode.replace('CRYPTO_', '') as CryptoAsset;
       const config = this.cryptoConfigs[asset];
-      return Boolean(config && config.status === 'ACTIVE');
+      return Boolean(
+        config
+        && config.status === 'ACTIVE'
+        && !isPlaceholderCustomerPaymentDetail(config.receivingAddress)
+        && !isPlaceholderCustomerPaymentDetail(config.network),
+      );
     }
 
     return false;
+  }
+
+  static configurationPresence(): Array<{ field: string; env: string; state: 'CONFIGURED' | 'MISSING' }> {
+    const rows: Array<[string, string, string]> = [
+      ['account_holder', 'BANK_ACCOUNT_HOLDER', this.bankConfig.accountHolder],
+      ['bank_name', 'BANK_NAME', this.bankConfig.bankName],
+      ['iban', 'BANK_IBAN', this.bankConfig.iban],
+      ['bic', 'BANK_BIC_SWIFT', this.bankConfig.bicSwift],
+      ['payment_reference_format', 'BANK_REFERENCE_FORMAT', configuredDetail('BANK_REFERENCE_FORMAT')],
+      ['payment_instructions', 'BANK_PAYMENT_INSTRUCTIONS', configuredDetail('BANK_PAYMENT_INSTRUCTIONS')],
+      ['asset', 'CRYPTO_BTC_ADDRESS', this.cryptoConfigs.BTC.receivingAddress ? this.cryptoConfigs.BTC.asset : ''],
+      ['network', 'CRYPTO_BTC_NETWORK', this.cryptoConfigs.BTC.network],
+      ['wallet_address', 'CRYPTO_BTC_ADDRESS', this.cryptoConfigs.BTC.receivingAddress],
+      ['payment_instructions', 'CRYPTO_PAYMENT_INSTRUCTIONS', configuredDetail('CRYPTO_PAYMENT_INSTRUCTIONS')],
+    ];
+    return rows.map(([field, env, value]) => ({ field, env, state: value ? 'CONFIGURED' : 'MISSING' }));
   }
 }

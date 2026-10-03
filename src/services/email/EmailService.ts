@@ -156,7 +156,7 @@ export class EmailService {
     const rendered = EmailTemplates.renderSepaOrderConfirmation({
       ...ctx,
       iban: sepaDetails.iban,
-      bic: sepaDetails.bic || sepaDetails.bicSwift || 'ABNANL2A',
+      bic: sepaDetails.bic || sepaDetails.bicSwift || '',
       bankName: sepaDetails.bankName,
       accountHolder: sepaDetails.accountHolder,
     });

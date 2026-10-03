@@ -46,6 +46,7 @@ import {
   activateProductionAction,
 } from '@/actions/launch';
 import { LaunchReadinessReport, LaunchRequirement } from '@/domain/launch/LaunchReadinessService';
+import { bucketFor, OPERATOR_CONFIGURATION_CHECKLIST, type GateBucket } from '@/domain/launch/operator-configuration';
 import { PaymentMethodState } from '@/domain/payments/PaymentActivationService';
 
 export default function LaunchControlCenterPage() {
@@ -82,6 +83,8 @@ export default function LaunchControlCenterPage() {
     Object.fromEntries(Array.from({ length: 24 }, (_, index) => [index + 1, 'NOT_TESTED'])) as Record<number, 'PASS' | 'FAIL' | 'NOT_TESTED'>,
   );
   const [finalDecision, setFinalDecision] = useState<'LAUNCH_BLOCKED' | 'READY_TO_LAUNCH' | null>(null);
+  const [launchGates, setLaunchGates] = useState<Array<{ area: string; requirement: string; state: string; evidence: string; blocking: boolean; action: string }>>([]);
+  const [waivers, setWaivers] = useState<Array<{ gate: string; status: string; reason: string; owner: string; date: string; scope: string; risk_note: string }>>([]);
   const [finalError, setFinalError] = useState<string | null>(null);
   const [confirmation, setConfirmation] = useState('');
 
@@ -116,10 +119,22 @@ export default function LaunchControlCenterPage() {
     setLoading(true);
     setErrorMsg(null);
     try {
+      const finalPromise = getFinalLaunchDecisionAction().then((finalRes) => {
+        if (finalRes.success && finalRes.decision) {
+          setFinalDecision(finalRes.decision.decision);
+          setLaunchGates(finalRes.decision.gates || []);
+          setWaivers(finalRes.decision.waivers || []);
+          setFinalError(null);
+        } else {
+          setFinalDecision('LAUNCH_BLOCKED');
+          setFinalError(finalRes.error || 'The final launch decision did not load.');
+        }
+        return finalRes;
+      });
       const [repRes, payRes, finalRes, storageRes, backupRes, monitoringRes, rateRes] = await Promise.all([
         getLaunchReadinessReportAction(),
         getPaymentMethodStatesAction(),
-        getFinalLaunchDecisionAction(),
+        finalPromise,
         getStorageReadinessAction(),
         getBackupReadinessAction(),
         getMonitoringReadinessAction(),
@@ -168,9 +183,6 @@ export default function LaunchControlCenterPage() {
           errors: storageRes.errors,
         });
       }
-      if (finalRes.success && finalRes.decision) setFinalDecision(finalRes.decision.decision);
-      else setFinalDecision('LAUNCH_BLOCKED');
-
       if (!repRes.success || !repRes.report) {
         setErrorMsg(repRes.error || 'Failed to retrieve launch readiness report.');
       } else {
@@ -264,6 +276,20 @@ export default function LaunchControlCenterPage() {
     URL.revokeObjectURL(url);
   };
 
+  const grouped: Record<GateBucket, typeof launchGates> = {
+    READY: [],
+    REQUIRED_CONFIGURATION: [],
+    WAIVED: [],
+    RECORDED: [],
+  };
+  for (const item of launchGates) grouped[bucketFor(item.state, item.blocking)].push(item);
+  const sectionCopy: Record<GateBucket, { title: string; note: string }> = {
+    READY: { title: 'Ready', note: 'These gates passed from real evidence.' },
+    REQUIRED_CONFIGURATION: { title: 'Required configuration', note: 'The operator still has to supply these values. Nothing here was invented.' },
+    WAIVED: { title: 'Intentionally waived', note: 'Only FUSION_EU_INITIAL_LAUNCH_POLICY waivers appear here. A waiver is not a pass.' },
+    RECORDED: { title: 'Recorded, not a pass', note: 'Not applicable, not tested, disabled for launch, or a non-blocking warning.' },
+  };
+
   const getStatusBadge = (status: 'READY' | 'WARNING' | 'BLOCKED') => {
     switch (status) {
       case 'READY':
@@ -288,15 +314,15 @@ export default function LaunchControlCenterPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div className="max-w-7xl mx-auto w-full min-w-0 px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Top Header & Context Badges */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-[#E5E3DD] pb-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-[#E5E3DD] pb-6 min-w-0">
         <div>
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#4A5D4E] text-white flex items-center justify-center font-bold text-sm">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-8 h-8 rounded-lg bg-[#4A5D4E] text-white flex items-center justify-center font-bold text-sm shrink-0">
               <Lock className="w-4 h-4" />
             </div>
-            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#121212]">
+            <h1 className="font-serif text-2xl sm:text-3xl font-bold text-[#121212] min-w-0">
               Launch Control Center &amp; Production Gate
             </h1>
           </div>
@@ -327,6 +353,58 @@ export default function LaunchControlCenterPage() {
         <h2 className="font-serif text-xl font-bold text-[#121212]">Final launch gate</h2>
         <p className="text-sm text-[#5C5852]">Production control is PAUSED. The staging checklist below is not inspected and is not a launch approval.</p>
         <p className="font-mono text-sm font-bold text-[#121212]">{finalDecision || 'LAUNCH_BLOCKED'}</p>
+        {errorMsg ? <p className="text-sm text-rose-800" role="alert">{errorMsg}</p> : null}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 min-w-0">
+          {(['READY', 'REQUIRED_CONFIGURATION', 'WAIVED'] as const).map((bucket) => (
+            <section key={bucket} className="min-w-0 rounded-xl border border-[#E5E3DD] bg-[#FBFBF9] p-4 space-y-2">
+              <h3 className="text-sm font-semibold text-[#121212]">{sectionCopy[bucket].title}</h3>
+              <p className="text-xs text-[#5C5852]">{sectionCopy[bucket].note}</p>
+              {grouped[bucket].length === 0 ? <p className="text-xs text-[#5C5852]">None.</p> : grouped[bucket].map((item) => (
+                <div key={`${item.area}-${item.requirement}`} className="text-xs text-[#5C5852] border-t border-[#E5E3DD] pt-2">
+                  <p className="font-semibold text-[#121212] break-words">{item.area}: {item.requirement}</p>
+                  <p className="font-mono">{item.state}{item.blocking ? ' · blocks activation' : ''}</p>
+                  <p className="break-words">{item.evidence}</p>
+                </div>
+              ))}
+            </section>
+          ))}
+        </div>
+        {waivers.map((waiver) => (
+          <div key={waiver.gate} className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-xs text-[#5C5852] space-y-1">
+            <p className="font-semibold text-[#121212]">{waiver.gate}: {waiver.status}</p>
+            <p>{waiver.reason}</p>
+            <p>Owner: {waiver.owner}. Date: {waiver.date}.</p>
+            <p>Scope: {waiver.scope}</p>
+            <p>Risk: {waiver.risk_note}</p>
+          </div>
+        ))}
+        <section className="rounded-xl border border-[#E5E3DD] p-4 space-y-3 min-w-0">
+          <h3 className="text-sm font-semibold text-[#121212]">Operator configuration checklist</h3>
+          {['Infrastructure', 'Payments', 'Tax', 'Legal', 'Commerce'].map((group) => (
+            <div key={group}>
+              <p className="text-xs font-semibold uppercase tracking-wide text-[#5C5852]">{group}</p>
+              <ul className="mt-1 space-y-1">
+                {OPERATOR_CONFIGURATION_CHECKLIST.filter((item) => item.group === group).map((item) => {
+                  const gate = launchGates.find((row) => row.requirement === item.gate);
+                  return (
+                    <li key={item.item} className="text-xs text-[#5C5852] break-words">
+                      {item.item}: {gate?.state || 'NOT_LOADED'}. Fields: {item.fields.join(', ')}.
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </section>
+        {grouped.RECORDED.length > 0 ? (
+          <section className="rounded-xl border border-[#E5E3DD] p-4 space-y-2">
+            <h3 className="text-sm font-semibold text-[#121212]">{sectionCopy.RECORDED.title}</h3>
+            <p className="text-xs text-[#5C5852]">{sectionCopy.RECORDED.note}</p>
+            {grouped.RECORDED.map((item) => (
+              <p key={`${item.area}-${item.requirement}`} className="text-xs text-[#5C5852] break-words">{item.area}: {item.requirement} · {item.state}</p>
+            ))}
+          </section>
+        ) : null}
         {finalDecision === 'READY_TO_LAUNCH' ? (
           <div className="space-y-3">
             <p className="text-sm text-[#121212]">Production launch readiness verified. All mandatory production gates have passed. Activating production will make the configured storefront, payment methods, customer workflows, email delivery, and approved catalogue available according to the current production configuration.</p>
@@ -352,13 +430,13 @@ export default function LaunchControlCenterPage() {
 
       {/* Primary Environment Gate Banner */}
       <div className="rounded-2xl p-6 border shadow-xs bg-[#FFF5F5] border-rose-200">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 min-w-0">
+            <div className="flex items-center gap-4 min-w-0">
             <div className="w-12 h-12 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0">
               <ShieldAlert className="w-7 h-7" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono text-xs uppercase font-extrabold tracking-wider px-2 py-0.5 rounded bg-rose-200 text-rose-900">
                   Target: Vercel Production
                 </span>
@@ -386,7 +464,7 @@ export default function LaunchControlCenterPage() {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-[#E5E3DD] overflow-x-auto text-xs font-bold uppercase tracking-wider">
+      <div className="flex w-full max-w-full min-w-0 items-center gap-2 border-b border-[#E5E3DD] overflow-x-auto text-xs font-bold uppercase tracking-wider">
         <button
           onClick={() => setActiveTab('overview')}
           className={`py-3 px-4 border-b-2 transition whitespace-nowrap cursor-pointer ${

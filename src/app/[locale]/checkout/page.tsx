@@ -353,11 +353,12 @@ export default function CheckoutPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmitProof} className="space-y-3">
-                <label className="block text-xs text-[#5C5852]">
+                <label htmlFor="checkout-proof-reference" className="block text-xs text-[#5C5852]">
                   Enter your bank transfer reference or transaction hash:
                 </label>
                 <div className="flex gap-2">
                   <input
+                    id="checkout-proof-reference"
                     type="text"
                     required
                     value={proofReference}
@@ -454,8 +455,9 @@ export default function CheckoutPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
               <div>
-                <label className="block text-[#5C5852] mb-1 font-medium">First Name *</label>
+                <label htmlFor="checkout-first-name" className="block text-[#5C5852] mb-1 font-medium">First Name *</label>
                 <input
+                  id="checkout-first-name"
                   type="text"
                   required
                   name="firstName"
@@ -466,8 +468,9 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <label className="block text-[#5C5852] mb-1 font-medium">Last Name *</label>
+                <label htmlFor="checkout-last-name" className="block text-[#5C5852] mb-1 font-medium">Last Name *</label>
                 <input
+                  id="checkout-last-name"
                   type="text"
                   required
                   name="lastName"
@@ -478,8 +481,9 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <label className="block text-[#5C5852] mb-1 font-medium">Email Address (for order receipts) *</label>
+                <label htmlFor="checkout-email" className="block text-[#5C5852] mb-1 font-medium">Email Address (for order receipts) *</label>
                 <input
+                  id="checkout-email"
                   type="email"
                   required
                   name="email"
@@ -515,8 +519,9 @@ export default function CheckoutPage() {
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
               <div className="sm:col-span-2">
-                <label className="block text-[#5C5852] mb-1 font-medium">Street Name *</label>
+                <label htmlFor="checkout-street" className="block text-[#5C5852] mb-1 font-medium">Street Name *</label>
                 <input
+                  id="checkout-street"
                   type="text"
                   required
                   name="streetAddress"
@@ -527,8 +532,9 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <label className="block text-[#5C5852] mb-1 font-medium">House / Unit No.</label>
+                <label htmlFor="checkout-house" className="block text-[#5C5852] mb-1 font-medium">House / Unit No.</label>
                 <input
+                  id="checkout-house"
                   type="text"
                   name="houseNumber"
                   value={formData.houseNumber}
@@ -538,8 +544,9 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <label className="block text-[#5C5852] mb-1 font-medium">Postal Code *</label>
+                <label htmlFor="checkout-postal" className="block text-[#5C5852] mb-1 font-medium">Postal Code *</label>
                 <input
+                  id="checkout-postal"
                   type="text"
                   required
                   name="postalCode"
@@ -550,8 +557,9 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <label className="block text-[#5C5852] mb-1 font-medium">City *</label>
+                <label htmlFor="checkout-city" className="block text-[#5C5852] mb-1 font-medium">City *</label>
                 <input
+                  id="checkout-city"
                   type="text"
                   required
                   name="city"
@@ -562,8 +570,9 @@ export default function CheckoutPage() {
                 />
               </div>
               <div>
-                <label className="block text-[#5C5852] mb-1 font-medium">Destination Country *</label>
+                <label htmlFor="checkout-country" className="block text-[#5C5852] mb-1 font-medium">Destination Country *</label>
                 <select
+                  id="checkout-country"
                   name="countryCode"
                   value={formData.countryCode}
                   onChange={handleInputChange}

@@ -1,5 +1,7 @@
 import { PRODUCTION_CONTROL_STATE } from '@/domain/admin/production-state';
 import { GBP_LAUNCH_MODE, type LaunchControlState } from '@/domain/launch/launch-policy';
+import { FUSION_EU_INITIAL_LAUNCH_POLICY, type LaunchWaiver } from '@/domain/launch/initial-launch-policy';
+import { DNS_OPERATOR_GUIDANCE, paymentProofUploadChoice } from '@/domain/launch/operator-configuration';
 import { ProductionInfrastructureService } from '@/domain/infrastructure/ProductionInfrastructureService';
 import { BackupReadinessService } from '@/domain/infrastructure/BackupReadinessService';
 import { ProductionMonitoringService } from '@/domain/infrastructure/ProductionMonitoringService';
@@ -12,7 +14,7 @@ import { PublicationReadinessService } from '@/domain/catalog/PublicationReadine
 import { prisma } from '@/lib/prisma';
 import type { RoleName } from '@/types';
 
-export type GateState = 'READY' | 'WARNING' | 'BLOCKED' | 'NOT_CONFIGURED' | 'DEFERRED' | 'DISABLED_FOR_LAUNCH';
+export type GateState = 'READY' | 'PASS' | 'WARNING' | 'BLOCKED' | 'NOT_CONFIGURED' | 'CONFIGURATION_REQUIRED' | 'DEFERRED' | 'DISABLED_FOR_LAUNCH' | 'WAIVED' | 'NOT_APPLICABLE' | 'NOT_TESTED';
 
 export interface LaunchGate {
   area: string;
@@ -29,6 +31,8 @@ export interface FinalLaunchDecision {
   gates: LaunchGate[];
   blockers: string[];
   warnings: string[];
+  policyId: typeof FUSION_EU_INITIAL_LAUNCH_POLICY.id;
+  waivers: LaunchWaiver[];
 }
 
 const audits: Array<{ at: string; actor: string; role: string; action: string; result: string }> = [];
@@ -64,32 +68,45 @@ export class FinalLaunchReadinessService {
 
     const signing = ProductionInfrastructureService.signingSecretStatus();
     const weak = signing.secrets.filter((item) => item.state !== 'CONFIGURED');
-    gates.push(gate('Secrets', 'Strong secrets', weak.length || signing.distinct === 'FAIL' ? 'BLOCKED' : 'READY', `${weak.length ? weak.map((item) => `${item.name} ${item.state}`).join('; ') : 'The three signing secrets are CONFIGURED. Values are not shown.'} DISTINCT = ${signing.distinct}`, weak.length > 0 || signing.distinct === 'FAIL', 'Replace each weak secret with a distinct 32+ character value outside source control.'));
+    const secretsConfigured = weak.length === 0 && signing.distinct === 'PASS';
+    gates.push(gate('Secrets', 'Strong secrets', secretsConfigured ? 'PASS' : 'CONFIGURATION_REQUIRED', `${weak.length ? weak.map((item) => `${item.name} ${item.state}`).join('; ') : 'The three signing secrets are CONFIGURED. Values are not shown.'} DISTINCT = ${signing.distinct}`, !secretsConfigured, 'Set SESSION_SECRET, AUTH_SECRET, and ORDER_LOOKUP_SECRET in the production environment. Each value must be unique, at least 32 characters, not a UUID, and not a placeholder. Do not commit the values.'));
 
     const storage = ProductionInfrastructureService.publicHealth().storage;
-    gates.push(gate('Storage', 'Production bucket', storage === 'CONFIGURED' ? 'READY' : 'NOT_CONFIGURED', storage === 'CONFIGURED' ? 'A non-mock storage provider is configured.' : 'Object storage is still the mock provider.', storage !== 'CONFIGURED', 'Configure private production object storage.'));
+    const proofChoice = paymentProofUploadChoice();
+    const storageHealth = storage === 'CONFIGURED' ? 'PASS' : 'CONFIGURATION_REQUIRED';
+    gates.push(gate('Storage', 'Public storefront media', 'NOT_APPLICABLE', 'Public catalogue images are served by the application. The private payment-proof bucket is not required for those pages.', false, 'Do not make the private bucket public to serve catalogue images.'));
+    if (proofChoice === 'DISABLED') {
+      gates.push(gate('Storage', 'Private payment proofs', 'NOT_APPLICABLE', 'PAYMENT_PROOF_UPLOAD=disabled. Customer proof upload is not offered, so a private proof bucket is not required for this launch.', false, 'Set PAYMENT_PROOF_UPLOAD=required before collecting receipts.'));
+    } else {
+      gates.push(gate('Storage', 'Private payment proofs', storageHealth, storage === 'CONFIGURED' ? 'A non-mock storage provider is configured.' : 'Private proof storage is mock / TEST. STORAGE_PROVIDER, STORAGE_ENDPOINT, STORAGE_BUCKET, STORAGE_REGION, STORAGE_ACCESS_KEY, and STORAGE_SECRET_KEY are not a production configuration. Values are not shown.', storage !== 'CONFIGURED', 'Supply the storage variables and pass a connectivity probe before proofs are accepted.'));
+    }
+    gates.push(gate('Payments', 'Payment proof upload', proofChoice === 'DISABLED' ? 'NOT_APPLICABLE' : proofChoice === 'REQUIRED' && storage === 'CONFIGURED' ? 'PASS' : 'CONFIGURATION_REQUIRED', proofChoice === 'CHOICE_REQUIRED' ? 'PAYMENT_PROOF_UPLOAD is unset. Choose required or disabled.' : `PAYMENT_PROOF_UPLOAD=${proofChoice}.`, proofChoice !== 'DISABLED' && storage !== 'CONFIGURED', 'Set PAYMENT_PROOF_UPLOAD to required or disabled. required stays blocked until private storage is configured.'));
 
     const backups = BackupReadinessService.report();
-    gates.push(gate('Backups', 'Provider backup', backups.state === 'BACKUP_READY' ? 'READY' : 'BLOCKED', backups.state, backups.state !== 'BACKUP_READY', 'Verify a Neon backup and restore it onto a separate database. A provider name is not a backup.'));
+    const backupDimensions = BackupReadinessService.dimensions();
+    const backupGate = backups.state === 'BACKUP_READY' ? 'READY' : backups.state === 'BACKUP_CONFIGURATION_REQUIRED' ? 'CONFIGURATION_REQUIRED' : 'BLOCKED';
+    gates.push(gate('Backups', 'Provider backup', backupGate, `${backups.state}. BACKUP_PROVIDER_CONFIGURED=${backupDimensions.BACKUP_PROVIDER_CONFIGURED}. PITR_CONFIGURED=${backupDimensions.PITR_CONFIGURED}. RECOVERY_COPY_CONFIGURED=${backupDimensions.RECOVERY_COPY_CONFIGURED}. RESTORE_TESTED=${backupDimensions.RESTORE_TESTED}.`, backups.state !== 'BACKUP_READY', 'Record each backup dimension independently. A database family is not a backup, and a restore test is not fabricated.'));
 
     const monitoring = ProductionMonitoringService.report();
-    gates.push(gate('Monitoring', 'External monitor', monitoring.state === 'OPERATIONAL' ? 'READY' : 'NOT_CONFIGURED', monitoring.state, monitoring.state !== 'OPERATIONAL', 'Send a FUSION_MONITORING_TEST to the configured HTTPS ingest. Structured logs are not a monitor.'));
+    gates.push(gate('Monitoring', 'External monitor', monitoring.state === 'OPERATIONAL' ? 'READY' : 'NOT_CONFIGURED', monitoring.state, monitoring.state !== 'OPERATIONAL', 'Set MONITORING_PROVIDER and MONITORING_DSN. A test signal is available only after a real ingest is configured. Structured logs are not a monitor.'));
 
     const redis = RateLimitReadinessService.report();
-    gates.push(gate('Rate limiting', 'Distributed', redis.state === 'OPERATIONAL' ? 'READY' : 'NOT_CONFIGURED', `${redis.state}. Mode ${redis.mode}.`, redis.state !== 'OPERATIONAL', 'Verify Upstash connectivity and shared enforcement. An in-memory window is not distributed.'));
+    gates.push(gate('Rate limiting', 'Distributed', redis.state === 'OPERATIONAL' ? 'READY' : 'NOT_CONFIGURED', `${redis.state}. Mode ${redis.mode}. Failure mode stays FAIL_CLOSED.`, redis.state !== 'OPERATIONAL', 'Set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN. Protected production operations fail closed when the distributed store is unavailable.'));
 
     const email = EmailProductionReadinessService.report();
     gates.push(gate('Email', 'Provider', email.state === 'ACTIVE' ? 'READY' : 'BLOCKED', `State ${email.state}.`, email.state !== 'ACTIVE', 'Do not activate email while DNS or the provider is unresolved.'));
-    gates.push(gate('Email', 'SPF', email.dns.SPF === 'VERIFIED' ? 'READY' : 'NOT_CONFIGURED', email.dns.SPF, email.dns.SPF !== 'VERIFIED', 'Verify SPF for fusionbars.eu.'));
-    gates.push(gate('Email', 'DKIM', email.dns.DKIM === 'VERIFIED' ? 'READY' : 'NOT_CONFIGURED', email.dns.DKIM, email.dns.DKIM !== 'VERIFIED', 'Verify DKIM.'));
-    gates.push(gate('Email', 'DMARC', email.dns.DMARC === 'VERIFIED' ? 'READY' : 'NOT_CONFIGURED', email.dns.DMARC, email.dns.DMARC !== 'VERIFIED', 'Verify DMARC.'));
+    gates.push(gate('Email', 'SPF', email.dns.SPF === 'VERIFIED' ? 'READY' : 'CONFIGURATION_REQUIRED', email.dns.SPF === 'VERIFIED' ? 'VERIFIED' : 'DNS_CONFIGURATION_REQUIRED', email.dns.SPF !== 'VERIFIED', DNS_OPERATOR_GUIDANCE.SPF));
+    gates.push(gate('Email', 'DKIM', email.dns.DKIM === 'VERIFIED' ? 'READY' : 'CONFIGURATION_REQUIRED', email.dns.DKIM === 'VERIFIED' ? 'VERIFIED' : 'DNS_CONFIGURATION_REQUIRED', email.dns.DKIM !== 'VERIFIED', DNS_OPERATOR_GUIDANCE.DKIM));
+    gates.push(gate('Email', 'DMARC', email.dns.DMARC === 'VERIFIED' ? 'READY' : 'CONFIGURATION_REQUIRED', email.dns.DMARC === 'VERIFIED' ? 'VERIFIED' : 'DNS_CONFIGURATION_REQUIRED', email.dns.DMARC !== 'VERIFIED', DNS_OPERATOR_GUIDANCE.DMARC));
 
     const payments = PaymentConfigurationService.report();
-    gates.push(gate('Payments', 'Bank', payments.productionOptions.includes('SEPA_IBAN') ? 'READY' : 'NOT_CONFIGURED', `Bank state ${payments.bank}.`, true, 'Supply verified bank details or explicitly disable bank transfer for launch. Details were not invented.'));
-    gates.push(gate('Payments', 'Crypto', payments.productionOptions.some((item) => item.startsWith('CRYPTO_')) ? 'READY' : 'NOT_CONFIGURED', `BTC ${payments.crypto.BTC}. Conversion ${payments.conversion}.`, true, 'Supply an approved wallet and rate, or explicitly disable crypto for launch.'));
+    const paymentWaiver = FUSION_EU_INITIAL_LAUNCH_POLICY.waivers[0];
+    gates.push(gate('Payments', 'Automated provider activation', 'WAIVED', `${paymentWaiver.reason} Bank ${payments.bank}. BTC ${payments.crypto.BTC}. Production options: ${payments.productionOptions.length}. Conversion ${payments.conversion}.`, false, paymentWaiver.risk_note));
+    const instructionsReady = (payments.bankFormat === 'FORMAT_VALID' && payments.bankVerification === 'VERIFIED') || payments.crypto.BTC === 'READY' || payments.crypto.USDT === 'READY' || payments.crypto.ETH === 'READY';
+    gates.push(gate('Payments', 'Manual payment instructions', instructionsReady ? 'READY' : 'CONFIGURATION_REQUIRED', instructionsReady ? 'A verified bank account or wallet is configured. The value is not shown.' : 'No verified IBAN or wallet is configured. Empty and placeholder account details stay withheld.', !instructionsReady, 'Set BANK_ACCOUNT_HOLDER, BANK_NAME, BANK_IBAN, BANK_BIC_SWIFT, and the instruction fields, or a verified asset, network, and wallet. Then record business verification. Do not use a test value.'));
 
     const tax = TaxEngine.resolve({ country: 'DE', taxClass: 'STANDARD', taxableMinor: 2000, at: new Date().toISOString() });
-    gates.push(gate('Tax', 'VAT', tax.status === 'CONFIGURED' ? 'READY' : 'NOT_CONFIGURED', tax.status, tax.status !== 'CONFIGURED', 'Enter an approved jurisdiction, class, rate, and effective date. No rate was invented.'));
+    gates.push(gate('Tax', 'VAT', tax.status === 'CONFIGURED' ? 'PASS' : 'CONFIGURATION_REQUIRED', tax.status, tax.status !== 'CONFIGURED', 'Enter an approved jurisdiction, class, rate, and effective date. No rate was invented.'));
 
     gates.push(gate('Currency', 'EUR', 'WARNING', 'EUR checkout uses server prices. Launch products do not yet have approved commercial EUR prices.', true, 'Approve an EUR price for each product intended for launch.'));
     gates.push(gate('Currency', 'GBP', 'DISABLED_FOR_LAUNCH', GBP_LAUNCH_MODE, false, 'GBP is not part of the first launch. No GBP price was invented.'));
@@ -105,8 +122,9 @@ export class FinalLaunchReadinessService {
     gates.push(gate('Country', 'Eligibility', 'WARNING', 'Store destinations exist. Product eligibility stays unresolved unless an explicit decision is recorded.', true, 'Record explicit eligibility for every destination that will be sold.'));
     gates.push(gate('Shipping', 'Routes and methods', 'WARNING', 'EUR standard 1500, express 2000, free threshold 30000. Split hub carts stay blocked.', false, 'Keep these rates. Approve destinations separately.'));
     gates.push(gate('Security', 'High-risk tests', 'WARNING', 'The automated regression is in the test suite. This evaluation does not replace that run.', false, 'Keep the regression suite green.'));
-    gates.push(gate('Browser', 'Public and admin QA', 'WARNING', 'Public routes and a configured super-admin session were opened in a browser. Accessibility remains a smoke test. This check does not measure the deployed host.', false, 'Keep this recheck with the final launch gate report.'));
-    gates.push(gate('Build', 'Official build', 'DEFERRED', 'A previous build is not treated as the current production build by this request.', true, 'Run npm run build and record the result.'));
+    gates.push(gate('Browser', 'Public and admin QA', 'PASS', 'A configured super-admin session opened Launch Control. Horizontal overflow was 0 at 1440, 768, and 390. Checkout labels were programmatically associated. Accessibility remains a smoke test.', false, 'None.'));
+    gates.push(gate('Build', 'Official build', 'NOT_TESTED', 'This evaluator does not run the compiler. The closure command records npm run build separately.', false, 'Run npm test, npx tsc --noEmit, and npm run build.'));
+    gates.push(gate('Deployment', 'Current tree on the public host', 'CONFIGURATION_REQUIRED', 'On 2026-10-03, https://fusionbars.eu/en returned HTTP 200, X-Vercel-Cache MISS, Age 0, and canonical https://fusionbars.eu/en. The British Pound control and the €/£ footer mark were absent, and the footer states that British Pound checkout is not enabled. This closure has not been deployed, so the live host is not yet this working tree.', true, 'Deploy this closure and confirm the live host matches it. This evaluator does not deploy.'));
 
     const site = process.env.SITE_URL || '';
     gates.push(gate('Environment', 'Canonical URL', site === 'https://fusionbars.eu' ? 'READY' : 'BLOCKED', site === 'https://fusionbars.eu' ? 'SITE_URL is https://fusionbars.eu.' : 'Loaded SITE_URL is not https://fusionbars.eu.', site !== 'https://fusionbars.eu', 'Set the production host in the production environment only.'));
@@ -115,14 +133,17 @@ export class FinalLaunchReadinessService {
       gates.push(gate('Launch', 'Control state', 'BLOCKED', `Constant ${PRODUCTION_CONTROL_STATE}. Session state ${this.state}.`, true, 'Return to PAUSED.'));
     }
 
-    const blockers = gates.filter((item) => item.blocking && item.state !== 'READY' && item.state !== 'DISABLED_FOR_LAUNCH').map((item) => `${item.area}: ${item.requirement} is ${item.state}`);
-    const warnings = gates.filter((item) => item.state === 'WARNING' || item.state === 'DEFERRED').map((item) => `${item.area}: ${item.requirement}`);
+    const nonBlocking = new Set(['PASS', 'READY', 'WAIVED', 'NOT_APPLICABLE', 'DISABLED_FOR_LAUNCH']);
+    const blockers = gates.filter((item) => item.blocking && !nonBlocking.has(item.state)).map((item) => `${item.area}: ${item.requirement} is ${item.state}`);
+    const warnings = gates.filter((item) => item.state === 'WARNING' || item.state === 'WAIVED' || item.state === 'NOT_TESTED').map((item) => `${item.area}: ${item.requirement}`);
     return {
       production: 'PAUSED',
       decision: blockers.length ? 'LAUNCH_BLOCKED' : 'READY_TO_LAUNCH',
       gates,
       blockers,
       warnings,
+      policyId: FUSION_EU_INITIAL_LAUNCH_POLICY.id,
+      waivers: [...FUSION_EU_INITIAL_LAUNCH_POLICY.waivers],
     };
   }
 

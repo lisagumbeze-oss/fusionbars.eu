@@ -7,6 +7,17 @@ const IBAN_LENGTHS: Record<string, number> = {
 
 export type FormatState = 'FORMAT_VALID' | 'FORMAT_INVALID' | 'NOT_CONFIGURED';
 
+/** Placeholder and test account strings must not be shown to customers. */
+export function isPlaceholderCustomerPaymentDetail(value: string | undefined): boolean {
+  const text = (value || '').trim().toLowerCase();
+  if (!text) return true;
+  return text.includes('placeholder')
+    || text.includes('test_only')
+    || text.includes('nl00test')
+    || text === 'testnl2a'
+    || text.includes('000000000000000000000000000000000000dead');
+}
+
 export function ibanFormat(value: string | undefined): FormatState {
   const compact = (value || '').replace(/\s+/g, '').toUpperCase();
   if (!compact) return 'NOT_CONFIGURED';

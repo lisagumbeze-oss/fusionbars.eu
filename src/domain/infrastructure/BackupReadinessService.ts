@@ -109,6 +109,21 @@ export class BackupReadinessService {
     return 'RESTORE_REHEARSAL_REQUIRED';
   }
 
+  static dimensions(evidence?: BackupEvidence): {
+    BACKUP_PROVIDER_CONFIGURED: 'YES' | 'NO';
+    PITR_CONFIGURED: 'YES' | 'NO';
+    RECOVERY_COPY_CONFIGURED: 'YES' | 'NO';
+    RESTORE_TESTED: 'YES' | 'NO';
+  } {
+    const resolved = evidence || this.liveEvidence();
+    return {
+      BACKUP_PROVIDER_CONFIGURED: this.providerVariable(resolved) === 'CONFIGURED' && resolved.backupEnabled === 'YES' ? 'YES' : 'NO',
+      PITR_CONFIGURED: resolved.pitr === 'CONFIGURED' ? 'YES' : 'NO',
+      RECOVERY_COPY_CONFIGURED: resolved.recoveryCopy === 'PRESENT' ? 'YES' : 'NO',
+      RESTORE_TESTED: resolved.restoreResult === 'PASS' && resolved.restoreTargetIsolated ? 'YES' : 'NO',
+    };
+  }
+
   static report(evidence?: BackupEvidence) {
     const live = !evidence;
     const resolved = evidence || this.liveEvidence();

@@ -7,6 +7,7 @@
 
 import { cookies } from 'next/headers';
 import { AuthService } from '@/domain/auth/AuthService';
+import { ADMIN_SESSION_COOKIE } from '@/domain/auth/AdminAuthService';
 import { RBACService } from '@/domain/auth/RBACService';
 import { LaunchReadinessService, LaunchReadinessReport } from '@/domain/launch/LaunchReadinessService';
 import { PaymentActivationService, PaymentMethodActivationStage } from '@/domain/payments/PaymentActivationService';
@@ -30,7 +31,7 @@ import { EnvironmentService } from '@/config/environment';
  */
 async function assertSuperAdminCaller() {
   const cookieStore = await cookies();
-  const token = cookieStore.get('fb_session')?.value;
+  const token = cookieStore.get(ADMIN_SESSION_COOKIE)?.value;
   if (!token) {
     throw new Error('Unauthorized: Authentication required.');
   }

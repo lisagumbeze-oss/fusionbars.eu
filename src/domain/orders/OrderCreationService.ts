@@ -22,6 +22,7 @@ import { HubAllocationService } from '@/domain/inventory/HubAllocationService';
 import { InventoryService } from '@/domain/inventory/InventoryService';
 import { BankTransferPaymentService, CryptoPaymentService, PaymentInstructions } from '@/domain/payments/PaymentService';
 import { PaymentConfigService, CryptoAsset } from '@/domain/payments/PaymentConfig';
+import { isPlaceholderCustomerPaymentDetail } from '@/domain/payments/payment-format';
 import { PaymentConfigurationService } from '@/domain/payments/PaymentConfigurationService';
 import { getCheckoutCryptoWallets } from '@/domain/payments/CheckoutCryptoWallets';
 import {
@@ -292,6 +293,24 @@ export class OrderCreationService {
       };
     }
 
+    const visibleDetails = paymentInstructions.details as { iban?: string; bicSwift?: string; accountHolder?: string; bankName?: string; receivingAddress?: string; qrPayload?: string };
+    if (isPlaceholderCustomerPaymentDetail(visibleDetails.iban)) {
+      visibleDetails.iban = '';
+      visibleDetails.bicSwift = '';
+      visibleDetails.accountHolder = '';
+      visibleDetails.bankName = '';
+      paymentNotificationDetails = { ...paymentNotificationDetails, iban: '', bic: '', accountHolder: '', bankName: '' };
+      paymentInstructions.instructions = 'Payment account details are not configured. Do not send funds until verified instructions are published.';
+    }
+    if (isPlaceholderCustomerPaymentDetail(visibleDetails.receivingAddress)) {
+      visibleDetails.receivingAddress = '';
+      visibleDetails.qrPayload = '';
+      paymentInstructions.instructions = 'A receiving address is not configured. Do not send funds until a verified address is published.';
+    }
+    if (paymentInstructions.wallets) {
+      paymentInstructions.wallets = paymentInstructions.wallets.filter((wallet) => !isPlaceholderCustomerPaymentDetail(wallet.address));
+    }
+
     // STEP 13: Create Transactional Order Object
     const dbOrder: DbOrder = {
       id: orderId,
@@ -427,10 +446,10 @@ export class OrderCreationService {
     if (paymentMethodCode === 'SEPA_IBAN') {
       void dispatchEmailSafely('sepa_order_confirmation', () =>
         EmailService.sendSepaOrderConfirmation(dbOrder, {
-          iban: paymentNotificationDetails.iban || 'NL00TEST0000000000',
-          bic: paymentNotificationDetails.bic || 'TESTNL2A',
-          accountHolder: paymentNotificationDetails.accountHolder || 'Fusion EU Logistics B.V.',
-          bankName: paymentNotificationDetails.bankName || 'European Merchant Bank',
+          iban: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.iban) ? '' : paymentNotificationDetails.iban || '',
+          bic: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.bic) ? '' : paymentNotificationDetails.bic || '',
+          accountHolder: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.accountHolder) ? '' : paymentNotificationDetails.accountHolder || '',
+          bankName: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.bankName) ? '' : paymentNotificationDetails.bankName || '',
           reference: orderNumber,
         })
       );
@@ -439,7 +458,7 @@ export class OrderCreationService {
         EmailService.sendCryptoOrderConfirmation(dbOrder, {
           cryptoName: paymentNotificationDetails.cryptoName || 'Bitcoin',
           network: paymentNotificationDetails.network || 'Bitcoin Mainnet',
-          receivingAddress: paymentNotificationDetails.receivingAddress || 'bc1q_placeholder_btc_test_only',
+          receivingAddress: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.receivingAddress) ? '' : paymentNotificationDetails.receivingAddress || '',
           wallets: (paymentInstructions.wallets ?? []).map((wallet) => ({
             name: wallet.name,
             symbol: wallet.symbol,

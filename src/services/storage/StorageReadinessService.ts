@@ -37,6 +37,17 @@ export class StorageReadinessService {
     this.lastTest = 'NOT_RUN';
   }
 
+  static productionHealth() {
+    const report = this.report();
+    return {
+      state: report.state === 'ACTIVE' ? 'READY' as const : 'CONFIGURATION_REQUIRED' as const,
+      provider: report.provider,
+      variables: report.variables,
+      privateStorage: report.privateStorage,
+      lastTest: report.lastTest,
+    };
+  }
+
   static report() {
     const mode = process.env.VERCEL_ENV || process.env.NODE_ENV || 'development';
     const provider = (clean('STORAGE_PROVIDER') || 'mock').toLowerCase();

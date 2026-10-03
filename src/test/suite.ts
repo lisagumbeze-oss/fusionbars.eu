@@ -26,6 +26,8 @@ import { CommerceRepository } from '@/lib/commerce-repository';
 import { EmailTemplates } from '@/emails/templates';
 import { CANONICAL_ORDER_STATUSES, OrderStatus } from '@/types';
 import { PaymentConfigService } from '@/domain/payments/PaymentConfig';
+import { getCheckoutCryptoWallets, setCheckoutCryptoWalletsForTests } from '@/domain/payments/CheckoutCryptoWallets';
+import { bucketFor, OPERATOR_CONFIGURATION_CHECKLIST } from '@/domain/launch/operator-configuration';
 import { bicFormat, ibanFormat, receivingAddressFormat } from '@/domain/payments/payment-format';
 import {
   CRYPTO_PAYMENT_DISCOUNT_PERCENT,
@@ -111,6 +113,29 @@ export interface TestSuiteReport {
   failedCount: number;
   durationMs: number;
   results: TestResult[];
+}
+
+const FIXTURE_CHECKOUT_WALLETS = [
+  { symbol: 'BTC', name: 'Bitcoin', network: 'fixture-network', address: 'fixture-btc-not-a-wallet' },
+  { symbol: 'ETH', name: 'Ethereum', network: 'fixture-network', address: 'fixture-eth-not-a-wallet' },
+  { symbol: 'BCH', name: 'Bitcoin Cash', network: 'fixture-network', address: 'fixture-bch-not-a-wallet' },
+];
+
+async function createConfiguredOrder(input: Parameters<typeof OrderCreationService.createOrder>[0]) {
+  const restore = PaymentConfigService.snapshotForTests();
+  try {
+    if (input.paymentMethodCode === 'SEPA_IBAN' || input.paymentMethodCode === 'CRYPTO_BTC') {
+      PaymentConfigService.forceMethodActiveForTests([input.paymentMethodCode]);
+    }
+    if (input.paymentMethodCode === 'CRYPTO_BTC') {
+      PaymentConfigService.setCryptoStatus('BTC', 'ACTIVE');
+      setCheckoutCryptoWalletsForTests(FIXTURE_CHECKOUT_WALLETS);
+    }
+    return await OrderCreationService.createOrder(input);
+  } finally {
+    setCheckoutCryptoWalletsForTests(null);
+    restore();
+  }
 }
 
 export class DomainTestSuite {
@@ -946,7 +971,7 @@ export class DomainTestSuite {
     // AREA 23: TRANSACTIONAL ORDER CREATION & SNAPSHOTS (PHASE 3)
     // ----------------------------------------------------
     await run('Order Creation Pipeline', 'Should atomically create order with unique FB-EU-YYYY-XXXXX reference and price snapshots', async () => {
-      const order = await OrderCreationService.createOrder({
+      const order = await createConfiguredOrder({
         items: [{ variantId: 'var_bar_1', quantity: 5 }],
         currency: 'EUR',
         shippingAddress: {
@@ -977,8 +1002,8 @@ export class DomainTestSuite {
         throw new Error(`Authoritative line total snapshot incorrect: ${item.lineTotal}`);
       }
 
-      if (!order.paymentInstructions.details.iban) {
-        throw new Error('Missing SEPA IBAN details in generated instructions');
+      if (order.paymentInstructions.details.iban) {
+        throw new Error('A placeholder IBAN was returned to the customer');
       }
     });
 
@@ -1016,7 +1041,7 @@ export class DomainTestSuite {
 
       let sepaRejected = false;
       try {
-        await OrderCreationService.createOrder({
+        await createConfiguredOrder({
           items: [{ variantId: 'var_bar_1', quantity: 1 }],
           currency: 'EUR',
           shippingAddress: { ...address, email: `sepa.small.${Date.now()}@fusionbars.eu` },
@@ -1030,7 +1055,7 @@ export class DomainTestSuite {
         throw new Error('Orders under 100 must reject bank transfer');
       }
 
-      const sepa = await OrderCreationService.createOrder({
+      const sepa = await createConfiguredOrder({
         items: [{ variantId: 'var_bar_1', quantity: 5 }],
         currency: 'EUR',
         shippingAddress: { ...address, email: `sepa.${Date.now()}@fusionbars.eu` },
@@ -1041,7 +1066,7 @@ export class DomainTestSuite {
       setCryptoPriceLoader(async () => cryptoPrices);
       let crypto;
       try {
-        crypto = await OrderCreationService.createOrder({
+        crypto = await createConfiguredOrder({
           items: [{ variantId: 'var_bar_1', quantity: 5 }],
           currency: 'EUR',
           shippingAddress: address,
@@ -1293,7 +1318,7 @@ export class DomainTestSuite {
     // ----------------------------------------------------
     await run('Carrier Tracking Unavailable', 'Public order lookup must not expose carrier APIs or internal logistics hub routing', async () => {
       // Create a test order
-      const orderRes = await OrderCreationService.createOrder({
+      const orderRes = await createConfiguredOrder({
         items: [{ variantId: 'var_bar_1', quantity: 5 }],
         currency: 'EUR',
         shippingAddress: {
@@ -1375,8 +1400,8 @@ export class DomainTestSuite {
     // ----------------------------------------------------
     await run('Payment Configuration Protected', 'Public payment options must never expose bank accounts, IBANs, BICs, or crypto addresses', () => {
       const publicOptions = PaymentConfigService.getPublicPaymentOptions();
-      if (!publicOptions || publicOptions.length === 0) {
-        throw new Error('Public payment options should return available rails');
+      if (publicOptions.some((option) => option.code === 'SEPA_IBAN')) {
+        throw new Error('A placeholder bank account was offered to customers');
       }
 
       for (const opt of publicOptions) {
@@ -1405,7 +1430,7 @@ export class DomainTestSuite {
       // Attempting to checkout with an inactive payment method must throw
       let rejected = false;
       try {
-        await OrderCreationService.createOrder({
+        await createConfiguredOrder({
           items: [{ variantId: 'var_bar_1', quantity: 1 }],
           currency: 'EUR',
           shippingAddress: {
@@ -1691,7 +1716,7 @@ export class DomainTestSuite {
     // ----------------------------------------------------
     await run('Object Storage Authorization & Presigned URL Gates', 'Should securely store proof and authorize only owner or admin', async () => {
       // Create a test order
-      const orderRes = await OrderCreationService.createOrder({
+      const orderRes = await createConfiguredOrder({
         items: [{ variantId: 'var_bar_1', quantity: 5 }],
         currency: 'EUR',
         shippingAddress: {
@@ -2046,7 +2071,7 @@ export class DomainTestSuite {
     await run('Inactive Payment Rail Gated from Checkout', 'Public checkout quote and order creation must reject inactive payment codes', async () => {
       let threw = false;
       try {
-        await OrderCreationService.createOrder({
+        await createConfiguredOrder({
           items: [{ variantId: 'var_bar_1', quantity: 1 }],
           currency: 'EUR',
           shippingAddress: {
@@ -5397,7 +5422,7 @@ export class DomainTestSuite {
           throw new Error(`${cohortSlug} leaked into the public catalogue`);
         }
       }
-      const created = await OrderCreationService.createOrder({
+      const created = await createConfiguredOrder({
         items: [{ variantId: 'var_bar_1', quantity: 5 }],
         currency: 'EUR',
         shippingAddress: {
@@ -5420,7 +5445,7 @@ export class DomainTestSuite {
         if (CatalogService.getPublicProducts().some((product) => product.slug === slug)) throw new Error('Unpublished product remained in search and categories');
         let purchased = false;
         try {
-          await OrderCreationService.createOrder({
+          await createConfiguredOrder({
             items: [{ variantId: 'var_bar_1', quantity: 5 }],
             currency: 'EUR',
             shippingAddress: {
@@ -6325,7 +6350,17 @@ export class DomainTestSuite {
       if (blocked.state !== 'PAUSED' || blocked.decision !== 'LAUNCH_BLOCKED' || !blocked.error) throw new Error('A blocked gate was activated');
       const decision = await FinalLaunchReadinessService.evaluate();
       if (decision.decision !== 'LAUNCH_BLOCKED' || decision.production !== 'PAUSED') throw new Error('The final decision was not blocked');
-      if (decision.gates.some((item) => item.state === 'READY' && item.requirement === 'VAT')) throw new Error('VAT was marked ready');
+      if (decision.gates.some((item) => (item.state === 'READY' || item.state === 'PASS') && item.requirement === 'VAT')) throw new Error('VAT was marked ready');
+      const waiver = decision.waivers.find((item) => item.gate === 'Automated payment-provider activation');
+      const providerGate = decision.gates.find((item) => item.requirement === 'Automated provider activation');
+      if (!waiver || waiver.status !== 'WAIVED' || providerGate?.state !== 'WAIVED' || providerGate.blocking) throw new Error('The payment-provider waiver was hidden or treated as a pass');
+      if (decision.gates.some((item) => item.state === 'NOT_TESTED' && item.requirement === 'Official build' && item.blocking)) throw new Error('An unrun compiler check was allowed to block as if it had failed');
+      if (decision.gates.some((item) => bucketFor(item.state, item.blocking) === 'READY' && item.state === 'WAIVED')) throw new Error('A waiver was placed in the ready section');
+      if (decision.gates.some((item) => bucketFor(item.state, item.blocking) === 'READY' && item.state === 'NOT_TESTED')) throw new Error('An untested gate was placed in the ready section');
+      const backupDimensions = BackupReadinessService.dimensions();
+      if (Object.values(backupDimensions).some((value) => value === 'YES')) throw new Error('A backup dimension was marked configured without evidence');
+      if (OPERATOR_CONFIGURATION_CHECKLIST.some((item) => /NL00|IBAN[0-9]|bc1q/i.test(item.fields.join(' ')))) throw new Error('The operator checklist contained a payment credential');
+      if ((await getCheckoutCryptoWallets({ amountMinor: 2000, currency: 'EUR' })).length !== 0) throw new Error('Unconfigured checkout wallets were offered');
       const paused = FinalLaunchReadinessService.pause({ role: 'SUPER_ADMIN', actor: 'admin@fusionbars.eu', confirmation: 'PAUSE PRODUCTION' });
       if (paused.state !== 'PAUSED' || PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Pause did not keep production paused');
       if (JSON.stringify(firstBatchState) !== beforeBatch) throw new Error('The launch gate changed the pilot file');
@@ -6431,7 +6466,7 @@ export class DomainTestSuite {
         const badMime = FileUploadSecurityService.validateUpload({ filename: 'proof.pdf', mimeType: 'application/x-msdownload', sizeBytes: 32, bufferHeaderHex: '4D5A' });
         if (badMime.valid) throw new Error('Invalid MIME was accepted');
 
-        const orderRes = await OrderCreationService.createOrder({
+        const orderRes = await createConfiguredOrder({
           items: [{ variantId: 'var_bar_1', quantity: 5 }],
           currency: 'EUR',
           shippingAddress: { firstName: 'Ada', lastName: 'Storage', email: 'ada.storage@example.com', streetAddress: '1 Store Lane', city: 'Berlin', postalCode: '10115', countryCode: 'DE', phone: '+49 151 00000000' },
