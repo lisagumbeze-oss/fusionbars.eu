@@ -91,12 +91,13 @@ export class EnvironmentService {
     const isDevelopment = mode === 'development';
     const isTest = mode === 'test';
 
-    const configuredSiteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://fusionbars.eu';
+    const canonicalSiteUrl = 'https://fusionbars.eu';
+    const configuredSiteUrl = process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || canonicalSiteUrl;
     const runningDomainSuite = process.argv.some((arg) => arg.includes('run-tests'));
-    const siteUrl =
-      (isTest || runningDomainSuite) && configuredSiteUrl.includes('localhost')
-        ? 'https://fusionbars.eu'
-        : configuredSiteUrl;
+    const unsafeCustomerHost = /localhost|127\.0\.0\.1|0\.0\.0\.0|^http:\/\//i.test(configuredSiteUrl);
+    const siteUrl = isProduction || ((isTest || runningDomainSuite) && unsafeCustomerHost)
+      ? canonicalSiteUrl
+      : configuredSiteUrl;
 
     // 1. Secrets check
     const sessionSecret = process.env.SESSION_SECRET || (isProduction ? '' : 'dev_insecure_session_secret_32char_minimum!');

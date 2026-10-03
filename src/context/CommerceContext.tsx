@@ -4,6 +4,7 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CurrencyCode, LocaleCode } from '../types';
 import { MoneyEngine } from '../lib/money';
 import { AdminOverrides, StoreOperationsSettings } from '@/domain/admin/AdminOverrides';
+import { GBP_LAUNCH_MODE } from '@/domain/launch/launch-policy';
 
 export interface CartItem {
   id: string; // variantId
@@ -64,7 +65,7 @@ export function CommerceProvider({
   useEffect(() => {
     try {
       const savedCurrency = localStorage.getItem('fusion_eu_currency') as CurrencyCode;
-      if (savedCurrency && (savedCurrency === 'EUR' || savedCurrency === 'GBP')) {
+      if (savedCurrency === 'EUR' || (savedCurrency === 'GBP' && GBP_LAUNCH_MODE !== 'DISABLED_FOR_LAUNCH')) {
         setCurrencyState(savedCurrency);
       }
       const savedCart = localStorage.getItem('fusion_eu_cart');
@@ -81,6 +82,7 @@ export function CommerceProvider({
   }, []);
 
   const setCurrency = (c: CurrencyCode) => {
+    if (c === 'GBP' && GBP_LAUNCH_MODE === 'DISABLED_FOR_LAUNCH') return;
     setCurrencyState(c);
     try {
       localStorage.setItem('fusion_eu_currency', c);

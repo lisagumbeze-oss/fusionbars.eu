@@ -17,7 +17,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { createOrderAction } from '@/actions/orders';
-import { submitPaymentProofAction } from '@/actions/payments';
+import { listCustomerPaymentMethodsAction, submitPaymentProofAction } from '@/actions/payments';
 import { CountryRegistry } from '@/domain/countries/CountryRegistry';
 import { ShippingService } from '@/domain/shipping/ShippingService';
 import {
@@ -48,6 +48,7 @@ export default function CheckoutPage() {
 
   const [shippingMethodCode, setShippingMethodCode] = useState<'STANDARD' | 'EXPRESS'>('STANDARD');
   const [paymentMethodCode, setPaymentMethodCode] = useState<'SEPA_IBAN' | 'CRYPTO_BTC'>('CRYPTO_BTC');
+  const [customerMethods, setCustomerMethods] = useState<string[] | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -63,6 +64,19 @@ export default function CheckoutPage() {
   const expressOption = shippingCalculation.methods.find((m) => m.code === 'EXPRESS');
   const dynamicShippingCost = shippingCalculation.selectedMethod.cost;
   const bankTransferAvailable = isBankTransferAvailable(subtotal);
+
+  useEffect(() => {
+    let cancelled = false;
+    listCustomerPaymentMethodsAction().then((result) => {
+      if (cancelled) return;
+      const codes = result.methods.map((method) => method.code);
+      setCustomerMethods(codes);
+      if (!codes.includes('CRYPTO_BTC') && codes.includes('SEPA_IBAN')) setPaymentMethodCode('SEPA_IBAN');
+    }).catch(() => {
+      if (!cancelled) setCustomerMethods([]);
+    });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     if (!bankTransferAvailable && paymentMethodCode === 'SEPA_IBAN') {
@@ -634,13 +648,16 @@ export default function CheckoutPage() {
               4. Payment Method
             </h2>
             <CryptoDiscountNotice locale={locale} compact />
-            {!bankTransferAvailable && (
+            {!bankTransferAvailable && customerMethods?.some((code) => code.startsWith('CRYPTO_')) && (
               <p className="text-xs text-[#5C5852]">
                 Orders under {formatMoney(10000)} can be paid with cryptocurrency. Bank transfer is available from {formatMoney(10000)}.
               </p>
             )}
             <div className="space-y-3 text-xs">
-              {bankTransferAvailable && (
+              {customerMethods && customerMethods.length === 0 && (
+                <p className="text-[#5C5852]">Payment methods are not available.</p>
+              )}
+              {customerMethods?.includes('SEPA_IBAN') && bankTransferAvailable && (
               <label
                 className={`p-4 rounded-xl border cursor-pointer block transition ${
                   paymentMethodCode === 'SEPA_IBAN'
@@ -662,12 +679,12 @@ export default function CheckoutPage() {
                   <span className="text-[11px] text-[#4A5D4E] font-medium font-sans">Zero Fees &bull; Instant Confirmation</span>
                 </div>
                 <p className="text-[#5C5852] mt-2 pl-6">
-                  Direct transfer to our Dutch/German merchant accounts with automated Order Reference reconciliation.
+                  The payable amount and payment reference are set by the order. Account instructions appear only after this method is available for the order.
                 </p>
               </label>
               )}
 
-              <label
+              {customerMethods?.some((code) => code.startsWith('CRYPTO_')) && <label
                 className={`p-4 rounded-xl border cursor-pointer block transition ${
                   paymentMethodCode === 'CRYPTO_BTC'
                     ? 'border-[#4A5D4E] bg-[#F0F4F1]/60'
@@ -692,7 +709,7 @@ export default function CheckoutPage() {
                 <p className="text-[#5C5852] mt-2 pl-6">
                   Pay with cryptocurrency and save 10% on the merchandise subtotal. Wallet addresses are shown after you confirm the order.
                 </p>
-              </label>
+              </label>}
             </div>
           </div>
         </div>
@@ -731,7 +748,7 @@ export default function CheckoutPage() {
               )}
               <div className="flex justify-between">
                 <span>Tax/VAT</span>
-                <span className="font-mono text-[#121212]">Not configured</span>
+                <span className="font-mono text-[#121212]">TAX_CONFIGURATION_REQUIRED</span>
               </div>
               <div className="flex justify-between">
                 <span>European Shipping ({shippingMethodCode})</span>
@@ -750,7 +767,7 @@ export default function CheckoutPage() {
                 <ShieldCheck className="w-4 h-4 text-[#4A5D4E]" />
                 <span>Zero Trust Architecture</span>
               </div>
-              <p>The server recalculates price, discount, tax, and shipping before the order is saved. Tax treatment is not configured, so no VAT amount is added. No card data is stored.</p>
+              <p>The server recalculates price, discount, tax, and shipping before the order is saved. Tax treatment is TAX_CONFIGURATION_REQUIRED, so this total is not a tax-settled amount. No published terms are available to accept. No card data is stored.</p>
             </div>
 
             <button

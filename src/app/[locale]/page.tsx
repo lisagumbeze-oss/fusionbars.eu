@@ -4,7 +4,7 @@ import Image from 'next/image';
 import { CatalogService } from '@/lib/catalog';
 import ProductCard from '@/components/ProductCard';
 import { LocaleCode } from '@/types';
-import { ShieldCheck, Truck, Sparkles, ArrowRight, CheckCircle2, ChevronRight, Lock, Heart, Award, Layers } from 'lucide-react';
+import { ShieldCheck, Truck, Sparkles, ArrowRight, CheckCircle2, ChevronRight, Lock, Heart, Award } from 'lucide-react';
 import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
 
 interface HomePageProps {
@@ -314,29 +314,6 @@ export default async function HomePage({ params }: HomePageProps) {
               Our artisan chocolate bars have an unopened shelf life of 12 months when stored in a cool, dry place between 14&deg;C and 18&deg;C. Refrigeration is not required unless ambient temperatures exceed 24&deg;C.
             </p>
           </div>
-        </div>
-      </section>
-
-      {/* 8. ARCHITECTURE & REVIEWER CONSOLE PROMPT */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-6 rounded-xl bg-[#F0F4F1] border border-[#4A5D4E]/30 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-[#4A5D4E] text-white flex items-center justify-center shrink-0">
-              <Layers className="w-5 h-5" />
-            </div>
-            <div>
-              <h4 className="text-sm font-bold text-[#121212]">Technical Architecture &amp; Domain Verification Console</h4>
-              <p className="text-xs text-[#5C5852]">
-                Inspect real-time domain test suite (24 tests), European shipping simulator, and finite state machine.
-              </p>
-            </div>
-          </div>
-          <Link
-            href={`/${locale}/admin/architecture`}
-            className="px-4 py-2 rounded-lg bg-[#4A5D4E] hover:bg-[#3B4A3E] text-white text-xs font-semibold font-mono tracking-wide transition shrink-0"
-          >
-            Open Architecture Console &rarr;
-          </Link>
         </div>
       </section>
     </div>

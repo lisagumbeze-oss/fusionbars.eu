@@ -13,6 +13,7 @@ import {
   getAdminPromotionsAction,
   getAdminSettingsAction,
   getEmailDeliveryLogAction,
+  retryEmailDeliveryAction,
   getEmailTemplateCenterAction,
   markAdminNotificationReadAction,
   markAllAdminNotificationsReadAction,
@@ -213,10 +214,21 @@ export default function AdminModule({ module }: { module: ModuleId }) {
           <p className="text-sm">Provider key: {settings.email.keyConfigured ? 'Present' : 'Missing'}</p>
         </Panel>
         <Panel title="Security">
-          <p className="text-sm">Session secret: {settings.security.sessionSecretConfigured ? 'Present' : 'Using development fallback'}</p>
-          <p className="text-sm">Auth secret: {settings.security.authSecretConfigured ? 'Present' : 'Using development fallback'}</p>
-          <p className="text-sm">Rate limit: {settings.security.distributedRateLimit ? 'Distributed' : 'Local'}</p>
-          <p className="text-sm mt-2">Production: {payload.productionState}</p>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-[#5C5852]">
+                <th className="py-1 font-semibold">Secret</th>
+                <th className="py-1 font-semibold">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td className="py-1">Session secret</td><td>{settings.security.sessionSecret}</td></tr>
+              <tr><td className="py-1">Auth secret</td><td>{settings.security.authSecret}</td></tr>
+              <tr><td className="py-1">Order lookup secret</td><td>{settings.security.orderLookupSecret}</td></tr>
+            </tbody>
+          </table>
+          <p className="text-sm mt-2">Rate limit: {settings.security.distributedRateLimit ? 'Distributed' : 'Local'}</p>
+          <p className="text-sm">Production: {payload.productionState}</p>
         </Panel>
         <div className="lg:col-span-2 flex flex-wrap items-center gap-3">
           <button type="submit" className="rounded-lg bg-[#4A5D4E] text-white px-4 py-2 text-sm font-semibold">Save store settings</button>
@@ -273,7 +285,7 @@ export default function AdminModule({ module }: { module: ModuleId }) {
                     return;
                   }
                   const form = new FormData(event.currentTarget);
-                  const result = await sendTestEmailAction({ recipientEmail: String(form.get('recipient') || '') });
+                  const result = await sendTestEmailAction({ recipientEmail: String(form.get('recipient') || ''), templateId: preview.id, confirmation: 'SEND_TEST_EMAIL' });
                   setNotice(result.success ? (result.message || 'Test probe queued.') : (result.error || 'Test send was not accepted.'));
                 }}
               >
@@ -291,22 +303,33 @@ export default function AdminModule({ module }: { module: ModuleId }) {
 
   if (module === 'email-delivery') {
     const status = search.get('status') || 'ALL';
-    const entries = (payload?.entries || []).filter((entry: any) => status === 'ALL' || entry.status === status);
+    const templateFilter = (search.get('template') || '').toLowerCase();
+    const recipientFilter = (search.get('recipient') || '').toLowerCase();
+    const entries = (payload?.entries || []).filter((entry: any) => {
+      if (status !== 'ALL' && entry.status !== status && entry.deliveryStatus !== status) return false;
+      if (templateFilter && !String(entry.template || '').toLowerCase().includes(templateFilter)) return false;
+      if (recipientFilter && !String(entry.recipient || '').toLowerCase().includes(recipientFilter)) return false;
+      return true;
+    });
+    const selected = entries.find((entry: any) => entry.messageId === search.get('message')) || null;
     return (
       <Panel>
-        <div className="flex flex-wrap gap-2 mb-4 text-xs">
-          {['ALL', 'success', 'pending', 'failed', 'bounced'].map((item) => (
+        <form className="flex flex-wrap gap-2 mb-4 text-xs" onSubmit={(event) => { event.preventDefault(); const form = new FormData(event.currentTarget); router.push(`?status=${status}&template=${encodeURIComponent(String(form.get('template') || ''))}&recipient=${encodeURIComponent(String(form.get('recipient') || ''))}`); }}>
+          <input name="template" defaultValue={search.get('template') || ''} placeholder="Template" className="rounded-lg border border-[#E5E3DD] px-2 py-1" />
+          <input name="recipient" defaultValue={search.get('recipient') || ''} placeholder="Recipient" className="rounded-lg border border-[#E5E3DD] px-2 py-1" />
+          <button type="submit" className="rounded-lg border border-[#E5E3DD] px-2 py-1">Search</button>
+          {['ALL', 'success', 'pending', 'failed', 'bounced', 'SENT', 'FAILED', 'BOUNCED'].map((item) => (
             <button key={item} type="button" className="rounded-lg border border-[#E5E3DD] px-2 py-1" onClick={() => router.push(`?status=${item}`)}>{item}</button>
           ))}
-        </div>
+        </form>
         {entries.length === 0 ? <p className="text-sm text-[#5C5852]">No email delivery records match this filter.</p> : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead><tr className="text-[#5C5852]"><th className="py-2">Message</th><th>Template</th><th>Recipient</th><th>Provider</th><th>Status</th><th>Sent</th><th>Failure</th></tr></thead>
               <tbody>
                 {entries.map((entry: any) => (
-                  <tr key={entry.messageId} className="border-t border-[#E5E3DD]">
-                    <td className="py-2 font-mono">{entry.messageId}</td>
+                  <tr key={`${entry.eventId || entry.messageId}`} className="border-t border-[#E5E3DD]">
+                    <td className="py-2 font-mono"><button type="button" className="underline" onClick={() => router.push(`?message=${encodeURIComponent(entry.messageId)}`)}>{entry.messageId}</button></td>
                     <td>{entry.template}</td>
                     <td>{entry.recipient}</td>
                     <td>{entry.provider}</td>
@@ -319,6 +342,25 @@ export default function AdminModule({ module }: { module: ModuleId }) {
             </table>
           </div>
         )}
+        {selected && (
+          <div className="mt-4 rounded-xl border border-[#E5E3DD] p-3 text-sm">
+            <p>Message: {selected.messageId}</p>
+            <p>Event: {selected.eventId || 'Provider handoff'}</p>
+            <p>Template: {selected.template}</p>
+            <p>Recipient: {selected.recipient}</p>
+            <p>Provider: {selected.provider}</p>
+            <p>Status: {selected.deliveryStatus}</p>
+            <p>Provider status: {selected.providerDelivery || 'UNKNOWN'}</p>
+            <p>Bounce: {selected.bounceCategory || '—'}</p>
+            <p>Order: {selected.orderNumber || '—'}</p>
+            <p>Retries: {selected.retryCount || 0}</p>
+            <p>Failure: {selected.failureReason || '—'}</p>
+            {payload?.canRetry && selected.eventId && selected.deliveryStatus === 'FAILED' && (
+              <button type="button" className="mt-2 underline" onClick={() => setConfirm({ title: `Retry ${selected.template}? This does not change the order.`, run: async () => { const res = await retryEmailDeliveryAction(role, selected.eventId, 'RETRY_EMAIL'); setNotice(res.success ? res.message || 'Retry accepted.' : res.error || 'Retry was not accepted.'); if (res.success) load(); } })}>Retry failed email</button>
+            )}
+          </div>
+        )}
+        {notice && <p className="mt-3 text-sm">{notice}</p>}
       </Panel>
     );
   }
@@ -377,7 +419,12 @@ export default function AdminModule({ module }: { module: ModuleId }) {
             <p>USDT: {payload.readiness.crypto.USDT}</p>
             <p>Ethereum: {payload.readiness.crypto.ETH}</p>
             <p>Production payment options: {payload.readiness.productionOptions.join(', ') || 'None'}</p>
+            <p>Bank verification: {payload.readiness.bankVerification}</p>
+            <p>Currencies: {(payload.readiness.supportedCurrencies || []).join(', ')}</p>
+            <p>Bitcoin address verification: {payload.readiness.addressVerification?.BTC}</p>
+            <p>Bitcoin network: {payload.readiness.networkApproval?.BTC}</p>
             <p>Crypto amount rule: {payload.readiness.conversion}</p>
+            <p>Awaiting verification: {payload.readiness.operations?.submitted ?? rows.filter((row: any) => row.status === 'PAYMENT_SUBMITTED').length}</p>
           </div>
         )}
         {rows.length === 0 ? <StateMessage message="No payments currently require verification." /> : (

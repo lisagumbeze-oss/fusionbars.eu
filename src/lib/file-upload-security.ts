@@ -137,6 +137,29 @@ export class FileUploadSecurityService {
    * Generates secure HTTP response headers for serving private payment proof files.
    * Enforces no-index and nosniff to prevent script execution or search engine crawl.
    */
+  static imageDimensions(buffer: Buffer, mimeType: string): { width: number; height: number } | null {
+    if (mimeType === 'image/png' && buffer.length >= 24 && buffer.subarray(0, 4).toString('hex').toUpperCase() === '89504E47') {
+      const width = buffer.readUInt32BE(16);
+      const height = buffer.readUInt32BE(20);
+      if (width > 0 && height > 0 && width <= 8000 && height <= 8000) return { width, height };
+    }
+    if (mimeType === 'image/jpeg' && buffer.subarray(0, 3).toString('hex').toUpperCase() === 'FFD8FF') {
+      let offset = 2;
+      while (offset + 9 < buffer.length) {
+        if (buffer[offset] !== 0xff) return null;
+        const marker = buffer[offset + 1];
+        const size = buffer.readUInt16BE(offset + 2);
+        if (marker === 0xc0 || marker === 0xc2) {
+          const height = buffer.readUInt16BE(offset + 5);
+          const width = buffer.readUInt16BE(offset + 7);
+          if (width > 0 && height > 0 && width <= 8000 && height <= 8000) return { width, height };
+        }
+        offset += 2 + size;
+      }
+    }
+    return null;
+  }
+
   static getPrivateSecurityHeaders(mimeType: string, downloadName: string = 'proof.pdf'): Record<string, string> {
     return {
       'Content-Type': mimeType,

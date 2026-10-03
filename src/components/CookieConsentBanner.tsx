@@ -5,12 +5,15 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ShieldCheck, Cookie, Settings, Check, X } from 'lucide-react';
 import { useCommerce } from '@/context/CommerceContext';
+import { LegalGovernanceService } from '@/domain/legal/LegalGovernanceService';
 
 export interface ConsentSettings {
   essential: boolean;
+  preferences: boolean;
   analytics: boolean;
   marketing: boolean;
   timestamp: string;
+  version: string;
 }
 
 const COOKIE_CONSENT_KEY = 'fb_cookie_consent_v1';
@@ -21,6 +24,7 @@ export default function CookieConsentBanner() {
   const sitsAboveBottomNav = !pathname.includes('/admin') && !pathname.includes('/checkout');
   const [visible, setVisible] = useState(false);
   const [showPreferences, setShowPreferences] = useState(false);
+  const [preferencesAllowed, setPreferencesAllowed] = useState(false);
   const [analyticsAllowed, setAnalyticsAllowed] = useState(false);
   const [marketingAllowed, setMarketingAllowed] = useState(false);
 
@@ -34,6 +38,7 @@ export default function CookieConsentBanner() {
         return () => clearTimeout(timer);
       } else {
         const parsed = JSON.parse(stored) as ConsentSettings;
+        setPreferencesAllowed(Boolean(parsed.preferences));
         setAnalyticsAllowed(Boolean(parsed.analytics));
         setMarketingAllowed(Boolean(parsed.marketing));
       }
@@ -42,12 +47,14 @@ export default function CookieConsentBanner() {
     }
   }, []);
 
-  const saveConsent = (analytics: boolean, marketing: boolean) => {
+  const saveConsent = (preferences: boolean, analytics: boolean, marketing: boolean) => {
     const settings: ConsentSettings = {
       essential: true,
+      preferences,
       analytics,
       marketing,
       timestamp: new Date().toISOString(),
+      version: 'consent-v1',
     };
 
     try {
@@ -64,15 +71,15 @@ export default function CookieConsentBanner() {
   };
 
   const handleAcceptAll = () => {
-    saveConsent(true, true);
+    saveConsent(true, true, true);
   };
 
   const handleEssentialOnly = () => {
-    saveConsent(false, false);
+    saveConsent(false, false, false);
   };
 
   const handleSavePreferences = () => {
-    saveConsent(analyticsAllowed, marketingAllowed);
+    saveConsent(preferencesAllowed, analyticsAllowed, marketingAllowed);
   };
 
   if (!visible) return null;
@@ -96,7 +103,7 @@ export default function CookieConsentBanner() {
               <span>European Privacy &amp; Cookie Consent</span>
             </h3>
             <p className="text-xs text-neutral-400 mt-1 leading-relaxed">
-              We deploy essential session cookies for checkout authentication and shopping bag persistence. Optional analytics remain deactivated until your explicit permission is given.
+              Necessary storage keeps the session and cart working. Preferences, analytics, and marketing stay off unless you allow them. No analytics provider is configured.
             </p>
           </div>
         </div>
@@ -106,8 +113,8 @@ export default function CookieConsentBanner() {
           <div className="p-3 bg-neutral-900 rounded-xl border border-neutral-800 space-y-3 text-xs">
             <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
               <div>
-                <strong className="block text-neutral-200">Strictly Essential</strong>
-                <span className="text-[11px] text-neutral-400">Cart, currency, and cryptographic session cookies</span>
+                <strong className="block text-neutral-200">Necessary</strong>
+                <span className="text-[11px] text-neutral-400">Session and cart storage used to operate checkout</span>
               </div>
               <span className="text-[10px] uppercase font-bold text-[#88A48D] px-2 py-0.5 rounded bg-[#4A5D4E]/20">
                 Always Active
@@ -116,8 +123,22 @@ export default function CookieConsentBanner() {
 
             <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
               <div>
-                <strong className="block text-neutral-200">Performance &amp; Diagnostics</strong>
-                <span className="text-[11px] text-neutral-400">Anonymous load latency and checkout health metrics</span>
+                <strong className="block text-neutral-200">Preferences</strong>
+                <span className="text-[11px] text-neutral-400">Currency and wishlist stored in this browser</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={preferencesAllowed}
+                onChange={(e) => setPreferencesAllowed(e.target.checked)}
+                className="w-4 h-4 accent-[#4A5D4E] rounded cursor-pointer"
+                aria-label="Allow preference storage"
+              />
+            </div>
+
+            <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
+              <div>
+                <strong className="block text-neutral-200">Analytics</strong>
+                <span className="text-[11px] text-neutral-400">No analytics provider is configured. This choice does not load a tracker.</span>
               </div>
               <input
                 type="checkbox"
@@ -131,7 +152,7 @@ export default function CookieConsentBanner() {
             <div className="flex items-center justify-between">
               <div>
                 <strong className="block text-neutral-200">Marketing &amp; Announcements</strong>
-                <span className="text-[11px] text-neutral-400">Botanical batch releases and tasting notices</span>
+                <span className="text-[11px] text-neutral-400">No marketing tracker is configured. Newsletter delivery is separate and not active.</span>
               </div>
               <input
                 type="checkbox"
@@ -187,10 +208,12 @@ export default function CookieConsentBanner() {
         </div>
 
         <div className="text-[10px] text-neutral-500 flex items-center justify-between pt-1 border-t border-neutral-800">
-          <span>GDPR Compliant Technical Architecture</span>
-          <Link href={`/${locale}/legal/cookies`} className="underline hover:text-neutral-300">
-            Read Cookie Policy
-          </Link>
+          <span>Optional categories are not required to use the site.</span>
+          {LegalGovernanceService.active('cookies', 'en') ? (
+            <Link href={`/${locale}/legal/cookies`} className="underline hover:text-neutral-300">Cookie policy</Link>
+          ) : (
+            <span>Cookie policy is not published.</span>
+          )}
         </div>
       </div>
     </aside>

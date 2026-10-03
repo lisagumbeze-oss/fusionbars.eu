@@ -12,6 +12,7 @@ import {
 import { CustomerAuthService } from '../domain/auth/CustomerAuthService';
 import { AuthService } from '../domain/auth/AuthService';
 import { CommerceRepository } from '../lib/commerce-repository';
+import { RateLimiterService } from '@/lib/rate-limiter';
 
 const SESSION_COOKIE_NAME = 'fb_session';
 
@@ -21,6 +22,8 @@ const SESSION_COOKIE_NAME = 'fb_session';
 export async function registerCustomerAction(rawInput: unknown) {
   try {
     const validated = customerRegisterSchema.parse(rawInput);
+    const limited = await RateLimiterService.enforce('registration', validated.email);
+    if (!limited.allowed) return { success: false, error: limited.error };
     const result = await CustomerAuthService.register({
       email: validated.email,
       password: validated.password,
@@ -56,6 +59,8 @@ export async function registerCustomerAction(rawInput: unknown) {
 export async function loginCustomerAction(rawInput: unknown) {
   try {
     const validated = customerLoginSchema.parse(rawInput);
+    const limited = await RateLimiterService.enforce('login', validated.email);
+    if (!limited.allowed) return { success: false, error: limited.error };
     const result = await CustomerAuthService.login({
       email: validated.email,
       password: validated.password,
@@ -232,6 +237,8 @@ export async function deleteCustomerAddressAction(addressId: string) {
 export async function requestPasswordResetAction(rawInput: unknown) {
   try {
     const validated = passwordResetRequestSchema.parse(rawInput);
+    const limited = await RateLimiterService.enforce('password_reset', validated.email);
+    if (!limited.allowed) return { success: false, error: limited.error };
     const result = await CustomerAuthService.requestPasswordReset(validated.email);
     return {
       success: true,

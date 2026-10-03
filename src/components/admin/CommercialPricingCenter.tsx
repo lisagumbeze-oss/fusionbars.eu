@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
+import { useParams, useSearchParams } from 'next/navigation';
 import { getCommercialDashboardAction } from '@/actions/commercial';
 import { useAdminRole } from '@/components/admin/AdminShell';
 
@@ -11,6 +13,9 @@ function money(amount: number | null, currency: 'EUR' | 'GBP') {
 
 export default function CommercialPricingCenter() {
   const { role } = useAdminRole();
+  const params = useParams<{ locale: string }>();
+  const locale = params?.locale || 'en';
+  const launchOnly = useSearchParams().get('scope') === 'launch';
   const [data, setData] = useState<any>(null);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
@@ -18,7 +23,7 @@ export default function CommercialPricingCenter() {
 
   useEffect(() => {
     let cancelled = false;
-    getCommercialDashboardAction(role, search, page).then((result) => {
+    getCommercialDashboardAction(role, search, page, launchOnly).then((result) => {
       if (cancelled) return;
       if (!result.success) setError(result.error);
       else setData(result);
@@ -26,7 +31,7 @@ export default function CommercialPricingCenter() {
     return () => {
       cancelled = true;
     };
-  }, [role, search, page]);
+  }, [role, search, page, launchOnly]);
 
   if (error) return <p className="text-sm text-rose-800">{error}</p>;
   if (!data) return <p className="text-sm text-[#5C5852]">Loading commercial pricing…</p>;
@@ -41,6 +46,12 @@ export default function CommercialPricingCenter() {
       </div>
       <p className="text-xs text-[#5C5852]">
         Catalogue amounts are labelled separately from approved commercial prices. Source prices are not store prices. Production is {data.production}. Pricing mode is {data.summary.pricingMode}. Tax display is {data.summary.taxDisplayMode}.
+      </p>
+      <p className="text-xs">
+        <Link href={`/${locale}/admin/pricing?scope=launch`} className="underline">Launch catalogue</Link>
+        {' · '}
+        <Link href={`/${locale}/admin/pricing`} className="underline">All products</Link>
+        {launchOnly ? ' · Showing launch-selected products only. None are selected until an authorised choice is recorded.' : ''}
       </p>
       <input
         value={search}

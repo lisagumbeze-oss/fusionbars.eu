@@ -7,6 +7,7 @@ import ProductDetailClient from './ProductDetailClient';
 import ProductCard from '@/components/ProductCard';
 import { LocaleCode } from '@/types';
 import type { Metadata } from 'next';
+import { INDEXABLE_LOCALE, indexableUrl, indexingRobots, offerAvailability } from '@/lib/search-indexing';
 
 interface ProductDetailPageProps {
   params: Promise<{ locale: string; slug: string }> | { locale: string; slug: string };
@@ -15,18 +16,18 @@ interface ProductDetailPageProps {
 export async function generateMetadata({ params }: ProductDetailPageProps): Promise<Metadata> {
   const resolved = await params;
   const product = CatalogService.getPublicProductBySlug(resolved.slug);
-  if (!product) return { title: 'Product Not Found | Fusion EU' };
+  if (!product) return { title: 'Product Not Found | Fusion EU', robots: { index: false, follow: false } };
 
+  const canonical = indexableUrl(`/${resolved.locale}/products/${product.slug}`);
   return {
     title: `${product.name} | Fusion Mushroom Bars EU`,
     description: product.shortDescription,
-    alternates: {
-      canonical: `https://fusionbars.eu/${resolved.locale}/products/${product.slug}`,
-    },
+    robots: indexingRobots(resolved.locale, `/${resolved.locale}/products/${product.slug}`),
+    alternates: { canonical },
     openGraph: {
       title: `${product.name} | Fusion Mushroom Bars EU`,
       description: product.shortDescription,
-      url: `https://fusionbars.eu/${resolved.locale}/products/${product.slug}`,
+      url: canonical,
       images: [
         {
           url: product.primaryImage.startsWith('http')
@@ -54,7 +55,9 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const relatedProducts = CatalogService.getRelatedProducts(slug, 4);
 
   // Schema.org Product JSON-LD structured data
-  const offer = PricingEngine.structuredOffer(product.slug, product.variants[0]?.id || null);
+  const offerVariant = product.variants[0];
+  const offer = PricingEngine.structuredOffer(product.slug, offerVariant?.id || null);
+  const canonical = indexableUrl(`/${INDEXABLE_LOCALE}/products/${product.slug}`);
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -69,8 +72,8 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
       ? {
           offers: {
             ...offer,
-            availability: 'https://schema.org/InStock',
-            url: `https://fusionbars.eu/${locale}/products/${product.slug}`,
+            availability: offerAvailability(offerVariant?.stockStatus),
+            url: canonical,
           },
         }
       : {}),
@@ -99,6 +102,45 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
 
         {/* Client Interactive Product Detail Engine */}
         <ProductDetailClient product={product} />
+
+        <section className="pt-10 border-t border-[#E5E3DD] space-y-8" aria-labelledby="product-facts">
+          <h2 id="product-facts" className="font-serif text-2xl font-bold text-[#121212]">Product facts</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-[#5C5852] leading-relaxed">
+            {product.ingredients.length > 0 && (
+              <div>
+                <h3 className="font-semibold text-[#121212] mb-2">Ingredients</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  {product.ingredients.map((ingredient) => (
+                    <li key={ingredient}>{ingredient}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {product.allergens.length > 0 && (
+              <div>
+                <h3 className="font-semibold text-[#121212] mb-2">Allergens</h3>
+                <p>{product.allergens.join(' · ')}</p>
+              </div>
+            )}
+            {product.dietaryAttributes.length > 0 && (
+              <div>
+                <h3 className="font-semibold text-[#121212] mb-2">Dietary notes</h3>
+                <ul className="list-disc pl-5 space-y-1">
+                  {product.dietaryAttributes.map((attribute) => (
+                    <li key={attribute}>{attribute}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {(product.laboratoryTesting || product.complianceNotes) && (
+              <div>
+                <h3 className="font-semibold text-[#121212] mb-2">Lab verification</h3>
+                {product.laboratoryTesting && <p>{product.laboratoryTesting}</p>}
+                {product.complianceNotes && <p className="mt-2">{product.complianceNotes}</p>}
+              </div>
+            )}
+          </div>
+        </section>
 
         {/* Related Products Carousel / Grid */}
         {relatedProducts.length > 0 && (

@@ -26,6 +26,7 @@ import { CommerceRepository } from '@/lib/commerce-repository';
 import { EmailTemplates } from '@/emails/templates';
 import { CANONICAL_ORDER_STATUSES, OrderStatus } from '@/types';
 import { PaymentConfigService } from '@/domain/payments/PaymentConfig';
+import { bicFormat, ibanFormat, receivingAddressFormat } from '@/domain/payments/payment-format';
 import {
   CRYPTO_PAYMENT_DISCOUNT_PERCENT,
   calculateCryptoPaymentDiscount,
@@ -40,6 +41,7 @@ import { lookupOrderAction } from '@/actions/orders';
 import { submitPaymentProofAction } from '@/actions/payments';
 import { EnvironmentService } from '@/config/environment';
 import { ObjectStorageService } from '@/services/storage/ObjectStorageService';
+import { StorageReadinessService } from '@/services/storage/StorageReadinessService';
 import { EmailService } from '@/services/email/EmailService';
 import { MockEmailProvider } from '@/services/email/EmailProvider';
 import { ObservabilityService } from '@/lib/observability';
@@ -48,7 +50,23 @@ import { LaunchReadinessService } from '@/domain/launch/LaunchReadinessService';
 import { ProductionDeploymentGuard } from '@/domain/launch/ProductionDeploymentGuard';
 import { PaymentActivationService } from '@/domain/payments/PaymentActivationService';
 import { PaymentConfigurationService } from '@/domain/payments/PaymentConfigurationService';
+import { PaymentProductionReadinessService } from '@/domain/payments/PaymentProductionReadinessService';
 import { PaymentVerificationService } from '@/domain/payments/PaymentVerificationService';
+import { EmailProductionReadinessService } from '@/services/email/EmailProductionReadinessService';
+import { EmailDnsVerificationService } from '@/services/email/EmailDnsVerificationService';
+import { EmailDeliveryLedger } from '@/services/email/EmailDeliveryLedger';
+import { dispatchOrderStatusEmail } from '@/services/email/order-notifications';
+import { LegalGovernanceService } from '@/domain/legal/LegalGovernanceService';
+import { ProductionInfrastructureService } from '@/domain/infrastructure/ProductionInfrastructureService';
+import { BackupReadinessService, BackupEvidence } from '@/domain/infrastructure/BackupReadinessService';
+import { ProductionMonitoringService, MonitoringEvidence } from '@/domain/infrastructure/ProductionMonitoringService';
+import { RateLimitReadinessService, RateLimitEvidence } from '@/domain/infrastructure/RateLimitReadinessService';
+import { DistributedRedisRateLimitStore, MemoryRateLimitStore } from '@/lib/rate-limiter';
+import { CommerceRehearsalService } from '@/domain/qa/CommerceRehearsalService';
+import { classifySigningSecrets, secretConfigurationAudit } from '@/domain/infrastructure/secret-readiness';
+import { FinalLaunchReadinessService } from '@/domain/launch/FinalLaunchReadinessService';
+import { GBP_LAUNCH_MODE } from '@/domain/launch/launch-policy';
+import { safeInternalAdminPath } from '@/domain/infrastructure/safe-path';
 import { ProductPublicationGuard } from '@/domain/catalog/ProductPublicationGuard';
 import { MasterCatalogueImportService } from '@/domain/import/MasterCatalogueImportService';
 import { DeterministicMatchingEngine } from '@/domain/import/DeterministicMatchingEngine';
@@ -65,6 +83,7 @@ import { EmailTemplateRegistry } from '@/domain/admin/EmailTemplateRegistry';
 import { deliveryLogExposesSecrets, projectDeliveryLog } from '@/domain/admin/EmailDeliveryLog';
 import { CatalogService } from '@/lib/catalog';
 import { PublicationReadinessService, ReadinessInput } from '@/domain/catalog/PublicationReadinessService';
+import { LaunchCatalogueService } from '@/domain/catalog/LaunchCatalogueService';
 import { CatalogueRolloutService } from '@/domain/catalog/CatalogueRolloutService';
 import { CommercialConfigurationService } from '@/domain/commercial/CommercialConfigurationService';
 import { PricingEngine } from '@/domain/commercial/PricingEngine';
@@ -72,6 +91,8 @@ import { TaxEngine } from '@/domain/commercial/TaxEngine';
 import { CurrencyConversionService } from '@/domain/commercial/CurrencyConversionService';
 import { DestinationEngine } from '@/domain/shipping/DestinationEngine';
 import { FulfilmentRoutingService } from '@/domain/shipping/FulfilmentRoutingService';
+import sitemap from '@/app/sitemap';
+import { customerAbsoluteUrl, indexableUrl, indexingRobots, offerAvailability } from '@/lib/search-indexing';
 import rolloutState from '@/data/catalogue-rollout-state.json';
 import firstBatchState from '@/data/catalogue-first-batch-state.json';
 import specialistExecution from '@/data/catalogue-specialist-review-state.json';
@@ -5685,7 +5706,7 @@ export class DomainTestSuite {
         evidence: 'Test jurisdiction only',
         taxDisplayMode: 'TAX_EXCLUDED',
       });
-      CommercialConfigurationService.addVatRate({
+      const draftedRate = CommercialConfigurationService.addVatRate({
         actor: 'finance.review@fusionbars.eu',
         actorRole: 'FINANCE_MANAGER',
         country: 'DE',
@@ -5693,6 +5714,20 @@ export class DomainTestSuite {
         rateBps: 1900,
         effectiveFrom: '2026-01-01T00:00:00.000Z',
         evidence: 'Fixture rate, not a business registration',
+      });
+      CommercialConfigurationService.approveVatRate({
+        actor: 'admin@fusionbars.eu',
+        actorRole: 'SUPER_ADMIN',
+        rateId: draftedRate.id,
+        rationale: 'Fixture approval only',
+        evidence: 'Fixture rate, not a business registration',
+      });
+      CommercialConfigurationService.activateVatRate({
+        actor: 'admin@fusionbars.eu',
+        actorRole: 'SUPER_ADMIN',
+        rateId: draftedRate.id,
+        confirmation: 'ACTIVATE_TAX_RATE',
+        rationale: 'Fixture activation only',
       });
       CommercialConfigurationService.assignTaxClass({
         actor: 'finance.review@fusionbars.eu',
@@ -6036,6 +6071,994 @@ export class DomainTestSuite {
       if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production must stay paused');
       PaymentConfigurationService.resetForTests();
       PaymentVerificationService.resetForTests();
+    });
+
+    await run('Email Production Readiness', 'Production email stays blocked until provider, DNS, and activation checks pass', async () => {
+      EmailProductionReadinessService.resetForTests();
+      EmailDeliveryLedger.resetForTests();
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const beforeSpecialist = JSON.stringify(specialistExecution);
+      const report = EmailProductionReadinessService.report();
+      const secret = process.env.EMAIL_PROVIDER_KEY || process.env.SMTP_PASSWORD || '';
+      if (report.state === 'ACTIVE' || report.production !== 'PAUSED') throw new Error('Email delivery became production-active');
+      if (report.dns.SPF !== 'NOT_CONFIGURED' || report.dns.DKIM !== 'NOT_CONFIGURED' || report.dns.DMARC !== 'NOT_CONFIGURED') throw new Error('DNS authentication was invented');
+      if (secret && JSON.stringify(report).includes(secret)) throw new Error('Email readiness exposed a provider secret');
+      const activation = EmailProductionReadinessService.activate({ role: 'SUPER_ADMIN', actor: 'ops@fusionbars.eu', confirmation: 'ACTIVATE_PRODUCTION_EMAIL', rationale: 'Attempt' });
+      if (activation.success) throw new Error('Email activated before the readiness checks passed');
+      const denied = EmailProductionReadinessService.activate({ role: 'CUSTOMER', actor: 'customer', confirmation: 'ACTIVATE_PRODUCTION_EMAIL', rationale: 'Attempt' });
+      if (denied.success) throw new Error('A customer activated production email');
+      const mock = new MockEmailProvider();
+      if (mock.validateConfiguration().valid || (await mock.getDeliveryStatus('mock')).status === 'DELIVERED') throw new Error('Mock provider was treated as delivered production email');
+      const templates = EmailTemplateRegistry.validateAll();
+      if (!templates.ok || templates.missing.length || templates.validated < 14) throw new Error(templates.error || 'Template validation failed');
+      const probe = EmailTemplateRegistry.preview('test-email');
+      if (!probe || !`${probe.subject} ${probe.text} ${probe.html}`.includes('TEST EMAIL')) throw new Error('Test email was not clearly marked');
+      EmailService.setProvider(mock);
+      const order: any = {
+        orderNumber: 'FB-EU-EMAIL-1',
+        currency: 'EUR',
+        totalAmount: 21500,
+        guestEmail: 'buyer@example.com',
+        shippingAddress: { firstName: 'Ada', lastName: 'Buyer', countryCode: 'DE' },
+        items: [],
+        status: 'PAYMENT_VERIFIED',
+      };
+      await dispatchOrderStatusEmail(order, 'PAYMENT_VERIFIED');
+      await dispatchOrderStatusEmail(order, 'PAYMENT_VERIFIED');
+      await dispatchOrderStatusEmail(order, 'PENDING_PAYMENT');
+      if (mock.sentMessages.length !== 1) throw new Error('Payment email trigger was duplicated or fired for the wrong state');
+      EmailDeliveryLedger.recordBounce({ recipient: 'buyer@example.com', permanent: true, category: 'hard', reason: 'mailbox does not exist' });
+      await dispatchOrderStatusEmail({ ...order, orderNumber: 'FB-EU-EMAIL-2' }, 'SHIPPED');
+      if (mock.sentMessages.length !== 1) throw new Error('A permanently bounced recipient received another email');
+      const shipped = await EmailService.sendOrderShipped({ ...order, orderNumber: 'FB-EU-EMAIL-3', trackingNumber: '' });
+      if (!shipped.success) throw new Error('Shipment email failed');
+      const shippedBody = `${mock.sentMessages.at(-1)?.html || ''} ${mock.sentMessages.at(-1)?.text || ''}`;
+      if (/https?:\/\/(?!fusionbars\.eu)/.test(shippedBody) || /tracking/i.test(shippedBody)) throw new Error('Shipment email fabricated tracking information');
+      EmailDeliveryLedger.claim('failed-mail', { template: 'payment-verified', recipient: 'buyer@example.com', provider: 'mock', orderNumber: order.orderNumber });
+      EmailDeliveryLedger.complete('failed-mail', { success: false, error: 'SMTP_PASSWORD=secret mailbox timeout' });
+      const failed = EmailDeliveryLedger.list().find((item) => item.eventId === 'failed-mail');
+      if (!failed || failed.status !== 'FAILED' || failed.failureReason?.includes('SMTP_PASSWORD')) throw new Error('Failure was dropped or exposed a secret');
+      const retryDenied = EmailDeliveryLedger.permitRetry({ eventId: 'failed-mail', role: 'CUSTOMER', confirmation: 'RETRY_EMAIL', stillValid: true, recipientValid: true });
+      const retryInvalid = EmailDeliveryLedger.permitRetry({ eventId: 'failed-mail', role: 'SUPER_ADMIN', confirmation: 'RETRY_EMAIL', stillValid: false, recipientValid: true });
+      if (retryDenied.allowed || retryInvalid.allowed) throw new Error('Unsafe email retry was allowed');
+      const injected = await EmailService.sendTestProbe({ recipientEmail: 'buyer@example.com\nBcc: evil@example.com', initiatedBy: 'ops@fusionbars.eu' });
+      if (injected.success) throw new Error('Header injection was accepted');
+      if (LaunchReadinessService.checkEmail({} as any).status !== 'BLOCKED') throw new Error('Launch control marked email ready');
+      if (JSON.stringify(firstBatchState) !== beforeBatch || JSON.stringify(specialistExecution) !== beforeSpecialist) throw new Error('Email configuration changed the pilot files');
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production must stay paused');
+      EmailProductionReadinessService.resetForTests();
+      EmailDeliveryLedger.resetForTests();
+    });
+
+    await run('Legal Governance', 'Unapproved legal documents stay private and missing business facts stay unconfigured', () => {
+      LegalGovernanceService.resetForTests();
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const beforeSpecialist = JSON.stringify(specialistExecution);
+      const report = LegalGovernanceService.report();
+      if (report.production !== 'PAUSED') throw new Error('Production state changed');
+      if (!['NOT_CONFIGURED', 'DRAFT', 'REVIEW_REQUIRED', 'APPROVED', 'PUBLISHED', 'CONFIGURED'].includes(report.profile.legalName.state)) throw new Error('Legal name state is invalid');
+      if (report.profile.legalName.state === 'NOT_CONFIGURED' && report.profile.legalName.value) throw new Error('A missing legal name was invented');
+      if (LegalGovernanceService.active('terms', 'en') || LegalGovernanceService.active('privacy', 'de')) throw new Error('An unpublished or untranslated legal document was public');
+      if (LegalGovernanceService.publicLinks().length !== 0) throw new Error('Draft legal documents were linked publicly');
+      let contentApproved = false;
+      try {
+        LegalGovernanceService.saveDraft({ type: 'terms', locale: 'en', title: 'Terms', content: 'Authorized terms text', role: 'CONTENT_MANAGER', actor: 'content@fusionbars.eu', source: 'fixture', effectiveDate: '2026-01-01' });
+        LegalGovernanceService.approve({ type: 'terms', locale: 'en', role: 'CONTENT_MANAGER', actor: 'content@fusionbars.eu' });
+        contentApproved = true;
+      } catch {
+        contentApproved = false;
+      }
+      if (contentApproved) throw new Error('A content editor approved a legal document');
+      LegalGovernanceService.approve({ type: 'terms', locale: 'en', role: 'COMPLIANCE_MANAGER', actor: 'compliance@fusionbars.eu' });
+      if (LegalGovernanceService.active('terms', 'en')) throw new Error('Approval published the document');
+      const published = LegalGovernanceService.publish({ type: 'terms', locale: 'en', role: 'SUPER_ADMIN', actor: 'admin@fusionbars.eu', confirmation: 'PUBLISH_LEGAL_DOCUMENT', reason: 'Fixture publication' });
+      LegalGovernanceService.saveDraft({ type: 'terms', locale: 'en', title: 'Terms', content: 'Replacement terms text', role: 'COMPLIANCE_MANAGER', actor: 'compliance@fusionbars.eu', effectiveDate: '2026-06-01' });
+      LegalGovernanceService.approve({ type: 'terms', locale: 'en', role: 'COMPLIANCE_MANAGER', actor: 'compliance@fusionbars.eu' });
+      const replacement = LegalGovernanceService.publish({ type: 'terms', locale: 'en', role: 'COMPLIANCE_MANAGER', actor: 'compliance@fusionbars.eu', confirmation: 'PUBLISH_LEGAL_DOCUMENT', reason: 'Replacement' });
+      const active = LegalGovernanceService.active('terms', 'en');
+      if (published.version !== 1 || replacement.version !== 2 || active?.content !== 'Replacement terms text' || active.version !== 2) throw new Error('Legal versions were not preserved');
+      const consent = LegalGovernanceService.recordConsent({ categories: { preferences: false, analytics: true, marketing: false }, locale: 'en', privacyVersion: null, cookieVersion: null });
+      LegalGovernanceService.withdrawOptionalConsent(consent.id);
+      const necessary = LegalGovernanceService.cookieInventory().find((item) => item.key === 'fb_session');
+      if (!necessary?.necessary || LegalGovernanceService.analyticsStatus() !== 'NOT_CONFIGURED') throw new Error('Consent categories were collapsed');
+      if (LegalGovernanceService.flagClaim('fixture-claim-bar', 'This product cures disease') !== 'REQUIRES_REVIEW') throw new Error('A sensitive claim was not flagged');
+      if (!LegalGovernanceService.blocksPublication('fixture-claim-bar') || LegalGovernanceService.claimStatus('fixture-claim-bar') === 'ILLEGAL') throw new Error('Claim review made a legal determination');
+      const blocked = DestinationEngine.evaluate({ slug: 'audit-test-product', country: 'DE' });
+      if (/reviewer|evidence|rationale/i.test(blocked.customerMessage || '')) throw new Error('Country messaging exposed internal review data');
+      if (LaunchReadinessService.checkLegal().status !== 'BLOCKED') throw new Error('Launch control treated incomplete legal setup as ready');
+      if (JSON.stringify(firstBatchState) !== beforeBatch || JSON.stringify(specialistExecution) !== beforeSpecialist) throw new Error('Legal governance changed the pilot files');
+      LegalGovernanceService.resetForTests();
+    });
+
+    await run('Production Security Hardening', 'Missing, malicious, and duplicated production conditions are blocked without exposing secrets', async () => {
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const beforeSpecialist = JSON.stringify(specialistExecution);
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production must stay paused');
+      if (!AdminAccess.can('SUPER_ADMIN', 'payments') || AdminAccess.can('CUSTOMER', 'payments') || RBACService.hasPermission('CUSTOMER', 'orders:verify_payment')) {
+        throw new Error('Customer access reached an admin payment control');
+      }
+      const deniedPublish = await PublicationReadinessService.publish({ slug: 'audit-test-product', actor: 'content@fusionbars.eu', role: 'CONTENT_MANAGER', confirm: true });
+      if (deniedPublish.success) throw new Error('A content role published a product');
+      const expired = AuthService.generateSessionToken({ id: 'sec-user', email: 'sec@example.eu', role: 'CUSTOMER' }, 1);
+      const current = AuthService.generateSessionToken({ id: 'sec-user', email: 'sec@example.eu', role: 'CUSTOMER' });
+      if (AuthService.verifySessionToken(expired) || AuthService.verifySessionToken(`${current.slice(0, -4)}forged`)) {
+        throw new Error('An expired or forged session was accepted');
+      }
+      let resetAccepted = false;
+      try {
+        await CustomerAuthService.confirmPasswordReset('definitely-invalid-token-value-000', 'correct-horse-battery');
+        resetAccepted = true;
+      } catch {
+        resetAccepted = false;
+      }
+      if (resetAccepted) throw new Error('An invalid reset token was accepted');
+      RateLimiterService.configure('guest_order_lookup', { maxAttempts: 2, windowSeconds: 600 });
+      RateLimiterService.reset('guest_order_lookup', 'security-probe');
+      RateLimiterService.consume('guest_order_lookup', 'security-probe');
+      RateLimiterService.consume('guest_order_lookup', 'security-probe');
+      if (RateLimiterService.consume('guest_order_lookup', 'security-probe').allowed) throw new Error('Order lookup brute force was not limited');
+      RateLimiterService.configure('guest_order_lookup', { maxAttempts: 20, windowSeconds: 600 });
+      const priced = await CartPricingService.calculateCart({
+        items: [{ variantId: 'var-almond-crush', quantity: 1, unitPrice: 1 } as any],
+        currency: 'EUR',
+        destinationCountry: 'DE',
+        selectedShippingMethod: 'STANDARD',
+        fetchVariantsByIds: mockFetch,
+      });
+      if (priced.subtotal !== 2000 || priced.shippingAmount !== 1500) throw new Error('Client price or shipping replaced the server total');
+      const blockedCountry = DestinationEngine.evaluate({ slug: 'fusion-almond-crush', country: 'US' });
+      if (!blockedCountry.blockCheckout) throw new Error('A disabled destination was allowed');
+      const audit = PublicationReadinessService.evaluateCurrent('audit-test-product');
+      if (audit.readiness !== 'DO_NOT_PUBLISH') throw new Error('Audit Test Product left DO_NOT_PUBLISH');
+      let ssrfAllowed = false;
+      try {
+        ProductionInfrastructureService.assertSafeRemoteUrl('http://169.254.169.254/latest/meta-data');
+        ssrfAllowed = true;
+      } catch {
+        ssrfAllowed = false;
+      }
+      if (ssrfAllowed || FileUploadSecurityService.validateUpload({ filename: 'proof.html', mimeType: 'text/html', sizeBytes: 32 }).valid) {
+        throw new Error('SSRF or active content upload was accepted');
+      }
+      if (safeInternalAdminPath('https://evil.example/en/admin', 'en') !== '/en/admin' || safeInternalAdminPath('/en/admin/orders', 'en') !== '/en/admin/orders') {
+        throw new Error('Open redirect protection failed');
+      }
+      PaymentVerificationService.resetForTests();
+      PaymentVerificationService.registerProof({ orderNumber: 'FB-EU-SEC-1', reference: 'FUSION-SEC-1', expectedAmount: 10000, evidenceKey: 'private/proofs/sec.pdf' });
+      let duplicatePayment = false;
+      try {
+        PaymentVerificationService.registerProof({ orderNumber: 'FB-EU-SEC-1', reference: 'FUSION-SEC-1', expectedAmount: 10000, evidenceKey: 'private/proofs/sec.pdf' });
+        duplicatePayment = true;
+      } catch {
+        duplicatePayment = false;
+      }
+      PaymentVerificationService.resetForTests();
+      if (duplicatePayment) throw new Error('A duplicate payment reference was accepted');
+      if (!EmailDeliveryLedger.claim('sec-mail', { template: 'payment-verified', recipient: 'buyer@example.com', provider: 'mock', orderNumber: 'FB-EU-SEC-1' }) || EmailDeliveryLedger.claim('sec-mail', { template: 'payment-verified', recipient: 'buyer@example.com', provider: 'mock', orderNumber: 'FB-EU-SEC-1' })) {
+        throw new Error('A duplicate email event was sent');
+      }
+      const stale = await PublicationReadinessService.publish({ slug: 'audit-test-product', actor: 'admin@fusionbars.eu', role: 'SUPER_ADMIN', confirm: true, expectedReady: true });
+      if (stale.success || PublicationReadinessService.evaluateCurrent('audit-test-product').readiness !== 'DO_NOT_PUBLISH') throw new Error('A stale admin update published the audit product');
+      let webhookAccepted = false;
+      try {
+        ProductionInfrastructureService.rejectUnconfiguredWebhook('');
+        webhookAccepted = true;
+      } catch {
+        webhookAccepted = false;
+      }
+      if (webhookAccepted) throw new Error('An unsigned webhook was accepted');
+      const previousBackup = process.env.BACKUP_PROVIDER;
+      const previousMonitor = process.env.SENTRY_DSN;
+      const previousWebhook = process.env.MONITORING_WEBHOOK_URL;
+      const previousDsn = process.env.MONITORING_DSN;
+      const previousMode = process.env.VERCEL_ENV;
+      const previousEmail = process.env.EMAIL_PROVIDER;
+      delete process.env.BACKUP_PROVIDER;
+      delete process.env.SENTRY_DSN;
+      delete process.env.MONITORING_WEBHOOK_URL;
+      delete process.env.MONITORING_DSN;
+      process.env.VERCEL_ENV = 'production';
+      process.env.EMAIL_PROVIDER = 'mock';
+      try {
+        if (ProductionInfrastructureService.backupStatus() !== 'BACKUP_CONFIGURATION_REQUIRED') throw new Error('Missing backups were treated as configured');
+        if (ProductionInfrastructureService.monitoringStatus() !== 'NOT_CONFIGURED') throw new Error('Missing monitoring was treated as active');
+        if (LaunchReadinessService.checkBackups().status !== 'BLOCKED' || LaunchReadinessService.checkMonitoring().status !== 'BLOCKED') throw new Error('Launch control hid an infrastructure blocker');
+        if (!ProductionInfrastructureService.environmentSeparation().some((item) => item.includes('Mock email'))) throw new Error('Mock email was allowed as production email');
+        ProductionInfrastructureService.assertProductionMigrationCommand('prisma migrate deploy');
+        let resetAllowed = false;
+        try {
+          ProductionInfrastructureService.assertProductionMigrationCommand('prisma migrate reset');
+          resetAllowed = true;
+        } catch {
+          resetAllowed = false;
+        }
+        if (resetAllowed) throw new Error('A production reset command was allowed');
+        const checklist = JSON.stringify(ProductionInfrastructureService.secretChecklist());
+        const health = JSON.stringify(ProductionInfrastructureService.publicHealth());
+        if (/postgres:\/\/|sk_live|BEGIN |EMAIL_PROVIDER_KEY=/.test(`${checklist} ${health}`)) throw new Error('A readiness response exposed a secret');
+        const scrubbed = JSON.stringify(ObservabilityService.scrub({ password: 'hunter2', DATABASE_URL: 'postgres://user:secret@db.example/app', correlationId: ProductionInfrastructureService.createCorrelationId() }));
+        if (scrubbed.includes('hunter2') || scrubbed.includes('postgres://')) throw new Error('Structured logs retained a secret');
+      } finally {
+        if (previousBackup === undefined) delete process.env.BACKUP_PROVIDER;
+        else process.env.BACKUP_PROVIDER = previousBackup;
+        if (previousMonitor === undefined) delete process.env.SENTRY_DSN;
+        else process.env.SENTRY_DSN = previousMonitor;
+        if (previousWebhook === undefined) delete process.env.MONITORING_WEBHOOK_URL;
+        else process.env.MONITORING_WEBHOOK_URL = previousWebhook;
+        if (previousDsn === undefined) delete process.env.MONITORING_DSN;
+        else process.env.MONITORING_DSN = previousDsn;
+        if (previousMode === undefined) delete process.env.VERCEL_ENV;
+        else process.env.VERCEL_ENV = previousMode;
+        if (previousEmail === undefined) delete process.env.EMAIL_PROVIDER;
+        else process.env.EMAIL_PROVIDER = previousEmail;
+        EmailDeliveryLedger.resetForTests();
+      }
+      if (JSON.stringify(firstBatchState) !== beforeBatch || JSON.stringify(specialistExecution) !== beforeSpecialist) throw new Error('Security hardening changed the pilot files');
+    });
+
+    await run('Commerce Rehearsal', 'End-to-end fixture flows stop safely and known launch gaps stay visible', async () => {
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const beforeSpecialist = JSON.stringify(specialistExecution);
+      const report = await CommerceRehearsalService.run();
+      if (report.production !== 'PAUSED') throw new Error('Production was activated');
+      const failed = report.checks.filter((item) => item.state === 'FAIL');
+      if (failed.length) throw new Error(failed.map((item) => `${item.area} / ${item.check}: ${item.evidence}`).join(' | '));
+      const audit = report.checks.find((item) => item.check === 'Audit Test Product' || item.check === 'Fixture ready and audit product blocked');
+      if (!audit || audit.state === 'FAIL') throw new Error('Audit Test Product was not kept private');
+      if (JSON.stringify(firstBatchState) !== beforeBatch || JSON.stringify(specialistExecution) !== beforeSpecialist) throw new Error('The rehearsal changed the pilot files');
+    });
+
+    await run('Final Launch Gate', 'Activation stays paused until every mandatory gate is actually satisfied', async () => {
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production control state changed');
+      if (GBP_LAUNCH_MODE !== 'DISABLED_FOR_LAUNCH') throw new Error('GBP launch mode is ambiguous');
+      const audit = PublicationReadinessService.evaluateCurrent('audit-test-product');
+      if (audit.readiness !== 'DO_NOT_PUBLISH') throw new Error('Audit Test Product changed');
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const roles = ['CUSTOMER', 'CONTENT_MANAGER', 'CATALOG_MANAGER', 'FINANCE_MANAGER', 'COMPLIANCE_MANAGER'] as const;
+      for (const role of roles) {
+        const denied = await FinalLaunchReadinessService.activate({ role, actor: 'gate@fusionbars.eu', confirmation: 'Confirm Production Activation', reauthenticated: true });
+        if (denied.state !== 'PAUSED') throw new Error(`${role} activated production`);
+      }
+      const unconfirmed = await FinalLaunchReadinessService.activate({ role: 'SUPER_ADMIN', actor: 'admin@fusionbars.eu', confirmation: 'yes', reauthenticated: true });
+      if (unconfirmed.state !== 'PAUSED') throw new Error('Activation ran without the confirmation phrase');
+      const blocked = await FinalLaunchReadinessService.activate({ role: 'SUPER_ADMIN', actor: 'admin@fusionbars.eu', confirmation: 'Confirm Production Activation', reauthenticated: true });
+      if (blocked.state !== 'PAUSED' || blocked.decision !== 'LAUNCH_BLOCKED' || !blocked.error) throw new Error('A blocked gate was activated');
+      const decision = await FinalLaunchReadinessService.evaluate();
+      if (decision.decision !== 'LAUNCH_BLOCKED' || decision.production !== 'PAUSED') throw new Error('The final decision was not blocked');
+      if (decision.gates.some((item) => item.state === 'READY' && item.requirement === 'VAT')) throw new Error('VAT was marked ready');
+      const paused = FinalLaunchReadinessService.pause({ role: 'SUPER_ADMIN', actor: 'admin@fusionbars.eu', confirmation: 'PAUSE PRODUCTION' });
+      if (paused.state !== 'PAUSED' || PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Pause did not keep production paused');
+      if (JSON.stringify(firstBatchState) !== beforeBatch) throw new Error('The launch gate changed the pilot file');
+    });
+
+    await run('Production Secret Readiness', 'Signing secrets stay server-side and block when any one is weak or shared', async () => {
+      const saved = {
+        SESSION_SECRET: process.env.SESSION_SECRET,
+        AUTH_SECRET: process.env.AUTH_SECRET,
+        ORDER_LOOKUP_SECRET: process.env.ORDER_LOOKUP_SECRET,
+      };
+      const sessionValue = 'fixture-session-secret-9f3c1a7e5b284d60c1aa77e0b91d44f2';
+      const authValue = 'fixture-auth-value-8e2b7c4d1a9056ff33ab19c0de77a418';
+      const lookupValue = 'fixture-lookup-value-6c0d9e1f4a27b58391aa44c7de20f615';
+      const restore = () => {
+        for (const name of ['SESSION_SECRET', 'AUTH_SECRET', 'ORDER_LOOKUP_SECRET'] as const) {
+          if (saved[name] === undefined) delete process.env[name];
+          else process.env[name] = saved[name];
+        }
+      };
+      try {
+        process.env.SESSION_SECRET = sessionValue;
+        process.env.AUTH_SECRET = authValue;
+        process.env.ORDER_LOOKUP_SECRET = lookupValue;
+        const valid = classifySigningSecrets(process.env);
+        if (valid.distinct !== 'PASS' || valid.secrets.some((item) => item.state !== 'CONFIGURED')) throw new Error('Distinct strong secrets were not CONFIGURED');
+        const customer = { id: 'secret-customer', email: 'buyer@example.com', role: 'CUSTOMER' as const };
+        const customerToken = AuthService.generateSessionToken(customer);
+        if (AuthService.verifySessionToken(customerToken)?.role !== 'CUSTOMER') throw new Error('Customer session was rejected');
+        const adminToken = AuthService.generateSessionToken({ id: 'secret-admin', email: 'sales@fusionbars.eu', role: 'SUPER_ADMIN' });
+        if (AuthService.verifySessionToken(adminToken)?.role !== 'SUPER_ADMIN') throw new Error('Admin session was rejected');
+        if (AuthService.verifySessionToken(`${customerToken}x`) || AuthService.verifySessionToken('')) throw new Error('Invalid session was accepted');
+        const expired = AuthService.generateSessionToken(customer, 1);
+        if (AuthService.verifySessionToken(expired)) throw new Error('Expired session was accepted');
+        process.env.SESSION_SECRET = 'short_weak_secret';
+        if (classifySigningSecrets(process.env).secrets.find((item) => item.name === 'SESSION_SECRET')?.state !== 'PRODUCTION_SECRET_TOO_WEAK') throw new Error('A short secret was accepted');
+        if (LaunchReadinessService.checkSecrets({} as never).status !== 'BLOCKED') throw new Error('One weak secret left the gate open');
+        delete process.env.AUTH_SECRET;
+        if (classifySigningSecrets(process.env).secrets.find((item) => item.name === 'AUTH_SECRET')?.state !== 'MISSING') throw new Error('An empty secret was not MISSING');
+        process.env.SESSION_SECRET = sessionValue;
+        process.env.AUTH_SECRET = authValue;
+        process.env.ORDER_LOOKUP_SECRET = 'CHANGE_ME_IN_PRODUCTION_MIN_32_CHAR_LOOKUP_SECRET';
+        if (classifySigningSecrets(process.env).secrets.find((item) => item.name === 'ORDER_LOOKUP_SECRET')?.state !== 'PRODUCTION_SECRET_TOO_WEAK') throw new Error('A known placeholder was accepted');
+        process.env.ORDER_LOOKUP_SECRET = sessionValue;
+        const duplicate = classifySigningSecrets(process.env);
+        if (duplicate.distinct !== 'FAIL' || LaunchReadinessService.checkSecrets({} as never).status !== 'BLOCKED') throw new Error('Duplicate secrets were accepted');
+        const published = `${JSON.stringify(ProductionInfrastructureService.publicHealth())} ${JSON.stringify(ProductionInfrastructureService.secretChecklist())}`;
+        if (published.includes(sessionValue) || published.includes(authValue)) throw new Error('A secret value was returned by a public status');
+        const audit = secretConfigurationAudit({ actor: 'operator', role: 'SUPER_ADMIN', environment: 'production', result: 'CONFIGURED' });
+        if (!audit.metadata?.includes('Production security secret configuration updated.') || audit.metadata.includes(sessionValue)) throw new Error('The audit record was not safe');
+        const lookup = await GuestOrderService.secureLookup({ token: 'tok_fb_not_a_real_token' });
+        if (lookup.order) throw new Error('An invalid order lookup returned an order');
+        if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Secret validation changed production state');
+      } finally {
+        restore();
+      }
+    });
+
+    await run('Production Object Storage', 'Private evidence stays private and mock storage cannot become production-active', async () => {
+      const names = ['STORAGE_PROVIDER', 'STORAGE_ENDPOINT', 'STORAGE_BUCKET', 'STORAGE_REGION', 'STORAGE_ACCESS_KEY', 'STORAGE_SECRET_KEY', 'STORAGE_ENVIRONMENT', 'VERCEL_ENV'] as const;
+      const saved = Object.fromEntries(names.map((name) => [name, process.env[name]])) as Record<(typeof names)[number], string | undefined>;
+      const restore = () => {
+        for (const name of names) {
+          if (saved[name] === undefined) delete process.env[name];
+          else process.env[name] = saved[name];
+        }
+        ObjectStorageService.resetForTests();
+      };
+      try {
+        process.env.VERCEL_ENV = 'production';
+        process.env.STORAGE_PROVIDER = 'mock';
+        StorageReadinessService.resetForTests();
+        const productionMock = StorageReadinessService.report();
+        if (productionMock.state !== 'CONFIGURATION_REQUIRED' || productionMock.privateStorage === 'READY') throw new Error('Mock storage was treated as production-active');
+        if (LaunchReadinessService.checkObjectStorage({} as never).status !== 'BLOCKED') throw new Error('Mock storage passed the launch gate');
+        delete process.env.VERCEL_ENV;
+        process.env.STORAGE_PROVIDER = 's3';
+        delete process.env.STORAGE_ACCESS_KEY;
+        delete process.env.STORAGE_SECRET_KEY;
+        delete process.env.STORAGE_BUCKET;
+        const missing = StorageReadinessService.report();
+        if (missing.state !== 'CONFIGURATION_REQUIRED' || missing.variables.STORAGE_CREDENTIALS !== 'MISSING') throw new Error('Missing storage credentials were accepted');
+        process.env.STORAGE_ENVIRONMENT = 'production';
+        if (StorageReadinessService.report().environmentSeparation !== 'FAIL') throw new Error('Development was allowed to target production storage');
+        for (const name of names) {
+          if (saved[name] === undefined) delete process.env[name];
+          else process.env[name] = saved[name];
+        }
+        ObjectStorageService.resetForTests();
+
+        const secret = process.env.STORAGE_SECRET_KEY || '';
+        const accessKey = process.env.STORAGE_ACCESS_KEY || '';
+        const published = `${JSON.stringify(StorageReadinessService.report())} ${JSON.stringify(ProductionInfrastructureService.publicHealth())} ${JSON.stringify(ProductionInfrastructureService.readiness())}`;
+        if ((secret && published.includes(secret)) || (accessKey && published.includes(accessKey))) throw new Error('A storage credential was published');
+        if (ProductionInfrastructureService.publicHealth().storage === 'CONFIGURED') throw new Error('Unverified storage was reported as configured');
+
+        const html = await ObjectStorageService.uploadPaymentProof({ buffer: Buffer.from('<html><script>alert(1)</script></html>'), filename: 'proof.html', mimeType: 'text/html', orderNumber: 'FB-EU-STORAGE' });
+        if (html.success) throw new Error('HTML upload was accepted');
+        const executable = await ObjectStorageService.uploadPaymentProof({ buffer: Buffer.from('%PDF-1.4\n%%EOF'), filename: 'proof.html.pdf', mimeType: 'application/pdf', orderNumber: 'FB-EU-STORAGE' });
+        if (executable.success) throw new Error('Executable extension was accepted');
+        const oversize = FileUploadSecurityService.validateUpload({ filename: 'proof.pdf', mimeType: 'application/pdf', sizeBytes: 6 * 1024 * 1024, bufferHeaderHex: '25504446' });
+        if (oversize.valid) throw new Error('Oversize upload was accepted');
+        const badMime = FileUploadSecurityService.validateUpload({ filename: 'proof.pdf', mimeType: 'application/x-msdownload', sizeBytes: 32, bufferHeaderHex: '4D5A' });
+        if (badMime.valid) throw new Error('Invalid MIME was accepted');
+
+        const orderRes = await OrderCreationService.createOrder({
+          items: [{ variantId: 'var_bar_1', quantity: 5 }],
+          currency: 'EUR',
+          shippingAddress: { firstName: 'Ada', lastName: 'Storage', email: 'ada.storage@example.com', streetAddress: '1 Store Lane', city: 'Berlin', postalCode: '10115', countryCode: 'DE', phone: '+49 151 00000000' },
+          shippingMethodCode: 'STANDARD',
+          paymentMethodCode: 'SEPA_IBAN',
+        });
+        const orderNumber = orderRes.order.orderNumber;
+        const samplePdf = Buffer.from('%PDF-1.4\n%storage-fixture\n%%EOF');
+        const stored = await ObjectStorageService.uploadPaymentProof({ buffer: samplePdf, filename: 'transfer.pdf', mimeType: 'application/pdf', orderNumber, uploadedByEmail: 'ada.storage@example.com' });
+        if (!stored.success || !stored.storageKey?.startsWith('private/proofs/') || stored.storageKey.includes('ada.storage')) throw new Error('Payment evidence was not stored under a private unguessable key');
+        if (!ObjectStorageService.proofBelongsToOrder(stored.storageKey, orderNumber) || ObjectStorageService.isPublicMedia(stored.storageKey)) throw new Error('Payment evidence was not private');
+        const denied = await Promise.all([
+          ObjectStorageService.getAuthorizedDownloadUrl({ storageKey: stored.storageKey, requester: {} }),
+          ObjectStorageService.getAuthorizedDownloadUrl({ storageKey: 'https://storage.example/proof.pdf', requester: { role: 'SUPER_ADMIN' } }),
+          ObjectStorageService.getAuthorizedDownloadUrl({ storageKey: 'private/proofs/guessed.pdf', requester: { role: 'FINANCE_MANAGER' } }),
+          ObjectStorageService.getAuthorizedDownloadUrl({ storageKey: stored.storageKey, requester: { role: 'CONTENT_MANAGER' } }),
+          ObjectStorageService.getAuthorizedDownloadUrl({ storageKey: stored.storageKey, requester: { email: 'other.customer@example.com' } }),
+        ]);
+        if (denied.some((result) => result.allowed)) throw new Error('Unauthorized payment evidence access was allowed');
+        const finance = await ObjectStorageService.readAuthorizedObject({ storageKey: stored.storageKey, requester: { role: 'FINANCE_MANAGER' } });
+        const owner = await ObjectStorageService.readAuthorizedObject({ storageKey: stored.storageKey, requester: { email: 'ada.storage@example.com' } });
+        if (!finance || !owner) throw new Error('Authorized payment evidence could not be read');
+        const headers = FileUploadSecurityService.getPrivateSecurityHeaders('application/pdf', 'proof.pdf');
+        if (!headers['Cache-Control'].includes('private') || !headers['Cache-Control'].includes('no-store')) throw new Error('Private evidence is publicly cacheable');
+
+        const notStored = await submitPaymentProofAction({ orderId: orderNumber, referenceOrTxid: `REF-MISSING-${Date.now()}`, lookupToken: orderRes.order.lookupToken, guestEmail: 'ada.storage@example.com', proofFileUrl: 'private/proofs/missing.pdf' });
+        if (notStored.success) throw new Error('A missing object became a successful payment submission');
+        const submitted = await submitPaymentProofAction({ orderId: orderNumber, referenceOrTxid: `REF-STORED-${Date.now()}`, lookupToken: orderRes.order.lookupToken, guestEmail: 'ada.storage@example.com', proofFileUrl: stored.storageKey });
+        if (!submitted.success || submitted.status !== 'PAYMENT_SUBMITTED') throw new Error(submitted.error || 'Stored evidence did not reach PAYMENT_SUBMITTED');
+        const verified = await CommerceRepository.findOrderByIdOrNumber(orderNumber);
+        if (verified?.status === 'PAYMENT_VERIFIED') throw new Error('Upload verified the payment');
+
+        const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', 'base64');
+        const pending = await ObjectStorageService.uploadCatalogueMedia({ buffer: png, filename: 'bar.png', mimeType: 'image/png', productSlug: 'audit-test-product', visibility: 'PENDING' });
+        const rejected = await ObjectStorageService.uploadCatalogueMedia({ buffer: png, filename: 'bar.png', mimeType: 'image/png', productSlug: 'audit-test-product', visibility: 'REJECTED' });
+        const approved = await ObjectStorageService.uploadCatalogueMedia({ buffer: png, filename: 'bar.png', mimeType: 'image/png', productSlug: 'audit-test-product', visibility: 'PUBLIC' });
+        if (!pending.storageKey || !rejected.storageKey || !approved.storageKey) throw new Error('Catalogue media upload failed');
+        if (ObjectStorageService.isPublicMedia(pending.storageKey) || ObjectStorageService.isPublicMedia(rejected.storageKey) || !ObjectStorageService.isPublicMedia(approved.storageKey)) throw new Error('Catalogue visibility was not enforced');
+        const financeMedia = await ObjectStorageService.getAuthorizedDownloadUrl({ storageKey: approved.storageKey, requester: { role: 'FINANCE_MANAGER' } });
+        const catalogueRole = await ObjectStorageService.getAuthorizedDownloadUrl({ storageKey: approved.storageKey, requester: { role: 'CATALOG_MANAGER' } });
+        if (financeMedia.allowed || !catalogueRole.allowed) throw new Error('Catalogue media authorization was wrong');
+        if (PublicationReadinessService.evaluateCurrent('audit-test-product').readiness !== 'DO_NOT_PUBLISH') throw new Error('Stored media published the audit product');
+        const corrupt = await ObjectStorageService.uploadCatalogueMedia({ buffer: samplePdf, filename: 'bar.png', mimeType: 'image/png', productSlug: 'audit-test-product', visibility: 'PUBLIC' });
+        if (corrupt.success) throw new Error('A corrupt image became public media');
+
+        ObjectStorageService.setProvider({
+          async putObject() { throw new Error('down'); },
+          async getObject() { return null; },
+          async deleteObject() { return false; },
+          async generatePresignedUrl() { return ''; },
+          async listKeys() { return []; },
+          listingAvailable() { return false; },
+        });
+        const failedWrite = await ObjectStorageService.uploadPaymentProof({ buffer: samplePdf, filename: 'transfer.pdf', mimeType: 'application/pdf', orderNumber, uploadedByEmail: 'ada.storage@example.com' });
+        if (failedWrite.success) throw new Error('A failed storage write was recorded as stored');
+
+        const objects = new Map<string, Buffer>();
+        ObjectStorageService.setProvider({
+          async putObject(key, buffer) { objects.set(key, buffer); },
+          async getObject(key) { const buffer = objects.get(key); return buffer ? { buffer, mimeType: 'text/plain' } : null; },
+          async deleteObject(key) { return objects.delete(key); },
+          async generatePresignedUrl() { return ''; },
+          async listKeys() { return [...objects.keys()]; },
+          listingAvailable() { return true; },
+        });
+        await objects.set('private/orphan-fixture', Buffer.from('orphan'));
+        const orphans = await ObjectStorageService.reportOrphans();
+        if (orphans.listing !== 'AVAILABLE' || !orphans.objectWithoutReference.includes('private/orphan-fixture')) throw new Error('Orphan storage was hidden');
+        const stillThere = await ObjectStorageService.reportOrphans();
+        if (!stillThere.objectWithoutReference.includes('private/orphan-fixture')) throw new Error('An ambiguous orphan was deleted');
+
+        process.env.VERCEL_ENV = 'production';
+        process.env.STORAGE_PROVIDER = 's3';
+        process.env.STORAGE_ENDPOINT = 'https://storage.example.invalid';
+        process.env.STORAGE_BUCKET = 'private-readiness-fixture';
+        process.env.STORAGE_REGION = 'eu-central-1';
+        process.env.STORAGE_ACCESS_KEY = 'fixtureaccesskeyvalue0001';
+        process.env.STORAGE_SECRET_KEY = 'fixturesecretkeyvalue000000000001';
+        delete process.env.STORAGE_ENVIRONMENT;
+        StorageReadinessService.resetForTests();
+        if (StorageReadinessService.report().state !== 'REVIEW_REQUIRED') throw new Error('Unproven storage became ACTIVE');
+        const probe = await ObjectStorageService.runConnectivityProbe();
+        if (probe !== 'PASS' || StorageReadinessService.report().state !== 'ACTIVE') throw new Error('A successful private connectivity probe did not become ACTIVE');
+        const afterProbe = JSON.stringify(StorageReadinessService.report());
+        if (afterProbe.includes('fixtureaccesskeyvalue0001') || afterProbe.includes('fixturesecretkeyvalue000000000001')) throw new Error('Probe readiness exposed credentials');
+        if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Storage readiness activated production');
+      } finally {
+        restore();
+      }
+    });
+
+    await run('Production Backup Readiness', 'A provider name is not a backup and restore stays blocked until a separate rehearsal passes', async () => {
+      const savedProvider = process.env.BACKUP_PROVIDER;
+      const restoreEnv = () => {
+        if (savedProvider === undefined) delete process.env.BACKUP_PROVIDER;
+        else process.env.BACKUP_PROVIDER = savedProvider;
+      };
+      const structures = { catalogue: 'PRESENT' as const, customers: 'PRESENT' as const, orders: 'PRESENT' as const, payments: 'PRESENT' as const, inventory: 'PRESENT' as const, audit: 'PRESENT' as const };
+      const evidence = (overrides: Partial<BackupEvidence>): BackupEvidence => ({
+        databaseFamily: 'neon',
+        providerName: 'neon',
+        backupEnabled: 'UNKNOWN',
+        recoveryCopy: 'UNKNOWN',
+        retention: 'RETENTION_POLICY_NOT_CONFIGURED',
+        pitr: 'NOT_CONFIGURED',
+        encryption: 'UNKNOWN',
+        lastBackupAt: null,
+        restoreResult: 'NOT_RUN',
+        restoreAt: null,
+        restoreTargetIsolated: false,
+        schemaCompatible: null,
+        structures: { catalogue: 'NOT_CHECKED', customers: 'NOT_CHECKED', orders: 'NOT_CHECKED', payments: 'NOT_CHECKED', inventory: 'NOT_CHECKED', audit: 'NOT_CHECKED' },
+        monitoring: 'NOT_CONNECTED',
+        ...overrides,
+      });
+      try {
+        delete process.env.BACKUP_PROVIDER;
+        const missing = BackupReadinessService.report();
+        if (missing.state !== 'BACKUP_CONFIGURATION_REQUIRED' || missing.providerVariable !== 'MISSING') throw new Error('A missing backup provider was accepted');
+        if (missing.retention !== 'RETENTION_POLICY_NOT_CONFIGURED' || missing.rpo !== 'NOT_CONFIGURED' || missing.rto !== 'NOT_CONFIGURED') throw new Error('A retention period or recovery objective was invented');
+        if (missing.restore !== 'NOT_RUN' || missing.encryption !== 'UNKNOWN' || missing.pitr !== 'NOT_CONFIGURED') throw new Error('An unverified backup was treated as enabled');
+        process.env.BACKUP_PROVIDER = 'neon';
+        const named = BackupReadinessService.report();
+        if (named.state !== 'BACKUP_CONFIGURATION_REQUIRED' || named.providerVariable !== 'CONFIGURED' || !named.launchBlocked) throw new Error('The provider name was treated as a verified backup');
+        process.env.BACKUP_PROVIDER = 'postgres://backup-user:secret@restore.example/db';
+        const unsafe = JSON.stringify(BackupReadinessService.report());
+        if (!unsafe.includes('"providerVariable":"INVALID"') || unsafe.includes('postgres://') || unsafe.includes('secret@')) throw new Error('A backup connection string was published');
+        const databaseUrl = process.env.DATABASE_URL || '';
+        const directUrl = process.env.DIRECT_URL || '';
+        const published = `${JSON.stringify(BackupReadinessService.report())} ${JSON.stringify(ProductionInfrastructureService.publicHealth())} ${JSON.stringify(ProductionInfrastructureService.readiness())}`;
+        if ((databaseUrl && published.includes(databaseUrl)) || (directUrl && published.includes(directUrl))) throw new Error('A database URL was published');
+        if (ProductionInfrastructureService.publicHealth().backups !== 'BACKUP_CONFIGURATION_REQUIRED') throw new Error('Public health reported backups ready');
+        if (LaunchReadinessService.checkBackups().status !== 'BLOCKED') throw new Error('Launch control accepted an unverified backup');
+        if (BackupReadinessService.evaluate(evidence({})) !== 'BACKUP_CONFIGURATION_REQUIRED') throw new Error('Missing backup evidence was accepted');
+        if (BackupReadinessService.evaluate(evidence({ backupEnabled: 'YES' })) !== 'BACKUP_CONFIGURED') throw new Error('An enabled provider without a recovery copy was not CONFIGURED');
+        if (BackupReadinessService.evaluate(evidence({ backupEnabled: 'YES', recoveryCopy: 'PRESENT' })) !== 'RESTORE_REHEARSAL_REQUIRED') throw new Error('A backup without a restore was fully accepted');
+        if (BackupReadinessService.evaluate(evidence({ backupEnabled: 'YES', recoveryCopy: 'PRESENT', lastBackupAt: '2026-10-02T00:00:00.000Z' })) !== 'BACKUP_VERIFIED') throw new Error('A known backup was not distinguished from an unverified one');
+        const restored = evidence({ backupEnabled: 'YES', recoveryCopy: 'PRESENT', restoreResult: 'PASS', restoreAt: '2026-10-02T00:00:00.000Z', restoreTargetIsolated: true, schemaCompatible: true, structures });
+        if (BackupReadinessService.evaluate(restored) !== 'RESTORE_REHEARSED' || !BackupReadinessService.report(restored).launchBlocked) throw new Error('A restore without retention became launch-ready');
+        const ready = BackupReadinessService.evaluate({ ...restored, retention: 'CONFIGURED', lastBackupAt: '2026-10-02T00:00:00.000Z' });
+        if (ready !== 'BACKUP_READY') throw new Error('A complete isolated restore was rejected');
+        if (BackupReadinessService.evaluate({ ...restored, restoreResult: 'FAIL' }) !== 'RESTORE_REHEARSAL_FAILED') throw new Error('A failed restore was accepted');
+        if (BackupReadinessService.evaluate({ ...restored, restoreTargetIsolated: false }) !== 'RESTORE_REHEARSAL_FAILED') throw new Error('A restore onto the production database was accepted');
+        if (BackupReadinessService.evaluate({ ...evidence({ backupEnabled: 'YES', recoveryCopy: 'PRESENT' }), error: 'PROVIDER_UNAVAILABLE' }) !== 'BACKUP_ERROR') throw new Error('A provider failure was hidden');
+        if (BackupReadinessService.view('CUSTOMER').allowed || BackupReadinessService.view('FINANCE_MANAGER').allowed || BackupReadinessService.view('CATALOG_MANAGER').allowed) throw new Error('A non-super-admin received backup details');
+        const adminView = BackupReadinessService.view('SUPER_ADMIN');
+        if (!adminView.allowed) throw new Error('Super Admin could not view backup readiness');
+        if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Backup readiness activated production');
+      } finally {
+        restoreEnv();
+      }
+    });
+
+    await run('Production Monitoring And Rate Limits', 'Logs and variable names do not make monitoring or distributed limits operational', async () => {
+      const saved = {
+        MONITORING_DSN: process.env.MONITORING_DSN,
+        SENTRY_DSN: process.env.SENTRY_DSN,
+        MONITORING_WEBHOOK_URL: process.env.MONITORING_WEBHOOK_URL,
+        UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL,
+        UPSTASH_REDIS_REST_TOKEN: process.env.UPSTASH_REDIS_REST_TOKEN,
+        UPSTASH_TARGET: process.env.UPSTASH_TARGET,
+        MONITORING_TARGET: process.env.MONITORING_TARGET,
+        VERCEL_ENV: process.env.VERCEL_ENV,
+      };
+      const restore = () => {
+        for (const [name, value] of Object.entries(saved)) {
+          if (value === undefined) delete process.env[name];
+          else process.env[name] = value;
+        }
+        ProductionMonitoringService.resetForTests();
+        RateLimitReadinessService.resetForTests();
+      };
+      const monitoring = (overrides: Partial<MonitoringEvidence>): MonitoringEvidence => ({
+        dsn: 'MISSING', webhook: 'MISSING', environment: 'development', target: '', reachability: 'NOT_RUN', testSignal: 'NOT_RUN', alerting: 'NOT_CONFIGURED', lastSuccessAt: null, lastFailureAt: null, ...overrides,
+      });
+      const limiter = (overrides: Partial<RateLimitEvidence>): RateLimitEvidence => ({
+        url: 'MISSING', token: 'MISSING', environment: 'development', target: '', connectivity: 'NOT_RUN', sharedEnforcement: 'NOT_RUN', lastFailureAt: null, ...overrides,
+      });
+      try {
+        delete process.env.MONITORING_DSN;
+        delete process.env.SENTRY_DSN;
+        delete process.env.MONITORING_WEBHOOK_URL;
+        delete process.env.UPSTASH_REDIS_REST_URL;
+        delete process.env.UPSTASH_REDIS_REST_TOKEN;
+        const liveMonitor = ProductionMonitoringService.report();
+        const liveLimit = RateLimitReadinessService.report();
+        if (liveMonitor.state !== 'NOT_CONFIGURED' || liveMonitor.alerting !== 'NOT_CONFIGURED' || liveMonitor.testSignal !== 'NOT_RUN') throw new Error('Missing monitoring was treated as operational');
+        if (liveLimit.state !== 'NOT_CONFIGURED' || liveLimit.mode !== 'IN_MEMORY_ONLY') throw new Error('Missing Upstash was treated as distributed');
+        if (ProductionInfrastructureService.publicHealth().monitoring !== 'NOT_CONFIGURED' || ProductionInfrastructureService.publicHealth().rateLimit !== 'NOT_CONFIGURED') throw new Error('Public health hid a missing control');
+        if (LaunchReadinessService.checkMonitoring().status !== 'BLOCKED' || LaunchReadinessService.checkRateLimiting({} as never).status !== 'BLOCKED') throw new Error('Launch control accepted an unverified control');
+        if (ProductionMonitoringService.evaluate(monitoring({})) !== 'NOT_CONFIGURED') throw new Error('Empty monitoring evidence was accepted');
+        if (ProductionMonitoringService.evaluate(monitoring({ dsn: 'INVALID' })) !== 'FAILED') throw new Error('An invalid monitoring destination was accepted');
+        if (ProductionMonitoringService.evaluate(monitoring({ dsn: 'CONFIGURED' })) !== 'CONFIGURED') throw new Error('Configuration was collapsed into a connection');
+        if (ProductionMonitoringService.evaluate(monitoring({ dsn: 'CONFIGURED', reachability: 'PASS' })) !== 'CONNECTED') throw new Error('A connection was treated as operational');
+        const signal = ProductionMonitoringService.evaluate(monitoring({ dsn: 'CONFIGURED', reachability: 'PASS', testSignal: 'PASS' }));
+        if (signal !== 'OPERATIONAL' || ProductionMonitoringService.report(monitoring({ dsn: 'CONFIGURED', reachability: 'PASS', testSignal: 'PASS' })).alerting !== 'NOT_CONFIGURED') throw new Error('An event ingest was treated as an alert path');
+        if (ProductionMonitoringService.evaluate(monitoring({ dsn: 'CONFIGURED', testSignal: 'FAIL' })) !== 'FAILED') throw new Error('A failed monitoring delivery was hidden');
+        process.env.MONITORING_DSN = 'https://ingest.fusionbars-monitor.invalid/events';
+        const sent = await ProductionMonitoringService.sendTestSignal('SUPER_ADMIN', async (payload) => payload.event === 'FUSION_MONITORING_TEST' && !JSON.stringify(payload).includes('password'));
+        if (!sent.allowed || sent.state !== 'OPERATIONAL') throw new Error('A controlled monitoring signal was rejected');
+        if (ProductionMonitoringService.view('CUSTOMER').allowed || ProductionMonitoringService.view('FINANCE_MANAGER').allowed) throw new Error('Monitoring details were shown to a non-super-admin');
+        delete process.env.MONITORING_DSN;
+        ProductionMonitoringService.resetForTests();
+
+        if (RateLimitReadinessService.evaluate(limiter({})) !== 'NOT_CONFIGURED') throw new Error('A missing rate-limit token was accepted');
+        if (RateLimitReadinessService.evaluate(limiter({ url: 'INVALID', token: 'CONFIGURED' })) !== 'FAILED') throw new Error('An invalid Upstash URL was accepted');
+        if (RateLimitReadinessService.evaluate(limiter({ url: 'CONFIGURED', token: 'MISSING' })) !== 'NOT_CONFIGURED') throw new Error('A missing Upstash token was configured');
+        if (RateLimitReadinessService.evaluate(limiter({ url: 'CONFIGURED', token: 'CONFIGURED' })) !== 'CONFIGURED') throw new Error('Credentials alone became operational');
+        if (RateLimitReadinessService.evaluate(limiter({ url: 'CONFIGURED', token: 'CONFIGURED', connectivity: 'PASS' })) !== 'CONNECTED') throw new Error('Connectivity was collapsed');
+        if (RateLimitReadinessService.evaluate(limiter({ url: 'CONFIGURED', token: 'CONFIGURED', connectivity: 'PASS', sharedEnforcement: 'PASS' })) !== 'OPERATIONAL') throw new Error('Shared enforcement did not become operational');
+        if (RateLimitReadinessService.evaluate(limiter({ url: 'CONFIGURED', token: 'CONFIGURED', environment: 'preview', target: 'production' })) !== 'FAILED') throw new Error('Preview was allowed to use production rate-limit state');
+        if (RateLimitReadinessService.evaluate(limiter({ url: 'CONFIGURED', token: 'CONFIGURED', error: 'RATE_LIMIT_BACKEND_UNAVAILABLE' })) !== 'FAILED') throw new Error('A rate-limit outage was hidden');
+        const verification = RateLimitReadinessService.report().policies.find((policy) => policy.action === 'email_verification');
+        if (!verification || verification.enforced || verification.maxAttempts !== 10) throw new Error('An existing rate-limit policy was changed or wrongly marked enforced');
+        if (RateLimitReadinessService.view('CUSTOMER').allowed) throw new Error('Rate-limit details were shown to a customer');
+
+        const counts = new Map<string, number>();
+        const fakeFetch: typeof fetch = async (input, init) => {
+          const body = JSON.parse(String(init?.body || '[]')) as string[][];
+          const key = body[0]?.[1] || '';
+          const count = (counts.get(key) || 0) + 1;
+          counts.set(key, count);
+          return new Response(JSON.stringify([{ result: count }, { result: 1 }, { result: 30 }]));
+        };
+        const instanceA = new DistributedRedisRateLimitStore('https://fixture.upstash.io', 'fixture-token-value-0001', fakeFetch);
+        const instanceB = new DistributedRedisRateLimitStore('https://fixture.upstash.io', 'fixture-token-value-0001', fakeFetch);
+        if (!(await instanceA.consume('shared', 2, 60)).allowed || !(await instanceB.consume('shared', 2, 60)).allowed || (await instanceB.consume('shared', 2, 60)).allowed) throw new Error('Two instances did not share one limit');
+        const down = new DistributedRedisRateLimitStore('https://fixture.upstash.io', 'fixture-token-value-0001', async () => { throw new Error('down'); });
+        if ((await down.consume('outage', 5, 60)).allowed) throw new Error('A distributed limiter outage failed open');
+        const memory = new MemoryRateLimitStore();
+        if (!memory.consume('alpha', 1, 1).allowed || memory.consume('alpha', 1, 1).allowed) throw new Error('The threshold was not enforced');
+        await new Promise((resolve) => setTimeout(resolve, 1100));
+        if (!memory.consume('alpha', 1, 1).allowed || !memory.consume('beta', 1, 60).allowed) throw new Error('The window did not expire or quotas were shared');
+        const published = `${JSON.stringify(ProductionMonitoringService.report())} ${JSON.stringify(RateLimitReadinessService.report())} ${JSON.stringify(ProductionInfrastructureService.publicHealth())} ${JSON.stringify(ProductionInfrastructureService.readiness())}`;
+        if (published.includes('fixture-token-value-0001') || published.includes('https://ingest.fusionbars-monitor.invalid') || published.includes('postgres://')) throw new Error('An infrastructure credential was published');
+        if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Monitoring readiness activated production');
+      } finally {
+        restore();
+      }
+    });
+
+    await run('Search indexing', 'English catalogue URLs are the only sitemap documents', async () => {
+      const urls = (await sitemap()).map((entry) => entry.url);
+      if (urls.length === 0) throw new Error('Sitemap was empty');
+      if (urls.some((url) => /\/(de|fr|es|it|nl)(\/|$)/.test(url))) throw new Error(`A non-English locale was submitted: ${urls.find((url) => /\/(de|fr|es|it|nl)(\/|$)/.test(url))}`);
+      if (urls.some((url) => url.includes('?category=') || url.includes('?search='))) throw new Error('A shop filter was submitted as its own document');
+      if (!urls.every((url) => url.startsWith('https://fusionbars.eu/en'))) throw new Error('A sitemap URL was outside the English document set');
+      if (!urls.includes('https://fusionbars.eu/en') || !urls.includes('https://fusionbars.eu/en/shop')) throw new Error('Home or shop was missing');
+      if (!urls.some((url) => url.startsWith('https://fusionbars.eu/en/products/'))) throw new Error('Published products were missing');
+      if (indexableUrl('/de/products/fusion-artisan-mushroom-chocolate-bar') !== 'https://fusionbars.eu/en/products/fusion-artisan-mushroom-chocolate-bar') throw new Error('A translated URL did not canonicalise to English');
+      if (indexableUrl('/en/shop') !== 'https://fusionbars.eu/en/shop') throw new Error('The English shop URL changed');
+      if (indexingRobots('de', '/de/shop').index || !indexingRobots('en', '/en/shop').index) throw new Error('Locale index rules were reversed');
+      if (indexingRobots('en', '/en/admin').index || indexingRobots('en', '/en/cart').follow) throw new Error('A private route stayed indexable');
+      if (offerAvailability('OUT_OF_STOCK') !== 'https://schema.org/OutOfStock' || offerAvailability('LOW_STOCK') !== 'https://schema.org/LimitedAvailability' || offerAvailability('IN_STOCK') !== 'https://schema.org/InStock') throw new Error('Offer availability did not follow stock');
+      if (customerAbsoluteUrl('/en/orders/lookup') !== 'https://fusionbars.eu/en/orders/lookup') throw new Error('An order link left the canonical host');
+      let hostHeaderUrl = false;
+      try { customerAbsoluteUrl('http://localhost:3000/en'); hostHeaderUrl = true; } catch { hostHeaderUrl = false; }
+      if (hostHeaderUrl || urls.some((url) => /localhost|http:\/\/|\/admin|\/cart|\/checkout|\/account|audit-test-product/.test(url))) throw new Error('A private or non-production URL entered the sitemap');
+    });
+
+    await run('Production Email DNS And Delivery', 'Provider evidence is required before email can leave review', async () => {
+      const secret = process.env.EMAIL_PROVIDER_KEY || '';
+      const previousFrom = process.env.EMAIL_FROM;
+      const previousProvider = process.env.EMAIL_PROVIDER;
+      const previousKey = process.env.EMAIL_PROVIDER_KEY;
+      const restore = () => {
+        if (previousFrom === undefined) delete process.env.EMAIL_FROM;
+        else process.env.EMAIL_FROM = previousFrom;
+        if (previousProvider === undefined) delete process.env.EMAIL_PROVIDER;
+        else process.env.EMAIL_PROVIDER = previousProvider;
+        if (previousKey === undefined) delete process.env.EMAIL_PROVIDER_KEY;
+        else process.env.EMAIL_PROVIDER_KEY = previousKey;
+        EmailProductionReadinessService.resetForTests();
+        EmailDeliveryLedger.resetForTests();
+        EmailService.setProvider(new MockEmailProvider());
+      };
+      try {
+        process.env.EMAIL_PROVIDER = 'resend';
+        delete process.env.EMAIL_PROVIDER_KEY;
+        EmailProductionReadinessService.resetForTests();
+        if (EmailProductionReadinessService.state() !== 'NOT_CONFIGURED') throw new Error('A missing provider key was accepted');
+        process.env.EMAIL_PROVIDER_KEY = 'short-key';
+        if (EmailProductionReadinessService.state() !== 'NOT_CONFIGURED' || !EmailProductionReadinessService.blockers().some((item) => item.includes('invalid'))) throw new Error('An invalid provider key was accepted');
+        process.env.EMAIL_PROVIDER = 'mock';
+        EmailProductionReadinessService.resetForTests();
+        if (EmailProductionReadinessService.state() === 'ACTIVE' || new MockEmailProvider().validateConfiguration().valid) throw new Error('Mock email qualified as production');
+        process.env.EMAIL_PROVIDER = 'resend';
+        process.env.EMAIL_PROVIDER_KEY = previousKey;
+        process.env.EMAIL_FROM = 'other@example.com';
+        if (EmailProductionReadinessService.sender().matchesCanonical) throw new Error('A non-canonical sender was accepted');
+        process.env.EMAIL_FROM = previousFrom;
+
+        const rejected = await EmailDnsVerificationService.inspect({
+          provider: 'resend',
+          apiKey: 're_fixture_key_value_0001',
+          fetchImpl: async () => new Response(JSON.stringify({ data: [] }), { status: 401 }),
+          resolveTxt: async () => [],
+        });
+        if (rejected.credentialAcceptance !== 'REJECTED' || rejected.spf === 'VERIFIED' || rejected.domainVerification === 'VERIFIED') throw new Error('A rejected credential verified the domain');
+        EmailProductionReadinessService.applyObservation(rejected);
+        if (EmailProductionReadinessService.report().credentials !== 'INVALID' || EmailProductionReadinessService.report().state === 'ACTIVE') throw new Error('Rejected credentials stayed available');
+
+        const publicOnly = await EmailDnsVerificationService.inspect({
+          provider: 'resend',
+          apiKey: 're_fixture_key_value_0001',
+          fetchImpl: async () => new Response(JSON.stringify({ data: [] }), { status: 200 }),
+          resolveTxt: async (host) => host.startsWith('_dmarc') ? [['v=DMARC1; p=none']] : [['v=spf1 include:example.test ~all']],
+        });
+        if (publicOnly.credentialAcceptance !== 'ACCEPTED' || publicOnly.spfRecord !== 'PRESENT' || publicOnly.dmarcRecord !== 'PRESENT' || publicOnly.dmarcPolicy !== 'NONE') throw new Error('Public DNS observation was lost');
+        if (publicOnly.spf === 'VERIFIED' || publicOnly.dkim === 'VERIFIED' || publicOnly.dmarc === 'VERIFIED' || publicOnly.domainVerification === 'VERIFIED') throw new Error('Public DNS was treated as provider verification');
+
+        const verified = await EmailDnsVerificationService.inspect({
+          provider: 'resend',
+          apiKey: 're_fixture_key_value_0001',
+          fetchImpl: async () => new Response(JSON.stringify({ data: [{ name: 'fusionbars.eu', status: 'verified', records: [{ record: 'SPF', status: 'verified' }, { record: 'DKIM', status: 'verified' }, { record: 'DMARC', status: 'verified' }] }] }), { status: 200 }),
+          resolveTxt: async () => [],
+        });
+        if (verified.credentialAcceptance !== 'ACCEPTED' || verified.domainVerification !== 'VERIFIED' || verified.spf !== 'VERIFIED' || verified.dkim !== 'VERIFIED' || verified.dmarc !== 'VERIFIED') throw new Error('Provider evidence was not accepted');
+        process.env.EMAIL_FROM = 'Fusion Mushroom Bars EU <sales@fusionbars.eu>';
+        process.env.EMAIL_REPLY_TO = 'sales@fusionbars.eu';
+        EmailProductionReadinessService.resetForTests();
+        EmailProductionReadinessService.applyObservation(verified);
+        EmailProductionReadinessService.recordControlledTest({ actor: 'ops-unknown@fusionbars.eu', eventId: 'fixture-unknown', handoff: 'SENT', delivery: 'UNKNOWN' });
+        if (EmailProductionReadinessService.state() === 'READY' || EmailProductionReadinessService.state() === 'ACTIVE') throw new Error('UNKNOWN delivery was treated as confirmed');
+        EmailProductionReadinessService.recordControlledTest({ actor: 'ops-delivered@fusionbars.eu', eventId: 'fixture-delivered', handoff: 'SENT', delivery: 'DELIVERED' });
+        if (EmailProductionReadinessService.state() !== 'READY') throw new Error(`Verified evidence did not reach READY: ${EmailProductionReadinessService.blockers().join(' | ')}`);
+        const activated = EmailProductionReadinessService.activate({ role: 'SUPER_ADMIN', actor: 'ops@fusionbars.eu', confirmation: 'ACTIVATE_PRODUCTION_EMAIL', rationale: 'Fixture evidence' });
+        if (!activated.success || PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Fixture activation changed production or stayed blocked');
+        EmailDeliveryLedger.claim('history-kept', { template: 'payment-verified', recipient: 'buyer@example.com', provider: 'fixture' });
+        EmailProductionReadinessService.disable({ role: 'SUPER_ADMIN', actor: 'ops@fusionbars.eu', rationale: 'Fixture rollback' });
+        if (EmailProductionReadinessService.state() !== 'DISABLED' || !EmailDeliveryLedger.list().some((item) => item.eventId === 'history-kept')) throw new Error('Disable removed delivery history');
+        let customerDisabled = false;
+        try { EmailProductionReadinessService.disable({ role: 'CUSTOMER', actor: 'customer', rationale: 'no' }); customerDisabled = true; } catch { customerDisabled = false; }
+        if (customerDisabled) throw new Error('A customer disabled production email');
+        let inventedDns = false;
+        try { EmailProductionReadinessService.recordDnsStatus({ role: 'SUPER_ADMIN', record: 'SPF', status: 'VERIFIED' }); inventedDns = true; } catch { inventedDns = false; }
+        if (inventedDns) throw new Error('DNS was marked verified without provider evidence');
+
+        EmailDeliveryLedger.resetForTests();
+        EmailDeliveryLedger.claim('status-sent', { template: 'order-shipped', recipient: 'buyer@example.com', provider: 'fixture' });
+        EmailDeliveryLedger.complete('status-sent', { success: true, messageId: 'msg-sent' });
+        EmailDeliveryLedger.applyProviderStatus('status-sent', 'UNKNOWN');
+        const sent = EmailDeliveryLedger.list().find((item) => item.eventId === 'status-sent');
+        if (sent?.status !== 'SENT' || sent.providerDelivery !== 'UNKNOWN') throw new Error('SENT was rewritten before provider delivery');
+        EmailDeliveryLedger.applyProviderStatus('status-sent', 'DELIVERED');
+        if (EmailDeliveryLedger.list().find((item) => item.eventId === 'status-sent')?.status !== 'DELIVERED') throw new Error('Confirmed delivery was not recorded');
+        EmailDeliveryLedger.claim('status-failed', { template: 'order-shipped', recipient: 'buyer@example.com', provider: 'fixture' });
+        EmailDeliveryLedger.complete('status-failed', { success: false, error: 'temporary failure' });
+        if (EmailDeliveryLedger.list().find((item) => item.eventId === 'status-failed')?.status !== 'FAILED') throw new Error('A provider failure was dropped');
+        EmailDeliveryLedger.recordBounce({ recipient: 'buyer@example.com', messageId: 'msg-bounce', category: 'hard', reason: 'mailbox missing', permanent: true });
+        if (!EmailDeliveryLedger.list().some((item) => item.status === 'BOUNCED' && item.bounceCategory === 'hard')) throw new Error('A bounce was not recorded');
+        if (EmailDeliveryLedger.claim('status-sent', { template: 'order-shipped', recipient: 'buyer@example.com', provider: 'fixture' })) throw new Error('A duplicate event was claimed');
+        const retryDenied = EmailDeliveryLedger.permitRetry({ eventId: 'status-failed', role: 'CUSTOMER', confirmation: 'RETRY_EMAIL', stillValid: true, recipientValid: true });
+        if (retryDenied.allowed) throw new Error('An unauthorized retry was allowed');
+
+        const mock = new MockEmailProvider();
+        EmailService.setProvider(mock);
+        const order: any = { orderNumber: 'FB-EU-EMAIL-DNS', currency: 'EUR', totalAmount: 21500, guestEmail: 'ship@example.com', shippingAddress: { firstName: 'Ada', lastName: 'Buyer', countryCode: 'DE' }, items: [], status: 'SHIPPED' };
+        await dispatchOrderStatusEmail(order, 'SHIPPED');
+        await dispatchOrderStatusEmail(order, 'SHIPPED');
+        if (mock.sentMessages.length !== 1) throw new Error('A repeated shipment event sent another email');
+        const blockedProvider = {
+          name: 'resend',
+          async sendEmail() { return { success: true, messageId: 'should-not-send' }; },
+          async getDeliveryStatus() { return { status: 'DELIVERED' as const }; },
+          validateConfiguration() { return { valid: false, missing: ['production'] }; },
+        };
+        EmailService.setProvider(blockedProvider);
+        EmailProductionReadinessService.resetForTests();
+        const blocked = await EmailService.sendOrderShipped(order);
+        if (blocked.success) throw new Error('Ordinary production email was sent before activation');
+        const injected = await EmailService.sendTestProbe({ recipientEmail: 'buyer@example.com\nBcc: evil@example.com', initiatedBy: 'ops@fusionbars.eu' });
+        if (injected.success) throw new Error('Header injection was accepted');
+        if (EmailService.resolveProviderName({ vercelEnv: 'preview', configured: 'resend' }) !== 'mock') throw new Error('Preview reused the production email provider');
+        if (EmailService.getBaseUrl() !== 'https://fusionbars.eu') throw new Error('A customer email link left https://fusionbars.eu');
+        let invalidWebhook = false;
+        try { ProductionInfrastructureService.rejectUnconfiguredWebhook('t=1,v1=abc'); invalidWebhook = true; } catch { invalidWebhook = false; }
+        if (invalidWebhook) throw new Error('A signed webhook was accepted without a provider verifier');
+        const templates = EmailTemplateRegistry.validateAll();
+        if (!templates.ok || templates.total !== 19 || templates.validated !== 19 || templates.missing.length) throw new Error('The 19 email templates were not all validated');
+        const published = JSON.stringify(EmailProductionReadinessService.report());
+        if ((secret && published.includes(secret)) || published.includes('re_fixture_key_value_0001')) throw new Error('Email readiness exposed a provider secret');
+        if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Email readiness activated production');
+      } finally {
+        restore();
+      }
+    });
+
+    await run('Production Payment Configuration', 'Unverified payment details stay out of production checkout', async () => {
+      const restoreBank = PaymentConfigService.snapshotForTests();
+      const previousNetwork = process.env.CRYPTO_BTC_NETWORK;
+      const restore = () => {
+        if (previousNetwork === undefined) delete process.env.CRYPTO_BTC_NETWORK;
+        else process.env.CRYPTO_BTC_NETWORK = previousNetwork;
+        restoreBank();
+        PaymentConfigurationService.resetForTests();
+        PaymentVerificationService.resetForTests();
+      };
+      try {
+        PaymentConfigurationService.resetForTests();
+        PaymentVerificationService.resetForTests();
+        const live = PaymentConfigurationService.report();
+        if (live.production !== 'PAUSED' || live.productionOptions.length !== 0 || live.bank === 'ACTIVE' || live.crypto.BTC === 'ACTIVE') throw new Error('A payment method was production-active');
+        if (live.conversion !== 'CRYPTO_RATE_CONFIGURATION_REQUIRED' || live.controlledTest.SEPA_IBAN !== 'NOT_RUN') throw new Error('A payment conversion or controlled test was invented');
+        if (live.bankVerification !== 'NOT_VERIFIED') throw new Error('Bank details were marked business-verified');
+        if (ibanFormat('NL00TEST0000000000') !== 'FORMAT_INVALID' || bicFormat('NOT-A-BIC') !== 'FORMAT_INVALID') throw new Error('An invalid account string passed format validation');
+        if (ibanFormat('DE89370400440532013000') !== 'FORMAT_VALID' || bicFormat('COBADEFFXXX') !== 'FORMAT_VALID') throw new Error('A structurally valid account string was rejected');
+        if (receivingAddressFormat('USDT', '', 'T123') !== 'NOT_CONFIGURED') throw new Error('USDT was given a network without configuration');
+        PaymentConfigurationService.forceCustomerModeForTests('production');
+        if (PaymentConfigurationService.customerMethods().methods.length !== 0) throw new Error('Inactive payment methods were offered to production customers');
+        PaymentConfigurationService.forceCustomerModeForTests(null);
+
+        PaymentConfigService.replaceBankForTests({ accountHolder: 'Example Holder', bankName: 'Example Bank', iban: 'DE89370400440532013000', bicSwift: 'COBADEFFXXX', status: 'ACTIVE' });
+        PaymentConfigurationService.recordCurrencies({ role: 'FINANCE_MANAGER', currencies: ['EUR'] });
+        let gbp = false;
+        try { PaymentConfigurationService.recordCurrencies({ role: 'FINANCE_MANAGER', currencies: ['GBP'] }); gbp = true; } catch { gbp = false; }
+        if (gbp) throw new Error('GBP bank transfer was enabled');
+        PaymentConfigurationService.recordBankVerification({ role: 'FINANCE_MANAGER', reviewer: 'finance@fusionbars.eu', decision: 'VERIFIED', evidence: 'finance-desk-record' });
+        if (PaymentConfigurationService.bankState() !== 'READY') throw new Error('Verified bank details did not stay short of activation');
+        const historical = { amount: 1500, reference: PaymentConfigurationService.customerReference('FB-EU-2026-10001') };
+        const denied = PaymentConfigurationService.activate({ code: 'SEPA_IBAN', actor: 'customer', role: 'CUSTOMER', confirmation: 'ACTIVATE_PAYMENT_METHOD', rationale: 'Attempt' });
+        const early = PaymentConfigurationService.activate({ code: 'SEPA_IBAN', actor: 'finance', role: 'SUPER_ADMIN', confirmation: 'ACTIVATE_PAYMENT_METHOD', rationale: 'Attempt' });
+        if (denied.success || early.success) throw new Error('Payment activation bypassed readiness');
+        PaymentConfigurationService.usePrerequisiteOverrideForTests({ evidence: true, notifications: true });
+        PaymentConfigurationService.recordControlledTest({ code: 'SEPA_IBAN', role: 'SUPER_ADMIN', actor: 'finance@fusionbars.eu', result: 'PASSED', evidence: 'fixture-bank-test' });
+        const activated = PaymentConfigurationService.activate({ code: 'SEPA_IBAN', actor: 'finance@fusionbars.eu', role: 'SUPER_ADMIN', confirmation: 'ACTIVATE_PAYMENT_METHOD', rationale: 'Fixture readiness' });
+        if (!activated.success || PRODUCTION_CONTROL_STATE !== 'PAUSED' || historical.amount !== 1500) throw new Error('Payment activation changed production or a historical amount');
+        PaymentConfigurationService.forceCustomerModeForTests('production');
+        if (!PaymentConfigurationService.customerMethods().methods.some((method) => method.code === 'SEPA_IBAN')) throw new Error('An active bank method stayed hidden');
+        PaymentConfigurationService.forceCustomerModeForTests(null);
+        PaymentConfigurationService.disable({ code: 'SEPA_IBAN', actor: 'finance@fusionbars.eu', role: 'SUPER_ADMIN', rationale: 'Fixture rollback' });
+        if (PaymentConfigurationService.bankState() !== 'DISABLED' || PaymentConfigurationService.productionOptions().includes('SEPA_IBAN') || PaymentConfigurationService.report().audit < 1) throw new Error('Disabling a method removed its history or left it available');
+
+        process.env.CRYPTO_BTC_NETWORK = 'Bitcoin Mainnet';
+        PaymentConfigService.setCryptoReceivingAddress('BTC', 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4');
+        if (receivingAddressFormat('BTC', 'Bitcoin Mainnet', 'bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4') !== 'FORMAT_VALID') throw new Error('A Bitcoin address fixture failed format validation');
+        PaymentConfigurationService.recordAssetApproval({ asset: 'BTC', role: 'FINANCE_MANAGER', reviewer: 'finance@fusionbars.eu', network: 'Bitcoin Mainnet' });
+        PaymentConfigurationService.recordAddressVerification({ asset: 'BTC', role: 'FINANCE_MANAGER', reviewer: 'finance@fusionbars.eu', decision: 'VERIFIED', evidence: 'address-record' });
+        let missingAge = false;
+        try { PaymentConfigurationService.recordCryptoRate({ asset: 'BTC', role: 'FINANCE_MANAGER', rate: '1', source: 'fixture', currency: 'EUR', strategy: 'PROVIDER_DERIVED', version: 'v1' }); missingAge = true; } catch { missingAge = false; }
+        if (missingAge) throw new Error('A provider rate was stored without a maximum age');
+        PaymentConfigurationService.recordCryptoRate({ asset: 'BTC', role: 'FINANCE_MANAGER', rate: '1', source: 'fixture', currency: 'EUR', strategy: 'PROVIDER_DERIVED', version: 'v1', at: '2020-01-01T00:00:00.000Z', maxAgeSeconds: 60 });
+        if (PaymentConfigurationService.quoteCrypto('BTC').error !== 'CRYPTO_RATE_STALE') throw new Error('A stale conversion was accepted');
+        if (PaymentConfigurationService.cryptoState('USDT') === 'ACTIVE' || PaymentConfigurationService.report().networkApproval.USDT === 'APPROVED') throw new Error('USDT became active without approval');
+        PaymentVerificationService.registerProof({ orderNumber: 'FB-EU-PAY-1', reference: 'PAY-REF-1', expectedAmount: PaymentVerificationService.authoritativeAmount(1800, null), transactionHash: 'abc123' });
+        let duplicateHash = false;
+        try { PaymentVerificationService.registerProof({ orderNumber: 'FB-EU-PAY-2', reference: 'PAY-REF-2', expectedAmount: 1800, transactionHash: 'ABC123' }); duplicateHash = true; } catch { duplicateHash = false; }
+        let clientAmount = false;
+        try { PaymentVerificationService.authoritativeAmount(1800, 1700); clientAmount = true; } catch { clientAmount = false; }
+        let clientAddress = false;
+        try { PaymentVerificationService.assertReceivingAddress('configured-address', 'other-address'); clientAddress = true; } catch { clientAddress = false; }
+        if (duplicateHash || clientAmount || clientAddress) throw new Error('A client or duplicate payment change was accepted');
+        const published = JSON.stringify(PaymentProductionReadinessService.report());
+        if (published.includes('DE89370400440532013000') || published.includes('bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4') || published.includes('COBADEFFXXX')) throw new Error('Payment readiness exposed account details');
+        if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Payment configuration activated production');
+      } finally {
+        restore();
+      }
+    });
+
+    await run('VAT and Legal Policy', 'Missing tax and unpublished legal text stay non-public', () => {
+      CommercialConfigurationService.resetForTests();
+      LegalGovernanceService.resetForTests();
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const beforeSpecialist = JSON.stringify(specialistExecution);
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production must stay paused');
+      if (CommercialConfigurationService.taxReadiness().state !== 'TAX_CONFIGURATION_REQUIRED') throw new Error('An unconfigured tax ledger was treated as ready');
+      if (CommercialConfigurationService.canWrite('CONTENT_MANAGER') || CommercialConfigurationService.canWrite('CATALOG_MANAGER') || AdminAccess.can('CUSTOMER', 'pricing') || AdminAccess.can('CUSTOMER', 'settings')) {
+        throw new Error('Tax or legal administration was opened to an unauthorised role');
+      }
+      CommercialConfigurationService.updatePolicy({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        rationale: 'Fixture exclusive display',
+        evidence: 'Test only',
+        taxDisplayMode: 'TAX_EXCLUDED',
+      });
+      const drafted = CommercialConfigurationService.addVatRate({
+        actor: 'finance.review@fusionbars.eu',
+        actorRole: 'FINANCE_MANAGER',
+        country: 'DE',
+        taxClass: 'STANDARD',
+        rateBps: 1900,
+        effectiveFrom: '2026-01-01T00:00:00.000Z',
+        effectiveTo: '2027-01-01T00:00:00.000Z',
+        evidence: 'Fixture rate, not a business registration',
+      });
+      const beforeActivation = TaxEngine.resolve({ country: 'DE', taxClass: 'STANDARD', taxableMinor: 10000, at: '2026-06-01T00:00:00.000Z' });
+      if (beforeActivation.status !== 'TAX_CONFIGURATION_REQUIRED' || beforeActivation.taxMinor != null) throw new Error('A drafted VAT rate was applied');
+      let financeActivated = false;
+      try {
+        CommercialConfigurationService.activateVatRate({ actor: 'finance.review@fusionbars.eu', actorRole: 'FINANCE_MANAGER', rateId: drafted.id, confirmation: 'ACTIVATE_TAX_RATE', rationale: 'Should fail' });
+        financeActivated = true;
+      } catch {
+        financeActivated = false;
+      }
+      if (financeActivated) throw new Error('Finance activation bypassed super-admin approval');
+      CommercialConfigurationService.approveVatRate({ actor: 'admin@fusionbars.eu', actorRole: 'SUPER_ADMIN', rateId: drafted.id, rationale: 'Fixture approval', evidence: 'Fixture reference' });
+      const approvedOnly = TaxEngine.resolve({ country: 'DE', taxClass: 'STANDARD', taxableMinor: 10000, at: '2026-06-01T00:00:00.000Z' });
+      if (approvedOnly.status !== 'TAX_CONFIGURATION_REQUIRED') throw new Error('Approval activated the rate');
+      CommercialConfigurationService.activateVatRate({ actor: 'admin@fusionbars.eu', actorRole: 'SUPER_ADMIN', rateId: drafted.id, confirmation: 'ACTIVATE_TAX_RATE', rationale: 'Fixture activation' });
+      const applied = TaxEngine.resolve({ country: 'DE', taxClass: 'STANDARD', taxableMinor: 10000, at: '2026-06-01T00:00:00.000Z' });
+      if (applied.status !== 'CONFIGURED' || applied.taxMinor !== 1900) throw new Error('An activated exclusive rate was not applied');
+      const expired = TaxEngine.resolve({ country: 'DE', taxClass: 'STANDARD', taxableMinor: 10000, at: '2027-06-01T00:00:00.000Z' });
+      if (expired.status !== 'TAX_CONFIGURATION_REQUIRED') throw new Error('An expired rate was applied');
+      CommercialConfigurationService.updatePolicy({ actor: 'finance.review@fusionbars.eu', actorRole: 'FINANCE_MANAGER', rationale: 'Fixture inclusive display', evidence: 'Test only', taxDisplayMode: 'TAX_INCLUDED' });
+      const included = TaxEngine.resolve({ country: 'DE', taxClass: 'STANDARD', taxableMinor: 11900, at: '2026-06-01T00:00:00.000Z' });
+      if (included.treatment !== 'TAX_INCLUDED' || included.taxMinor !== 1900) throw new Error('Inclusive tax was not extracted from the supplied price');
+      const standardShip = ShippingService.calculateShipping({ subtotal: 1000, currency: 'EUR', destinationCountry: 'DE', selectedMethodCode: 'STANDARD' });
+      if (standardShip.selectedMethod.cost !== 1500 || DestinationEngine.shippingTax('DE', 1500).status !== 'TAX_CONFIGURATION_REQUIRED') throw new Error('Shipping price or shipping tax was guessed');
+      if (LegalGovernanceService.publicProfile().legalName) throw new Error('An unapproved legal name was public');
+      let unpublishedAccepted = false;
+      try {
+        LegalGovernanceService.recordAcceptance({ type: 'terms', locale: 'en', version: 1, orderReference: 'FB-FIXTURE', actor: 'customer@example.com' });
+        unpublishedAccepted = true;
+      } catch {
+        unpublishedAccepted = false;
+      }
+      if (unpublishedAccepted) throw new Error('An unpublished terms document was accepted');
+      LegalGovernanceService.saveDraft({ type: 'terms', locale: 'en', title: 'Terms', content: 'FIXTURE_TERMS_BODY_NOT_FOR_AUDIT', role: 'COMPLIANCE_MANAGER', actor: 'compliance@fusionbars.eu', effectiveDate: '2026-01-01', source: 'fixture' });
+      if (LegalGovernanceService.active('terms', 'en') || LegalGovernanceService.publicLinks().some((link) => link.type === 'terms')) throw new Error('A draft terms document was public');
+      LegalGovernanceService.approve({ type: 'terms', locale: 'en', role: 'COMPLIANCE_MANAGER', actor: 'compliance@fusionbars.eu' });
+      if (LegalGovernanceService.active('terms', 'en')) throw new Error('Approval published the terms');
+      const published = LegalGovernanceService.publish({ type: 'terms', locale: 'en', role: 'SUPER_ADMIN', actor: 'admin@fusionbars.eu', confirmation: 'PUBLISH_LEGAL_DOCUMENT', reason: 'Fixture publication' });
+      const acceptance = LegalGovernanceService.recordAcceptance({ type: 'terms', locale: 'en', version: published.version, orderReference: 'FB-FIXTURE', actor: 'customer@example.com' });
+      if (acceptance.version !== published.version) throw new Error('Checkout recorded the wrong terms version');
+      if (JSON.stringify(LegalGovernanceService.report().documents).includes('FIXTURE_TERMS_BODY_NOT_FOR_AUDIT')) throw new Error('The public report stored document body text');
+      if (LegalGovernanceService.active('terms', 'de')) throw new Error('English publication approved a German translation');
+      CommercialConfigurationService.resetForTests();
+      LegalGovernanceService.resetForTests();
+      if (CommercialConfigurationService.taxReadiness().state !== 'TAX_CONFIGURATION_REQUIRED' || LegalGovernanceService.publicLinks().length !== 0) throw new Error('Fixture tax or legal publication leaked into the live state');
+      if (JSON.stringify(firstBatchState) !== beforeBatch || JSON.stringify(specialistExecution) !== beforeSpecialist) throw new Error('Tax and legal governance changed the pilot files');
+    });
+
+    await run('Launch Catalogue', 'Launch selection stays unpublished and unresolved products stay blocked', () => {
+      LaunchCatalogueService.resetForTests();
+      CommercialConfigurationService.resetForTests();
+      DestinationEngine.resetForTests();
+      PublicationReadinessService.resetForTests();
+      const beforeBatch = JSON.stringify(firstBatchState);
+      const beforeSpecialist = JSON.stringify(specialistExecution);
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED' || GBP_LAUNCH_MODE !== 'DISABLED_FOR_LAUNCH') throw new Error('Launch preparation changed production or GBP policy');
+      const live = LaunchCatalogueService.report();
+      if (live.catalogue.selected !== 0 || live.catalogue.published !== 0 || live.catalogue.ready !== 0) throw new Error('A saved product was selected, published, or marked ready');
+      if (live.launchSet.localePolicy || live.launchSet.intendedCountries.length !== 0) throw new Error('A launch locale or destination policy was assumed');
+      if (LaunchCatalogueService.selection('audit-test-product') !== 'DO_NOT_LAUNCH') throw new Error('Audit Test Product was eligible for launch');
+      if (LaunchCatalogueService.selection('a-box-of-10-fusion-gummies') !== 'NOT_SELECTED' || LaunchCatalogueService.selection('a-box-of-fusion-gummies') !== 'NOT_SELECTED') {
+        throw new Error('The distinct gummy boxes were selected or merged');
+      }
+      let auditSelected = false;
+      try {
+        LaunchCatalogueService.selectForLaunch({ slug: 'audit-test-product', actor: 'catalogue@fusionbars.eu', role: 'SUPER_ADMIN', evidence: 'Must fail' });
+        auditSelected = true;
+      } catch {
+        auditSelected = false;
+      }
+      if (auditSelected || LaunchCatalogueService.publicationCandidate('audit-test-product')) throw new Error('Audit Test Product entered the launch catalogue');
+      let customerSelected = false;
+      try {
+        LaunchCatalogueService.selectForLaunch({ slug: 'fixture-launch-bar', actor: 'customer@example.com', role: 'CUSTOMER', evidence: 'No' });
+        customerSelected = true;
+      } catch {
+        customerSelected = false;
+      }
+      if (customerSelected) throw new Error('A customer selected a launch product');
+      let bulk = false;
+      try { LaunchCatalogueService.rejectUnsafeBulk('SELECT_ALL'); bulk = true; } catch { bulk = false; }
+      let convert = false;
+      try { CommercialConfigurationService.rejectUnsafeBulk('CONVERT_ALL_USD_TO_EUR'); convert = true; } catch { convert = false; }
+      let europe = false;
+      try { LaunchCatalogueService.setIntendedCountries({ countries: ['EUROPE'], actor: 'admin@fusionbars.eu', role: 'SUPER_ADMIN', evidence: 'No' }); europe = true; } catch { europe = false; }
+      if (bulk || convert || europe) throw new Error('A bulk price, selection, or Europe approval was available');
+      const missing = LaunchCatalogueService.checklist('fusion-bars-banana-chocolate').find((row) => row.id === 'PRICING');
+      if (!missing || missing.state === 'PASS') throw new Error('A missing EUR price was treated as approved');
+      const locales = ['en', 'de', 'fr', 'es', 'it', 'nl'];
+      const translations: Record<string, { state: 'APPROVED'; draft: string; reviewer: string; timestamp: string }> = {};
+      for (const locale of locales) translations[locale] = { state: 'APPROVED', draft: `Public ${locale} copy.`, reviewer: 'content.review@fusionbars.eu', timestamp: '2026-09-27T00:00:00.000Z' };
+      const ready: ReadinessInput = {
+        slug: 'fixture-launch-bar',
+        dataStatus: 'ADJUDICATED',
+        testRecord: false,
+        review: {
+          productSlug: 'fixture-launch-bar',
+          reviewer: 'content.review@fusionbars.eu',
+          updatedAt: '2026-09-27T00:00:00.000Z',
+          pricing: { state: 'PRICE_APPROVED', approvedCurrency: 'EUR', approvedPrice: 18, rationale: 'Fixture EUR price', evidence: 'Fixture worksheet', reviewer: 'finance.review@fusionbars.eu', timestamp: '2026-09-27T00:00:00.000Z' },
+          compliance: { state: 'APPROVED_FOR_PUBLICATION', rationale: 'Fixture confection', evidence: 'Fixture file', reviewer: 'compliance.review@fusionbars.eu', timestamp: '2026-09-27T00:00:00.000Z' },
+          countries: [{ country: 'DE', decision: 'ALLOWED', rationale: 'Fixture destination', evidence: 'Fixture country file', reviewer: 'compliance.review@fusionbars.eu', timestamp: '2026-09-27T00:00:00.000Z' }],
+          content: { state: 'CONTENT_APPROVED', candidatePublicContent: 'Fixture bar.', approvedPublicContent: 'Fixture bar.', reviewer: 'content.review@fusionbars.eu', timestamp: '2026-09-27T00:00:00.000Z' },
+          translations,
+          media: { state: 'VERIFIED', reviewer: 'catalogue.review@fusionbars.eu', timestamp: '2026-09-27T00:00:00.000Z', note: 'Fixture image' },
+          publication: 'NOT_READY',
+        },
+      };
+      PublicationReadinessService.installFixture(ready);
+      LaunchCatalogueService.selectForLaunch({ slug: 'fixture-launch-bar', actor: 'catalogue@fusionbars.eu', role: 'CATALOG_MANAGER', evidence: 'Fixture selection' });
+      if (!LaunchCatalogueService.publicationCandidate('fixture-launch-bar') || PublicationReadinessService.isPubliclyVisible('fixture-launch-bar') || PublicationReadinessService.customerPurchaseDecision('fixture-launch-bar').allowed) {
+        throw new Error('Launch selection published or sold the fixture');
+      }
+      if (LaunchCatalogueService.fullyLaunchReady('fixture-launch-bar')) throw new Error('Unconfigured tax or legal documents were treated as launch-ready');
+      const drafted = CommercialConfigurationService.draftPrice({ actor: 'finance.review@fusionbars.eu', actorRole: 'FINANCE_MANAGER', productSlug: 'fixture-launch-bar', currency: 'EUR', amountMinor: 1800, effectiveFrom: '2026-01-01T00:00:00.000Z', rationale: 'Fixture EUR price', evidence: 'Fixture worksheet', taxClass: 'STANDARD' });
+      CommercialConfigurationService.approvePrice({ actor: 'admin@fusionbars.eu', actorRole: 'SUPER_ADMIN', priceId: drafted.id, rationale: 'Fixture approval', evidence: 'Fixture worksheet' });
+      if (LaunchCatalogueService.checklist('fixture-launch-bar').find((row) => row.id === 'PRICING')?.state !== 'PASS') throw new Error('An approved EUR price was not recognised');
+      const future = CommercialConfigurationService.draftPrice({ actor: 'finance.review@fusionbars.eu', actorRole: 'FINANCE_MANAGER', productSlug: 'fixture-launch-future', currency: 'EUR', amountMinor: 1900, effectiveFrom: '2099-01-01T00:00:00.000Z', rationale: 'Future fixture', evidence: 'Fixture worksheet', taxClass: 'STANDARD' });
+      CommercialConfigurationService.approvePrice({ actor: 'admin@fusionbars.eu', actorRole: 'SUPER_ADMIN', priceId: future.id, rationale: 'Future approval', evidence: 'Fixture worksheet' });
+      if (PricingEngine.activeApprovedPrice('fixture-launch-future', null, 'EUR', '2026-06-01T00:00:00.000Z')) throw new Error('A future EUR price was applied early');
+      let clash = false;
+      try {
+        const again = CommercialConfigurationService.draftPrice({ actor: 'finance.review@fusionbars.eu', actorRole: 'FINANCE_MANAGER', productSlug: 'fixture-launch-bar', currency: 'EUR', amountMinor: 2000, effectiveFrom: '2026-06-01T00:00:00.000Z', rationale: 'Conflicting fixture', evidence: 'Fixture worksheet', taxClass: 'STANDARD' });
+        CommercialConfigurationService.approvePrice({ actor: 'admin@fusionbars.eu', actorRole: 'SUPER_ADMIN', priceId: again.id, rationale: 'Conflict', evidence: 'Fixture worksheet' });
+        clash = true;
+      } catch {
+        clash = false;
+      }
+      if (clash) throw new Error('A conflicting EUR price was approved');
+      DestinationEngine.recordRule({ actor: 'compliance.review@fusionbars.eu', actorRole: 'COMPLIANCE_MANAGER', productSlug: 'fixture-launch-bar', country: 'DE', decision: 'DEFERRED', rationale: 'Fixture deferral', evidence: 'Fixture file', effectiveFrom: '2020-01-01T00:00:00.000Z' });
+      if (!DestinationEngine.evaluate({ slug: 'fixture-launch-bar', country: 'DE', complianceState: 'DEFERRED' }).blockCheckout) throw new Error('A deferred country or compliance state was purchasable');
+      DestinationEngine.recordRule({ actor: 'compliance.review@fusionbars.eu', actorRole: 'COMPLIANCE_MANAGER', productSlug: 'fixture-launch-blocked', country: 'DE', decision: 'BLOCKED', rationale: 'Fixture block', evidence: 'Fixture file', effectiveFrom: '2020-01-01T00:00:00.000Z' });
+      if (DestinationEngine.evaluate({ slug: 'fixture-launch-blocked', country: 'DE' }).explicitlyAllowed) throw new Error('A blocked destination was allowed');
+      if (DestinationEngine.evaluate({ slug: 'fixture-launch-missing', country: 'FR' }).productDecision !== 'NOT_CONFIGURED') throw new Error('A missing country decision was filled in');
+      if (LaunchCatalogueService.auditEvents().length < 1 || LaunchCatalogueService.report().launchSet.history < 1) throw new Error('Launch selection was not versioned');
+      LaunchCatalogueService.resetForTests();
+      CommercialConfigurationService.resetForTests();
+      DestinationEngine.resetForTests();
+      PublicationReadinessService.resetForTests();
+      if (LaunchCatalogueService.selectedSlugs().length !== 0 || CommercialConfigurationService.taxReadiness().state !== 'TAX_CONFIGURATION_REQUIRED') throw new Error('Fixture launch state leaked');
+      if (JSON.stringify(firstBatchState) !== beforeBatch || JSON.stringify(specialistExecution) !== beforeSpecialist) throw new Error('Launch catalogue changed the pilot files');
     });
 
     const passedCount = results.filter((r) => r.passed).length;

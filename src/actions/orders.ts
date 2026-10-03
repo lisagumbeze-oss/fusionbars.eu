@@ -10,6 +10,7 @@ import { AuthService } from '../domain/auth/AuthService';
 import { CommerceRepository, DbOrder } from '../lib/commerce-repository';
 import { OrderStatus, RoleName } from '../types';
 import { ensureAdminOverridesLoaded } from '@/domain/admin/AdminOverrideStore';
+import { RateLimiterService } from '@/lib/rate-limiter';
 
 /**
  * Server Action: Atomically creates an order with full server-authoritative calculations,
@@ -19,6 +20,8 @@ export async function createOrderAction(rawInput: unknown) {
   try {
     ensureAdminOverridesLoaded();
     const validated = createOrderSchema.parse(rawInput);
+    const limited = await RateLimiterService.enforce('public_order_creation', validated.shippingAddress.email);
+    if (!limited.allowed) return { success: false, error: limited.error };
     const result = await OrderCreationService.createOrder({
       items: validated.items,
       currency: validated.currency,
@@ -67,6 +70,9 @@ export async function lookupOrderAction(input: {
     if (!input.token && (!input.orderNumber || !input.email)) {
       return { success: false, error: 'Please provide both your order reference and email address.' };
     }
+    const lookupKey = input.email || input.orderNumber || 'token';
+    const limited = await RateLimiterService.enforce('guest_order_lookup', lookupKey);
+    if (!limited.allowed) return { success: false, error: limited.error };
 
     if (input.orderNumber && input.email) {
       guestOrderLookupSchema.parse({

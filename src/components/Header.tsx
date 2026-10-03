@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, Shield, Sparkles, Layers, User } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, Shield, User } from 'lucide-react';
 import AnnouncementBar from './AnnouncementBar';
 import SearchModal from './SearchModal';
 import { useCommerce } from '../context/CommerceContext';
@@ -82,16 +82,6 @@ export default function Header() {
 
             {/* Right: Actions */}
             <div className="flex items-center gap-2 sm:gap-4 text-[#121212]">
-              {/* Architecture Console quick link for reviewer */}
-              <Link
-                href={`/${locale}/admin/architecture`}
-                title="Architecture & Domain Engine Console"
-                className="hidden md:flex items-center gap-1.5 px-2.5 py-1 text-xs text-[#4A5D4E] bg-[#F0F4F1] hover:bg-[#E2ECE4] rounded border border-[#4A5D4E]/20 transition font-mono font-medium"
-              >
-                <Layers className="w-3.5 h-3.5" />
-                <span>Architecture</span>
-              </Link>
-
               {/* Search — desktop only; mobile uses the bottom nav */}
               <button
                 onClick={() => setIsSearchOpen(true)}
@@ -160,13 +150,6 @@ export default function Header() {
                 </Link>
               ))}
               <div className="pt-2 border-t border-[#E5E3DD]">
-                <Link
-                  href={`/${locale}/admin/architecture`}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-2 py-2 px-3 text-[#4A5D4E] font-mono text-xs"
-                >
-                  <Layers className="w-4 h-4" /> Architecture Verification Console
-                </Link>
                 <Link
                   href={`/${locale}/admin`}
                   onClick={() => setIsMobileMenuOpen(false)}

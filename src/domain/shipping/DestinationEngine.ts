@@ -249,7 +249,8 @@ export class DestinationEngine {
   }
 
   static shippingTax(country: string, amountMinor: number) {
-    return TaxEngine.resolve({ country, taxClass: 'NOT_CONFIGURED', taxableMinor: amountMinor, at: new Date().toISOString() });
+    const taxClass = CommercialConfigurationService.get().tax.shippingTaxClass || 'NOT_CONFIGURED';
+    return TaxEngine.resolve({ country, taxClass, taxableMinor: amountMinor, at: new Date().toISOString() });
   }
 
   static cohort() {

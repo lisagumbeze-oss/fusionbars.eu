@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { z } from 'zod';
 import { ADMIN_SESSION_COOKIE, AdminAuthService } from '@/domain/auth/AdminAuthService';
 import { AuthService } from '@/domain/auth/AuthService';
+import { RateLimiterService } from '@/lib/rate-limiter';
 
 const loginSchema = z.object({
   email: z.string().trim().email(),
@@ -27,6 +28,8 @@ export async function loginAdminAction(rawInput: unknown) {
     return { success: false, error: 'Email or password is incorrect.' };
   }
 
+  const limited = await RateLimiterService.enforce('admin_auth', parsed.data.email);
+  if (!limited.allowed) return { success: false, error: limited.error };
   const result = AdminAuthService.authenticate(parsed.data.email, parsed.data.password);
   if (!result) {
     return { success: false, error: 'Email or password is incorrect.' };

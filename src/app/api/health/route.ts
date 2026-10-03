@@ -1,18 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { EnvironmentService } from '@/config/environment';
+import { ProductionInfrastructureService } from '@/domain/infrastructure/ProductionInfrastructureService';
+import { StorageReadinessService } from '@/services/storage/StorageReadinessService';
 
 /**
  * Public Health Probe
  * Returns minimal operational status for uptime monitors without exposing internal infrastructure details.
  */
 export async function GET() {
+  const health = ProductionInfrastructureService.publicHealth();
   return NextResponse.json(
     {
-      status: 'healthy',
+      status: health.status,
+      application: health.application,
+      database: health.database,
+      storage: health.storage,
+      email: health.email,
+      payments: health.payments,
+      backup: { status: health.backups },
+      monitoring: { status: health.monitoring },
+      rateLimit: { status: health.rateLimit },
       timestamp: new Date().toISOString(),
       service: 'fusion-mushroom-bars-eu',
-      environment: process.env.NODE_ENV || 'development',
     },
     {
       status: 200,
@@ -60,9 +70,10 @@ export async function POST(req: NextRequest) {
   }
 
   // 2. Storage Readiness
+  const storage = StorageReadinessService.report();
   checks.storage = {
-    status: 'pass',
-    note: config.storage.provider,
+    status: storage.state === 'ACTIVE' ? 'pass' : 'fail',
+    note: storage.state,
   };
 
   // 3. Email Readiness

@@ -14,6 +14,7 @@ import {
   ValidatedLineItem,
 } from '@/types';
 import { prisma } from './prisma';
+import { OrderDatabasePersistence } from '@/domain/orders/OrderDatabasePersistence';
 
 export interface DbCustomer {
   id: string;
@@ -123,6 +124,14 @@ export interface DbOrder {
     pricingVersion: string;
     configurationVersion: number;
     destinationCountry: string;
+    shippingTaxAmount?: MinorUnits | null;
+    shippingTaxStatus?: string;
+    capturedAt: string;
+  };
+  legalSnapshot?: {
+    termsVersion: number | null;
+    termsStatus: string;
+    privacyVersion: number | null;
     capturedAt: string;
   };
   shippingSnapshot?: {
@@ -725,58 +734,20 @@ export class CommerceRepository {
     store.orders.set(order.orderNumber, order);
     store.orders.set(order.lookupToken, order);
 
-    if (await checkDb()) {
+    if (process.env.NODE_ENV === 'production') {
+      if (!(await checkDb())) {
+        store.orders.delete(order.id);
+        store.orders.delete(order.orderNumber);
+        store.orders.delete(order.lookupToken);
+        throw new Error('DATABASE_UNAVAILABLE');
+      }
       try {
-        const method = await prisma.shippingMethod.findFirst({
-          where: { code: order.shippingMethodCode },
-        });
-
-        if (method) {
-          await prisma.order.create({
-            data: {
-              id: order.id,
-              orderNumber: order.orderNumber,
-              lookupToken: order.lookupToken,
-              customerId: order.customerId || null,
-              guestEmail: order.guestEmail,
-              guestPhone: order.guestPhone || null,
-              currency: order.currency,
-              subtotalAmount: order.subtotalAmount,
-              discountAmount: order.discountAmount,
-              shippingAmount: order.shippingAmount,
-              totalAmount: order.totalAmount,
-              status: order.status,
-              shippingOriginHub: order.shippingOriginHub,
-              shippingMethodId: method.id,
-              shippingAddress: {
-                create: {
-                  firstName: order.shippingAddress.firstName,
-                  lastName: order.shippingAddress.lastName,
-                  streetAddress: order.shippingAddress.streetAddress,
-                  houseNumber: order.shippingAddress.houseNumber || null,
-                  city: order.shippingAddress.city,
-                  postalCode: order.shippingAddress.postalCode,
-                  countryCode: order.shippingAddress.countryCode,
-                  phone: order.shippingAddress.phone,
-                },
-              },
-              discreetPackaging: order.discreetPackaging,
-              items: {
-                create: order.items.map((it) => ({
-                  variantId: it.variantId,
-                  productName: it.productName,
-                  variantName: it.variantName,
-                  sku: it.sku,
-                  unitPrice: it.unitPrice,
-                  quantity: it.quantity,
-                  lineTotal: it.lineTotal,
-                })),
-              },
-            } as any,
-          });
-        }
-      } catch {
-        // Resilient fallback mode
+        await OrderDatabasePersistence.persist(order);
+      } catch (error) {
+        store.orders.delete(order.id);
+        store.orders.delete(order.orderNumber);
+        store.orders.delete(order.lookupToken);
+        throw error;
       }
     }
 

@@ -22,6 +22,7 @@ import { HubAllocationService } from '@/domain/inventory/HubAllocationService';
 import { InventoryService } from '@/domain/inventory/InventoryService';
 import { BankTransferPaymentService, CryptoPaymentService, PaymentInstructions } from '@/domain/payments/PaymentService';
 import { PaymentConfigService, CryptoAsset } from '@/domain/payments/PaymentConfig';
+import { PaymentConfigurationService } from '@/domain/payments/PaymentConfigurationService';
 import { getCheckoutCryptoWallets } from '@/domain/payments/CheckoutCryptoWallets';
 import {
   cryptoDiscountPercent,
@@ -35,6 +36,7 @@ import { CommerceRepository, DbOrder } from '@/lib/commerce-repository';
 import { GuestOrderService } from './GuestOrderService';
 import { OrderService } from './OrderService';
 import { dispatchEmailSafely, EmailService } from '@/services/email/EmailService';
+import { LegalGovernanceService } from '@/domain/legal/LegalGovernanceService';
 
 export interface CreateOrderInput {
   items: Array<{ variantId: string; quantity: number }>;
@@ -46,6 +48,7 @@ export interface CreateOrderInput {
   customerId?: string | null;
   customerNotes?: string;
   discreetPackaging?: boolean;
+  acceptedTermsVersion?: number | null;
 }
 
 export interface OrderCreationResult {
@@ -221,6 +224,9 @@ export class OrderCreationService {
     if (!PaymentConfigService.isPaymentMethodActive(paymentMethodCode)) {
       throw new Error(`Payment method "${paymentMethodCode}" is currently unavailable or inactive.`);
     }
+    if (PaymentConfigurationService.productionCheckoutRequired() && !PaymentConfigurationService.productionOptions().includes(paymentMethodCode)) {
+      throw new Error('This payment method is not available.');
+    }
 
     let paymentInstructions: PaymentInstructions;
     let paymentNotificationDetails: { iban?: string; bic?: string; bankName?: string; accountHolder?: string; cryptoName?: string; network?: string; receivingAddress?: string } = {};
@@ -354,6 +360,10 @@ export class OrderCreationService {
       destinationCountry,
       at: dbOrder.createdAt,
     });
+    const shippingTax = DestinationEngine.shippingTax(destinationCountry, dbOrder.shippingAmount);
+    if ((process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production') && (commercial.taxStatus === 'TAX_CONFIGURATION_REQUIRED' || shippingTax.status === 'TAX_CONFIGURATION_REQUIRED')) {
+      throw new Error('TAX_CONFIGURATION_REQUIRED');
+    }
     dbOrder.commercialSnapshot = {
       currency,
       subtotal: dbOrder.subtotalAmount,
@@ -368,6 +378,8 @@ export class OrderCreationService {
       pricingVersion: 'CATALOGUE_UNAPPROVED',
       configurationVersion: commercial.configurationVersion,
       destinationCountry,
+      shippingTaxAmount: shippingTax.taxMinor,
+      shippingTaxStatus: shippingTax.status,
       capturedAt: dbOrder.createdAt,
     };
     dbOrder.shippingSnapshot = {
@@ -379,6 +391,19 @@ export class OrderCreationService {
       hub: chosenHub,
       configurationVersion: DestinationEngine.get().version,
       eligibility: 'NOT_CONFIGURED',
+      capturedAt: dbOrder.createdAt,
+    };
+    const publishedTerms = LegalGovernanceService.active('terms', 'en');
+    if (!publishedTerms && input.acceptedTermsVersion != null) {
+      throw new Error('An unpublished terms document cannot be accepted.');
+    }
+    if (publishedTerms && input.acceptedTermsVersion !== publishedTerms.version) {
+      throw new Error('The current terms version must be accepted.');
+    }
+    dbOrder.legalSnapshot = {
+      termsVersion: publishedTerms?.version ?? null,
+      termsStatus: publishedTerms ? 'PUBLISHED' : 'NOT_PUBLISHED',
+      privacyVersion: LegalGovernanceService.active('privacy', 'en')?.version ?? null,
       capturedAt: dbOrder.createdAt,
     };
 

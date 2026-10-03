@@ -7,6 +7,7 @@ import { RBACService } from '@/domain/auth/RBACService';
 import specialistSeed from '@/data/catalogue-specialist-review-state.json';
 import firstBatchSeed from '@/data/catalogue-first-batch-state.json';
 import catalogueData from '@/data/consolidated-catalogue.json';
+import { LegalGovernanceService } from '@/domain/legal/LegalGovernanceService';
 
 export const REQUIRED_PUBLICATION_LOCALES = ['en', 'de', 'fr', 'es', 'it', 'nl'] as const;
 
@@ -22,7 +23,7 @@ const LOCALE_NAMES: Record<string, string> = {
 export type PublicationReadiness = 'NOT_READY' | 'READY_FOR_PUBLICATION' | 'DO_NOT_PUBLISH';
 export type PublicationLedgerStatus = 'NOT_PUBLISHED' | 'PUBLISHED' | 'UNPUBLISHED';
 export type GateVisual = 'COMPLETE' | 'PENDING' | 'BLOCKED' | 'REJECTED' | 'DO_NOT_PUBLISH';
-export type PublicationGateId = 'data' | 'pricing' | 'compliance' | 'country' | 'content' | 'media' | 'translation' | 'audit';
+export type PublicationGateId = 'data' | 'pricing' | 'compliance' | 'country' | 'content' | 'claims' | 'media' | 'translation' | 'audit';
 
 export interface PublicationGateResult {
   gate: PublicationGateId;
@@ -176,6 +177,7 @@ export class PublicationReadinessService {
     gates.push(this.complianceGate(review, input.testRecord));
     gates.push(this.countryGate(review));
     gates.push(this.contentGate(review));
+    gates.push(this.claimGate(input.slug));
     gates.push(this.mediaGate(review));
     gates.push(this.translationGate(review));
     gates.push(this.auditGate(input));
@@ -426,6 +428,13 @@ export class PublicationReadinessService {
     }
     if (state === 'REJECTED') return gate('compliance', state, 'REJECTED', 'Compliance approval missing', 'Compliance', route);
     return gate('compliance', state, 'PENDING', 'Compliance approval missing', 'Compliance', route);
+  }
+
+  private static claimGate(slug: string): PublicationGateResult {
+    if (LegalGovernanceService.blocksPublication(slug)) {
+      return gate('claims', 'REQUIRES_REVIEW', 'BLOCKED', 'Sensitive public wording requires specialist review. This is not a legal determination.', 'Compliance', '/admin/legal');
+    }
+    return gate('claims', 'NO_RECORD', 'COMPLETE', 'No open claim review is attached to this product.', 'Compliance', '/admin/legal');
   }
 
   private static countryGate(review: SpecialistProductReview | null): PublicationGateResult {

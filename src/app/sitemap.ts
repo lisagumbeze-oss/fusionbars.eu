@@ -1,58 +1,35 @@
 import { MetadataRoute } from 'next';
-import { SUPPORTED_LOCALES } from '@/i18n';
 import { CatalogService } from '@/lib/catalog';
+import { LegalGovernanceService } from '@/domain/legal/LegalGovernanceService';
+import { INDEXABLE_LOCALE, SITE_ORIGIN } from '@/lib/search-indexing';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://fusionbars.eu';
   const now = new Date();
-
   const staticRoutes = [
     '',
     '/shop',
     '/contact',
-    '/legal/privacy',
-    '/legal/terms',
-    '/legal/refunds',
-    '/legal/shipping',
-    '/legal/cookies',
-    '/legal/imprint',
+    ...LegalGovernanceService.publicLinks().map((link) => link.href),
   ];
-
-  const categories = CatalogService.getCategories();
   const products = CatalogService.getPublicProducts();
-
   const sitemapEntries: MetadataRoute.Sitemap = [];
 
-  for (const locale of SUPPORTED_LOCALES) {
-    // 1. Static Pages
-    for (const route of staticRoutes) {
-      sitemapEntries.push({
-        url: `${baseUrl}/${locale}${route}`,
-        lastModified: now,
-        changeFrequency: route === '' ? 'daily' : route.startsWith('/legal') ? 'monthly' : 'weekly',
-        priority: route === '' ? 1.0 : route === '/shop' ? 0.9 : 0.5,
-      });
-    }
+  for (const route of staticRoutes) {
+    sitemapEntries.push({
+      url: `${SITE_ORIGIN}/${INDEXABLE_LOCALE}${route}`,
+      lastModified: now,
+      changeFrequency: route === '' ? 'daily' : route.startsWith('/legal') ? 'monthly' : 'weekly',
+      priority: route === '' ? 1.0 : route === '/shop' ? 0.9 : 0.5,
+    });
+  }
 
-    // 2. Curated Categories
-    for (const cat of categories) {
-      sitemapEntries.push({
-        url: `${baseUrl}/${locale}/shop?category=${cat.slug}`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: 0.8,
-      });
-    }
-
-    // 3. Published Artisan Products
-    for (const prod of products) {
-      sitemapEntries.push({
-        url: `${baseUrl}/${locale}/products/${prod.slug}`,
-        lastModified: now,
-        changeFrequency: 'weekly',
-        priority: 0.85,
-      });
-    }
+  for (const prod of products) {
+    sitemapEntries.push({
+      url: `${SITE_ORIGIN}/${INDEXABLE_LOCALE}/products/${prod.slug}`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.85,
+    });
   }
 
   return sitemapEntries;

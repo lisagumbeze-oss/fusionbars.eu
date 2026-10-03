@@ -20,7 +20,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState<string>(product.primaryImage);
   const [isAdded, setIsAdded] = useState(false);
-  const [activeTab, setActiveTab] = useState<'details' | 'ingredients' | 'shipping' | 'lab'>('details');
 
   const selectedVariant: NormalizedVariant = product.variants[selectedVariantIndex] || product.variants[0];
   const unitPrice = currency === 'EUR' ? selectedVariant.priceEUR : selectedVariant.priceGBP;
@@ -114,6 +113,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <p className="text-sm text-[#5C5852] mt-2 leading-relaxed font-normal">
             {product.headline}
           </p>
+          <p className="text-sm text-[#5C5852] mt-3 leading-relaxed">{product.description}</p>
         </div>
 
         {/* Price & Stock Display */}
@@ -240,81 +240,13 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           </span>
         </div>
 
-        {/* Structured Product Specifications Tabs */}
-        <div className="pt-4 border-t border-[#E5E3DD] space-y-4">
-          <div className="flex border-b border-[#E5E3DD] gap-4 text-xs font-medium">
-            {[
-              { id: 'details', label: 'Description' },
-              { id: 'ingredients', label: 'Ingredients & Allergens' },
-              { id: 'shipping', label: 'Discreet Dispatch' },
-              { id: 'lab', label: 'Lab Verification' },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`pb-2.5 transition relative cursor-pointer ${
-                  activeTab === tab.id ? 'text-[#121212] font-semibold' : 'text-[#5C5852] hover:text-[#121212]'
-                }`}
-              >
-                {tab.label}
-                {activeTab === tab.id && (
-                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#4A5D4E]" />
-                )}
-              </button>
-            ))}
-          </div>
-
-          <div className="text-xs text-[#5C5852] leading-relaxed">
-            {activeTab === 'details' && (
-              <div className="space-y-3">
-                <p>{product.description}</p>
-                <div className="flex flex-wrap gap-2 pt-2">
-                  {product.dietaryAttributes.map((attr, i) => (
-                    <span key={i} className="text-[#121212] bg-white border border-[#E5E3DD] px-2.5 py-1 rounded text-[11px] font-medium">
-                      {attr}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'ingredients' && (
-              <div className="space-y-3">
-                <strong className="block text-[#121212] font-semibold">Formula Ingredients:</strong>
-                <ul className="list-disc pl-5 space-y-1">
-                  {product.ingredients.map((ing, i) => (
-                    <li key={i}>{ing}</li>
-                  ))}
-                </ul>
-                <div className="pt-2 border-t border-[#E5E3DD]">
-                  <strong className="text-red-700 block font-semibold mb-0.5">Allergen Information:</strong>
-                  <p>{product.allergens.join(' · ')}</p>
-                </div>
-              </div>
-            )}
-
-            {activeTab === 'shipping' && (
-              <div className="space-y-2">
-                <p>
-                  <strong>Discreet Packaging Guarantee:</strong> All orders are dispatched in plain, odorless, tamper-evident outer cartons with zero confectionery, brand, or botanical markings on the exterior.
-                </p>
-                <p>
-                  <strong>Origin Hubs:</strong> Netherlands (NL), Spain (ES), Germany (DE), and France (FR). Standard transit time is 2&ndash;4 business days across continental Europe.
-                </p>
-              </div>
-            )}
-
-            {activeTab === 'lab' && (
-              <div className="space-y-2">
-                <p>
-                  <strong>ISO/IEC 17025 Certified:</strong> {product.laboratoryTesting}
-                </p>
-                <p>
-                  <strong>Compliance Standard:</strong> {product.complianceNotes}
-                </p>
-              </div>
-            )}
-          </div>
+        <div className="pt-4 border-t border-[#E5E3DD] space-y-2 text-xs text-[#5C5852] leading-relaxed">
+          <p>
+            <strong className="text-[#121212]">Discreet dispatch:</strong> Orders leave in plain, odorless, tamper-evident outer cartons with no confectionery, brand, or botanical markings on the exterior.
+          </p>
+          <p>
+            <strong className="text-[#121212]">Origin hubs:</strong> Netherlands, Spain, Germany, and France. Standard transit is 2–4 business days across continental Europe.
+          </p>
         </div>
       </div>
     </div>

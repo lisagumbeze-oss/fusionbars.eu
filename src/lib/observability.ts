@@ -12,6 +12,7 @@ export interface StructuredLogEntry {
   message: string;
   metadata?: Record<string, any>;
   environment: string;
+  correlationId?: string;
 }
 
 export type MonitoringHandler = (entry: StructuredLogEntry) => void;
@@ -37,6 +38,23 @@ export class ObservabilityService {
     'creditcard',
     'cvv',
     'cardnumber',
+    'database_url',
+    'direct_url',
+    'databaseurl',
+    'directurl',
+    'apikey',
+    'api_key',
+    'emailproviderkey',
+    'email_provider_key',
+    'accesskey',
+    'storage_access_key',
+    'storage_secret_key',
+    'restore_database_url',
+    'neon_api_key',
+    'monitoring_dsn',
+    'sentry_dsn',
+    'webhook',
+    'upstash',
   ];
 
   private static readonly LEVEL_PRIORITY: Record<LogLevel, number> = {
@@ -65,6 +83,9 @@ export class ObservabilityService {
     if (obj === null || obj === undefined) return obj;
     if (typeof obj === 'string') {
       // Mask IBAN-like patterns
+      if (/postgres(ql)?:\/\//i.test(obj) || /sk_live_|BEGIN [A-Z ]*PRIVATE KEY/i.test(obj)) {
+        return '[REDACTED_SECRET]';
+      }
       if (/[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}/i.test(obj)) {
         return `${obj.substring(0, 4)}****[REDACTED_IBAN]`;
       }
@@ -96,6 +117,7 @@ export class ObservabilityService {
     }
 
     const sanitizedMeta = metadata ? this.scrub(metadata) : undefined;
+    const correlationId = typeof sanitizedMeta?.correlationId === 'string' ? sanitizedMeta.correlationId : undefined;
     const entry: StructuredLogEntry = {
       timestamp: new Date().toISOString(),
       level,
@@ -103,6 +125,7 @@ export class ObservabilityService {
       message,
       metadata: sanitizedMeta,
       environment: process.env.NODE_ENV || 'development',
+      correlationId,
     };
 
     // Format output as single-line JSON in production for CloudWatch / Vercel Log Drains

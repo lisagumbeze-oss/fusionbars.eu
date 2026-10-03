@@ -1,82 +1,107 @@
 # Production Payment Configuration Report
 
-Date: 2026-09-27
+Date: 2026-10-03
 
-Production: **PAUSED**
+Production control state: `PAUSED`
 
-No production bank account, IBAN, BIC, or wallet address was entered. Placeholder values remain test configuration and cannot become `ACTIVE`.
+Final launch decision remains `LAUNCH_BLOCKED`. This closure did not change catalogue decisions, publication, VAT, country eligibility, shipping, legal documents, email activation, object storage, backups, monitoring, production secrets, or the overall launch state.
 
-## Payment Methods
+No payment method was activated. No live payment was marked successful.
 
-### Bank Transfer
+## Bank Transfer
 
-- Current state: `TEST`
-- Configuration completeness: incomplete. The stored account details are test placeholders, so no production account is configured.
-- Supported currencies: the existing checkout currency, with the amount taken from the order total.
-- Verification workflow: a customer proof moves the order to `PAYMENT_SUBMITTED`. Finance verification is a separate authorized action. Uploading proof does not verify the payment.
-- Evidence storage: proof is recorded as a private object key. Public `http` and `https` evidence URLs are rejected. The finance queue says “Private evidence on file” and does not link a public file URL.
-- Customer reference: `FUSION-` plus the existing order number. Internal lookup tokens are not used.
-- Activation: saving configuration does not activate the method. `SUPER_ADMIN` confirmation still fails while credentials are placeholders and production is `PAUSED`.
+| Item | State |
+| --- | --- |
+| Configuration | `TEST` |
+| Business verification | `NOT_VERIFIED` |
+| IBAN format | `NOT_CONFIGURED` |
+| BIC format | `NOT_CONFIGURED` |
+| Supported currencies | `NOT_CONFIGURED` |
+| Payment reference | `FUSION-{orderNumber}` |
+| Payment proof | Private submission remains in place. Proof does not verify the payment. |
+| Activation | `TEST` |
+| Controlled test | `NOT_RUN` |
 
-### Cryptocurrency
+The loaded bank configuration is still the development placeholder. Format checks distinguish `FORMAT_VALID` from `BUSINESS_VERIFIED`. A valid string is not treated as proof that the account belongs to the business. No IBAN, BIC, account holder, or bank name was invented, and none is shown on the public readiness report.
 
-- Current state: Bitcoin `TEST`; USDT `NOT_CONFIGURED`; Ethereum `NOT_CONFIGURED`.
-- Configured assets/networks: no approved production asset or network.
-- Destination configuration: no approved receiving address. The development Bitcoin value is a placeholder and is not a production destination.
-- Conversion configuration: `CRYPTO_RATE_CONFIGURATION_REQUIRED`. No rate is guessed.
-- Verification workflow: a transaction reference can be submitted, but a hash alone does not verify payment. Finance must review the expected order amount.
-- Discount: the existing merchandise cryptocurrency discount stays in the order pipeline. No new discount was created.
-- Production payment options: none.
+GBP bank transfer stays unavailable while GBP remains `DISABLED_FOR_LAUNCH`. EUR is not assumed to be enabled until it is explicitly approved.
 
-## Finance
+## Cryptocurrency
 
-- Verification queue: `/admin/payments`, limited to Finance and Super Admin.
-- Actions: verify, reject, and request clarification. There is no Verify All.
-- Discrepancy handling: a submitted amount that differs from `order.totalAmount` returns `AMOUNT_MISMATCH` and does not verify the payment. No partial-payment or refund rule was invented.
-- Reconciliation: matching uses the payment reference, expected amount, currency, and finance decision. There is no automated bank or blockchain settlement feed.
-- Rejection: a cancellation through payment verification requires a reason. A later submission keeps the previous evidence and adds a new record.
-- Expiration: not configured. Orders are not cancelled by an invented deadline.
-- Settings: `/admin/settings/payments` shows method state and blockers without account numbers, addresses, or secrets.
+| Item | Bitcoin | USDT | ETH |
+| --- | --- | --- | --- |
+| Code support | `SUPPORTED_IN_CODE` | `SUPPORTED_IN_CODE` | `SUPPORTED_IN_CODE` |
+| Business approval | `NOT_APPROVED` | `NOT_APPROVED` | `NOT_APPROVED` |
+| Network | `NOT_CONFIGURED` | `NOT_CONFIGURED` | `NOT_CONFIGURED` |
+| Address verification | `NOT_VERIFIED` | `NOT_VERIFIED` | `NOT_VERIFIED` |
+| Activation | `TEST` | `NOT_CONFIGURED` | `NOT_CONFIGURED` |
+| Controlled test | `NOT_RUN` | `NOT_RUN` | `NOT_RUN` |
+
+Conversion: `CRYPTO_RATE_CONFIGURATION_REQUIRED`
+
+No receiving address, network, exchange rate, or rate-age limit was invented. A provider-derived rate cannot be stored without an explicit maximum age. A stale stored rate returns `CRYPTO_RATE_STALE`. Code support is not business approval and is not `ACTIVE`.
+
+Production payment options: none.
 
 ## Security
 
-- RBAC: payment verification stays with Finance and Super Admin. Customers can submit proof and cannot verify it.
-- Evidence privacy: public evidence URLs are rejected. Admin responses no longer return the stored proof URL.
-- Duplicate protection: a repeated payment reference is rejected. A repeated verification of an already verified payment is idempotent and does not send another verification email.
-- Idempotency: the second verify request returns the existing verified state.
-- Secrets: production credentials stay in server environment variables. The admin readiness report does not return them.
-- Payment creation still depends on the order. Unpublished products, cancelled orders, and already paid orders are rejected before a payment decision.
+| Item | State |
+| --- | --- |
+| RBAC | Finance verification and payment activation stay role-controlled. A customer cannot verify or activate a method. |
+| Amount authority | The payable amount comes from the order. A different client amount is rejected as `AMOUNT_MISMATCH` or refused before review. |
+| Receiving address | A client-supplied address that differs from the configured address is rejected. |
+| Duplicate protection | A repeated payment reference or transaction hash is rejected. A repeated verification is idempotent. |
+| Evidence privacy | Public evidence URLs are rejected. Production object storage remains `CONFIGURATION_REQUIRED`, so evidence storage is not production-ready. |
+| Rate limits | Payment-proof submission stays on the existing limiter. |
+| Audit | Configuration, verification, activation, rejection, and disable actions record the actor, role, and result. Bank passwords, private keys, and seed phrases are not stored. |
+
+## Checkout
+
+Production checkout offers only methods in state `ACTIVE`. In this environment that list is empty, so production customers are not shown bank or wallet instructions. Development checkout can still use the existing test rails. Those rails are not production options.
+
+The order total, currency, and payment reference stay server-side. Historical order snapshots are not rewritten when configuration changes.
 
 ## Notifications
 
-- Templates present: bank-transfer order confirmation, cryptocurrency order confirmation, payment proof submitted, payment verified, and payment rejected.
-- Event triggers recorded for proof submission, verification, and rejection.
-- A verification email is sent only when the order actually changes to verified. A repeated verification does not send another one.
-- Delivery readiness: the email provider is not treated as production-ready. Test runs can still receive provider rate-limit responses. That does not mark email delivery active.
+Payment email events remain the existing order and payment templates. They are not sent as production mail because email is not `ACTIVE`. A payment notification is not treated as `PAYMENT_VERIFIED`. Repeated payment events still share one delivery claim.
 
-## Launch Blockers
+## Controlled Test
 
-- Bank transfer credentials are test placeholders.
-- Bitcoin has no approved receiving address.
-- Cryptocurrency conversion is `CRYPTO_RATE_CONFIGURATION_REQUIRED`.
-- USDT and Ethereum are `NOT_CONFIGURED`.
-- No payment method is `ACTIVE`.
-- Production control is `PAUSED`.
-- Payment expiration is not configured, so no automatic cancellation rule exists.
-- Existing launch checks still block production for incomplete database, secrets, object storage, email, and legal configuration when those inputs are missing or are placeholders.
-- Development checkout can still show the test bank and Bitcoin rails so current order tests keep passing. Those rails are classified `TEST` and are not production payment options.
+| Item | Result |
+| --- | --- |
+| Bank transfer live test | `NOT_RUN` |
+| Cryptocurrency live test | `NOT_RUN` |
+| Live reconciliation | Not performed |
+| Fabricated success | None |
 
-Product readiness stays separate. A payment method can be configured later while a product remains `NOT_READY`. A product can be ready for publication and still have no production payment method.
-
-The first 10 catalogue decisions were not changed.
+The automated suite uses isolated fixtures to prove that a complete, verified configuration can reach activation and that production stays `PAUSED`. Those fixtures are removed at the end of the test. They are not the business account or a live transfer.
 
 ## Validation
 
-- `npm test`: 212 passed, 0 failed.
-- `npx tsc --noEmit`: passed.
-- `npm run build`: passed. Prisma Client generated and the Next.js build completed, including `/admin/payments` and `/admin/settings/payments`.
+| Command | Result |
+| --- | --- |
+| `npm test` | 224 passed, 0 failed |
+| `npx tsc --noEmit` | Passed |
+| `npm run build` | Passed |
 
-Admin payment screens require an authenticated session, so they were not clicked in a browser.
+The admin payment screens and the public checkout were not clicked. Admin routes require a session.
+
+## Other launch blockers
+
+These were not changed:
+
+- Signing secrets remain `PRODUCTION_SECRET_TOO_WEAK`
+- Object storage remains `CONFIGURATION_REQUIRED` for production. Development storage remains mock / `TEST`
+- Backups remain `BACKUP_CONFIGURATION_REQUIRED`
+- Monitoring remains `NOT_CONFIGURED`
+- Distributed rate limiting remains `NOT_CONFIGURED`
+- Email remains `REVIEW_REQUIRED`. SPF, DKIM, and DMARC remain `NOT_CONFIGURED`. The controlled email test was not sent.
+- VAT remains `TAX_CONFIGURATION_REQUIRED`
+- Legal company information remains `NOT_CONFIGURED`. Required English policies remain unpublished.
+- No pilot product is approved for publication
+- Country eligibility remains unresolved
+- Loaded `SITE_URL` is not `https://fusionbars.eu`
+- Browser, responsive, and accessibility screens were not inspected
 
 ## Production
 

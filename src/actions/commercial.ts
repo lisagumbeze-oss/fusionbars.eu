@@ -4,16 +4,19 @@ import { RoleName } from '@/types';
 import { CatalogService } from '@/lib/catalog';
 import { CommercialConfigurationService } from '@/domain/commercial/CommercialConfigurationService';
 import { PricingEngine } from '@/domain/commercial/PricingEngine';
+import { LaunchCatalogueService } from '@/domain/catalog/LaunchCatalogueService';
 import { PRODUCTION_CONTROL_STATE } from '@/domain/admin/AdminDashboardService';
 
-export async function getCommercialDashboardAction(role: RoleName, search = '', page = 1) {
+export async function getCommercialDashboardAction(role: RoleName, search = '', page = 1, launchOnly = false) {
   if (!CommercialConfigurationService.canView(role)) {
     return { success: false as const, error: `${role} cannot view commercial configuration.` };
   }
   const summary = PricingEngine.commercialSummary();
   const cohort = PricingEngine.cohortReport();
   const query = search.trim().toLowerCase();
+  const launchSlugs = new Set(LaunchCatalogueService.selectedSlugs());
   const rows = CatalogService.getProducts()
+    .filter((product) => !launchOnly || launchSlugs.has(product.slug))
     .filter((product) => !query || `${product.name} ${product.slug} ${product.categoryName}`.toLowerCase().includes(query))
     .map((product) => {
       const variant = product.variants[0];

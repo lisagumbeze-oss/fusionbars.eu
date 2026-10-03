@@ -607,19 +607,21 @@ ${context.message}
     recipientEmail: string;
     providerName: string;
     initiatedBy: string;
+    templateName?: string;
   }): { subject: string; text: string; html: string } {
-    const subject = '[TEST] Fusion Mushroom Bars EU — Email Infrastructure Probe';
-    const text = `Test message to ${context.recipientEmail} via ${context.providerName}, initiated by ${context.initiatedBy} at ${new Date().toISOString()}.`;
+    const subject = 'FUSION PRODUCTION EMAIL TEST — TEST EMAIL';
+    const text = `FUSION PRODUCTION EMAIL TEST. TEST EMAIL to ${context.recipientEmail} via ${context.providerName}, initiated by ${context.initiatedBy} at ${new Date().toISOString()}.`;
     const html = renderEmailShell({
       title: subject,
       supportEmail: 'sales@fusionbars.eu',
       bodyHtml: `
-        ${renderHeading('Transactional email test', 'success')}
+        ${renderHeading('FUSION PRODUCTION EMAIL TEST', 'success')}
         <p>This controlled verification was initiated by <strong>${escapeHtml(context.initiatedBy)}</strong>.</p>
         ${renderAccentPanel(
           'Probe details',
           [
             renderDetailRow('Recipient', context.recipientEmail),
+            renderDetailRow('Template', context.templateName || 'test-email'),
             renderDetailRow('Provider', context.providerName),
             renderDetailRow('Timestamp', new Date().toISOString()),
           ].join('')

@@ -5,10 +5,16 @@
 
 import { EnvironmentService, AppEnvironmentConfig } from '@/config/environment';
 import { prisma } from '@/lib/prisma';
-import { RateLimiterService } from '@/lib/rate-limiter';
 import { SUPPORTED_LOCALES } from '@/i18n';
 import { CatalogService } from '@/lib/catalog';
 import { PaymentConfigService } from '@/domain/payments/PaymentConfig';
+import { EmailProductionReadinessService } from '@/services/email/EmailProductionReadinessService';
+import { LegalGovernanceService } from '@/domain/legal/LegalGovernanceService';
+import { ProductionInfrastructureService } from '@/domain/infrastructure/ProductionInfrastructureService';
+import { StorageReadinessService } from '@/services/storage/StorageReadinessService';
+import { BackupReadinessService } from '@/domain/infrastructure/BackupReadinessService';
+import { ProductionMonitoringService } from '@/domain/infrastructure/ProductionMonitoringService';
+import { RateLimitReadinessService } from '@/domain/infrastructure/RateLimitReadinessService';
 
 export type LaunchStatus = 'READY' | 'WARNING' | 'BLOCKED';
 export type LaunchSeverity = 'MANDATORY' | 'RECOMMENDED' | 'INFORMATIONAL';
@@ -122,6 +128,22 @@ export class LaunchReadinessService {
       };
     }
 
+    if (config.mode === 'production' && /sqlite|file:|localhost|127\.0\.0\.1/i.test(`${dbUrl} ${directUrl}`)) {
+      return {
+        id: 'database',
+        name: 'Production PostgreSQL Database',
+        category: 'Infrastructure',
+        description: 'Production must use the configured PostgreSQL host.',
+        severity: 'MANDATORY',
+        status: 'BLOCKED',
+        validationMessage: 'A development database cannot be used in production.',
+        requiredInput: 'Production DATABASE_URL and DIRECT_URL. Values are not displayed.',
+        owner: 'DevOps / Infrastructure Lead',
+        lastCheckedAt: now,
+        details: { database: 'MISSING' },
+      };
+    }
+
     // Connectivity verification
     try {
       await prisma.$queryRaw`SELECT 1`;
@@ -129,10 +151,10 @@ export class LaunchReadinessService {
         id: 'database',
         name: 'Production PostgreSQL Database',
         category: 'Infrastructure',
-        description: 'PostgreSQL database connection verified and schema synchronized.',
+        description: 'PostgreSQL connection probe. This probe does not prove that migrations have been applied.',
         severity: 'MANDATORY',
         status: 'READY',
-        validationMessage: 'Database connection verified via SELECT 1 probe.',
+        validationMessage: 'Database connection answered SELECT 1. Migration status still has to be checked with prisma migrate status before deployment.',
         requiredInput: 'None (Configured)',
         owner: 'DevOps / Infrastructure Lead',
         lastCheckedAt: now,
@@ -157,25 +179,12 @@ export class LaunchReadinessService {
   // 2. SECRETS CHECK
   static checkSecrets(config: AppEnvironmentConfig): LaunchRequirement {
     const now = new Date().toISOString();
-    const sessionSecret = process.env.SESSION_SECRET || '';
-    const orderLookupSecret = process.env.ORDER_LOOKUP_SECRET || '';
-    const authSecret = process.env.AUTH_SECRET || '';
+    const signing = ProductionInfrastructureService.signingSecretStatus();
+    const missing = signing.secrets.some((item) => item.state === 'MISSING');
+    const weak = signing.secrets.some((item) => item.state === 'PRODUCTION_SECRET_TOO_WEAK');
+    const invalid = signing.secrets.some((item) => item.state === 'INVALID') || signing.distinct === 'FAIL';
 
-    const weakPlaceholders = [
-      'CHANGE_ME',
-      'dev_insecure',
-      'secret123',
-      'placeholder',
-      'test_secret',
-      '12345678',
-    ];
-
-    const isWeak = (val: string) =>
-      !val ||
-      val.length < 32 ||
-      weakPlaceholders.some((wp) => val.toLowerCase().includes(wp.toLowerCase()));
-
-    if (!sessionSecret || !orderLookupSecret || !authSecret) {
+    if (missing) {
       return {
         id: 'secrets',
         name: 'Production Cryptographic Secrets',
@@ -190,7 +199,7 @@ export class LaunchReadinessService {
       };
     }
 
-    if (isWeak(sessionSecret) || isWeak(orderLookupSecret) || isWeak(authSecret)) {
+    if (weak) {
       return {
         id: 'secrets',
         name: 'Production Cryptographic Secrets',
@@ -206,7 +215,7 @@ export class LaunchReadinessService {
     }
 
     // Check uniqueness
-    if (sessionSecret === orderLookupSecret || sessionSecret === authSecret || orderLookupSecret === authSecret) {
+    if (invalid) {
       return {
         id: 'secrets',
         name: 'Production Cryptographic Secrets',
@@ -397,13 +406,10 @@ export class LaunchReadinessService {
   // 5. OBJECT STORAGE CHECK
   static checkObjectStorage(config: AppEnvironmentConfig): LaunchRequirement {
     const now = new Date().toISOString();
-    const endpoint = process.env.STORAGE_ENDPOINT || '';
-    const bucket = process.env.STORAGE_BUCKET || '';
-    const accessKey = process.env.STORAGE_ACCESS_KEY || '';
-    const secretKey = process.env.STORAGE_SECRET_KEY || '';
-    const provider = process.env.STORAGE_PROVIDER || 'mock';
+    const storage = StorageReadinessService.report();
+    const provider = storage.provider;
 
-    if (provider === 'mock') {
+    if (provider === 'mock' || storage.state !== 'ACTIVE') {
       return {
         id: 'object_storage',
         name: 'Private Object Storage (Payment Proofs)',
@@ -411,23 +417,8 @@ export class LaunchReadinessService {
         description: 'Private encrypted S3/R2 bucket for storing payment proofs.',
         severity: 'MANDATORY',
         status: 'BLOCKED',
-        validationMessage: 'Storage is currently running in mock provider mode. Production requires S3 or Cloudflare R2.',
+        validationMessage: `Storage state is ${storage.state}. Mock storage cannot be the production provider.`,
         requiredInput: 'STORAGE_ENDPOINT, STORAGE_BUCKET, STORAGE_ACCESS_KEY, and STORAGE_SECRET_KEY.',
-        owner: 'Infrastructure Lead',
-        lastCheckedAt: now,
-      };
-    }
-
-    if (!endpoint || !bucket || !accessKey || !secretKey) {
-      return {
-        id: 'object_storage',
-        name: 'Private Object Storage (Payment Proofs)',
-        category: 'Storage',
-        description: 'S3-compatible credentials verification.',
-        severity: 'MANDATORY',
-        status: 'BLOCKED',
-        validationMessage: 'Missing one or more S3 credentials (endpoint, bucket, access key, or secret key).',
-        requiredInput: 'Configure full S3 bucket credentials in environment.',
         owner: 'Infrastructure Lead',
         lastCheckedAt: now,
       };
@@ -440,63 +431,44 @@ export class LaunchReadinessService {
       description: 'Private S3 object storage verified.',
       severity: 'MANDATORY',
       status: 'READY',
-      validationMessage: `Configured bucket "${bucket}" with private access policy.`,
+      validationMessage: 'Private production storage is ACTIVE. Credential values are not shown.',
       requiredInput: 'None (Configured)',
       owner: 'Infrastructure Lead',
       lastCheckedAt: now,
-      details: { bucket, endpoint },
     };
   }
 
   // 6. EMAIL CHECK
   static checkEmail(config: AppEnvironmentConfig): LaunchRequirement {
     const now = new Date().toISOString();
-    const provider = process.env.EMAIL_PROVIDER || 'mock';
-    const key = process.env.EMAIL_PROVIDER_KEY || '';
-    const from = process.env.EMAIL_FROM || 'sales@fusionbars.eu';
-
-    if (provider === 'mock') {
-      return {
-        id: 'email',
-        name: 'Transactional Email Service',
-        category: 'Communications',
-        description: 'Production transactional email delivery infrastructure (Resend, Postmark).',
-        severity: 'MANDATORY',
-        status: 'BLOCKED',
-        validationMessage: 'Email provider is configured to "mock". Production requires live Resend or Postmark key.',
-        requiredInput: 'EMAIL_PROVIDER="resend" (or postmark) and production EMAIL_PROVIDER_KEY.',
-        owner: 'Operations / Email Lead',
-        lastCheckedAt: now,
-      };
-    }
-
-    if (!key || key.startsWith('re_mock') || key.length < 16) {
-      return {
-        id: 'email',
-        name: 'Transactional Email Service',
-        category: 'Communications',
-        description: 'Transactional email API key verification.',
-        severity: 'MANDATORY',
-        status: 'BLOCKED',
-        validationMessage: 'EMAIL_PROVIDER_KEY is missing or contains a mock placeholder.',
-        requiredInput: 'Production API key from email provider.',
-        owner: 'Operations / Email Lead',
-        lastCheckedAt: now,
-      };
-    }
-
+    const report = EmailProductionReadinessService.report();
+    const ready = report.state === 'ACTIVE' && report.blockers.length === 0;
     return {
       id: 'email',
       name: 'Transactional Email Service',
       category: 'Communications',
-      description: 'Transactional email configured via live provider.',
+      description: 'Provider, sender, DNS authentication, delivery logging, and bounce handling.',
       severity: 'MANDATORY',
-      status: 'READY',
-      validationMessage: `Provider "${provider}" verified with sender "${from}".`,
-      requiredInput: 'None (Configured)',
+      status: ready ? 'READY' : 'BLOCKED',
+      validationMessage: ready ? `Provider "${report.provider}" is active for ${report.sender.email}.` : report.blockers[0] || 'Email is not production-active.',
+      requiredInput: ready ? 'None (Configured)' : 'Provider credentials, SPF, DKIM, DMARC, a successful test send, and explicit activation.',
       owner: 'Operations / Email Lead',
       lastCheckedAt: now,
-      details: { provider, from },
+      details: {
+        provider: report.provider,
+        state: report.state,
+        credentials: report.credentials,
+        sender: report.sender.email,
+        replyTo: report.sender.replyTo,
+        domain: report.sender.domain,
+        spf: report.dns.SPF,
+        dkim: report.dns.DKIM,
+        dmarc: report.dns.DMARC,
+        testDelivery: report.testDelivery,
+        deliveryLogging: 'CONFIGURED',
+        bounceHandling: 'CONFIGURED',
+        retryHandling: 'CONFIGURED',
+      },
     };
   }
 
@@ -527,7 +499,7 @@ export class LaunchReadinessService {
       description: 'Apex canonical domain verified with 301 www redirect.',
       severity: 'MANDATORY',
       status: 'READY',
-      validationMessage: 'Canonical hostname is https://fusionbars.eu with permanent apex redirection.',
+      validationMessage: 'SITE_URL is https://fusionbars.eu. This check does not confirm a live DNS redirect.',
       requiredInput: 'None (Configured)',
       owner: 'DNS Administrator',
       lastCheckedAt: now,
@@ -559,6 +531,22 @@ export class LaunchReadinessService {
       };
     }
 
+    const documentBlockers = LegalGovernanceService.launchBlockers().filter((item) => !item.startsWith('Production is'));
+    if (documentBlockers.length) {
+      return {
+        id: 'legal',
+        name: 'Corporate Legal Entity Disclosures',
+        category: 'Legal & Compliance',
+        description: 'Business identity and published legal documents.',
+        severity: 'MANDATORY',
+        status: 'BLOCKED',
+        validationMessage: documentBlockers[0],
+        requiredInput: 'Authorized company details and published legal documents. Placeholders are not complete.',
+        owner: 'Legal Counsel / Operations',
+        lastCheckedAt: now,
+      };
+    }
+
     return {
       id: 'legal',
       name: 'Corporate Legal Entity Disclosures',
@@ -566,7 +554,7 @@ export class LaunchReadinessService {
       description: 'Official corporate registration details verified.',
       severity: 'MANDATORY',
       status: 'READY',
-      validationMessage: `Company ${company} (Reg: ${reg}, VAT: ${vat}) published across all 6 locales.`,
+      validationMessage: `Company ${company} (Reg: ${reg}, VAT: ${vat}) has published legal documents.`,
       requiredInput: 'None (Configured)',
       owner: 'Legal Counsel / Operations',
       lastCheckedAt: now,
@@ -576,21 +564,22 @@ export class LaunchReadinessService {
 
   // 9. RATE LIMITING CHECK
   static checkRateLimiting(config: AppEnvironmentConfig): LaunchRequirement {
+    void config;
     const now = new Date().toISOString();
-    const isDistributed = config.rateLimit.isDistributed;
-
-    if (!isDistributed) {
+    const limiter = RateLimitReadinessService.report();
+    if (limiter.state !== 'OPERATIONAL') {
       return {
         id: 'rate_limiting',
         name: 'Distributed Rate Limiting (Redis)',
         category: 'Security',
         description: 'Multi-region sliding-window abuse defense for serverless environment.',
         severity: 'RECOMMENDED',
-        status: 'WARNING',
-        validationMessage: 'Running in-memory sliding window. In multi-region serverless production, configure Upstash Redis.',
-        requiredInput: 'UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN.',
+        status: 'BLOCKED',
+        validationMessage: `${limiter.state}. In-memory limiting is not distributed enforcement.`,
+        requiredInput: 'A verified Upstash Redis REST database. Variable presence is not enough.',
         owner: 'DevOps / Security Lead',
         lastCheckedAt: now,
+        details: { state: limiter.state, mode: limiter.mode },
       };
     }
 
@@ -601,44 +590,79 @@ export class LaunchReadinessService {
       description: 'Distributed rate limiting active on Redis REST backend.',
       severity: 'MANDATORY',
       status: 'READY',
-      validationMessage: 'Active Redis sliding-window defense across all 9 rate-limited commerce operations.',
+      validationMessage: 'Distributed rate limiting is OPERATIONAL. Credentials are not shown.',
       requiredInput: 'None (Configured)',
       owner: 'DevOps / Security Lead',
       lastCheckedAt: now,
+      details: { state: limiter.state },
     };
   }
 
   // 10. MONITORING CHECK
   static checkMonitoring(): LaunchRequirement {
     const now = new Date().toISOString();
+    const monitoring = ProductionMonitoringService.report();
+    if (monitoring.state !== 'OPERATIONAL') {
+      return {
+        id: 'monitoring',
+        name: 'Production Observability & Secret Scrubbing',
+        category: 'Operations',
+        description: 'Structured application logs exist. An external monitoring destination is separate.',
+        severity: 'MANDATORY',
+        status: 'BLOCKED',
+        validationMessage: monitoring.state,
+        requiredInput: 'An HTTPS monitoring ingest URL plus a successful FUSION_MONITORING_TEST. Logs alone are not monitoring.',
+        owner: 'DevOps Lead',
+        lastCheckedAt: now,
+        details: { applicationLogs: 'CONFIGURED', destination: monitoring.state, alerting: monitoring.alerting },
+      };
+    }
     return {
       id: 'monitoring',
       name: 'Production Observability & Secret Scrubbing',
       category: 'Operations',
-      description: 'Structured JSON telemetry with automated PII and password/IBAN sanitization.',
+      description: 'Structured JSON telemetry with an external monitoring destination.',
       severity: 'MANDATORY',
       status: 'READY',
-      validationMessage: 'ObservabilityService active with recursive secret scrubbing across all log levels.',
+      validationMessage: 'External monitoring is OPERATIONAL. Credentials are not shown.',
       requiredInput: 'None (Configured)',
       owner: 'DevOps Lead',
       lastCheckedAt: now,
+      details: { destination: monitoring.state, alerting: monitoring.alerting },
     };
   }
 
   // 11. BACKUPS CHECK
   static checkBackups(): LaunchRequirement {
     const now = new Date().toISOString();
+    const backup = BackupReadinessService.report();
+    if (backup.state !== 'BACKUP_READY') {
+      return {
+        id: 'backups',
+        name: 'Database Backup & Recovery Procedure',
+        category: 'Operations',
+        description: 'Provider-managed PostgreSQL backups and a separate restore rehearsal.',
+        severity: 'MANDATORY',
+        status: 'BLOCKED',
+        validationMessage: backup.state,
+        requiredInput: 'A verified Neon backup and a successful restore onto a separate database. A provider name or a document is not a backup.',
+        owner: 'DevOps Lead',
+        lastCheckedAt: now,
+        details: { state: backup.state, restore: backup.restore, retention: backup.retention },
+      };
+    }
     return {
       id: 'backups',
       name: 'Database Backup & Recovery Procedure',
       category: 'Operations',
-      description: 'Documented backup and restore procedure for production PostgreSQL.',
+      description: 'Provider-managed PostgreSQL backups and a separate restore rehearsal.',
       severity: 'MANDATORY',
       status: 'READY',
-      validationMessage: 'Pre-migration snapshot and pg_dump procedures documented in docs/DATABASE_PRODUCTION_PROCEDURE.md.',
+      validationMessage: 'BACKUP_READY. Credential values are not shown.',
       requiredInput: 'None (Configured)',
       owner: 'DevOps Lead',
       lastCheckedAt: now,
+      details: { state: backup.state, restore: backup.restore },
     };
   }
 

@@ -2,6 +2,10 @@
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  images: {
+    dangerouslyAllowSVG: false,
+    remotePatterns: [],
+  },
 
   // Host/www redirects are owned by Vercel Domains only.
   // Keeping a www↔apex redirect here caused ERR_TOO_MANY_REDIRECTS when Vercel
@@ -50,7 +54,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.smartsuppchat.com https://*.smartsuppcdn.com; style-src 'self' 'unsafe-inline' https://*.smartsuppcdn.com; img-src 'self' data: https: blob:; font-src 'self' data: https://*.smartsuppcdn.com; media-src 'self' https://*.smartsuppcdn.com; connect-src 'self' https: ws: wss:; frame-src 'self' https://*.smartsupp.com https://*.smartsuppcdn.com; frame-ancestors 'self' https:;",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.smartsuppchat.com https://*.smartsuppcdn.com; style-src 'self' 'unsafe-inline' https://*.smartsuppcdn.com; img-src 'self' data: https: blob:; font-src 'self' data: https://*.smartsuppcdn.com; media-src 'self' https://*.smartsuppcdn.com; connect-src 'self' https: ws: wss:; frame-src 'self' https://*.smartsupp.com https://*.smartsuppcdn.com; frame-ancestors 'self';",
           },
         ],
       },
@@ -59,12 +63,14 @@ const nextConfig = {
         source: '/:locale(en|de|fr|es|it|nl)?/(admin|account|cart|checkout|orders|track|api)/:path*',
         headers: [
           { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, nosnippet' },
+          { key: 'Cache-Control', value: 'private, no-store' },
         ],
       },
       {
         source: '/(admin|account|cart|checkout|orders|track|api)/:path*',
         headers: [
           { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, nosnippet' },
+          { key: 'Cache-Control', value: 'private, no-store' },
         ],
       },
     ];

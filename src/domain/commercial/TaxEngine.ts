@@ -25,7 +25,7 @@ export class TaxEngine {
       return { status: 'EXEMPT', treatment: 'EXEMPT', taxClass: params.taxClass, rateBps: 0, taxableMinor: params.taxableMinor, taxMinor: 0, country: params.country };
     }
     const rate = state.tax.rates
-      .filter((row) => row.country === params.country && row.taxClass === params.taxClass && Date.parse(row.effectiveFrom) <= at && (!row.effectiveTo || Date.parse(row.effectiveTo) > at))
+      .filter((row) => row.status === 'ACTIVE' && row.country === params.country && row.taxClass === params.taxClass && Date.parse(row.effectiveFrom) <= at && (!row.effectiveTo || Date.parse(row.effectiveTo) > at))
       .sort((a, b) => Date.parse(b.effectiveFrom) - Date.parse(a.effectiveFrom))[0];
     if (!rate) return this.required(params.country, params.taxClass);
     const taxMinor = this.taxMinor(params.taxableMinor, rate.rateBps, treatment);

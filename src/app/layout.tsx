@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
+import { headers } from 'next/headers';
 import Script from 'next/script';
 import './globals.css';
 import ScrollToTop from '@/components/ScrollToTop';
+import { INDEXABLE_LOCALE } from '@/lib/search-indexing';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -15,22 +17,11 @@ export const metadata: Metadata = {
   description:
     'Official European storefront for Fusion Mushroom Bars. Gourmet Belgian couverture chocolate bars, fruit pectin gummies, and curator boxes. Temperature-controlled discreet European dispatch from NL, ES, DE, FR.',
   metadataBase: new URL('https://fusionbars.eu'),
-  alternates: {
-    canonical: 'https://fusionbars.eu',
-    languages: {
-      'en': 'https://fusionbars.eu/en',
-      'de': 'https://fusionbars.eu/de',
-      'fr': 'https://fusionbars.eu/fr',
-      'es': 'https://fusionbars.eu/es',
-      'it': 'https://fusionbars.eu/it',
-      'nl': 'https://fusionbars.eu/nl',
-    },
-  },
   openGraph: {
     title: 'Fusion Mushroom Bars EU | Gourmet Artisan Botanical Chocolates',
     description:
       'Gourmet Belgian couverture chocolate bars and vegan fruit pectin gummies infused with certified European functional botanicals. Discreet dispatch from NL, ES, DE, FR.',
-    url: 'https://fusionbars.eu',
+    url: 'https://fusionbars.eu/en',
     siteName: 'Fusion Mushroom Bars EU',
     locale: 'en_EU',
     type: 'website',
@@ -51,13 +42,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headerList = await headers();
+  const requested = headerList.get('x-locale') || INDEXABLE_LOCALE;
+  const lang = ['en', 'de', 'fr', 'es', 'it', 'nl'].includes(requested) ? requested : INDEXABLE_LOCALE;
+
   return (
-    <html lang="en">
+    <html lang={lang}>
       <body className="bg-[#FBFBF9] text-[#121212] antialiased min-h-screen selection:bg-[#4A5D4E] selection:text-white">
         <Script id="scroll-restoration" strategy="beforeInteractive">
           {`if('scrollRestoration' in history){history.scrollRestoration='manual';}window.scrollTo(0,0);`}

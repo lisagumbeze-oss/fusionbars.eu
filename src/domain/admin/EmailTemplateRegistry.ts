@@ -46,7 +46,21 @@ const TEMPLATES: EmailTemplateSummary[] = [
   { id: 'password-reset', name: 'Password reset', purpose: 'Send a password reset link.', trigger: 'Customer requests a password reset', recipient: 'Customer', audience: 'CUSTOMER', variables: ['customerName', 'resetUrl'], active: true, lastUpdated: UPDATED },
   { id: 'email-verification', name: 'Email verification', purpose: 'Ask the customer to verify an email address.', trigger: 'Account email verification', recipient: 'Customer', audience: 'CUSTOMER', variables: ['customerName', 'verifyUrl'], active: true, lastUpdated: UPDATED },
   { id: 'admin-operational-alert', name: 'Admin operational alert', purpose: 'Notify staff of a new order with the checkout details the customer entered.', trigger: 'New order created', recipient: 'Operations', audience: 'ADMIN', variables: ['firstName', 'lastName', 'email', 'phone', 'streetAddress', 'houseNumber', 'postalCode', 'city', 'country', 'shippingMethod', 'paymentMethodName', 'orderNumber', 'totalAmount', 'items'], active: true, lastUpdated: UPDATED },
+  { id: 'contact-confirmation', name: 'Contact confirmation', purpose: 'Confirm a customer contact enquiry.', trigger: 'Contact form submitted', recipient: 'Customer', audience: 'CUSTOMER', variables: ['customerName', 'subjectCategory', 'supportEmail'], active: true, lastUpdated: UPDATED },
+  { id: 'contact-ops-alert', name: 'Contact operations alert', purpose: 'Notify staff of a contact enquiry.', trigger: 'Contact form submitted', recipient: 'Operations', audience: 'ADMIN', variables: ['customerName', 'customerEmail', 'subjectCategory', 'message', 'locale'], active: true, lastUpdated: UPDATED },
+  { id: 'newsletter-confirmation', name: 'Newsletter confirmation', purpose: 'Confirm a bulletin subscription.', trigger: 'Newsletter signup', recipient: 'Subscriber', audience: 'CUSTOMER', variables: ['email', 'supportEmail'], active: true, lastUpdated: UPDATED },
+  { id: 'newsletter-ops-alert', name: 'Newsletter operations alert', purpose: 'Notify staff of a bulletin subscription.', trigger: 'Newsletter signup', recipient: 'Operations', audience: 'ADMIN', variables: ['email', 'locale'], active: true, lastUpdated: UPDATED },
+  { id: 'test-email', name: 'Test email', purpose: 'Send a clearly marked infrastructure probe.', trigger: 'Super Admin requests a test', recipient: 'Chosen recipient', audience: 'ADMIN', variables: ['recipientEmail', 'providerName', 'initiatedBy'], active: true, lastUpdated: UPDATED },
 ];
+
+export const EMAIL_VARIABLE_REGISTRY = {
+  customer: ['customerName', 'email'],
+  order: ['orderNumber', 'currency', 'totalAmount'],
+  payment: ['paymentMethodName', 'referenceOrTxid'],
+  shipping: ['shippingMethod', 'trackingNumber'],
+  account: ['verifyUrl', 'resetUrl', 'accountUrl'],
+  forbidden: ['password', 'authSecret', 'proofFileUrl', 'complianceNotes', 'auditLog'],
+};
 
 function render(id: string): { subject: string; text: string; html: string } {
   switch (id) {
@@ -102,6 +116,16 @@ function render(id: string): { subject: string; text: string; html: string } {
         country: 'Germany (DE)',
         shippingMethod: 'Standard Discreet Courier',
       });
+    case 'contact-confirmation':
+      return EmailTemplates.renderContactInquiryConfirmation({ customerName: ORDER.customerName, subjectCategory: 'Order question', supportEmail: ORDER.supportEmail });
+    case 'contact-ops-alert':
+      return EmailTemplates.renderContactInquiryOpsAlert({ customerName: ORDER.customerName, customerEmail: 'preview@example.com', subjectCategory: 'Order question', message: 'Preview message', locale: 'en' });
+    case 'newsletter-confirmation':
+      return EmailTemplates.renderNewsletterConfirmation({ email: 'preview@example.com', supportEmail: ORDER.supportEmail });
+    case 'newsletter-ops-alert':
+      return EmailTemplates.renderNewsletterOpsAlert({ email: 'preview@example.com', locale: 'en' });
+    case 'test-email':
+      return EmailTemplates.renderTestEmailProbe({ recipientEmail: 'preview@example.com', providerName: 'mock', initiatedBy: 'preview' });
     default:
       throw new Error('Unknown email template');
   }
@@ -121,5 +145,35 @@ export class EmailTemplateRegistry {
     if (!summary) return null;
     const rendered = render(id);
     return { ...summary, ...rendered };
+  }
+
+  static validateAll(): { ok: boolean; total: number; validated: number; missing: string[]; error?: string } {
+    const required = [
+      'sepa-order-confirmation', 'crypto-order-confirmation', 'payment-proof-submitted', 'payment-verified',
+      'payment-rejected', 'order-processing', 'order-shipped', 'order-delivered', 'order-cancelled',
+      'order-refunded', 'customer-welcome', 'password-reset', 'email-verification', 'admin-operational-alert',
+      'contact-confirmation', 'contact-ops-alert', 'newsletter-confirmation', 'newsletter-ops-alert', 'test-email',
+    ];
+    const missing = required.filter((id) => !this.get(id));
+    const forbiddenVariable = /password|authSecret|proofFileUrl|complianceNotes|auditLog/i;
+    const forbiddenContent = /sk_live_|lookupToken|SMTP_PASSWORD|BEGIN PRIVATE|proofFileUrl/i;
+    if (missing.length) return { ok: false, total: this.list().length, validated: 0, missing, error: `Missing template ${missing[0]}` };
+    let validated = 0;
+    for (const template of this.list()) {
+      if (template.variables.some((variable) => forbiddenVariable.test(variable))) {
+        return { ok: false, total: this.list().length, validated, missing, error: `${template.id} declares a forbidden variable` };
+      }
+      const preview = this.preview(template.id);
+      const body = `${preview?.subject || ''}\n${preview?.html || ''}\n${preview?.text || ''}`;
+      if (!preview?.subject || !preview.html || body.includes('undefined') || forbiddenContent.test(body)) {
+        return { ok: false, total: this.list().length, validated, missing, error: `${template.id} failed safe rendering` };
+      }
+      const links = body.match(/https?:\/\/[^\s"'<]+/g) || [];
+      if (links.some((link) => !link.startsWith('https://fusionbars.eu'))) {
+        return { ok: false, total: this.list().length, validated, missing, error: `${template.id} contains an uncontrolled URL` };
+      }
+      validated += 1;
+    }
+    return { ok: true, total: this.list().length, validated, missing };
   }
 }

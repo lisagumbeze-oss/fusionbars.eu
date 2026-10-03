@@ -8,6 +8,7 @@ import { getDictionary } from '../i18n';
 import { AdminOverrides } from '@/domain/admin/AdminOverrides';
 import { applyCryptoDiscountCopy } from '@/domain/payments/CryptoPaymentDiscount';
 import { subscribeNewsletterAction } from '@/actions/contact';
+import { LegalGovernanceService } from '@/domain/legal/LegalGovernanceService';
 
 export default function Footer() {
   const { locale } = useCommerce();
@@ -64,11 +65,11 @@ export default function Footer() {
 
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded bg-[#4A5D4E]/20 text-[#88A48D] flex items-center justify-center shrink-0">
-              <span className="font-mono font-bold text-xs">€/£</span>
+              <span className="font-mono font-bold text-xs">€</span>
             </div>
             <div>
-              <strong className="block text-neutral-100 font-semibold mb-0.5">Dual-Currency Pricing</strong>
-              <p className="text-neutral-400">Authoritative EUR base pricing with real-time British Pound (GBP) settlement rails.</p>
+              <strong className="block text-neutral-100 font-semibold mb-0.5">Launch currency</strong>
+              <p className="text-neutral-400">EUR is the launch currency. British Pound checkout is not enabled for this launch.</p>
             </div>
           </div>
 
@@ -100,8 +101,7 @@ export default function Footer() {
             {dict.common.tagline}. Europe&apos;s premier botanical confection atelier, harmonizing single-origin Belgian couverture chocolate with verified functional mycology. {applyCryptoDiscountCopy(dict.payment.cryptoDiscountBody)}
           </p>
           <div className="text-neutral-500 space-y-1">
-            <p>Direct Inquiries: <a href={`mailto:${supportEmail}`} className="text-neutral-300 hover:underline">{supportEmail}</a></p>
-            <p>Customer Support Hours: Mon &ndash; Fri (09:00 &ndash; 18:00 CET)</p>
+            <p>Support: <a href={`mailto:${supportEmail}`} className="text-neutral-300 hover:underline">{supportEmail}</a></p>
           </div>
         </div>
 
@@ -121,13 +121,13 @@ export default function Footer() {
         <div className="space-y-3">
           <h4 className="font-semibold text-neutral-200 tracking-wider uppercase text-[11px]">Transparency & Legal</h4>
           <ul className="space-y-2 text-neutral-400">
-            <li><Link href={`/${locale}/legal/privacy`} className="hover:text-white transition">Privacy Policy (GDPR)</Link></li>
-            <li><Link href={`/${locale}/legal/terms`} className="hover:text-white transition">Terms & Conditions</Link></li>
-            <li><Link href={`/${locale}/legal/refunds`} className="hover:text-white transition">Refund & Returns</Link></li>
-            <li><Link href={`/${locale}/legal/shipping`} className="hover:text-white transition">European Shipping Policy</Link></li>
-            <li><Link href={`/${locale}/legal/cookies`} className="hover:text-white transition">Cookie Preferences</Link></li>
-            <li><Link href={`/${locale}/legal/imprint`} className="hover:text-white transition">Legal Notice / Imprint</Link></li>
-            <li><Link href={`/${locale}/contact`} className="hover:text-white transition">Customer Support Desk</Link></li>
+            {LegalGovernanceService.publicLinks().map((link) => (
+              <li key={link.type}><Link href={`/${locale}${link.href}`} className="hover:text-white transition">{link.type}</Link></li>
+            ))}
+            {Object.keys(LegalGovernanceService.publicProfile()).length > 0 && (
+              <li><Link href={`/${locale}/legal/company`} className="hover:text-white transition">Company information</Link></li>
+            )}
+            <li><Link href={`/${locale}/contact`} className="hover:text-white transition">Customer support</Link></li>
           </ul>
         </div>
 
@@ -166,7 +166,7 @@ export default function Footer() {
               {subscribeError && (
                 <p className="text-[10px] text-red-400">{subscribeError}</p>
               )}
-              <p className="text-[10px] text-neutral-500">We respect European GDPR privacy standards. No marketing spam.</p>
+              <p className="text-[10px] text-neutral-500">Newsletter delivery is not production-active. Joining this list does not confirm a marketing email was sent.</p>
             </form>
           )}
         </div>
@@ -176,10 +176,10 @@ export default function Footer() {
       <div className="border-t border-neutral-900 bg-neutral-950 py-6 text-[11px] text-neutral-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-4">
           <p className="leading-relaxed">
-            <strong>European Botanical & Confectionery Notice:</strong> Products distributed by Fusion Mushroom Bars EU are crafted with culinary-grade functional mushroom extracts (including Lion&apos;s Mane, Reishi, Cordyceps, and Chaga) and premium Belgian chocolate. Products are intended for adult consumption (18+). These products are not intended to diagnose, treat, cure, or prevent any medical condition. Please store in a cool, dry place away from children.
+            Age verification at delivery is not configured. Product claims stay unpublished until a specialist review approves the public text.
           </p>
           <div className="flex flex-wrap justify-between items-center gap-4 pt-2 border-t border-neutral-900">
-            <p>&copy; {new Date().getFullYear()} Fusion Mushroom Bars EU. Registered European distribution.</p>
+            <p>&copy; {new Date().getFullYear()} Fusion Mushroom Bars EU.</p>
             <p>Production Target: Vercel &bull; Next.js 16 App Router &bull; PostgreSQL &bull; Server-Authoritative Commerce</p>
           </div>
         </div>

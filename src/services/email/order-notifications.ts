@@ -1,6 +1,30 @@
 import { DbOrder } from '@/lib/commerce-repository';
 import { OrderStatus } from '@/types';
-import { dispatchEmailSafely, EmailService } from './EmailService';
+import { EmailService } from './EmailService';
+import { EmailDeliveryLedger } from './EmailDeliveryLedger';
+
+async function sendOnce(
+  order: DbOrder,
+  status: OrderStatus,
+  template: string,
+  send: () => Promise<{ success: boolean; messageId?: string; error?: string }>
+): Promise<void> {
+  const recipient = (order.guestEmail || '').trim();
+  const eventId = `${order.orderNumber}:${status}:${template}`;
+  if (!recipient || EmailDeliveryLedger.isSuppressed(recipient)) {
+    EmailDeliveryLedger.claim(eventId, { template, recipient: recipient || 'missing', provider: 'suppressed', orderNumber: order.orderNumber });
+    EmailDeliveryLedger.complete(eventId, { success: false, error: 'Recipient is not eligible for this email.' });
+    return;
+  }
+  if (!EmailDeliveryLedger.claim(eventId, { template, recipient, provider: EmailService.getProvider().name, orderNumber: order.orderNumber })) {
+    return;
+  }
+  try {
+    EmailDeliveryLedger.complete(eventId, await send());
+  } catch (error) {
+    EmailDeliveryLedger.complete(eventId, { success: false, error: error instanceof Error ? error.message : 'Email send failed' });
+  }
+}
 
 export async function dispatchOrderStatusEmail(
   order: DbOrder,
@@ -12,28 +36,26 @@ export async function dispatchOrderStatusEmail(
 
   switch (newStatus) {
     case 'PAYMENT_VERIFIED':
-      await dispatchEmailSafely('payment_verified', () => EmailService.sendPaymentVerified(order));
+      await sendOnce(order, newStatus, 'payment-verified', () => EmailService.sendPaymentVerified(order));
       break;
     case 'PROCESSING':
-      await dispatchEmailSafely('order_processing', () => EmailService.sendOrderProcessing(order, locale));
+      await sendOnce(order, newStatus, 'order-processing', () => EmailService.sendOrderProcessing(order, locale));
       break;
     case 'SHIPPED':
-      await dispatchEmailSafely('order_shipped', () => EmailService.sendOrderShipped(order));
+      await sendOnce(order, newStatus, 'order-shipped', () => EmailService.sendOrderShipped(order));
       break;
     case 'DELIVERED':
-      await dispatchEmailSafely('order_delivered', () => EmailService.sendOrderDelivered(order));
+      await sendOnce(order, newStatus, 'order-delivered', () => EmailService.sendOrderDelivered(order));
       break;
     case 'CANCELLED':
       if (options?.previousStatus === 'PAYMENT_SUBMITTED') {
-        await dispatchEmailSafely('payment_rejected', () =>
-          EmailService.sendPaymentRejected(order, reason, locale)
-        );
+        await sendOnce(order, newStatus, 'payment-rejected', () => EmailService.sendPaymentRejected(order, reason, locale));
       } else {
-        await dispatchEmailSafely('order_cancelled', () => EmailService.sendOrderCancelled(order, reason));
+        await sendOnce(order, newStatus, 'order-cancelled', () => EmailService.sendOrderCancelled(order, reason));
       }
       break;
     case 'REFUNDED':
-      await dispatchEmailSafely('order_refunded', () => EmailService.sendOrderRefunded(order, reason));
+      await sendOnce(order, newStatus, 'order-refunded', () => EmailService.sendOrderRefunded(order, reason));
       break;
     default:
       break;

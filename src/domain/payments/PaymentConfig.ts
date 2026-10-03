@@ -116,6 +116,23 @@ export class PaymentConfigService {
     }
   }
 
+  static snapshotForTests(): () => void {
+    const bank = { ...this.bankConfig };
+    const crypto = {
+      BTC: { ...this.cryptoConfigs.BTC },
+      USDT: { ...this.cryptoConfigs.USDT },
+      ETH: { ...this.cryptoConfigs.ETH },
+    };
+    return () => {
+      this.bankConfig = bank;
+      this.cryptoConfigs = crypto;
+    };
+  }
+
+  static replaceBankForTests(next: BankPaymentConfig): void {
+    this.bankConfig = { ...next };
+  }
+
   /**
    * Returns safe PUBLIC payment options for customer-facing checkout.
    * Strictly omits sensitive details: No IBAN, No BIC, No receiving wallet addresses!

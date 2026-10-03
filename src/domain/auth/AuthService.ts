@@ -3,6 +3,7 @@
 // Cryptographic Sessions & Password Security
 // ===================================================
 
+import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import { AuthSessionUser, RoleName } from '@/types';
 import { RBACService } from './RBACService';
@@ -41,7 +42,7 @@ export class AuthService {
   /**
    * Generates a signed session token.
    */
-  static generateSessionToken(user: { id: string; email: string; name?: string | null; role: RoleName }): string {
+  static generateSessionToken(user: { id: string; email: string; name?: string | null; role: RoleName }, expiresAtSeconds?: number): string {
     const now = Math.floor(Date.now() / 1000);
     const payload: SessionTokenPayload = {
       sub: user.id,
@@ -49,17 +50,23 @@ export class AuthService {
       name: user.name,
       role: user.role,
       iat: now,
-      exp: now + this.SESSION_DURATION_SECONDS,
+      exp: expiresAtSeconds ?? now + this.SESSION_DURATION_SECONDS,
     };
 
     // JSON base64 encoding with signature mock/stub for zero-dependency node compatibility
     const header = Buffer.from(JSON.stringify({ alg: 'HS256', typ: 'JWT' })).toString('base64url');
     const body = Buffer.from(JSON.stringify(payload)).toString('base64url');
-    const secret = process.env.SESSION_SECRET || 'fusion-eu-secure-session-secret-2026';
-    
-    // In production, cryptographically sign; for standard serverless execution:
-    const signature = Buffer.from(`${header}.${body}.${secret}`).toString('base64url');
+    const signature = crypto.createHmac('sha256', this.sessionSecret()).update(`${header}.${body}`).digest('base64url');
     return `${header}.${body}.${signature}`;
+  }
+
+  private static sessionSecret(): string {
+    const secret = process.env.SESSION_SECRET || '';
+    if (process.env.NODE_ENV === 'production') {
+      if (secret.length < 32) throw new Error('PRODUCTION_SECRET_TOO_WEAK');
+      return secret;
+    }
+    return secret || 'fusion-eu-secure-session-secret-2026';
   }
 
   /**
@@ -72,11 +79,17 @@ export class AuthService {
       if (parts.length !== 3) return null;
 
       const [headerB64, bodyB64, sigB64] = parts;
-      const secret = process.env.SESSION_SECRET || 'fusion-eu-secure-session-secret-2026';
-      const expectedSig = Buffer.from(`${headerB64}.${bodyB64}.${secret}`).toString('base64url');
-
-      if (sigB64 !== expectedSig) {
-        return null; // Signature mismatch / tampering attempt
+      let secret: string;
+      try {
+        secret = this.sessionSecret();
+      } catch {
+        return null;
+      }
+      const expectedSig = crypto.createHmac('sha256', secret).update(`${headerB64}.${bodyB64}`).digest('base64url');
+      const actual = Buffer.from(sigB64);
+      const expected = Buffer.from(expectedSig);
+      if (actual.length !== expected.length || !crypto.timingSafeEqual(actual, expected)) {
+        return null;
       }
 
       const payload: SessionTokenPayload = JSON.parse(Buffer.from(bodyB64, 'base64url').toString('utf8'));

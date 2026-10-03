@@ -67,7 +67,12 @@ export async function quoteCryptoAmounts(
   return amounts;
 }
 
+const ALLOWED_PRICE_SYMBOLS = new Set(['BTC', 'ETH', 'BCH', 'USDT']);
+
 async function fetchLiveCryptoPrices(currency: CurrencyCode, symbols: string[]): Promise<CryptoFiatPrices> {
+  if ((currency !== 'EUR' && currency !== 'GBP') || symbols.some((symbol) => !ALLOWED_PRICE_SYMBOLS.has(symbol))) {
+    throw new Error('Cryptocurrency price source is not an approved destination.');
+  }
   try {
     return await fetchCoinGeckoPrices(currency, symbols);
   } catch {

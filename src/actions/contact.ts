@@ -4,6 +4,7 @@ import { z } from 'zod';
 import { RateLimiterService } from '@/lib/rate-limiter';
 import { PrivacyService } from '@/domain/privacy/PrivacyService';
 import { EmailService } from '@/services/email/EmailService';
+import { EmailProductionReadinessService } from '@/services/email/EmailProductionReadinessService';
 import { localeSchema } from '@/validation/schemas';
 
 const contactInquirySchema = z.object({
@@ -22,14 +23,8 @@ const newsletterSchema = z.object({
 export async function submitContactInquiryAction(rawInput: unknown) {
   try {
     const validated = contactInquirySchema.parse(rawInput);
-    const rateKey = validated.email.trim().toLowerCase();
-    const rateCheck = RateLimiterService.consume('newsletter_contact', rateKey);
-    if (!rateCheck.allowed) {
-      return {
-        success: false,
-        error: `Too many contact submissions. Please wait ${rateCheck.retryAfterSeconds} seconds.`,
-      };
-    }
+    const rateCheck = await RateLimiterService.enforce('newsletter_contact', validated.email);
+    if (!rateCheck.allowed) return { success: false, error: rateCheck.error };
 
     const result = await EmailService.sendContactInquiryEmails({
       name: validated.name.trim(),
@@ -39,10 +34,10 @@ export async function submitContactInquiryAction(rawInput: unknown) {
       locale: validated.locale,
     });
 
-    if (!result.customer.success || !result.ops.success) {
+    if (!result.customer.success || !result.ops.success || EmailProductionReadinessService.state() !== 'ACTIVE') {
       return {
         success: false,
-        error: 'The message could not be delivered. Please try again, or email sales@fusionbars.eu directly.',
+        error: 'The message was not confirmed as delivered. Production email is not active. You can email sales@fusionbars.eu directly.',
       };
     }
 
@@ -56,19 +51,15 @@ export async function subscribeNewsletterAction(rawInput: unknown) {
   try {
     const validated = newsletterSchema.parse(rawInput);
     const email = validated.email.trim().toLowerCase();
-    const rateCheck = RateLimiterService.consume('newsletter_contact', email);
-    if (!rateCheck.allowed) {
+    const rateCheck = await RateLimiterService.enforce('newsletter_contact', email);
+    if (!rateCheck.allowed) return { success: false, error: rateCheck.error };
+
+    if (EmailProductionReadinessService.state() !== 'ACTIVE') {
       return {
         success: false,
-        error: `Too many subscription attempts. Please wait ${rateCheck.retryAfterSeconds} seconds.`,
+        error: 'Newsletter delivery is not active. This did not confirm a marketing subscription email.',
       };
     }
-
-    PrivacyService.recordConsent({
-      email,
-      consentType: 'newsletter',
-      granted: true,
-    });
 
     const result = await EmailService.sendNewsletterConfirmation(email, validated.locale);
     if (!result.subscriber.success || !result.ops.success) {
@@ -77,6 +68,12 @@ export async function subscribeNewsletterAction(rawInput: unknown) {
         error: 'The subscription could not be delivered. Please try again, or email sales@fusionbars.eu directly.',
       };
     }
+
+    PrivacyService.recordConsent({
+      email,
+      consentType: 'newsletter',
+      granted: true,
+    });
 
     return { success: true, message: 'Subscription confirmed. A confirmation was sent to you and to the support desk.' };
   } catch (error: any) {

@@ -16,11 +16,16 @@ export interface SendEmailResult {
   success: boolean;
   messageId?: string;
   error?: string;
+  eventId?: string;
 }
+
+export type ProviderDeliveryStatus = 'QUEUED' | 'SENT' | 'DELIVERED' | 'FAILED' | 'BOUNCED' | 'REJECTED' | 'UNKNOWN';
 
 export interface ITransactionalEmailProvider {
   name: string;
   sendEmail(options: SendEmailOptions): Promise<SendEmailResult>;
+  getDeliveryStatus(messageId: string): Promise<{ status: ProviderDeliveryStatus }>;
+  validateConfiguration(): { valid: boolean; missing: string[] };
 }
 
 /**
@@ -51,6 +56,14 @@ export class MockEmailProvider implements ITransactionalEmailProvider {
       success: true,
       messageId: `mock_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`,
     };
+  }
+
+  async getDeliveryStatus(_messageId: string): Promise<{ status: ProviderDeliveryStatus }> {
+    return { status: 'SENT' };
+  }
+
+  validateConfiguration(): { valid: boolean; missing: string[] } {
+    return { valid: false, missing: ['production provider'] };
   }
 
   clear(): void {
@@ -85,8 +98,7 @@ export class ResendEmailProvider implements ITransactionalEmailProvider {
       });
 
       if (!response.ok) {
-        const errText = await response.text();
-        const error = `Resend HTTP ${response.status}: ${errText}`;
+        const error = `Resend HTTP ${response.status}`;
         recordDelivery({
           to: options.to,
           subject: options.subject,
@@ -112,6 +124,16 @@ export class ResendEmailProvider implements ITransactionalEmailProvider {
     } catch (e: any) {
       return { success: false, error: e.message || 'Resend request failed' };
     }
+  }
+
+  async getDeliveryStatus(_messageId: string): Promise<{ status: ProviderDeliveryStatus }> {
+    return { status: 'UNKNOWN' };
+  }
+
+  validateConfiguration(): { valid: boolean; missing: string[] } {
+    return this.apiKey && this.apiKey.length >= 16
+      ? { valid: true, missing: [] }
+      : { valid: false, missing: ['EMAIL_PROVIDER_KEY'] };
   }
 }
 
@@ -141,8 +163,7 @@ export class PostmarkEmailProvider implements ITransactionalEmailProvider {
       });
 
       if (!response.ok) {
-        const errText = await response.text();
-        return { success: false, error: `Postmark HTTP ${response.status}: ${errText}` };
+        return { success: false, error: `Postmark HTTP ${response.status}` };
       }
 
       const data = (await response.json()) as { MessageID: string };
@@ -150,5 +171,34 @@ export class PostmarkEmailProvider implements ITransactionalEmailProvider {
     } catch (e: any) {
       return { success: false, error: e.message || 'Postmark request failed' };
     }
+  }
+
+  async getDeliveryStatus(_messageId: string): Promise<{ status: ProviderDeliveryStatus }> {
+    return { status: 'UNKNOWN' };
+  }
+
+  validateConfiguration(): { valid: boolean; missing: string[] } {
+    return this.serverToken && this.serverToken.length >= 16
+      ? { valid: true, missing: [] }
+      : { valid: false, missing: ['EMAIL_PROVIDER_KEY'] };
+  }
+}
+
+export class SmtpEmailProvider implements ITransactionalEmailProvider {
+  name = 'smtp';
+
+  validateConfiguration(): { valid: boolean; missing: string[] } {
+    const missing = ['SMTP_HOST', 'SMTP_PORT', 'SMTP_USER', 'SMTP_PASSWORD'].filter((name) => !process.env[name]?.trim());
+    return { valid: missing.length === 0, missing };
+  }
+
+  async sendEmail(): Promise<SendEmailResult> {
+    const configuration = this.validateConfiguration();
+    if (!configuration.valid) return { success: false, error: 'SMTP configuration is incomplete.' };
+    return { success: false, error: 'SMTP delivery is not activated.' };
+  }
+
+  async getDeliveryStatus(_messageId: string): Promise<{ status: ProviderDeliveryStatus }> {
+    return { status: 'UNKNOWN' };
   }
 }

@@ -19,6 +19,11 @@ function withPrismaPoolerParams(url: string): string {
   return url.includes('?') ? `${url}&${query}` : `${url}?${query}`;
 }
 
+function withConnectTimeout(url: string): string {
+  if (!url || url.includes('connect_timeout=')) return url;
+  return `${url}${url.includes('?') ? '&' : '?'}connect_timeout=30`;
+}
+
 export function resolveDatabaseUrls() {
   if (!process.env.DATABASE_URL) {
     const pooled =
@@ -37,4 +42,7 @@ export function resolveDatabaseUrls() {
       process.env.DATABASE_URL_UNPOOLED ||
       process.env.DATABASE_URL;
   }
+
+  if (process.env.DATABASE_URL) process.env.DATABASE_URL = withConnectTimeout(process.env.DATABASE_URL);
+  if (process.env.DIRECT_URL) process.env.DIRECT_URL = withConnectTimeout(process.env.DIRECT_URL);
 }

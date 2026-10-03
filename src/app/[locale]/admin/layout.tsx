@@ -12,7 +12,8 @@ export default async function AdminLayout({
 }) {
   const { locale } = await params;
   const headerStore = await headers();
-  const isLogin = headerStore.get('x-admin-route') === 'login';
+  const pathname = headerStore.get('x-pathname') || '';
+  const isLogin = headerStore.get('x-admin-route') === 'login' || /\/admin\/login\/?$/.test(pathname);
   const cookieStore = await cookies();
   const session = AdminAuthService.sessionFromToken(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
 

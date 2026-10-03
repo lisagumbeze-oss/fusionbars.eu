@@ -4,12 +4,14 @@
 
 import { EmailTemplates, EmailRenderContext } from '@/emails/templates';
 import { buildOrderStatusUrl } from '@/emails/shell';
+import { EmailProductionReadinessService } from '@/services/email/EmailProductionReadinessService';
 import {
   ITransactionalEmailProvider,
   MockEmailProvider,
   ResendEmailProvider,
   PostmarkEmailProvider,
   SendEmailResult,
+  SendEmailOptions,
 } from './EmailProvider';
 import { DbOrder } from '@/lib/commerce-repository';
 import { CountryRegistry } from '@/domain/countries/CountryRegistry';
@@ -22,6 +24,11 @@ export class EmailService {
   private static baseUrl: string = 'https://fusionbars.eu';
   private static initialized = false;
 
+  static resolveProviderName(input: { vercelEnv?: string; configured?: string }): string {
+    if (input.vercelEnv === 'preview') return 'mock';
+    return input.configured || 'mock';
+  }
+
   static initializeFromConfig(config?: {
     providerName?: string;
     apiKey?: string;
@@ -30,19 +37,18 @@ export class EmailService {
     opsInbox?: string;
     baseUrl?: string;
   }): void {
-    const providerName = config?.providerName || process.env.EMAIL_PROVIDER || 'mock';
-    const apiKey = config?.apiKey || process.env.EMAIL_PROVIDER_KEY || '';
+    const providerName = this.resolveProviderName({
+      vercelEnv: process.env.VERCEL_ENV,
+      configured: config?.providerName || process.env.EMAIL_PROVIDER || 'mock',
+    });
+    const apiKey = providerName === 'mock' ? '' : (config?.apiKey || process.env.EMAIL_PROVIDER_KEY || '');
     this.defaultFrom =
       config?.from ||
       process.env.EMAIL_FROM ||
       'Fusion Mushroom Bars EU <sales@fusionbars.eu>';
     this.defaultReplyTo = config?.replyTo || process.env.EMAIL_REPLY_TO || 'sales@fusionbars.eu';
     this.opsInbox = config?.opsInbox || process.env.EMAIL_OPS_INBOX || this.defaultReplyTo;
-    this.baseUrl =
-      config?.baseUrl ||
-      process.env.SITE_URL ||
-      process.env.NEXT_PUBLIC_SITE_URL ||
-      'https://fusionbars.eu';
+    this.baseUrl = 'https://fusionbars.eu';
 
     if (providerName === 'resend' && apiKey) {
       this.provider = new ResendEmailProvider(apiKey, this.defaultFrom);
@@ -111,6 +117,29 @@ export class EmailService {
     return (order.guestEmail || '').trim();
   }
 
+  private static async deliver(options: SendEmailOptions, purpose: 'transactional' | 'controlled' = 'transactional'): Promise<SendEmailResult> {
+    this.ensureReady();
+    const recipient = options.to?.trim() || '';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient) || /[\r\n,]/.test(recipient)) {
+      return { success: false, error: 'Recipient is not valid.' };
+    }
+    if (this.provider.name !== 'mock') {
+      if (!EmailProductionReadinessService.sender().matchesCanonical) {
+        return { success: false, error: 'Sender is not the production sender.' };
+      }
+      if (purpose === 'transactional' && EmailProductionReadinessService.state() !== 'ACTIVE') {
+        return { success: false, error: 'Production email is not active.' };
+      }
+      if (purpose === 'controlled' && !EmailProductionReadinessService.controlledTestPermitted()) {
+        return { success: false, error: 'Controlled production email is not permitted until the provider and DNS checks pass.' };
+      }
+    }
+    const replyTo = options.replyTo && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(options.replyTo) && !/[\r\n]/.test(options.replyTo)
+      ? options.replyTo
+      : this.defaultReplyTo;
+    return this.provider.sendEmail({ ...options, to: recipient, from: this.defaultFrom, replyTo });
+  }
+
   static async sendSepaOrderConfirmation(
     order: DbOrder,
     sepaDetails: {
@@ -132,7 +161,7 @@ export class EmailService {
       accountHolder: sepaDetails.accountHolder,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: this.recipientForOrder(order),
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -156,7 +185,7 @@ export class EmailService {
     const ctx = this.buildRenderContext(order);
     const rendered = EmailTemplates.renderCryptoOrderConfirmation({ ...ctx, ...cryptoDetails });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: this.recipientForOrder(order),
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -190,7 +219,7 @@ export class EmailService {
       shippingMethod: order.shippingMethodCode === 'EXPRESS' ? 'Express Priority Courier' : 'Standard Discreet Courier',
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: this.opsInbox,
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -211,7 +240,7 @@ export class EmailService {
       supportEmail: this.defaultReplyTo,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: this.recipientForOrder(order),
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -230,7 +259,7 @@ export class EmailService {
       supportEmail: this.defaultReplyTo,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: this.recipientForOrder(order),
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -251,7 +280,7 @@ export class EmailService {
       supportEmail: this.defaultReplyTo,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: this.recipientForOrder(order),
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -271,7 +300,7 @@ export class EmailService {
       supportEmail: this.defaultReplyTo,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: this.recipientForOrder(order),
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -292,7 +321,7 @@ export class EmailService {
       supportEmail: this.defaultReplyTo,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: this.recipientForOrder(order),
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -311,7 +340,7 @@ export class EmailService {
       supportEmail: this.defaultReplyTo,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: this.recipientForOrder(order),
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -331,7 +360,7 @@ export class EmailService {
       supportEmail: this.defaultReplyTo,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: this.recipientForOrder(order),
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -353,7 +382,7 @@ export class EmailService {
       supportEmail: this.defaultReplyTo,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: this.recipientForOrder(order),
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -371,7 +400,7 @@ export class EmailService {
       supportEmail: this.defaultReplyTo,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: email,
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -393,7 +422,7 @@ export class EmailService {
       supportEmail: this.defaultReplyTo,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: email,
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -415,7 +444,7 @@ export class EmailService {
       supportEmail: this.defaultReplyTo,
     });
 
-    return this.provider.sendEmail({
+    return this.deliver({
       to: email,
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -446,7 +475,7 @@ export class EmailService {
       locale: input.locale,
     });
 
-    const customer = await this.provider.sendEmail({
+    const customer = await this.deliver({
       to: input.email,
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -456,7 +485,7 @@ export class EmailService {
       tags: [{ name: 'template', value: 'contact-confirmation' }],
     });
 
-    const ops = await this.provider.sendEmail({
+    const ops = await this.deliver({
       to: this.opsInbox,
       from: this.defaultFrom,
       replyTo: input.email,
@@ -484,7 +513,7 @@ export class EmailService {
     });
     const opsRendered = EmailTemplates.renderNewsletterOpsAlert({ email, locale });
 
-    const subscriber = await this.provider.sendEmail({
+    const subscriber = await this.deliver({
       to: email,
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
@@ -493,7 +522,7 @@ export class EmailService {
       text: rendered.text,
       tags: [{ name: 'template', value: 'newsletter-confirmation' }],
     });
-    const ops = await this.provider.sendEmail({
+    const ops = await this.deliver({
       to: this.opsInbox,
       from: this.defaultFrom,
       replyTo: email,
@@ -512,22 +541,29 @@ export class EmailService {
   static async sendTestProbe(input: {
     recipientEmail: string;
     initiatedBy: string;
+    templateName?: string;
   }): Promise<SendEmailResult> {
     this.ensureReady();
+    if (/[\r\n]/.test(input.recipientEmail) || input.recipientEmail.includes(',')) {
+      return { success: false, error: 'Recipient is not valid.' };
+    }
     const rendered = EmailTemplates.renderTestEmailProbe({
       recipientEmail: input.recipientEmail,
       providerName: this.provider.name,
       initiatedBy: input.initiatedBy,
+      templateName: input.templateName,
     });
 
-    return this.provider.sendEmail({
+    const eventId = `fusion-production-email-test:${Date.now().toString(36)}:${Math.random().toString(36).slice(2, 8)}`;
+    const result = await this.deliver({
       to: input.recipientEmail,
       from: this.defaultFrom,
       replyTo: this.defaultReplyTo,
       subject: rendered.subject,
       html: rendered.html,
       text: rendered.text,
-    });
+    }, 'controlled');
+    return { ...result, eventId };
   }
 }
 

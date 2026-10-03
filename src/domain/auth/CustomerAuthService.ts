@@ -81,9 +81,7 @@ export class CustomerAuthService {
     });
 
     const locale = input.preferredLocale || 'en';
-    const baseUrl =
-      process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://fusionbars.eu';
-    const accountUrl = `${baseUrl.replace(/\/$/, '')}/${locale}/account`;
+    const accountUrl = `${EmailService.getBaseUrl()}/${locale}/account`;
     const verifyUrl = `${accountUrl}?verifyToken=${verificationToken}`;
 
     void dispatchEmailSafely('customer_welcome', () =>
@@ -162,9 +160,7 @@ export class CustomerAuthService {
     } as any);
 
     const locale = customer.languageCode || 'en';
-    const baseUrl =
-      process.env.SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || 'https://fusionbars.eu';
-    const resetUrl = `${baseUrl.replace(/\/$/, '')}/${locale}/account/reset-password?token=${resetToken}`;
+    const resetUrl = `${EmailService.getBaseUrl()}/${locale}/account/reset-password?token=${resetToken}`;
 
     void dispatchEmailSafely('password_reset', () =>
       EmailService.sendPasswordReset(customer.email, customer.firstName, resetUrl)

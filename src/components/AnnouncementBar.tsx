@@ -4,6 +4,7 @@ import React from 'react';
 import { useCommerce } from '../context/CommerceContext';
 import { SUPPORTED_LOCALES } from '../i18n';
 import { applyCryptoDiscountCopy } from '@/domain/payments/CryptoPaymentDiscount';
+import { GBP_LAUNCH_MODE } from '@/domain/launch/launch-policy';
 import { LocaleCode } from '../types';
 import { Globe, Truck } from 'lucide-react';
 import { useRouter, usePathname } from 'next/navigation';
@@ -102,13 +103,15 @@ export default function AnnouncementBar() {
             >
               € EUR
             </button>
-            <button
-              onClick={() => setCurrency('GBP')}
-              className={`px-2 py-0.5 transition ${currency === 'GBP' ? 'bg-[#4A5D4E] text-white font-semibold' : 'text-neutral-400 hover:text-white'}`}
-              aria-label="Set currency to British Pound"
-            >
-              £ GBP
-            </button>
+            {GBP_LAUNCH_MODE !== 'DISABLED_FOR_LAUNCH' && (
+              <button
+                onClick={() => setCurrency('GBP')}
+                className={`px-2 py-0.5 transition ${currency === 'GBP' ? 'bg-[#4A5D4E] text-white font-semibold' : 'text-neutral-400 hover:text-white'}`}
+                aria-label="Set currency to British Pound"
+              >
+                £ GBP
+              </button>
+            )}
           </div>
 
           <div className="flex items-center gap-1 text-[10px] text-neutral-300">

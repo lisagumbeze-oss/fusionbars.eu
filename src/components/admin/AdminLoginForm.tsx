@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { loginAdminAction } from '@/actions/admin-auth';
+import { safeInternalAdminPath } from '@/domain/infrastructure/safe-path';
 
 export default function AdminLoginForm() {
   const params = useParams<{ locale: string }>();
@@ -25,7 +26,7 @@ export default function AdminLoginForm() {
         return;
       }
       const next = searchParams.get('next') || '';
-      const safeNext = next.startsWith(`/${locale}/admin`) && !next.includes('/admin/login') ? next : `/${locale}/admin`;
+      const safeNext = safeInternalAdminPath(next, locale);
       router.replace(safeNext);
       router.refresh();
     } catch {

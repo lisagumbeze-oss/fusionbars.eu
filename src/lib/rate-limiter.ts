@@ -1,3 +1,5 @@
+import { ObservabilityService } from '@/lib/observability';
+
 // ==============================================================================
 // FUSION MUSHROOM BARS EU - DISTRIBUTED RATE LIMITING SERVICE
 // Sliding-Window Abuse & Probing Defense Engine
@@ -25,6 +27,24 @@ export interface RateLimitResult {
   remaining: number;
   resetTimeMs: number;
   retryAfterSeconds?: number;
+}
+
+const PLACEHOLDER = /placeholder|change_me|example|your-token|your-url|mock/i;
+
+export function classifyUpstash(urlRaw: string, tokenRaw: string): { url: 'CONFIGURED' | 'MISSING' | 'INVALID'; token: 'CONFIGURED' | 'MISSING' | 'INVALID' } {
+  const url = urlRaw.trim();
+  const token = tokenRaw.trim();
+  let urlState: 'CONFIGURED' | 'MISSING' | 'INVALID' = 'MISSING';
+  if (url) {
+    try {
+      const parsed = new URL(url);
+      urlState = parsed.protocol === 'https:' && parsed.hostname.endsWith('.upstash.io') && !parsed.username && !parsed.password && !PLACEHOLDER.test(parsed.hostname) ? 'CONFIGURED' : 'INVALID';
+    } catch {
+      urlState = 'INVALID';
+    }
+  }
+  const tokenState = !token ? 'MISSING' : token.length >= 16 && !PLACEHOLDER.test(token) ? 'CONFIGURED' : 'INVALID';
+  return { url: urlState, token: tokenState };
 }
 
 export interface IRateLimitStore {
@@ -102,12 +122,22 @@ export class MemoryRateLimitStore implements IRateLimitStore {
  * Distributed Redis REST Store for serverless multi-region deployments (e.g. Upstash).
  * Communicates via standard HTTP fetch without importing vendor-specific packages into core domain.
  */
+class RejectingRateLimitStore implements IRateLimitStore {
+  consume(_key: string, _maxAttempts: number, windowSeconds: number): RateLimitResult {
+    return { allowed: false, remaining: 0, resetTimeMs: Date.now() + windowSeconds * 1000, retryAfterSeconds: windowSeconds };
+  }
+  check(_key: string, maxAttempts: number, windowSeconds: number): RateLimitResult {
+    return { allowed: false, remaining: 0, resetTimeMs: Date.now() + windowSeconds * 1000, retryAfterSeconds: windowSeconds };
+  }
+  reset(): void {}
+}
+
 export class DistributedRedisRateLimitStore implements IRateLimitStore {
-  constructor(private restUrl: string, private restToken: string) {}
+  constructor(private restUrl: string, private restToken: string, private fetchImpl: typeof fetch = fetch) {}
 
   async consume(key: string, maxAttempts: number, windowSeconds: number): Promise<RateLimitResult> {
     try {
-      const response = await fetch(`${this.restUrl}/pipeline`, {
+      const response = await this.fetchImpl(`${this.restUrl}/pipeline`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${this.restToken}`,
@@ -120,9 +150,7 @@ export class DistributedRedisRateLimitStore implements IRateLimitStore {
         ]),
       });
 
-      if (!response.ok) {
-        throw new Error(`Redis REST error: ${response.statusText}`);
-      }
+      if (!response.ok) throw new Error('REDIS_UNAVAILABLE');
 
       const results = (await response.json()) as Array<{ result: any }>;
       const count = Number(results[0]?.result || 1);
@@ -144,14 +172,13 @@ export class DistributedRedisRateLimitStore implements IRateLimitStore {
         resetTimeMs,
       };
     } catch {
-      // In case of distributed network failure, fallback safely to allow legitimate operations
-      return { allowed: true, remaining: 1, resetTimeMs: Date.now() + windowSeconds * 1000 };
+      return { allowed: false, remaining: 0, resetTimeMs: Date.now() + windowSeconds * 1000, retryAfterSeconds: windowSeconds };
     }
   }
 
   async check(key: string, maxAttempts: number, windowSeconds: number): Promise<RateLimitResult> {
     try {
-      const response = await fetch(`${this.restUrl}/get/ratelimit:${key}`, {
+      const response = await this.fetchImpl(`${this.restUrl}/get/ratelimit:${encodeURIComponent(key)}`, {
         headers: { Authorization: `Bearer ${this.restToken}` },
       });
       const data = (await response.json()) as { result: string | null };
@@ -164,13 +191,13 @@ export class DistributedRedisRateLimitStore implements IRateLimitStore {
         retryAfterSeconds: allowed ? undefined : windowSeconds,
       };
     } catch {
-      return { allowed: true, remaining: 1, resetTimeMs: Date.now() + windowSeconds * 1000 };
+      return { allowed: false, remaining: 0, resetTimeMs: Date.now() + windowSeconds * 1000, retryAfterSeconds: windowSeconds };
     }
   }
 
   async reset(key: string): Promise<void> {
     try {
-      await fetch(`${this.restUrl}/del/ratelimit:${key}`, {
+      await this.fetchImpl(`${this.restUrl}/del/ratelimit:${encodeURIComponent(key)}`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${this.restToken}` },
       });
@@ -185,6 +212,7 @@ export class DistributedRedisRateLimitStore implements IRateLimitStore {
  */
 export class RateLimiterService {
   private static store: IRateLimitStore = new MemoryRateLimitStore();
+  private static pinned = false;
 
   // Configured European commerce production thresholds
   private static configs: Record<RateLimitAction, RateLimitConfig> = {
@@ -204,18 +232,35 @@ export class RateLimiterService {
    */
   static setStore(store: IRateLimitStore): void {
     this.store = store;
+    this.pinned = true;
+  }
+
+  static resetForTests(): void {
+    this.store = new MemoryRateLimitStore();
+    this.pinned = false;
+  }
+
+  static policies(): Array<{ action: RateLimitAction; maxAttempts: number; windowSeconds: number }> {
+    return (Object.keys(this.configs) as RateLimitAction[]).map((action) => ({ action, ...this.configs[action] }));
   }
 
   /**
-   * Automatically configures distributed storage if Upstash environment variables exist.
+   * Production uses Upstash only when the URL and token are valid.
+   * Development keeps the in-memory window. Preview does not attach a target marked production.
    */
   static initializeFromEnvironment(): void {
-    const url = process.env.UPSTASH_REDIS_REST_URL;
-    const token = process.env.UPSTASH_REDIS_REST_TOKEN;
-    if (url && token) {
-      this.store = new DistributedRedisRateLimitStore(url, token);
-    } else {
-      this.store = new MemoryRateLimitStore();
+    if (this.pinned) return;
+    const mode = process.env.VERCEL_ENV || process.env.NODE_ENV || 'development';
+    const target = (process.env.UPSTASH_TARGET || '').trim().toLowerCase();
+    if (mode !== 'production') {
+      if (target === 'production') this.store = new RejectingRateLimitStore();
+      return;
+    }
+    const url = process.env.UPSTASH_REDIS_REST_URL || '';
+    const token = process.env.UPSTASH_REDIS_REST_TOKEN || '';
+    const classified = classifyUpstash(url, token);
+    if (classified.url === 'CONFIGURED' && classified.token === 'CONFIGURED') {
+      this.store = new DistributedRedisRateLimitStore(url.trim(), token.trim());
     }
   }
 
@@ -236,11 +281,13 @@ export class RateLimiterService {
    * Preserves backward compatibility across synchronous action signatures.
    */
   static consume(action: RateLimitAction, identifier: string): RateLimitResult {
+    this.initializeFromEnvironment();
     const config = this.configs[action] || { maxAttempts: 20, windowSeconds: 600 };
     const key = `${action}:${identifier.trim().toLowerCase()}`;
     const res = this.store.consume(key, config.maxAttempts, config.windowSeconds);
-    if ('then' in (res as any)) {
-      // Async result in sync context fallback
+    if ('then' in (res as Promise<RateLimitResult>)) {
+      const mode = process.env.VERCEL_ENV || process.env.NODE_ENV || 'development';
+      if (mode === 'production') return { allowed: false, remaining: 0, resetTimeMs: Date.now() + config.windowSeconds * 1000, retryAfterSeconds: config.windowSeconds };
       return { allowed: true, remaining: 1, resetTimeMs: Date.now() + config.windowSeconds * 1000 };
     }
     return res as RateLimitResult;
@@ -250,9 +297,22 @@ export class RateLimiterService {
    * Asynchronous consumption for distributed Redis serverless calls.
    */
   static async consumeAsync(action: RateLimitAction, identifier: string): Promise<RateLimitResult> {
+    this.initializeFromEnvironment();
     const config = this.configs[action] || { maxAttempts: 20, windowSeconds: 600 };
     const key = `${action}:${identifier.trim().toLowerCase()}`;
-    return Promise.resolve(this.store.consume(key, config.maxAttempts, config.windowSeconds));
+    try {
+      return await Promise.resolve(this.store.consume(key, config.maxAttempts, config.windowSeconds));
+    } catch {
+      const correlationId = `rl_${Date.now().toString(36)}`;
+      ObservabilityService.warn('RATE_LIMIT_BACKEND_UNAVAILABLE', 'Distributed rate limiter failed closed.', { correlationId, category: 'REDIS_UNAVAILABLE', action });
+      return { allowed: false, remaining: 0, resetTimeMs: Date.now() + config.windowSeconds * 1000, retryAfterSeconds: config.windowSeconds };
+    }
+  }
+
+  static async enforce(action: RateLimitAction, identifier: string): Promise<{ allowed: boolean; error?: string }> {
+    const result = await this.consumeAsync(action, identifier);
+    if (result.allowed) return { allowed: true };
+    return { allowed: false, error: 'Too many attempts. Try again later.' };
   }
 
   /**

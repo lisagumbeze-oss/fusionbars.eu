@@ -40,6 +40,8 @@ export interface CommercialPriceVersion {
   sourceAmount: number | null;
 }
 
+export type TaxConfigStatus = 'NOT_CONFIGURED' | 'DRAFT' | 'REVIEW_REQUIRED' | 'APPROVED' | 'ACTIVE' | 'SUPERSEDED' | 'REJECTED';
+
 export interface VatRateVersion {
   id: string;
   country: string;
@@ -48,7 +50,12 @@ export interface VatRateVersion {
   effectiveFrom: string;
   effectiveTo: string | null;
   evidence: string;
-  approvedBy: string;
+  rationale: string;
+  status: TaxConfigStatus;
+  approvedBy: string | null;
+  approvedAt: string | null;
+  activatedBy: string | null;
+  activatedAt: string | null;
   createdAt: string;
 }
 
@@ -98,6 +105,7 @@ export interface CommercialState {
     rates: VatRateVersion[];
     exemptions: Array<{ id: string; country: string; taxClass: TaxClass; evidence: string; approvedBy: string; effectiveFrom: string; effectiveTo: string | null }>;
     productClasses: Record<string, TaxClass>;
+    shippingTaxClass: TaxClass;
   };
   shipping: {
     strategy: 'EXPLICIT_PER_CURRENCY';
@@ -122,7 +130,7 @@ function defaults(): CommercialState {
     fourEyes: false,
     priceLock: 'RECALCULATE_AT_CHECKOUT',
     fx: { status: 'NOT_CONFIGURED', maxAgeHours: null, rates: [] },
-    tax: { displayMode: 'NOT_CONFIGURED', classes: [...TAX_CLASSES], jurisdictions: [], rates: [], exemptions: [], productClasses: {} },
+    tax: { displayMode: 'NOT_CONFIGURED', classes: [...TAX_CLASSES], jurisdictions: [], rates: [], exemptions: [], productClasses: {}, shippingTaxClass: 'NOT_CONFIGURED' },
     shipping: {
       strategy: 'EXPLICIT_PER_CURRENCY',
       thresholdBasis: 'ACTIVE_DISPLAY_CURRENCY',
@@ -438,18 +446,22 @@ export class CommercialConfigurationService {
       effectiveFrom: params.effectiveFrom,
       effectiveTo: params.effectiveTo || null,
       evidence: params.evidence.trim(),
-      approvedBy: params.actor,
+      rationale: 'Draft VAT rate. Entering a number does not activate it.',
+      status: 'DRAFT',
+      approvedBy: null,
+      approvedAt: null,
+      activatedBy: null,
+      activatedAt: null,
       createdAt: new Date().toISOString(),
     };
-    const clash = state.tax.rates.find((row) => row.country === record.country && row.taxClass === record.taxClass && this.overlaps(row, record));
+    const clash = state.tax.rates.find((row) => row.status !== 'REJECTED' && row.status !== 'SUPERSEDED' && row.country === record.country && row.taxClass === record.taxClass && this.overlaps(row, record));
     if (clash) throw new Error('A VAT rate already covers this jurisdiction, class, and effective period.');
     state.tax.rates.push(record);
-    if (!state.tax.jurisdictions.includes(record.country)) state.tax.jurisdictions.push(record.country);
     state.version += 1;
     this.audit(state, {
       entity: 'vat-rate',
       beforeValue: null,
-      afterValue: { id: record.id, rateBps: record.rateBps },
+      afterValue: { id: record.id, rateBps: record.rateBps, status: record.status },
       currency: null,
       amountMinor: null,
       country: record.country,
@@ -463,6 +475,114 @@ export class CommercialConfigurationService {
     });
     this.persist();
     return record;
+  }
+
+  static approveVatRate(params: { actor: string; actorRole: RoleName; rateId: string; rationale: string; evidence: string }): VatRateVersion {
+    if (params.actorRole !== 'SUPER_ADMIN') throw new Error('Only SUPER_ADMIN can approve a tax rate.');
+    if (!params.rationale?.trim() || !params.evidence?.trim()) throw new Error('Tax approval requires rationale and evidence.');
+    const state = this.get();
+    const rate = state.tax.rates.find((row) => row.id === params.rateId);
+    if (!rate || (rate.status !== 'DRAFT' && rate.status !== 'REVIEW_REQUIRED')) throw new Error('Only a draft tax rate can be approved.');
+    const before = rate.status;
+    rate.status = 'APPROVED';
+    rate.approvedBy = params.actor;
+    rate.approvedAt = new Date().toISOString();
+    rate.rationale = params.rationale.trim();
+    rate.evidence = params.evidence.trim();
+    state.version += 1;
+    this.audit(state, {
+      entity: 'vat-rate',
+      beforeValue: { id: rate.id, status: before, rateBps: rate.rateBps },
+      afterValue: { id: rate.id, status: rate.status, rateBps: rate.rateBps },
+      currency: null,
+      amountMinor: null,
+      country: rate.country,
+      taxClass: rate.taxClass,
+      taxRateBps: rate.rateBps,
+      actor: params.actor,
+      role: params.actorRole,
+      rationale: rate.rationale,
+      evidence: rate.evidence,
+      effectiveFrom: rate.effectiveFrom,
+    });
+    this.persist();
+    return rate;
+  }
+
+  static activateVatRate(params: { actor: string; actorRole: RoleName; rateId: string; confirmation: string; rationale: string }): VatRateVersion {
+    if (params.actorRole !== 'SUPER_ADMIN') throw new Error('Only SUPER_ADMIN can activate a tax rate.');
+    if (params.confirmation !== 'ACTIVATE_TAX_RATE') throw new Error('Explicit tax activation is required.');
+    if (!params.rationale?.trim()) throw new Error('Tax activation requires a rationale.');
+    const state = this.get();
+    const rate = state.tax.rates.find((row) => row.id === params.rateId);
+    if (!rate || rate.status !== 'APPROVED') throw new Error('Only an approved tax rate can be activated.');
+    for (const current of state.tax.rates) {
+      if (current.id !== rate.id && current.status === 'ACTIVE' && current.country === rate.country && current.taxClass === rate.taxClass && this.overlaps(current, rate)) {
+        current.status = 'SUPERSEDED';
+      }
+    }
+    rate.status = 'ACTIVE';
+    rate.activatedBy = params.actor;
+    rate.activatedAt = new Date().toISOString();
+    rate.rationale = params.rationale.trim();
+    if (!state.tax.jurisdictions.includes(rate.country)) state.tax.jurisdictions.push(rate.country);
+    state.version += 1;
+    this.audit(state, {
+      entity: 'vat-rate',
+      beforeValue: { id: rate.id, status: 'APPROVED', rateBps: rate.rateBps },
+      afterValue: { id: rate.id, status: rate.status, rateBps: rate.rateBps },
+      currency: null,
+      amountMinor: null,
+      country: rate.country,
+      taxClass: rate.taxClass,
+      taxRateBps: rate.rateBps,
+      actor: params.actor,
+      role: params.actorRole,
+      rationale: rate.rationale,
+      evidence: rate.evidence,
+      effectiveFrom: rate.effectiveFrom,
+    });
+    this.persist();
+    return rate;
+  }
+
+  static setShippingTaxClass(params: { actor: string; actorRole: RoleName; taxClass: TaxClass; rationale: string; evidence: string }): void {
+    if (params.actorRole !== 'SUPER_ADMIN') throw new Error('Only SUPER_ADMIN can set shipping tax treatment.');
+    if (!TAX_CLASSES.includes(params.taxClass)) throw new Error('Shipping tax class must be explicit.');
+    if (!params.rationale?.trim() || !params.evidence?.trim()) throw new Error('Shipping tax treatment requires rationale and evidence.');
+    const state = this.get();
+    const before = state.tax.shippingTaxClass || 'NOT_CONFIGURED';
+    state.tax.shippingTaxClass = params.taxClass;
+    state.version += 1;
+    this.audit(state, {
+      entity: 'shipping-tax-class',
+      beforeValue: before,
+      afterValue: params.taxClass,
+      currency: null,
+      amountMinor: null,
+      country: null,
+      taxClass: params.taxClass,
+      taxRateBps: null,
+      actor: params.actor,
+      role: params.actorRole,
+      rationale: params.rationale.trim(),
+      evidence: params.evidence.trim(),
+      effectiveFrom: null,
+    });
+    this.persist();
+  }
+
+  static taxReadiness(): { displayMode: TaxDisplayMode; shippingTaxClass: TaxClass; jurisdictions: string[]; activeRates: number; state: 'TAX_CONFIGURATION_REQUIRED' | 'CONFIGURED' } {
+    const tax = this.get().tax;
+    const activeRates = tax.rates.filter((row) => row.status === 'ACTIVE').length;
+    const configured = tax.displayMode !== 'NOT_CONFIGURED' && activeRates > 0;
+    return {
+      displayMode: tax.displayMode,
+      shippingTaxClass: tax.shippingTaxClass || 'NOT_CONFIGURED',
+      jurisdictions: [...tax.jurisdictions],
+      activeRates,
+      state: configured ? 'CONFIGURED' : 'TAX_CONFIGURATION_REQUIRED',
+    };
   }
 
   static assignTaxClass(params: { actor: string; actorRole: RoleName; productSlug: string; taxClass: TaxClass; evidence: string }): void {

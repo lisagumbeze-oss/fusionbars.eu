@@ -8,8 +8,9 @@ import { AdminOverrides } from '@/domain/admin/AdminOverrides';
 import { PaymentConfigService } from '@/domain/payments/PaymentConfig';
 import { CANONICAL_ORDER_STATUSES, OrderStatus } from '@/types';
 import { SUPPORTED_LOCALES } from '@/i18n';
+import { ProductionInfrastructureService } from '@/domain/infrastructure/ProductionInfrastructureService';
 
-export const PRODUCTION_CONTROL_STATE = 'PAUSED' as const;
+export { PRODUCTION_CONTROL_STATE } from '@/domain/admin/production-state';
 
 export interface CatalogueOperationsSnapshot {
   available: boolean;
@@ -71,8 +72,9 @@ export interface AdminSettingsSnapshot {
   };
   cryptoDiscountPercent: number;
   security: {
-    sessionSecretConfigured: boolean;
-    authSecretConfigured: boolean;
+    sessionSecret: 'CONFIGURED' | 'BLOCKED';
+    authSecret: 'CONFIGURED' | 'BLOCKED';
+    orderLookupSecret: 'CONFIGURED' | 'BLOCKED';
     distributedRateLimit: boolean;
   };
 }
@@ -204,6 +206,10 @@ export class AdminDashboardService {
   }
 
   static settingsSnapshot(): AdminSettingsSnapshot {
+    const secretStatus = (name: 'SESSION_SECRET' | 'AUTH_SECRET' | 'ORDER_LOOKUP_SECRET'): 'CONFIGURED' | 'BLOCKED' => {
+      const row = ProductionInfrastructureService.signingSecretStatus().secrets.find((item) => item.name === name);
+      return row?.state === 'CONFIGURED' ? 'CONFIGURED' : 'BLOCKED';
+    };
     const saved = AdminOverrides.settings();
     const rates = ShippingService.RATES.EUR;
     return {
@@ -229,8 +235,9 @@ export class AdminDashboardService {
       },
       cryptoDiscountPercent: AdminOverrides.settingsSaved() ? saved.cryptoDiscountPercent : 10,
       security: {
-        sessionSecretConfigured: Boolean(process.env.SESSION_SECRET),
-        authSecretConfigured: Boolean(process.env.AUTH_SECRET),
+        sessionSecret: secretStatus('SESSION_SECRET'),
+        authSecret: secretStatus('AUTH_SECRET'),
+        orderLookupSecret: secretStatus('ORDER_LOOKUP_SECRET'),
         distributedRateLimit: Boolean(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN),
       },
     };

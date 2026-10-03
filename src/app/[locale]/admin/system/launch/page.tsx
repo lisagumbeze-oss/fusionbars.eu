@@ -32,10 +32,18 @@ import {
   getLaunchReadinessReportAction,
   sendTestEmailAction,
   testStorageConnectivityAction,
+  getStorageReadinessAction,
+  getBackupReadinessAction,
+  getMonitoringReadinessAction,
+  sendMonitoringTestSignalAction,
+  getRateLimitReadinessAction,
+  testRateLimitConnectivityAction,
   updatePaymentMethodStageAction,
   getPaymentMethodStatesAction,
   updateLegalDocumentStatusAction,
   getTransactionalEmailPreviewAction,
+  getFinalLaunchDecisionAction,
+  activateProductionAction,
 } from '@/actions/launch';
 import { LaunchReadinessReport, LaunchRequirement } from '@/domain/launch/LaunchReadinessService';
 import { PaymentMethodState } from '@/domain/payments/PaymentActivationService';
@@ -58,6 +66,11 @@ export default function LaunchControlCenterPage() {
   // Storage probe state
   const [storageProbing, setStorageProbing] = useState(false);
   const [storageProbeResult, setStorageProbeResult] = useState<string | null>(null);
+  const [storageStatus, setStorageStatus] = useState<{ provider: string; state: string; privateStorage: string; publicMedia: string; lastTest: string; errors: string[] } | null>(null);
+  const [backupStatus, setBackupStatus] = useState<{ provider: string; providerVariable: string; state: string; restore: string; retention: string; lastBackupAt: string | null; error: string | null } | null>(null);
+  const [monitoringStatus, setMonitoringStatus] = useState<{ provider: string; state: string; alerting: string; testSignal: string; lastSuccessAt: string | null; lastFailureAt: string | null; error: string | null } | null>(null);
+  const [rateStatus, setRateStatus] = useState<{ provider: string; state: string; mode: string; connectivity: string; sharedEnforcement: string; lastFailureAt: string | null; error: string | null } | null>(null);
+  const [opsMessage, setOpsMessage] = useState<string | null>(null);
 
   // Email preview state
   const [selectedTemplate, setSelectedTemplate] = useState('sepa_confirmation');
@@ -65,13 +78,12 @@ export default function LaunchControlCenterPage() {
   const [previewData, setPreviewData] = useState<{ subject?: string; html?: string } | null>(null);
 
   // 24-point staging checklist state
-  const [checklist, setChecklist] = useState<Record<number, 'PASS' | 'FAIL' | 'NOT_TESTED'>>({
-    1: 'PASS', 2: 'PASS', 3: 'PASS', 4: 'PASS', 5: 'PASS', 6: 'PASS',
-    7: 'PASS', 8: 'PASS', 9: 'PASS', 10: 'NOT_TESTED', 11: 'NOT_TESTED',
-    12: 'PASS', 13: 'PASS', 14: 'PASS', 15: 'PASS', 16: 'PASS',
-    17: 'PASS', 18: 'PASS', 19: 'PASS', 20: 'PASS', 21: 'PASS',
-    22: 'PASS', 23: 'PASS', 24: 'PASS',
-  });
+  const [checklist, setChecklist] = useState<Record<number, 'PASS' | 'FAIL' | 'NOT_TESTED'>>(
+    Object.fromEntries(Array.from({ length: 24 }, (_, index) => [index + 1, 'NOT_TESTED'])) as Record<number, 'PASS' | 'FAIL' | 'NOT_TESTED'>,
+  );
+  const [finalDecision, setFinalDecision] = useState<'LAUNCH_BLOCKED' | 'READY_TO_LAUNCH' | null>(null);
+  const [finalError, setFinalError] = useState<string | null>(null);
+  const [confirmation, setConfirmation] = useState('');
 
   const checklistItems = [
     'Homepage Rendering & Hero Value Props',
@@ -104,10 +116,60 @@ export default function LaunchControlCenterPage() {
     setLoading(true);
     setErrorMsg(null);
     try {
-      const [repRes, payRes] = await Promise.all([
+      const [repRes, payRes, finalRes, storageRes, backupRes, monitoringRes, rateRes] = await Promise.all([
         getLaunchReadinessReportAction(),
         getPaymentMethodStatesAction(),
+        getFinalLaunchDecisionAction(),
+        getStorageReadinessAction(),
+        getBackupReadinessAction(),
+        getMonitoringReadinessAction(),
+        getRateLimitReadinessAction(),
       ]);
+      if (monitoringRes.success) {
+        setMonitoringStatus({
+          provider: monitoringRes.provider,
+          state: monitoringRes.state,
+          alerting: monitoringRes.alerting,
+          testSignal: monitoringRes.testSignal,
+          lastSuccessAt: monitoringRes.lastSuccessAt,
+          lastFailureAt: monitoringRes.lastFailureAt,
+          error: monitoringRes.error,
+        });
+      }
+      if (rateRes.success) {
+        setRateStatus({
+          provider: rateRes.provider,
+          state: rateRes.state,
+          mode: rateRes.mode,
+          connectivity: rateRes.connectivity,
+          sharedEnforcement: rateRes.sharedEnforcement,
+          lastFailureAt: rateRes.lastFailureAt,
+          error: rateRes.error,
+        });
+      }
+      if (backupRes.success) {
+        setBackupStatus({
+          provider: backupRes.provider,
+          providerVariable: backupRes.providerVariable,
+          state: backupRes.state,
+          restore: backupRes.restore,
+          retention: backupRes.retention,
+          lastBackupAt: backupRes.lastBackupAt,
+          error: backupRes.error,
+        });
+      }
+      if (storageRes.success) {
+        setStorageStatus({
+          provider: storageRes.provider,
+          state: storageRes.state,
+          privateStorage: storageRes.privateStorage,
+          publicMedia: storageRes.publicMedia,
+          lastTest: storageRes.lastTest,
+          errors: storageRes.errors,
+        });
+      }
+      if (finalRes.success && finalRes.decision) setFinalDecision(finalRes.decision.decision);
+      else setFinalDecision('LAUNCH_BLOCKED');
 
       if (!repRes.success || !repRes.report) {
         setErrorMsg(repRes.error || 'Failed to retrieve launch readiness report.');
@@ -149,7 +211,7 @@ export default function LaunchControlCenterPage() {
     setTestEmailSending(true);
     setTestEmailResult(null);
 
-    const res = await sendTestEmailAction({ recipientEmail: testEmailRecipient });
+    const res = await sendTestEmailAction({ recipientEmail: testEmailRecipient, templateId: selectedTemplate, confirmation: 'SEND_TEST_EMAIL' });
     if (res.success) {
       setTestEmailResult(`Success: ${res.message}`);
     } else {
@@ -260,6 +322,33 @@ export default function LaunchControlCenterPage() {
           </button>
         </div>
       </div>
+
+      <section className="rounded-2xl border border-[#E5E3DD] bg-white p-6 space-y-3">
+        <h2 className="font-serif text-xl font-bold text-[#121212]">Final launch gate</h2>
+        <p className="text-sm text-[#5C5852]">Production control is PAUSED. The staging checklist below is not inspected and is not a launch approval.</p>
+        <p className="font-mono text-sm font-bold text-[#121212]">{finalDecision || 'LAUNCH_BLOCKED'}</p>
+        {finalDecision === 'READY_TO_LAUNCH' ? (
+          <div className="space-y-3">
+            <p className="text-sm text-[#121212]">Production launch readiness verified. All mandatory production gates have passed. Activating production will make the configured storefront, payment methods, customer workflows, email delivery, and approved catalogue available according to the current production configuration.</p>
+            <input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className="w-full border border-[#E5E3DD] rounded-lg px-3 py-2 text-sm" aria-label="Confirm Production Activation" placeholder="Confirm Production Activation" />
+            <button
+              type="button"
+              className="px-4 py-2 rounded-lg bg-[#4A5D4E] text-white text-sm font-semibold disabled:opacity-40"
+              disabled={confirmation !== 'Confirm Production Activation'}
+              onClick={async () => {
+                const result = await activateProductionAction(confirmation);
+                setFinalError(result.error || null);
+                if (result.success) setFinalDecision('READY_TO_LAUNCH');
+              }}
+            >
+              Confirm Production Activation
+            </button>
+          </div>
+        ) : (
+          <p className="text-sm text-[#5C5852]">Activation stays unavailable while a mandatory gate is blocked, unconfigured, or deferred.</p>
+        )}
+        {finalError ? <p className="text-sm text-rose-800">{finalError}</p> : null}
+      </section>
 
       {/* Primary Environment Gate Banner */}
       <div className="rounded-2xl p-6 border shadow-xs bg-[#FFF5F5] border-rose-200">
@@ -720,8 +809,21 @@ export default function LaunchControlCenterPage() {
               </h3>
             </div>
             <p className="text-xs text-[#5C5852] leading-relaxed">
-              Uploads an encrypted test document and asserts presigned download authorization. Verifies that payment proofs cannot be enumerated publicly.
+              Production storage stays unconfigured until a real private provider passes a connectivity probe. A successful mock write is not production readiness.
             </p>
+            {storageStatus && (
+              <dl className="grid grid-cols-2 gap-2 text-xs">
+                <div><dt className="text-[#8A847A]">Provider</dt><dd className="font-semibold">{storageStatus.provider}</dd></div>
+                <div><dt className="text-[#8A847A]">State</dt><dd className="font-semibold">{storageStatus.state}</dd></div>
+                <div><dt className="text-[#8A847A]">Private storage</dt><dd className="font-semibold">{storageStatus.privateStorage}</dd></div>
+                <div><dt className="text-[#8A847A]">Public media</dt><dd className="font-semibold">{storageStatus.publicMedia}</dd></div>
+                <div><dt className="text-[#8A847A]">Last test</dt><dd className="font-semibold">{storageStatus.lastTest}</dd></div>
+                <div><dt className="text-[#8A847A]">Retention</dt><dd className="font-semibold">NOT_CONFIGURED</dd></div>
+              </dl>
+            )}
+            {storageStatus && storageStatus.errors.length > 0 && (
+              <p className="text-xs text-rose-800">{storageStatus.errors[0]}</p>
+            )}
 
             {storageProbeResult && (
               <div className={`p-3 rounded-lg text-xs ${storageProbeResult.startsWith('Success') ? 'bg-emerald-50 text-emerald-800 border border-emerald-200' : 'bg-rose-50 text-rose-800 border border-rose-200'}`}>
@@ -736,6 +838,74 @@ export default function LaunchControlCenterPage() {
             >
               {storageProbing ? 'Probing Bucket...' : 'Run Storage Connectivity Probe'}
             </button>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#4A5D4E]/10 text-[#4A5D4E] flex items-center justify-center">
+                <Database className="w-4 h-4" />
+              </div>
+              <h3 className="font-serif text-base font-bold text-[#121212]">
+                Database Backup &amp; Restore
+              </h3>
+            </div>
+            <p className="text-xs text-[#5C5852] leading-relaxed">
+              A provider name is not a verified backup. Restore stays unrehearsed until a separate database is recovered and read by the application.
+            </p>
+            {backupStatus && (
+              <dl className="grid grid-cols-2 gap-2 text-xs">
+                <div><dt className="text-[#8A847A]">Provider</dt><dd className="font-semibold">{backupStatus.provider}</dd></div>
+                <div><dt className="text-[#8A847A]">Configuration</dt><dd className="font-semibold">{backupStatus.providerVariable}</dd></div>
+                <div><dt className="text-[#8A847A]">State</dt><dd className="font-semibold">{backupStatus.state}</dd></div>
+                <div><dt className="text-[#8A847A]">Restore</dt><dd className="font-semibold">{backupStatus.restore}</dd></div>
+                <div><dt className="text-[#8A847A]">Retention</dt><dd className="font-semibold">{backupStatus.retention}</dd></div>
+                <div><dt className="text-[#8A847A]">Last verified backup</dt><dd className="font-semibold">{backupStatus.lastBackupAt || 'NOT_RUN'}</dd></div>
+              </dl>
+            )}
+            {backupStatus?.error && <p className="text-xs text-rose-800">{backupStatus.error}</p>}
+          </div>
+
+          <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#4A5D4E]/10 text-[#4A5D4E] flex items-center justify-center">
+                <Activity className="w-4 h-4" />
+              </div>
+              <h3 className="font-serif text-base font-bold text-[#121212]">Monitoring</h3>
+            </div>
+            <p className="text-xs text-[#5C5852] leading-relaxed">Structured logs stay separate from an external monitor. A DSN value is not an accepted test signal.</p>
+            {monitoringStatus && (
+              <dl className="grid grid-cols-2 gap-2 text-xs">
+                <div><dt className="text-[#8A847A]">Provider</dt><dd className="font-semibold">{monitoringStatus.provider}</dd></div>
+                <div><dt className="text-[#8A847A]">State</dt><dd className="font-semibold">{monitoringStatus.state}</dd></div>
+                <div><dt className="text-[#8A847A]">Alerting</dt><dd className="font-semibold">{monitoringStatus.alerting}</dd></div>
+                <div><dt className="text-[#8A847A]">Test signal</dt><dd className="font-semibold">{monitoringStatus.testSignal}</dd></div>
+                <div><dt className="text-[#8A847A]">Last success</dt><dd className="font-semibold">{monitoringStatus.lastSuccessAt || 'NOT_RUN'}</dd></div>
+                <div><dt className="text-[#8A847A]">Last failure</dt><dd className="font-semibold">{monitoringStatus.lastFailureAt || 'NONE'}</dd></div>
+              </dl>
+            )}
+            <button type="button" onClick={async () => { const res = await sendMonitoringTestSignalAction('SEND_MONITORING_TEST'); setOpsMessage(res.success ? 'Monitoring test accepted.' : res.error || 'Monitoring test did not succeed.'); await loadData(); }} className="w-full py-2.5 rounded-lg bg-[#121212] text-white text-xs font-semibold cursor-pointer">Send Monitoring Test Signal</button>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg bg-[#4A5D4E]/10 text-[#4A5D4E] flex items-center justify-center">
+                <ShieldAlert className="w-4 h-4" />
+              </div>
+              <h3 className="font-serif text-base font-bold text-[#121212]">Distributed Rate Limiting</h3>
+            </div>
+            <p className="text-xs text-[#5C5852] leading-relaxed">The in-memory window is for development. Production stays blocked until Upstash shared enforcement passes.</p>
+            {rateStatus && (
+              <dl className="grid grid-cols-2 gap-2 text-xs">
+                <div><dt className="text-[#8A847A]">Provider</dt><dd className="font-semibold">{rateStatus.provider}</dd></div>
+                <div><dt className="text-[#8A847A]">State</dt><dd className="font-semibold">{rateStatus.state}</dd></div>
+                <div><dt className="text-[#8A847A]">Mode</dt><dd className="font-semibold">{rateStatus.mode}</dd></div>
+                <div><dt className="text-[#8A847A]">Connectivity</dt><dd className="font-semibold">{rateStatus.connectivity}</dd></div>
+                <div><dt className="text-[#8A847A]">Shared enforcement</dt><dd className="font-semibold">{rateStatus.sharedEnforcement}</dd></div>
+                <div><dt className="text-[#8A847A]">Last failure</dt><dd className="font-semibold">{rateStatus.lastFailureAt || 'NONE'}</dd></div>
+              </dl>
+            )}
+            {opsMessage && <p className="text-xs text-[#5C5852]">{opsMessage}</p>}
+            <button type="button" onClick={async () => { const res = await testRateLimitConnectivityAction('TEST_RATE_LIMIT'); setOpsMessage(res.success ? 'Rate limit connectivity passed.' : res.error || 'Rate limit test did not succeed.'); await loadData(); }} className="w-full py-2.5 rounded-lg bg-[#121212] text-white text-xs font-semibold cursor-pointer">Test Rate Limit Connectivity</button>
           </div>
         </div>
       )}

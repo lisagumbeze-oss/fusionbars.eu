@@ -7,17 +7,28 @@ import { RBACService } from '../domain/auth/RBACService';
 import { AuthService } from '../domain/auth/AuthService';
 import { RoleName } from '../types';
 import { CommerceRepository } from '../lib/commerce-repository';
-import { dispatchEmailSafely, EmailService } from '@/services/email/EmailService';
+import { EmailService } from '@/services/email/EmailService';
+import { EmailDeliveryLedger } from '@/services/email/EmailDeliveryLedger';
 import { dispatchOrderStatusEmail } from '@/services/email/order-notifications';
+import { ObjectStorageService } from '@/services/storage/ObjectStorageService';
+import { RateLimiterService } from '@/lib/rate-limiter';
+import { PaymentConfigurationService } from '@/domain/payments/PaymentConfigurationService';
 
 /**
  * Server Action: Customer submits payment proof (Bank transfer reference, wire slip, or Crypto TXID).
  * Protected against IDOR: requires authenticated ownership or valid guest lookup credentials.
  */
+export async function listCustomerPaymentMethodsAction() {
+  const methods = PaymentConfigurationService.customerMethods();
+  return { mode: methods.mode, methods: methods.methods.map((method) => ({ code: method.code, name: method.name })) };
+}
+
 export async function submitPaymentProofAction(rawInput: unknown) {
   try {
     const validated = paymentProofSubmissionSchema.parse(rawInput);
     const { orderId, referenceOrTxid, senderAccountName, proofFileUrl, lookupToken, guestEmail } = validated;
+    const limited = await RateLimiterService.enforce('payment_proof_submission', orderId);
+    if (!limited.allowed) return { success: false, error: limited.error };
 
     const order = await CommerceRepository.findOrderByIdOrNumber(orderId);
     if (!order) {
@@ -25,8 +36,12 @@ export async function submitPaymentProofAction(rawInput: unknown) {
     }
 
     // Ownership & IDOR Verification
-    const cookieStore = await cookies();
-    const sessionToken = cookieStore.get('fb_session')?.value;
+    let sessionToken: string | undefined;
+    try {
+      sessionToken = (await cookies()).get('fb_session')?.value;
+    } catch {
+      sessionToken = undefined;
+    }
     let isAuthorized = false;
 
     if (sessionToken) {
@@ -57,8 +72,11 @@ export async function submitPaymentProofAction(rawInput: unknown) {
       };
     }
 
-    if (proofFileUrl && /^https?:\/\//i.test(proofFileUrl)) {
+    if (proofFileUrl && (/^https?:\/\//i.test(proofFileUrl) || proofFileUrl.includes('..'))) {
       return { success: false, error: 'Payment evidence cannot use a public URL.' };
+    }
+    if (proofFileUrl && !ObjectStorageService.proofBelongsToOrder(proofFileUrl, order.orderNumber)) {
+      return { success: false, error: 'Payment evidence was not stored.' };
     }
 
     const existingOrders = await CommerceRepository.getAllOrders();
@@ -88,9 +106,14 @@ export async function submitPaymentProofAction(rawInput: unknown) {
       `Payment reference submitted: ${referenceOrTxid}${senderAccountName ? ` (Account: ${senderAccountName})` : ''}`
     );
 
-    await dispatchEmailSafely('payment_proof_submitted', () =>
-      EmailService.sendPaymentProofSubmitted(order, referenceOrTxid)
-    );
+    const proofEvent = `${order.orderNumber}:PAYMENT_SUBMITTED:payment-proof-submitted`;
+    if (EmailDeliveryLedger.claim(proofEvent, { template: 'payment-proof-submitted', recipient: order.guestEmail, provider: EmailService.getProvider().name, orderNumber: order.orderNumber })) {
+      try {
+        EmailDeliveryLedger.complete(proofEvent, await EmailService.sendPaymentProofSubmitted(order, referenceOrTxid));
+      } catch (error) {
+        EmailDeliveryLedger.complete(proofEvent, { success: false, error: error instanceof Error ? error.message : 'Email send failed' });
+      }
+    }
 
     CommerceRepository.logAudit({
       action: 'PAYMENT_PROOF_SUBMITTED',

@@ -15,6 +15,7 @@ import { LaunchReadinessService } from '@/domain/launch/LaunchReadinessService';
 import { RBACService } from '@/domain/auth/RBACService';
 import { PublicationReadinessService } from '@/domain/catalog/PublicationReadinessService';
 import { PaymentConfigurationService } from '@/domain/payments/PaymentConfigurationService';
+import { EmailDeliveryLedger } from '@/services/email/EmailDeliveryLedger';
 import { CatalogueRolloutService, QueueFilters } from '@/domain/catalog/CatalogueRolloutService';
 import { RoleName } from '@/types';
 import { AdminOverrides } from '@/domain/admin/AdminOverrides';
@@ -146,9 +147,75 @@ export async function getEmailDeliveryLogAction(role: RoleName) {
     ? (provider as { sentMessages: Array<Record<string, unknown>> }).sentMessages
     : [];
   const sent = recorded.length > 0 ? recorded : mockSent;
-  const entries = projectDeliveryLog(sent, provider.name);
+  const entries = [
+    ...projectDeliveryLog(sent, provider.name),
+    ...EmailDeliveryLedger.list().map((attempt) => ({
+      messageId: attempt.messageId || attempt.eventId,
+      template: attempt.template,
+      recipient: attempt.recipient,
+      provider: attempt.provider,
+      status: attempt.status === 'SENT' ? 'success' as const : attempt.status === 'QUEUED' ? 'pending' as const : attempt.status === 'BOUNCED' ? 'bounced' as const : 'failed' as const,
+      sentAt: attempt.sentAt || attempt.createdAt,
+      deliveryStatus: attempt.status,
+      providerDelivery: attempt.providerDelivery,
+      failureReason: attempt.failureReason,
+      bounceCategory: attempt.bounceCategory,
+      eventId: attempt.eventId,
+      orderNumber: attempt.orderNumber,
+      retryCount: attempt.retryCount,
+      deliveredAt: attempt.deliveredAt,
+    })),
+  ];
   if (deliveryLogExposesSecrets(entries)) return { success: false as const, error: 'Email delivery history is unavailable. Retry.' };
-  return { success: true as const, provider: provider.name, entries };
+  return { success: true as const, provider: provider.name, entries, canRetry: role === 'SUPER_ADMIN' || role === 'ORDER_MANAGER' };
+}
+
+export async function retryEmailDeliveryAction(role: RoleName, eventId: string, confirmation: string) {
+  if (role !== 'SUPER_ADMIN' && role !== 'ORDER_MANAGER') return { success: false as const, error: 'Unauthorized email retry.' };
+  const attempt = EmailDeliveryLedger.list().find((item) => item.eventId === eventId);
+  if (!attempt?.orderNumber) return { success: false as const, error: 'Email attempt not found.' };
+  const order = await CommerceRepository.findOrderByIdOrNumber(attempt.orderNumber);
+  const expected: Record<string, string> = {
+    'payment-verified': 'PAYMENT_VERIFIED',
+    'order-processing': 'PROCESSING',
+    'order-shipped': 'SHIPPED',
+    'order-delivered': 'DELIVERED',
+    'order-cancelled': 'CANCELLED',
+    'payment-rejected': 'CANCELLED',
+    'order-refunded': 'REFUNDED',
+    'payment-proof-submitted': 'PAYMENT_SUBMITTED',
+  };
+  const stillValid = Boolean(order && expected[attempt.template] === order.status);
+  const decision = EmailDeliveryLedger.permitRetry({
+    eventId,
+    role,
+    confirmation,
+    stillValid,
+    recipientValid: attempt.recipient.includes('@'),
+  });
+  if (decision.allowed === false) return { success: false as const, error: decision.error };
+  if (!order) return { success: false as const, error: 'Email attempt not found.' };
+  if (!EmailDeliveryLedger.claim(eventId, { template: attempt.template, recipient: attempt.recipient, provider: EmailService.getProvider().name, orderNumber: order.orderNumber })) {
+    return { success: false as const, error: 'Retry was not accepted.' };
+  }
+  const senders: Record<string, () => Promise<{ success: boolean; messageId?: string; error?: string }>> = {
+    'payment-verified': () => EmailService.sendPaymentVerified(order),
+    'order-processing': () => EmailService.sendOrderProcessing(order),
+    'order-shipped': () => EmailService.sendOrderShipped(order),
+    'order-delivered': () => EmailService.sendOrderDelivered(order),
+    'order-cancelled': () => EmailService.sendOrderCancelled(order),
+    'payment-rejected': () => EmailService.sendPaymentRejected(order),
+    'order-refunded': () => EmailService.sendOrderRefunded(order),
+    'payment-proof-submitted': () => EmailService.sendPaymentProofSubmitted(order, order.paymentReference || 'resend'),
+  };
+  const send = senders[attempt.template];
+  if (!send) {
+    EmailDeliveryLedger.complete(eventId, { success: false, error: 'This template cannot be retried.' });
+    return { success: false as const, error: 'This template cannot be retried.' };
+  }
+  const result = await send();
+  EmailDeliveryLedger.complete(eventId, result);
+  return result.success ? { success: true as const, message: 'Email retry handed to the provider.' } : { success: false as const, error: result.error || 'Retry failed.' };
 }
 
 export async function getAdminSettingsAction(role: RoleName) {
