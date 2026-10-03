@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Mail, Shield, Check, ArrowRight } from 'lucide-react';
 import { useCommerce } from '../context/CommerceContext';
 import { getDictionary } from '../i18n';
@@ -14,7 +15,6 @@ export default function Footer() {
   const { locale } = useCommerce();
   const dict = getDictionary(locale);
   const supportEmail = AdminOverrides.settings().supportEmail;
-  const storeName = AdminOverrides.settings().storeName;
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [subscribeError, setSubscribeError] = useState<string | null>(null);
@@ -65,11 +65,11 @@ export default function Footer() {
 
           <div className="flex items-start gap-3">
             <div className="w-8 h-8 rounded bg-[#4A5D4E]/20 text-[#88A48D] flex items-center justify-center shrink-0">
-              <span className="font-mono font-bold text-xs">€</span>
+              <span className="font-mono font-bold text-xs">€/£</span>
             </div>
             <div>
-              <strong className="block text-neutral-100 font-semibold mb-0.5">Launch currency</strong>
-              <p className="text-neutral-400">EUR is the launch currency. British Pound checkout is not enabled for this launch.</p>
+              <strong className="block text-neutral-100 font-semibold mb-0.5">Euro and Pound</strong>
+              <p className="text-neutral-400">Switch between EUR and GBP in the announcement bar. Each price uses the amount stored for that currency.</p>
             </div>
           </div>
 
@@ -89,14 +89,15 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 text-xs">
         {/* Brand & Manifesto */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded bg-[#4A5D4E] text-white flex items-center justify-center font-serif text-sm font-bold">
-              F
-            </div>
-            <span className="font-serif text-lg tracking-wider font-bold text-neutral-100">
-              {storeName.toUpperCase()}
-            </span>
-          </div>
+          <Link href={`/${locale}`} className="inline-flex" aria-label="Fusion Mushroom Bars EU home">
+            <Image
+              src="/images/brand/fusion-logo.jpg"
+              alt="Fusion"
+              width={1024}
+              height={394}
+              className="h-10 w-auto"
+            />
+          </Link>
           <p className="text-neutral-400 leading-relaxed max-w-sm">
             {dict.common.tagline}. Europe&apos;s premier botanical confection atelier, harmonizing single-origin Belgian couverture chocolate with verified functional mycology. {applyCryptoDiscountCopy(dict.payment.cryptoDiscountBody)}
           </p>
@@ -107,27 +108,35 @@ export default function Footer() {
 
         {/* Collection Links */}
         <div className="space-y-3">
-          <h4 className="font-semibold text-neutral-200 tracking-wider uppercase text-[11px]">Collections</h4>
+          <h4 className="font-semibold text-neutral-200 tracking-wider uppercase text-[11px]">Shop</h4>
           <ul className="space-y-2 text-neutral-400">
+            <li><Link href={`/${locale}/shop`} className="hover:text-white transition">All products</Link></li>
             <li><Link href={`/${locale}/shop?category=artisan-chocolate-bars`} className="hover:text-white transition">Artisan Chocolate Bars (6g)</Link></li>
             <li><Link href={`/${locale}/shop?category=gummies`} className="hover:text-white transition">Fruit Pectin Gummies (4g)</Link></li>
             <li><Link href={`/${locale}/shop?category=bundles-collections`} className="hover:text-white transition">Boutique Curated Boxes</Link></li>
             <li><Link href={`/${locale}/shop?category=botanical-vaporizers`} className="hover:text-white transition">Botanical Vaporizers (2ml)</Link></li>
             <li><Link href={`/${locale}/shop?category=capsules`} className="hover:text-white transition">Microdose Capsules (30ct)</Link></li>
+            <li><Link href={`/${locale}/cart`} className="hover:text-white transition">Shopping bag</Link></li>
           </ul>
         </div>
 
         {/* Customer Care & Governance */}
         <div className="space-y-3">
-          <h4 className="font-semibold text-neutral-200 tracking-wider uppercase text-[11px]">Transparency & Legal</h4>
+          <h4 className="font-semibold text-neutral-200 tracking-wider uppercase text-[11px]">Customer</h4>
           <ul className="space-y-2 text-neutral-400">
+            <li><Link href={`/${locale}/about`} className="hover:text-white transition">About</Link></li>
+            <li><Link href={`/${locale}/faq`} className="hover:text-white transition">FAQs</Link></li>
+            <li><Link href={`/${locale}/contact`} className="hover:text-white transition">Contact</Link></li>
+            <li><Link href={`/${locale}/orders/lookup`} className="hover:text-white transition">Order status</Link></li>
+            <li><Link href={`/${locale}/account`} className="hover:text-white transition">Account</Link></li>
+            <li><Link href={`/${locale}/news`} className="hover:text-white transition">News</Link></li>
+            <li><Link href={`/${locale}/privacy`} className="hover:text-white transition">Privacy</Link></li>
             {LegalGovernanceService.publicLinks().map((link) => (
               <li key={link.type}><Link href={`/${locale}${link.href}`} className="hover:text-white transition">{link.type}</Link></li>
             ))}
             {Object.keys(LegalGovernanceService.publicProfile()).length > 0 && (
               <li><Link href={`/${locale}/legal/company`} className="hover:text-white transition">Company information</Link></li>
             )}
-            <li><Link href={`/${locale}/contact`} className="hover:text-white transition">Customer support</Link></li>
           </ul>
         </div>
 
@@ -137,6 +146,7 @@ export default function Footer() {
           <p className="text-neutral-400">
             Receive laboratory release bulletins, private batch allocations, and European dispatch notices.
           </p>
+          <Link href={`/${locale}/news`} className="inline-block text-neutral-300 hover:text-white transition">Read the store notes</Link>
           {subscribed ? (
             <div className="p-3 rounded bg-emerald-950/40 border border-emerald-800 text-emerald-300 flex items-center gap-2">
               <Check className="w-4 h-4" />

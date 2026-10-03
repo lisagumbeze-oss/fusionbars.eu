@@ -20,6 +20,7 @@ export interface Dictionary {
     labReports: string;
     origins: string;
     about: string;
+    faq: string;
     cart: string;
     account: string;
   };
@@ -77,7 +78,8 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       shop: 'Shop Collection',
       labReports: 'Lab Reports (COA)',
       origins: 'Fulfilment Hubs',
-      about: 'About Fusion EU',
+      about: 'About',
+      faq: 'FAQs',
       cart: 'Shopping Bag',
       account: 'Customer Account',
     },
@@ -134,6 +136,7 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       labReports: 'Laborberichte',
       origins: 'Versandzentren',
       about: 'Über Fusion EU',
+      faq: 'FAQ',
       cart: 'Warenkorb',
       account: 'Kundenkonto',
     },
@@ -190,6 +193,7 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       labReports: 'Analyses Labo',
       origins: 'Centres Logistiques',
       about: 'À propos',
+      faq: 'FAQ',
       cart: 'Panier',
       account: 'Mon Compte',
     },
@@ -246,6 +250,7 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       labReports: 'Certificados COA',
       origins: 'Centros de Envío',
       about: 'Sobre Nosotros',
+      faq: 'FAQ',
       cart: 'Cesta',
       account: 'Mi Cuenta',
     },
@@ -302,6 +307,7 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       labReports: 'Certificati Analisi',
       origins: 'Centri Logistici',
       about: 'Chi Siamo',
+      faq: 'FAQ',
       cart: 'Carrello',
       account: 'Il Mio Account',
     },
@@ -358,6 +364,7 @@ export const DICTIONARIES: Record<LocaleCode, Dictionary> = {
       labReports: 'Labrapporten',
       origins: 'Verzendhubs',
       about: 'Over Fusion EU',
+      faq: 'FAQ',
       cart: 'Winkelmand',
       account: 'Mijn Account',
     },

@@ -50,7 +50,7 @@ export default function ProductCard({ product }: ProductCardProps) {
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="group relative flex flex-col bg-white rounded-xl border border-[#E5E3DD] overflow-hidden hover:shadow-lg transition-all duration-300"
+      className="group relative flex flex-col overflow-hidden rounded-xl border border-[#E5E3DD] bg-white shadow-sm transition duration-300 hover:shadow-lg motion-safe:hover:-translate-y-1"
     >
       {/* Product Image Frame */}
       <Link
@@ -62,7 +62,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           alt={`${product.name} - ${selectedVariant.flavor}`}
           fill
           sizes="(max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
-          className="object-contain p-2 sm:p-4 group-hover:scale-105 transition-transform duration-500"
+          className="object-contain p-2 sm:p-4 motion-safe:group-hover:scale-105 motion-safe:transition-transform motion-safe:duration-500"
           referrerPolicy="no-referrer"
         />
 
@@ -101,13 +101,6 @@ export default function ProductCard({ product }: ProductCardProps) {
       {/* Card Content Area */}
       <div className="p-3 sm:p-5 flex-1 flex flex-col justify-between space-y-2 sm:space-y-3">
         <div>
-          {/* Category Kicker (Quiet inline text) */}
-          <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-[#5C5852] uppercase tracking-wider font-semibold mb-1 min-w-0">
-            <span className="truncate">{product.categoryName}</span>
-            <span aria-hidden="true">&bull;</span>
-            <span className="shrink-0">{selectedVariant.weightLabel}</span>
-          </div>
-
           {/* Product Title */}
           <Link
             href={`/${locale}/products/${product.slug}`}
@@ -159,7 +152,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           <button
             onClick={handleQuickAdd}
             disabled={selectedVariant.stockStatus === 'OUT_OF_STOCK'}
-            className={`w-full sm:w-auto justify-center px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer ${
+            className={`w-full sm:w-auto justify-center px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer motion-safe:active:scale-[0.98] ${
               isAdded
                 ? 'bg-emerald-600 text-white'
                 : selectedVariant.stockStatus === 'OUT_OF_STOCK'

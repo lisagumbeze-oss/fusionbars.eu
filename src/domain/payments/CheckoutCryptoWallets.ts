@@ -20,7 +20,6 @@ export interface CheckoutCryptoWallet {
 const WALLET_ENV: Array<{ symbol: string; name: string; networkEnv: string; addressEnv: string }> = [
   { symbol: 'BTC', name: 'Bitcoin', networkEnv: 'CRYPTO_BTC_NETWORK', addressEnv: 'CRYPTO_BTC_ADDRESS' },
   { symbol: 'ETH', name: 'Ethereum', networkEnv: 'CRYPTO_ETH_NETWORK', addressEnv: 'CRYPTO_ETH_ADDRESS' },
-  { symbol: 'USDT', name: 'Tether', networkEnv: 'CRYPTO_USDT_NETWORK', addressEnv: 'CRYPTO_USDT_ADDRESS' },
   { symbol: 'BCH', name: 'Bitcoin Cash', networkEnv: 'CRYPTO_BCH_NETWORK', addressEnv: 'CRYPTO_BCH_ADDRESS' },
 ];
 
@@ -73,7 +72,7 @@ export async function getCheckoutCryptoWallets(quote: {
   }));
 
   const amounts = wallets.length > 0
-    ? await quoteCryptoAmounts(quote.amountMinor, quote.currency, wallets.map((wallet) => wallet.symbol))
+    ? await quoteCryptoAmounts(quote.amountMinor, quote.currency, wallets.map((wallet) => wallet.symbol)).catch(() => ({} as Record<string, string>))
     : {};
 
   return Promise.all(

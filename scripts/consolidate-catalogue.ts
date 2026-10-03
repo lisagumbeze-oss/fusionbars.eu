@@ -15,6 +15,7 @@ export interface NormalizedVariant {
   stockLevel: number;
   stockStatus: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
   image: string;
+  description?: string;
   provenance: string[];
 }
 

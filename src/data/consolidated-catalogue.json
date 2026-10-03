@@ -22,7 +22,7 @@
       "slug": "artisan-chocolate-bars",
       "tagline": "Hand-tempered Belgian chocolate with functional European botanicals",
       "description": "Explore 26+ artisan flavors crafted in small batches using single-origin cocoa and certified European botanical extracts.",
-      "image": "/images/products/chocolate-bar.png",
+      "image": "/images/products/reference/fusion-bars-display-cases.jpg",
       "productCount": 3
     },
     {
@@ -30,7 +30,7 @@
       "slug": "gummies",
       "tagline": "Plant-based fruit pectin gummies with pure botanical essences",
       "description": "100% vegan, gelatin-free fruit gummies created with natural fruit purees and active functional botanicals.",
-      "image": "/images/products/a-box-of-fusion-gummies.png",
+      "image": "/images/products/reference/fusion-gummies-berry-citrus-0.png",
       "productCount": 1
     },
     {
@@ -38,7 +38,7 @@
       "slug": "bundles-collections",
       "tagline": "Multi-bar tasting boxes and commercial collector editions",
       "description": "Curated 10, 30, 50, and 100-bar presentation cases. Orders over €300 qualify for complimentary European shipping.",
-      "image": "/images/products/fusion-100-bars-boutique-box.png",
+      "image": "/images/products/reference/fusion-10-bars-boutique-box-0.jpg",
       "productCount": 4
     },
     {
@@ -46,7 +46,7 @@
       "slug": "botanical-vaporizers",
       "tagline": "Precision ceramic hardware with natural plant terpenes",
       "description": "All-in-one rechargeable vaporizers formulated with pure aromatic botanicals in medical-grade hardware.",
-      "image": "/images/products/berry-lemon-disposable.webp",
+      "image": "/images/products/reference/whole-melt-x-fusion-disposables-0.jpg",
       "productCount": 1
     },
     {
@@ -66,9 +66,9 @@
       "brand": "Fusion EU Artisan Confections",
       "categorySlug": "artisan-chocolate-bars",
       "categoryName": "Artisan Chocolate Bars",
-      "headline": "Belgian Couverture Chocolate with Certified European Functional Botanicals",
-      "shortDescription": "Small-batch gourmet chocolate bars infused with our proprietary European botanical mushroom blend. Hand-tempered in certified culinary facilities.",
-      "description": "Crafted in Europe using single-origin Belgian chocolate and certified culinary functional botanical extracts. Each 6g chocolate bar is scored into 12 precision confection pieces. Free from synthetic additives, artificial flavors, and preservatives. Shipped in discreet, temperature-guarded packaging across Europe.",
+      "headline": "Foil boutique chocolate bars with the flavor name on the wrapper",
+      "shortDescription": "The Fusion chocolate bar, photographed flavor by flavor on the Fusion Bars shop. The mark sits in the centre and the flavor name sits at the lower right.",
+      "description": "Each Fusion bar is a foil sleeve with the Fusion mark in the centre and the flavor name at the lower right. The back panel carries a QR code so the sleeve can be checked against the genuine pack. Fusion Bars EU dispatches these bars from Europe in discreet, temperature-guarded packaging. The 10-bar boutique box holds one each of ten flavors. For any other mix, write the flavors in the order note at checkout.",
       "productType": "CHOCOLATE_BAR",
       "status": "PUBLISHED",
       "reviewStatus": "APPROVED",
@@ -86,13 +86,50 @@
         "IE",
         "LU"
       ],
-      "primaryImage": "/images/products/chocolate-bar.png",
-      "hoverImage": "/images/products/birthday-cake.webp",
+      "primaryImage": "/images/products/reference/birthday-cake-fusion-bar-0.jpg",
+      "hoverImage": "/images/products/reference/fusion-bars-almond-crush-0.png",
       "galleryImages": [
-        "/images/products/chocolate-bar.png",
-        "/images/products/birthday-cake.webp",
-        "/images/products/almond-crush.png",
-        "/images/products/fusion-bar-cinnamon-toast.png"
+        "/images/products/reference/fusion-bars-display-cases.jpg",
+        "/images/products/reference/fusion-bars-almond-crush-0.png",
+        "/images/products/reference/birthday-cake-fusion-bar-0.jpg",
+        "/images/products/reference/birthday-cake-fusion-bar-1.jpg",
+        "/images/products/reference/cinnamon-toast-fusion-bar-0.png",
+        "/images/products/reference/cookie-dough-fusion-bar-0.jpg",
+        "/images/products/reference/cookies-cream-fusion-bar-0.png",
+        "/images/products/reference/cotton-candy-fusion-bar-0.jpg",
+        "/images/products/reference/cotton-candy-fusion-bar-1.jpg",
+        "/images/products/reference/ferrero-rocher-fusion-bar-0.png",
+        "/images/products/reference/fusion-bars-fuit-loops-0.png",
+        "/images/products/reference/heath-fusion-bar-0.jpg",
+        "/images/products/reference/heath-fusion-bar-1.jpg",
+        "/images/products/reference/fusion-bars-horchata-0.jpg",
+        "/images/products/reference/fusion-bars-horchata-1.jpg",
+        "/images/products/reference/capn-crunch-fusion-bar-0.jpg",
+        "/images/products/reference/capn-crunch-fusion-bar-1.jpg",
+        "/images/products/reference/keylime-pie-fusion-bar-0.jpg",
+        "/images/products/reference/keylime-pie-fusion-bar-1.jpg",
+        "/images/products/reference/fusion-bars-kitkat-0.jpg",
+        "/images/products/reference/fusion-bars-kitkat-1.jpg",
+        "/images/products/reference/lemon-blueberry-fusion-bar-0.jpg",
+        "/images/products/reference/fusion-bars-emms-0.jpg",
+        "/images/products/reference/fusion-bars-emms-1.jpg",
+        "/images/products/reference/matcha-fusion-mushroom-bars-0.jpg",
+        "/images/products/reference/fusion-bars-milk-chocolate-0.jpg",
+        "/images/products/reference/fusion-bars-mocha-0.jpg",
+        "/images/products/reference/nerds-fusion-bar-0.jpg",
+        "/images/products/reference/nerds-fusion-bar-1.jpg",
+        "/images/products/reference/peanut-butter-fusion-bar-0.jpg",
+        "/images/products/reference/peanut-butter-fusion-bar-1.jpg",
+        "/images/products/reference/pretzel-sea-salt-fusion-bar-0.jpg",
+        "/images/products/reference/pretzel-sea-salt-fusion-bar-1.jpg",
+        "/images/products/reference/raspberry-dark-chocolate-fusion-bar-0.jpg",
+        "/images/products/reference/raspberry-dark-chocolate-fusion-bar-1.jpg",
+        "/images/products/reference/rocky-road-fusion-bar-0.jpg",
+        "/images/products/reference/rocky-road-fusion-bar-1.jpg",
+        "/images/products/reference/strawberries-cream-fusion-bar-0.jpg",
+        "/images/products/reference/strawberries-cream-fusion-bar-1.jpg",
+        "/images/products/reference/thin-mints-fusion-bar-0.png",
+        "/images/products/reference/fusion-bars-twix-0.png"
       ],
       "variants": [
         {
@@ -108,12 +145,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 45,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/almond-crush.png",
+          "image": "/images/products/reference/fusion-bars-almond-crush-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Almond Crush is the toasted-almond chocolate bar from the Fusion boutique line. The silver wrapper carries the Fusion mark and the crush artwork along the lower edge. It is one of the ten flavors in the boutique box."
         },
         {
           "id": "var_bar_1",
@@ -128,12 +166,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 38,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/birthday-cake.webp",
+          "image": "/images/products/reference/birthday-cake-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Birthday Cake turns cake-batter sweetness, white chocolate, and sprinkle crunch into a foil bar. The pink wrapper is the celebration design shown on the Fusion Bars shop, with a matching back panel."
         },
         {
           "id": "var_bar_2",
@@ -148,12 +187,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 50,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/fusion-bar-cinnamon-toast.png",
+          "image": "/images/products/reference/cinnamon-toast-fusion-bar-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Cinnamon Toast is the warm bakery bar: cinnamon sugar over chocolate, in the Fusion boutique wrapper."
         },
         {
           "id": "var_bar_3",
@@ -168,12 +208,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 60,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/fusion-bar-cookie-dough.png",
+          "image": "/images/products/reference/cookie-dough-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Cookie Dough is the bakery-style bar, with dough pieces set in chocolate and the Fusion mark on the sleeve."
         },
         {
           "id": "var_bar_4",
@@ -188,12 +229,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 42,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/cookies-cream-fusion-bar-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Cookies & Cream uses a white-chocolate base and crunchy cookie pieces. The flavor is packed in the 10-bar boutique box and labeled on the lid."
         },
         {
           "id": "var_bar_5",
@@ -208,12 +250,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 30,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/fusion-bar-cotton-candy.png",
+          "image": "/images/products/reference/cotton-candy-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Cotton Candy is the spun-sugar chocolate bar. The Fusion Bars shop shows the front wrapper and the back panel."
         },
         {
           "id": "var_bar_6",
@@ -228,12 +271,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 25,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/fusion-bar-ferrari-rocher.png",
+          "image": "/images/products/reference/ferrero-rocher-fusion-bar-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Ferrero Rocher is the hazelnut-praline bar. The gold sleeve places the Fusion mark in the centre and the flavor name at the lower right, and it sits in the boutique box."
         },
         {
           "id": "var_bar_7",
@@ -248,12 +292,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 55,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/fusion-bar-fruit-loops.png",
+          "image": "/images/products/reference/fusion-bars-fuit-loops-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Fruit Loops is the cereal-milk chocolate bar, with a bright fruit finish and the Fusion boutique wrapper."
         },
         {
           "id": "var_bar_8",
@@ -268,12 +313,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 18,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/heath-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Heath is the English-toffee bar. Master cases of Heath appear in the Fusion Bars bulk photo, ten bars to a case, and the back panel carries the verification QR code."
         },
         {
           "id": "var_bar_9",
@@ -288,12 +334,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 22,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/fusion-bars-horchata-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Horchata is the cinnamon rice-milk chocolate bar. The Fusion Bars shop photo set includes the front wrapper and the back panel."
         },
         {
           "id": "var_bar_10",
@@ -308,12 +355,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 35,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/capn-crunch-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Kap'N Krunch is the cereal-crunch bar. The bulk photo on the Fusion Bars shop shows full master cases of this flavor beside Heath and Ferrero Rocher."
         },
         {
           "id": "var_bar_11",
@@ -328,12 +376,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 40,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/keylime-pie-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Key Lime Pie is the citrus-cream bar, with a tart lime finish. The shop listing shows the front wrapper and the back panel."
         },
         {
           "id": "var_bar_12",
@@ -348,12 +397,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 48,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/fusion-bars-kitkat-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "KitKat Wafer layers crisp wafer through the chocolate. The official photos show the front of the bar and the back panel."
         },
         {
           "id": "var_bar_13",
@@ -368,12 +418,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 15,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/lemon-blueberry-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Lemon Blueberry pairs tart lemon with blueberry. The flavor is printed on the boutique box lid with Birthday Cake, Banana Chocolate, Ferrero Rocher, and Twixy."
         },
         {
           "id": "var_bar_14",
@@ -388,12 +439,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 33,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/fusion-bar-em-and-ems.png",
+          "image": "/images/products/reference/fusion-bars-emms-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "M And Ms is the candy-shell crunch bar. The Fusion Bars shop shows the front wrapper and the back panel."
         },
         {
           "id": "var_bar_15",
@@ -408,12 +460,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 29,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/matcha-fusion-mushroom-bars-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Matcha folds milk chocolate and dark chocolate together with finely milled green tea. The tasting note is grassy and creamy, and the wrapper is the Matcha sleeve from the Fusion Bars shop."
         },
         {
           "id": "var_bar_16",
@@ -428,12 +481,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 65,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/fusion-bars-milk-chocolate-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Milk Chocolate is the plain boutique bar, cocoa and milk with the Fusion mark and no extra mix-in. It is one of the ten bars in the boutique box."
         },
         {
           "id": "var_bar_17",
@@ -448,12 +502,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 27,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/coffee.png",
+          "image": "/images/products/reference/fusion-bars-mocha-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Mocha is the coffee-and-cocoa bar from the Fusion boutique line, with the espresso flavor on the sleeve."
         },
         {
           "id": "var_bar_18",
@@ -468,12 +523,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 31,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/nerds-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Nerds is the rainbow candy-crunch bar. The shop listing shows the front wrapper and the back panel."
         },
         {
           "id": "var_bar_19",
@@ -488,12 +544,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 19,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/peanut-butter-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Peanut Butter Cup sets a peanut-butter centre in milk chocolate. The Fusion Bars shop shows the front wrapper and the back panel."
         },
         {
           "id": "var_bar_20",
@@ -508,12 +565,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 36,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/pretzel-sea-salt-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Pretzel & Sea Salt pairs salted pretzel crunch with chocolate. The official photos show the front wrapper and the back QR panel."
         },
         {
           "id": "var_bar_21",
@@ -528,12 +586,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 24,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/raspberry-dark-chocolate-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Raspberry Dark Chocolate is the darker cocoa bar with a raspberry finish. The shop photo set includes the front and the back."
         },
         {
           "id": "var_bar_22",
@@ -548,12 +607,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 17,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/rocky-road-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Rocky Road mixes marshmallow and crunch into the chocolate. The Fusion Bars shop shows the front wrapper and the back panel."
         },
         {
           "id": "var_bar_23",
@@ -568,12 +628,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 44,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/strawberries-cream-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Strawberries & Cream is the cream bar with a strawberry finish, and it is one of the ten flavors laid out in the boutique box."
         },
         {
           "id": "var_bar_24",
@@ -588,12 +649,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 39,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/thin-mints-fusion-bar-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Thin Mint is the cool mint crunch bar. The boutique box photo labels it along the front row of the assortment."
         },
         {
           "id": "var_bar_25",
@@ -608,12 +670,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 52,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/fusion-bars-twix-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Twixy is the caramel-cookie crunch bar. The boutique box lid lists it with Birthday Cake, Banana Chocolate, Ferrero Rocher, and Lemon Blueberry."
         }
       ],
       "ingredients": [
@@ -653,9 +716,9 @@
       "brand": "Laughing Gas × Fusion EU",
       "categorySlug": "artisan-chocolate-bars",
       "categoryName": "Artisan Chocolate Bars",
-      "headline": "Exclusive Designer Botanical Chocolate Series",
-      "shortDescription": "A celebrated limited-edition designer collaboration pairing exquisite European cacao blends with terpene-rich culinary botanicals.",
-      "description": "The Laughing Gas series represents a refined intersection of haute confectionery and botanical curation. Crafted with crisp textures including caramelized cocoa crisps and dark truffles, each 6g bar offers distinct sensory layers.",
+      "headline": "Laughing Gas × Fusion chocolate sleeves",
+      "shortDescription": "The Laughing Gas collaboration bars from the Fusion Bars shop: Coco, White Truffle, and Tremendous, each with a front and back photo.",
+      "description": "Laughing Gas × Fusion bars use the illustrated Laughing Gas sleeve with Powered by Fusion in the corner and the flavor on the coloured banner. Fusion Bars EU ships Crunchy Coco Pebbles, White Truffle, and Tremendous. Zashimi is the fourth sleeve on the reference shop and is included in the gallery.",
       "productType": "CHOCOLATE_BAR",
       "status": "PUBLISHED",
       "reviewStatus": "APPROVED",
@@ -673,11 +736,17 @@
         "IE",
         "LU"
       ],
-      "primaryImage": "/images/products/crunchy-coco-pebbles-laughing-gas-x-fusion-chocolate-bar-fusion-mushroom-bar.jpg",
-      "hoverImage": "/images/products/chocolate-bar.png",
+      "primaryImage": "/images/products/reference/white-truffle-fusion-bar-0.jpg",
+      "hoverImage": "/images/products/reference/coco-fusion-bars-0.jpg",
       "galleryImages": [
-        "/images/products/crunchy-coco-pebbles-laughing-gas-x-fusion-chocolate-bar-fusion-mushroom-bar.jpg",
-        "/images/products/chocolate-bar.png"
+        "/images/products/reference/coco-fusion-bars-0.jpg",
+        "/images/products/reference/coco-fusion-bars-1.jpg",
+        "/images/products/reference/white-truffle-fusion-bar-0.jpg",
+        "/images/products/reference/white-truffle-fusion-bar-1.jpg",
+        "/images/products/reference/tremendous-fusion-bars-0.jpg",
+        "/images/products/reference/tremendous-fusion-bars-1.jpg",
+        "/images/products/reference/zashimi-fusion-bar-0.jpg",
+        "/images/products/reference/zashimi-fusion-bar-1.jpg"
       ],
       "variants": [
         {
@@ -693,12 +762,13 @@
           "compareAtGBP": 2550,
           "stockLevel": 25,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/crunchy-coco-pebbles-laughing-gas-x-fusion-chocolate-bar-fusion-mushroom-bar.jpg",
+          "image": "/images/products/reference/coco-fusion-bars-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Crunchy Coco Pebbles is the Laughing Gas × Fusion bar with a cocoa-cereal crunch. The red sleeve says Powered by Fusion, and the shop listing includes the front and the back."
         },
         {
           "id": "var_lg_1",
@@ -713,12 +783,13 @@
           "compareAtGBP": 2550,
           "stockLevel": 20,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/white-truffle-fusion-bar-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "White Truffle is the Laughing Gas × Fusion cookies-and-cream bar. The official shop photo is the front of the sleeve, with a separate back panel."
         },
         {
           "id": "var_lg_2",
@@ -733,12 +804,13 @@
           "compareAtGBP": 2550,
           "stockLevel": 30,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/reference/tremendous-fusion-bars-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Tremendous is the Laughing Gas × Fusion caramel toffee crunch. The green banner names the flavor, and the shop listing includes the back panel."
         }
       ],
       "ingredients": [
@@ -773,9 +845,9 @@
       "brand": "High Tolerance × Fusion EU",
       "categorySlug": "artisan-chocolate-bars",
       "categoryName": "Artisan Chocolate Bars",
-      "headline": "Intense Botanical Confection for Experienced Enthusiasts",
-      "shortDescription": "Crafted for connoisseurs seeking deeper botanical depth, paired with complex single-origin cocoa profiles.",
-      "description": "High Tolerance × Fusion pairs dark cocoa concentrates with rich aromatic botanical infusions. Formulated with culinary precision in Barcelona and Amsterdam.",
+      "headline": "High Tolerance × Fusion chocolate bars",
+      "shortDescription": "The High Tolerance collaboration from the Fusion Bars shop. The open case shows the flavor sleeves, and wholesale cases run from 10 to 100 bars.",
+      "description": "High Tolerance × Fusion is the collaboration bar on the Fusion Bars shop. The open case lists Puffz, Fun Dip, Zabores, Lato Pop, Oulala, and Brain Freeze. Wholesale on that shop is sold as 10, 20, 30, 40, 50, or 100 bars, and the flavor request goes in the order note at checkout. Fusion Bars EU ships the same sleeves. Choose a flavor below.",
       "productType": "CHOCOLATE_BAR",
       "status": "PUBLISHED",
       "reviewStatus": "APPROVED",
@@ -793,11 +865,16 @@
         "IE",
         "LU"
       ],
-      "primaryImage": "/images/products/brain-high.jpg",
-      "hoverImage": "/images/products/fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar.jpg",
+      "primaryImage": "/images/products/reference/high-tolerance-x-fusion-bars-1.jpg",
+      "hoverImage": "/images/products/reference/high-tolerance-x-fusion-bars-0.jpg",
       "galleryImages": [
-        "/images/products/brain-high.jpg",
-        "/images/products/fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar.jpg"
+        "/images/products/reference/high-tolerance-x-fusion-bars-1.jpg",
+        "/images/products/reference/high-tolerance-x-fusion-bars-0.jpg",
+        "/images/products/reference/high-tolerance-x-fusion-bars-wholesale-0.jpg",
+        "/images/products/brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar.jpg",
+        "/images/products/fun-dip-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar.jpg",
+        "/images/products/puffz-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar.jpg",
+        "/images/products/zabores-high-tolerance-x-fusion-chocolate-bar-fusion-mushroom-bar.jpg"
       ],
       "variants": [
         {
@@ -813,11 +890,12 @@
           "compareAtGBP": 2550,
           "stockLevel": 22,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/brain-high.jpg",
+          "image": "/images/products/brain-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar.jpg",
           "provenance": [
             "RepoA",
             "RepoB"
-          ]
+          ],
+          "description": "Brain Freeze is the blue ice sleeve in the High Tolerance × Fusion case. The open-case photo on the reference shop and this studio shot show the same wrapper."
         },
         {
           "id": "var_ht_1",
@@ -836,7 +914,8 @@
           "provenance": [
             "RepoA",
             "RepoB"
-          ]
+          ],
+          "description": "Fun Dip is the rainbow High Tolerance × Fusion sleeve. It is named on the lid of the case in the reference shop photo."
         },
         {
           "id": "var_ht_2",
@@ -851,11 +930,12 @@
           "compareAtGBP": 2550,
           "stockLevel": 18,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/puffz-high-tolerance-x-fusion-chocolate-bar-premium-fusion-mushroom-bar.jpg",
           "provenance": [
             "RepoA",
             "RepoB"
-          ]
+          ],
+          "description": "Puffz is the blue character sleeve in the High Tolerance × Fusion assortment, shown both as a single bar and inside the reference case."
         },
         {
           "id": "var_ht_3",
@@ -870,11 +950,12 @@
           "compareAtGBP": 2550,
           "stockLevel": 16,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/chocolate-bar.png",
+          "image": "/images/products/zabores-high-tolerance-x-fusion-chocolate-bar-fusion-mushroom-bar.jpg",
           "provenance": [
             "RepoA",
             "RepoB"
-          ]
+          ],
+          "description": "Zabores is the red sleeve in the High Tolerance × Fusion case, named on the lid beside Fun Dip and Lato Pop."
         }
       ],
       "ingredients": [
@@ -909,9 +990,9 @@
       "brand": "Fusion EU Artisan Confections",
       "categorySlug": "gummies",
       "categoryName": "Gummies",
-      "headline": "Vegan Fruit Pectin Gummies with Organic Botanical Terpenes",
-      "shortDescription": "Tender, plant-based fruit gummies made with natural fruit purees and active functional European botanical essences.",
-      "description": "Crafted with 100% natural fruit pectin, organic tapioca syrup, and natural botanical essences. Gelatin-free and gluten-free, providing clean, chewable delight.",
+      "headline": "Vegan Fusion gummies tins, one flavor per lid",
+      "shortDescription": "The Fusion gummies tins from the Fusion Bars shop. Each flavor has its own lid, and every tin is vegan pectin.",
+      "description": "Fusion gummies are vegan pectin sweets in a round tin. On the Fusion Bars shop each flavor is its own tin, with the flavor name across the centre of the lid. Fusion Bars EU ships that same range. Pick a flavor to see the matching tin.",
       "productType": "GUMMIES",
       "status": "PUBLISHED",
       "reviewStatus": "APPROVED",
@@ -929,12 +1010,20 @@
         "IE",
         "LU"
       ],
-      "primaryImage": "/images/products/a-box-of-fusion-gummies.png",
-      "hoverImage": "/images/products/berry-citrus-gummies.jpg",
+      "primaryImage": "/images/products/reference/fusion-gummies-berry-citrus-0.png",
+      "hoverImage": "/images/products/reference/fusion-gummies-cactus-cooler-0.webp",
       "galleryImages": [
-        "/images/products/a-box-of-fusion-gummies.png",
-        "/images/products/berry-citrus-gummies.jpg",
-        "/images/products/cherry-lime-gummies.webp"
+        "/images/products/reference/fusion-gummies-berry-citrus-0.png",
+        "/images/products/reference/fusion-gummies-cactus-cooler-0.webp",
+        "/images/products/reference/fusion-cherry-lime-gummies-0.webp",
+        "/images/products/reference/fusion-gummies-grape-slushe-0.jpg",
+        "/images/products/reference/fusion-gummies-hawaiian-punch-0.jpg",
+        "/images/products/reference/fusion-gummies-lavender-lemonade-0.webp",
+        "/images/products/reference/fusion-gummies-passion-fruit-0.png",
+        "/images/products/reference/fusion-gummies-raspberry-goji-0.jpg",
+        "/images/products/reference/fusion-gummies-sour-apple-0.png",
+        "/images/products/reference/watermelon-fusion-mushroom-gummies-0.png",
+        "/images/products/reference/fusion-laughing-gas-gummies-0.png"
       ],
       "variants": [
         {
@@ -950,12 +1039,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 40,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/berry-citrus-gummies.jpg",
+          "image": "/images/products/reference/fusion-gummies-berry-citrus-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Berry Citrus is the red Fusion gummies tin: strawberry, blackberry, orange, and lime around the Fusion mark. The tin is vegan pectin and labeled Berry Citrus across the centre."
         },
         {
           "id": "var_gum_1",
@@ -970,12 +1060,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 35,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "image": "/images/products/reference/fusion-gummies-cactus-cooler-0.webp",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Cactus Cooler is the citrus-cactus Fusion gummies tin from the shop, vegan pectin with the flavor name across the centre of the lid."
         },
         {
           "id": "var_gum_2",
@@ -990,12 +1081,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 48,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/cherry-lime-gummies.webp",
+          "image": "/images/products/reference/fusion-cherry-lime-gummies-0.webp",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Cherry Lime is the cherry-and-lime Fusion gummies tin, vegan pectin, with the flavor printed on the lid."
         },
         {
           "id": "var_gum_3",
@@ -1010,12 +1102,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 26,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "image": "/images/products/reference/fusion-gummies-grape-slushe-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Grape Slushe is the grape Fusion gummies tin. The flavor is the bright slush note from the Fusion gummies line."
         },
         {
           "id": "var_gum_4",
@@ -1030,12 +1123,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 30,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "image": "/images/products/reference/fusion-gummies-hawaiian-punch-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Hawaiian Punch is the tropical fruit Fusion gummies tin, vegan pectin, labeled with that flavor on the lid."
         },
         {
           "id": "var_gum_5",
@@ -1050,12 +1144,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 15,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "image": "/images/products/reference/fusion-gummies-lavender-lemonade-0.webp",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Lavender Lemonade is the floral citrus Fusion gummies tin, vegan pectin, with lavender and lemonade on the lid."
         },
         {
           "id": "var_gum_6",
@@ -1070,12 +1165,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 38,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "image": "/images/products/reference/fusion-gummies-passion-fruit-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Passion Fruit is the tropical Fusion gummies tin, vegan pectin, with the passion-fruit artwork from the shop listing."
         },
         {
           "id": "var_gum_7",
@@ -1090,12 +1186,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 29,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "image": "/images/products/reference/fusion-gummies-raspberry-goji-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Raspberry Goji is the berry Fusion gummies tin, raspberry and goji on a vegan pectin sweet."
         },
         {
           "id": "var_gum_8",
@@ -1110,12 +1207,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 52,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "image": "/images/products/reference/fusion-gummies-sour-apple-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Sour Apple is the tart green-apple Fusion gummies tin, vegan pectin, with the sour-apple artwork from the shop."
         },
         {
           "id": "var_gum_9",
@@ -1130,12 +1228,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 60,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "image": "/images/products/reference/watermelon-fusion-mushroom-gummies-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Watermelon is the watermelon Fusion gummies tin, vegan pectin, with the flavor name on the lid."
         },
         {
           "id": "var_gum_10",
@@ -1150,12 +1249,13 @@
           "compareAtGBP": 2150,
           "stockLevel": 22,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/a-box-of-fusion-gummies.png",
+          "image": "/images/products/reference/fusion-laughing-gas-gummies-0.png",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "This is the Laughing Gas gummy tin from the Fusion Bars shop, a separate collaboration sweet from the Laughing Gas chocolate sleeves."
         }
       ],
       "ingredients": [
@@ -1196,9 +1296,9 @@
       "brand": "Fusion EU Botanical Labs",
       "categorySlug": "botanical-vaporizers",
       "categoryName": "Botanical Vaporizers",
-      "headline": "Pure Ceramic Hardware with Natural Botanical Terpenes",
-      "shortDescription": "All-in-one pre-charged botanical vaporizer filled with pure aromatic terpenes and plant extracts in leak-proof medical-grade hardware.",
-      "description": "Engineered for clean draw and precise temperature management. Ceramic heating core guarantees pure terpene expression without degradation or burned notes.",
+      "headline": "Fusion × Whole Melt disposable vaporizers",
+      "shortDescription": "The Fusion × Whole Melt disposable line. The reference photo shows the Guava Puree, Passionfruit OG, and Tangie Zest 10-packs with the device.",
+      "description": "The Fusion × Whole Melt disposables are the vaporizer line on the Fusion Bars shop. The collection photo shows Guava Puree, Passionfruit OG, and a citrus 10-pack with the device in front. Grape Ape has its own listing. Fusion Bars EU offers the flavors below with the photo that matches each one on that shop.",
       "productType": "DISPOSABLE",
       "status": "PUBLISHED",
       "reviewStatus": "REQUIRES_REVIEW",
@@ -1216,12 +1316,15 @@
         "IE",
         "LU"
       ],
-      "primaryImage": "/images/products/berry-lemon-disposable.webp",
+      "primaryImage": "/images/products/reference/whole-melt-x-fusion-disposables-0.jpg",
       "hoverImage": "/images/products/apple-strudel.webp",
       "galleryImages": [
-        "/images/products/berry-lemon-disposable.webp",
         "/images/products/apple-strudel.webp",
-        "/images/products/cactus-cooler.webp"
+        "/images/products/berry-lemon-disposable.webp",
+        "/images/products/bubba-kush.webp",
+        "/images/products/reference/whole-melt-x-fusion-disposables-0.jpg",
+        "/images/products/chemdawg-og.jpg",
+        "/images/products/reference/fusion-vaporizer-grape-ape-0.jpg"
       ],
       "variants": [
         {
@@ -1242,7 +1345,8 @@
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Apple Strudel is the bakery disposable: a green Fusion sleeve with pastry artwork and the vaporizer mark."
         },
         {
           "id": "var_vape_1",
@@ -1262,7 +1366,8 @@
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Berry Lemon Gelato is the yellow Fusion sleeve shown with the blue-to-pink device."
         },
         {
           "id": "var_vape_2",
@@ -1282,7 +1387,8 @@
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Bubba Kush is the purple Fusion disposable, sold as the device beside its matching box."
         },
         {
           "id": "var_vape_3",
@@ -1297,12 +1403,13 @@
           "compareAtGBP": 2550,
           "stockLevel": 25,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/cactus-cooler.webp",
+          "image": "/images/products/reference/whole-melt-x-fusion-disposables-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Cactus Cooler is a flavor in the Fusion disposable range. The hardware photo is the Fusion × Whole Melt collection from the reference shop."
         },
         {
           "id": "var_vape_4",
@@ -1322,7 +1429,8 @@
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "ChemDawg OG is the green Fusion disposable, photographed in its open box."
         },
         {
           "id": "var_vape_5",
@@ -1337,12 +1445,13 @@
           "compareAtGBP": 2550,
           "stockLevel": 30,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/berry-lemon-disposable.webp",
+          "image": "/images/products/reference/whole-melt-x-fusion-disposables-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Cherry Limeade is offered in the Fusion disposable range. The reference hardware photo is the Fusion × Whole Melt collection."
         },
         {
           "id": "var_vape_6",
@@ -1357,12 +1466,13 @@
           "compareAtGBP": 2550,
           "stockLevel": 32,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/berry-lemon-disposable.webp",
+          "image": "/images/products/reference/fusion-vaporizer-grape-ape-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Grape Ape is the grape-and-berry disposable with its own listing on the Fusion Bars shop."
         },
         {
           "id": "var_vape_7",
@@ -1377,12 +1487,13 @@
           "compareAtGBP": 2550,
           "stockLevel": 18,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/berry-lemon-disposable.webp",
+          "image": "/images/products/reference/whole-melt-x-fusion-disposables-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Guava Puree is the pink 10-pack in the front of the Fusion × Whole Melt disposables photo on the reference shop."
         },
         {
           "id": "var_vape_8",
@@ -1397,12 +1508,13 @@
           "compareAtGBP": 2550,
           "stockLevel": 16,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/berry-lemon-disposable.webp",
+          "image": "/images/products/reference/whole-melt-x-fusion-disposables-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Lavender Zkittles is offered in the Fusion disposable range. The reference hardware photo is the Fusion × Whole Melt collection."
         },
         {
           "id": "var_vape_9",
@@ -1417,12 +1529,13 @@
           "compareAtGBP": 2550,
           "stockLevel": 20,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/berry-lemon-disposable.webp",
+          "image": "/images/products/reference/whole-melt-x-fusion-disposables-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Maui Pineapple is offered in the Fusion disposable range. The reference hardware photo is the Fusion × Whole Melt collection."
         },
         {
           "id": "var_vape_10",
@@ -1437,12 +1550,13 @@
           "compareAtGBP": 2550,
           "stockLevel": 24,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/berry-lemon-disposable.webp",
+          "image": "/images/products/reference/whole-melt-x-fusion-disposables-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Passionfruit OG is the orange 10-pack on the left of the Fusion × Whole Melt disposables photo."
         }
       ],
       "ingredients": [
@@ -1518,6 +1632,7 @@
           "stockLevel": 50,
           "stockStatus": "IN_STOCK",
           "image": "/images/products/capsules.png",
+          "description": "Balance Blend is the everyday Fusion capsule tin: Lion's Mane and Cordyceps in a vegan shell, 30 capsules, with the Fusion Capsules label. This tin is part of the European range.",
           "provenance": [
             "RepoA",
             "RepoB"
@@ -1537,6 +1652,7 @@
           "stockLevel": 35,
           "stockStatus": "IN_STOCK",
           "image": "/images/products/capsules.png",
+          "description": "Clarity Focus is the stronger Fusion capsule tin: the same vegan Lion's Mane and Cordyceps shell, 30 capsules, in the Fusion Capsules bottle. This tin is part of the European range.",
           "provenance": [
             "RepoA",
             "RepoB"
@@ -1577,9 +1693,9 @@
       "brand": "Fusion EU Artisan Confections",
       "categorySlug": "bundles-collections",
       "categoryName": "Bundles & Collections",
-      "headline": "Curated Tasting Selection of 10 Distinct European Artisan Bars",
-      "shortDescription": "A presentation box containing 10 individually foil-sealed 6g chocolate bars spanning milk, dark, and specialty flavors.",
-      "description": "The definitive introduction to the Fusion European collection. Features 10 award-winning recipes presented in a luxury matte black presentation box with protective thermal insulation. Qualifies for Free European Standard Shipping.",
+      "headline": "Ten Fusion bars, ten flavors, in the boutique box",
+      "shortDescription": "The Fusion 10 Bars Boutique Box from the Fusion Bars shop: one open case of ten different bars.",
+      "description": "The Fusion 10 Bars Boutique Box is the curated case on the Fusion Bars shop. The teal box holds ten bars in ten flavors: Cookies & Cream, Almond Crush, Strawberries & Cream, Milk Chocolate, Thin Mint, Birthday Cake, Banana Chocolate, Ferrero Rocher, Twixy, and Lemon Blueberry. Fusion Bars EU ships this assortment in insulated packaging, and the order qualifies for free European standard shipping.",
       "productType": "BUNDLE",
       "status": "PUBLISHED",
       "reviewStatus": "APPROVED",
@@ -1597,11 +1713,11 @@
         "IE",
         "LU"
       ],
-      "primaryImage": "/images/products/fusion-100-bars-boutique-box.png",
-      "hoverImage": "/images/products/chocolate-bar.png",
+      "primaryImage": "/images/products/reference/fusion-10-bars-boutique-box-0.jpg",
+      "hoverImage": "/images/products/reference/fusion-10-bars-boutique-box-1.jpg",
       "galleryImages": [
-        "/images/products/fusion-100-bars-boutique-box.png",
-        "/images/products/chocolate-bar.png"
+        "/images/products/reference/fusion-10-bars-boutique-box-0.jpg",
+        "/images/products/reference/fusion-10-bars-boutique-box-1.jpg"
       ],
       "variants": [
         {
@@ -1617,11 +1733,12 @@
           "compareAtGBP": 17000,
           "stockLevel": 25,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/fusion-100-bars-boutique-box.png",
+          "image": "/images/products/reference/fusion-10-bars-boutique-box-0.jpg",
           "provenance": [
             "ReferenceSite",
             "RepoA"
-          ]
+          ],
+          "description": "The Fusion 10 Bars Boutique Box is the curated case on the Fusion Bars shop. The teal box holds ten bars in ten flavors: Cookies & Cream, Almond Crush, Strawberries & Cream, Milk Chocolate, Thin Mint, Birthday Cake, Banana Chocolate, Ferrero Rocher, Twixy, and Lemon Blueberry. Fusion Bars EU ships this assortment in insulated packaging, and the order qualifies for free European standard shipping."
         }
       ],
       "ingredients": [
@@ -1653,9 +1770,9 @@
       "brand": "Fusion EU Artisan Confections",
       "categorySlug": "bundles-collections",
       "categoryName": "Bundles & Collections",
-      "headline": "Complete Master Collection of 30 Artisan Chocolate Bars",
-      "shortDescription": "A comprehensive collection featuring the complete flavor catalogue with complimentary Express Priority European courier dispatch.",
-      "description": "Contains 30 individually foil-sealed bars representing our entire catalog including limited collaboration bars. Automatically qualifies for Free European Express Shipping with priority hub fulfillment.",
+      "headline": "Thirty Fusion bars, packed as master cases",
+      "shortDescription": "The Pack of 30 quantity of Fusion Bars Bulk. The reference shop uses the master-case photo for every bulk pack size.",
+      "description": "Pack of 30 from Fusion Bars Bulk. Fusion Bars Bulk on the reference shop is sold as a pack of 10, 20, 30, 40, 50, or 100. Master cases hold ten bars of one flavor, and a mixed order is available. The shop photo shows cases of Kap'N Krunch, Heath, and Ferrero Rocher. Write the flavors you want in the order note at checkout. Fusion Bars EU dispatches the same bulk format.",
       "productType": "BUNDLE",
       "status": "PUBLISHED",
       "reviewStatus": "APPROVED",
@@ -1673,10 +1790,12 @@
         "IE",
         "LU"
       ],
-      "primaryImage": "/images/products/fusion-100-bars-boutique-box.png",
-      "hoverImage": "/images/products/chocolate-bar.png",
+      "primaryImage": "/images/products/reference/fusion-bars-bulk-0.jpg",
+      "hoverImage": "/images/products/reference/fusion-10-bars-boutique-box-0.jpg",
       "galleryImages": [
-        "/images/products/fusion-100-bars-boutique-box.png"
+        "/images/products/reference/fusion-bars-bulk-0.jpg",
+        "/images/products/reference/fusion-10-bars-boutique-box-0.jpg",
+        "/images/products/reference/fusion-10-bars-boutique-box-1.jpg"
       ],
       "variants": [
         {
@@ -1692,11 +1811,12 @@
           "compareAtGBP": 38500,
           "stockLevel": 14,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/fusion-100-bars-boutique-box.png",
+          "image": "/images/products/reference/fusion-bars-bulk-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB"
-          ]
+          ],
+          "description": "Pack of 30 from Fusion Bars Bulk. Fusion Bars Bulk on the reference shop is sold as a pack of 10, 20, 30, 40, 50, or 100. Master cases hold ten bars of one flavor, and a mixed order is available. The shop photo shows cases of Kap'N Krunch, Heath, and Ferrero Rocher. Write the flavors you want in the order note at checkout. Fusion Bars EU dispatches the same bulk format."
         }
       ],
       "ingredients": [
@@ -1727,9 +1847,9 @@
       "brand": "Fusion EU Artisan Confections",
       "categorySlug": "bundles-collections",
       "categoryName": "Bundles & Collections",
-      "headline": "Commercial Tier Assortment for European Members",
-      "shortDescription": "Bulk allocation box containing 50 artisan bars in custom commercial protective packaging.",
-      "description": "Volume bundle designed for European collective buyers and boutique venues. Stored in temperature-regulated warehouse hubs (NL, ES, DE, FR) for rapid dispatch.",
+      "headline": "Fifty Fusion bars, packed as master cases",
+      "shortDescription": "The Pack of 50 quantity of Fusion Bars Bulk. The reference shop uses the master-case photo for every bulk pack size.",
+      "description": "Pack of 50 from Fusion Bars Bulk. Fusion Bars Bulk on the reference shop is sold as a pack of 10, 20, 30, 40, 50, or 100. Master cases hold ten bars of one flavor, and a mixed order is available. The shop photo shows cases of Kap'N Krunch, Heath, and Ferrero Rocher. Write the flavors you want in the order note at checkout. Fusion Bars EU dispatches the same bulk format.",
       "productType": "BUNDLE",
       "status": "PUBLISHED",
       "reviewStatus": "APPROVED",
@@ -1747,10 +1867,12 @@
         "IE",
         "LU"
       ],
-      "primaryImage": "/images/products/fusion-100-bars-boutique-box.png",
-      "hoverImage": "/images/products/chocolate-bar.png",
+      "primaryImage": "/images/products/reference/fusion-bars-bulk-0.jpg",
+      "hoverImage": "/images/products/reference/fusion-10-bars-boutique-box-0.jpg",
       "galleryImages": [
-        "/images/products/fusion-100-bars-boutique-box.png"
+        "/images/products/reference/fusion-bars-bulk-0.jpg",
+        "/images/products/reference/fusion-10-bars-boutique-box-0.jpg",
+        "/images/products/reference/fusion-10-bars-boutique-box-1.jpg"
       ],
       "variants": [
         {
@@ -1766,11 +1888,12 @@
           "compareAtGBP": 64000,
           "stockLevel": 10,
           "stockStatus": "IN_STOCK",
-          "image": "/images/products/fusion-100-bars-boutique-box.png",
+          "image": "/images/products/reference/fusion-bars-bulk-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB"
-          ]
+          ],
+          "description": "Pack of 50 from Fusion Bars Bulk. Fusion Bars Bulk on the reference shop is sold as a pack of 10, 20, 30, 40, 50, or 100. Master cases hold ten bars of one flavor, and a mixed order is available. The shop photo shows cases of Kap'N Krunch, Heath, and Ferrero Rocher. Write the flavors you want in the order note at checkout. Fusion Bars EU dispatches the same bulk format."
         }
       ],
       "ingredients": [
@@ -1801,9 +1924,9 @@
       "brand": "Fusion EU Artisan Confections",
       "categorySlug": "bundles-collections",
       "categoryName": "Bundles & Collections",
-      "headline": "The Ultimate 100-Bar European Master Archive",
-      "shortDescription": "The definitive 100-bar master archive featuring 10 curated batches of 10 distinct flavors.",
-      "description": "Crafted for verified European member clubs and premier hospitality clients. Each box is packed in high-density insulated flight cases with tracked temperature logs and direct private courier fulfillment.",
+      "headline": "One hundred Fusion bars, packed as master cases",
+      "shortDescription": "The Pack of 100 quantity of Fusion Bars Bulk. The reference shop uses the master-case photo for every bulk pack size.",
+      "description": "Pack of 100 from Fusion Bars Bulk. Fusion Bars Bulk on the reference shop is sold as a pack of 10, 20, 30, 40, 50, or 100. Master cases hold ten bars of one flavor, and a mixed order is available. The shop photo shows cases of Kap'N Krunch, Heath, and Ferrero Rocher. Write the flavors you want in the order note at checkout. Fusion Bars EU dispatches the same bulk format.",
       "productType": "BUNDLE",
       "status": "PUBLISHED",
       "reviewStatus": "APPROVED",
@@ -1821,10 +1944,12 @@
         "IE",
         "LU"
       ],
-      "primaryImage": "/images/products/fusion-100-bars-boutique-box.png",
-      "hoverImage": "/images/products/chocolate-bar.png",
+      "primaryImage": "/images/products/reference/fusion-bars-bulk-0.jpg",
+      "hoverImage": "/images/products/reference/fusion-10-bars-boutique-box-0.jpg",
       "galleryImages": [
-        "/images/products/fusion-100-bars-boutique-box.png"
+        "/images/products/reference/fusion-bars-bulk-0.jpg",
+        "/images/products/reference/fusion-10-bars-boutique-box-0.jpg",
+        "/images/products/reference/fusion-10-bars-boutique-box-1.jpg"
       ],
       "variants": [
         {
@@ -1840,12 +1965,13 @@
           "compareAtGBP": 115000,
           "stockLevel": 6,
           "stockStatus": "LOW_STOCK",
-          "image": "/images/products/fusion-100-bars-boutique-box.png",
+          "image": "/images/products/reference/fusion-bars-bulk-0.jpg",
           "provenance": [
             "RepoA",
             "RepoB",
             "ReferenceSite"
-          ]
+          ],
+          "description": "Pack of 100 from Fusion Bars Bulk. Fusion Bars Bulk on the reference shop is sold as a pack of 10, 20, 30, 40, 50, or 100. Master cases hold ten bars of one flavor, and a mixed order is available. The shop photo shows cases of Kap'N Krunch, Heath, and Ferrero Rocher. Write the flavors you want in the order note at checkout. Fusion Bars EU dispatches the same bulk format."
         }
       ],
       "ingredients": [

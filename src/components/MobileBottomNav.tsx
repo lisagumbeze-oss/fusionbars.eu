@@ -11,7 +11,7 @@ import SearchModal from './SearchModal';
 const HIDDEN_PATH_SEGMENTS = ['/admin', '/checkout'];
 
 export default function MobileBottomNav() {
-  const { locale, cartCount, isCartOpen, setIsCartOpen } = useCommerce();
+  const { locale, cartCount } = useCommerce();
   const pathname = usePathname();
   const dict = getDictionary(locale);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -31,11 +31,11 @@ export default function MobileBottomNav() {
   const isShopActive =
     !isSearchOpen &&
     (pathname.startsWith(`/${locale}/shop`) || pathname.startsWith(`/${locale}/products`));
-  const isCartActive = isCartOpen || pathname.startsWith(`/${locale}/cart`);
+  const isCartActive = pathname.startsWith(`/${locale}/cart`);
   const isAccountActive = !isSearchOpen && pathname.startsWith(accountHref);
 
   const itemClass = (active: boolean) =>
-    `relative flex flex-col items-center justify-center gap-0.5 min-h-16 min-w-0 px-1 text-[10px] font-medium tracking-wide transition-colors duration-150 ${
+    `relative flex flex-col items-center justify-center gap-0.5 min-h-16 min-w-0 px-1 text-[10px] font-medium tracking-wide transition-colors duration-150 motion-safe:active:scale-[0.97] ${
       active ? 'text-[#4A5D4E]' : 'text-[#5C5852] hover:text-[#121212]'
     }`;
 
@@ -92,12 +92,10 @@ export default function MobileBottomNav() {
           </li>
 
           <li>
-            <button
-              type="button"
-              onClick={() => setIsCartOpen(true)}
+            <Link
+              href={`/${locale}/cart`}
               aria-label={`${dict.navigation.cart}, ${cartCount} items`}
-              aria-expanded={isCartOpen}
-              aria-haspopup="dialog"
+              aria-current={pathname.startsWith(`/${locale}/cart`) ? 'page' : undefined}
               className={`w-full ${itemClass(isCartActive)}`}
             >
               {isCartActive && <ActiveMarker />}
@@ -114,7 +112,7 @@ export default function MobileBottomNav() {
                 )}
               </span>
               <span>{dict.bottomBar.cart}</span>
-            </button>
+            </Link>
           </li>
 
           <li>

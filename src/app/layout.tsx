@@ -27,10 +27,10 @@ export const metadata: Metadata = {
     type: 'website',
     images: [
       {
-        url: 'https://fusionbars.eu/images/products/chocolate-bar.png',
-        width: 1200,
-        height: 630,
-        alt: 'Fusion Mushroom Bars EU - Artisan European Confections',
+        url: 'https://fusionbars.eu/images/brand/fusion-logo.jpg',
+        width: 1024,
+        height: 394,
+        alt: 'Fusion',
       },
     ],
   },
@@ -39,6 +39,7 @@ export const metadata: Metadata = {
     title: 'Fusion Mushroom Bars EU | European Botanical Confections',
     description:
       'Gourmet Belgian chocolate bars, fruit pectin gummies, and collector boxes with discreet European courier delivery.',
+    images: ['https://fusionbars.eu/images/brand/fusion-logo.jpg'],
   },
 };
 

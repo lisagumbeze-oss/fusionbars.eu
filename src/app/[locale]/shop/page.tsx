@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import type { Metadata } from 'next';
 import { CatalogService } from '@/lib/catalog';
 import ProductCard from '@/components/ProductCard';
 import { LocaleCode } from '@/types';
@@ -7,10 +8,27 @@ import { getDictionary } from '@/i18n';
 import { ArrowLeft } from 'lucide-react';
 import ShopFilters from '@/components/ShopFilters';
 import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
+import JsonLd from '@/components/seo/JsonLd';
+import { publicPageMetadata } from '@/lib/page-metadata';
+import { breadcrumbList } from '@/lib/structured-data';
 
 interface ShopPageProps {
   params: Promise<{ locale: string }> | { locale: string };
   searchParams: Promise<{ category?: string; sort?: string; search?: string }> | { category?: string; sort?: string; search?: string };
+}
+
+export async function generateMetadata({ params, searchParams }: ShopPageProps): Promise<Metadata> {
+  const resolved = await params;
+  const query = await searchParams;
+  const searching = Boolean(query.search?.trim());
+  return publicPageMetadata({
+    locale: resolved.locale,
+    path: `/${resolved.locale}/shop`,
+    title: 'Shop Artisan Chocolate & Gummies | Fusion EU',
+    description:
+      'Single-origin Belgian chocolate bars, fruit pectin gummies, and curator boxes, dispatched from the Netherlands, Spain, Germany, and France.',
+    robots: searching ? { index: false, follow: true } : undefined,
+  });
 }
 
 export default async function ShopPage({ params, searchParams }: ShopPageProps) {
@@ -34,8 +52,14 @@ export default async function ShopPage({ params, searchParams }: ShopPageProps) 
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-10">
+      <JsonLd
+        data={breadcrumbList([
+          { name: 'Home', path: '/en' },
+          { name: 'Shop', path: '/en/shop' },
+        ])}
+      />
       {/* Breadcrumb & Title */}
-      <div className="border-b border-[#E5E3DD] pb-6 space-y-2">
+      <div className="motion-rise border-b border-[#E5E3DD] pb-6 space-y-2">
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-[#5C5852]">
           <Link href={`/${locale}`} className="hover:text-[#121212] transition">Home</Link>
           <span aria-hidden="true">/</span>
@@ -93,7 +117,7 @@ export default async function ShopPage({ params, searchParams }: ShopPageProps) 
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

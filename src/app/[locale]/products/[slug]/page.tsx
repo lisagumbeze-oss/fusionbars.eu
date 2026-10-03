@@ -8,6 +8,8 @@ import ProductCard from '@/components/ProductCard';
 import { LocaleCode } from '@/types';
 import type { Metadata } from 'next';
 import { INDEXABLE_LOCALE, indexableUrl, indexingRobots, offerAvailability } from '@/lib/search-indexing';
+import JsonLd from '@/components/seo/JsonLd';
+import { absoluteAssetUrl, breadcrumbList } from '@/lib/structured-data';
 
 interface ProductDetailPageProps {
   params: Promise<{ locale: string; slug: string }> | { locale: string; slug: string };
@@ -30,14 +32,16 @@ export async function generateMetadata({ params }: ProductDetailPageProps): Prom
       url: canonical,
       images: [
         {
-          url: product.primaryImage.startsWith('http')
-            ? product.primaryImage
-            : `https://fusionbars.eu${product.primaryImage}`,
-          width: 800,
-          height: 800,
+          url: absoluteAssetUrl(product.primaryImage),
           alt: product.name,
         },
       ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `${product.name} | Fusion Mushroom Bars EU`,
+      description: product.shortDescription,
+      images: [absoluteAssetUrl(product.primaryImage)],
     },
   };
 }
@@ -58,33 +62,42 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   const offerVariant = product.variants[0];
   const offer = PricingEngine.structuredOffer(product.slug, offerVariant?.id || null);
   const canonical = indexableUrl(`/${INDEXABLE_LOCALE}/products/${product.slug}`);
+  const sku = offerVariant?.sku?.trim();
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.name,
-    image: `https://fusionbars.eu${product.primaryImage}`,
-    description: product.description,
-    brand: {
-      '@type': 'Brand',
-      name: product.brand,
-    },
-    ...(offer
-      ? {
-          offers: {
-            ...offer,
-            availability: offerAvailability(offerVariant?.stockStatus),
-            url: canonical,
-          },
-        }
-      : {}),
+    '@graph': [
+      {
+        '@type': 'Product',
+        name: product.name,
+        image: absoluteAssetUrl(product.primaryImage),
+        description: product.description,
+        category: product.categoryName,
+        ...(sku ? { sku } : {}),
+        brand: {
+          '@type': 'Brand',
+          name: product.brand,
+        },
+        ...(offer
+          ? {
+              offers: {
+                ...offer,
+                availability: offerAvailability(offerVariant?.stockStatus),
+                url: canonical,
+              },
+            }
+          : {}),
+      },
+      breadcrumbList([
+        { name: 'Home', path: '/en' },
+        { name: 'Shop', path: '/en/shop' },
+        { name: product.name, path: `/en/products/${product.slug}` },
+      ]),
+    ],
   };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <JsonLd data={jsonLd} />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-16">
         {/* Breadcrumb Bar */}

@@ -13,6 +13,7 @@ import { dispatchOrderStatusEmail } from '@/services/email/order-notifications';
 import { ObjectStorageService } from '@/services/storage/ObjectStorageService';
 import { RateLimiterService } from '@/lib/rate-limiter';
 import { PaymentConfigurationService } from '@/domain/payments/PaymentConfigurationService';
+import { getCheckoutCryptoWallets } from '@/domain/payments/CheckoutCryptoWallets';
 
 /**
  * Server Action: Customer submits payment proof (Bank transfer reference, wire slip, or Crypto TXID).
@@ -21,6 +22,24 @@ import { PaymentConfigurationService } from '@/domain/payments/PaymentConfigurat
 export async function listCustomerPaymentMethodsAction() {
   const methods = PaymentConfigurationService.customerMethods();
   return { mode: methods.mode, methods: methods.methods.map((method) => ({ code: method.code, name: method.name })) };
+}
+
+export async function listCheckoutCryptoWalletsAction(amountMinor: number, currency: 'EUR' | 'GBP') {
+  const safeCurrency = currency === 'GBP' ? 'GBP' : 'EUR';
+  const safeAmount = Number.isInteger(amountMinor) && amountMinor > 0 ? amountMinor : 100;
+  const wallets = await getCheckoutCryptoWallets({ amountMinor: safeAmount, currency: safeCurrency });
+  return {
+    wallets: wallets
+      .filter((wallet) => wallet.symbol === 'BTC' || wallet.symbol === 'ETH' || wallet.symbol === 'BCH')
+      .map((wallet) => ({
+        symbol: wallet.symbol,
+        name: wallet.name,
+        network: wallet.network,
+        address: wallet.address,
+        amount: wallet.amount,
+        qrDataUrl: wallet.qrDataUrl,
+      })),
+  };
 }
 
 export async function submitPaymentProofAction(rawInput: unknown) {

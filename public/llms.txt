@@ -1,0 +1,26 @@
+# Fusion Mushroom Bars EU
+> European store for hand-finished Belgian chocolate bars, fruit pectin gummies, and curator boxes.
+
+Google Search does not use this file. It is a plain-text index for other agents.
+
+Fusion Mushroom Bars EU sells confectionery. Product pages are the published description for each item. The shop does not give medical advice, and a bar is not a treatment.
+
+## Key pages
+- https://fusionbars.eu/en : Homepage
+- https://fusionbars.eu/en/shop : Catalogue
+- https://fusionbars.eu/en/about : How the bars are made and where parcels leave
+- https://fusionbars.eu/en/faq : Ordering, payment, and dispatch
+- https://fusionbars.eu/en/contact : European support desk
+- https://fusionbars.eu/en/news : Store notes
+- https://fusionbars.eu/en/privacy : Privacy notice
+
+## Catalogue
+Product URLs use https://fusionbars.eu/en/products/{slug}. English is the indexable language. Other locale URLs canonicalise to the English page.
+
+## Commercial facts published on the store
+- Currency display is euro, with a pound display option.
+- Bank transfer is offered from €100, or £100 when prices are shown in pounds.
+- Bitcoin, Ethereum, and Bitcoin Cash take 10% off the merchandise subtotal. Shipping is not discounted.
+- Standard shipping is free once merchandise reaches €300, or £260 in pounds.
+- Parcels leave from hubs in the Netherlands, Spain, Germany, and France.
+- Support: sales@fusionbars.eu

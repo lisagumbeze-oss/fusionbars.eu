@@ -51,10 +51,10 @@ export default function CartDrawer() {
       role="dialog"
       aria-modal="true"
       aria-label="Shopping Cart Drawer"
-      className="fixed inset-0 z-50 overflow-hidden bg-black/50 backdrop-blur-xs transition-opacity"
+      className="fixed inset-0 z-50 overflow-hidden bg-black/50 backdrop-blur-xs animate-fadeIn"
     >
       <div className="absolute inset-y-0 right-0 max-w-full flex pl-10">
-        <div className="w-screen max-w-md bg-[#FBFBF9] border-l border-[#E5E3DD] shadow-2xl flex flex-col">
+        <div className="w-screen max-w-md bg-[#FBFBF9] border-l border-[#E5E3DD] shadow-2xl flex flex-col animate-drawer-in">
           {/* Header */}
           <div className="p-5 border-b border-[#E5E3DD] flex items-center justify-between bg-white">
             <div className="flex items-center gap-2">
@@ -228,6 +228,13 @@ export default function CartDrawer() {
               </div>
 
               <div className="space-y-2 pt-1">
+                <Link
+                  href={`/${locale}/cart`}
+                  onClick={() => setIsCartOpen(false)}
+                  className="w-full py-2.5 px-4 rounded-lg border border-[#E5E3DD] text-[#121212] font-semibold text-xs flex items-center justify-center gap-2 transition hover:bg-[#FBFBF9]"
+                >
+                  View bag
+                </Link>
                 <Link
                   href={`/${locale}/checkout`}
                   onClick={() => setIsCartOpen(false)}

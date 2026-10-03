@@ -12,6 +12,7 @@ import { CommerceRepository } from '@/lib/commerce-repository';
 import { CatalogService } from '@/lib/catalog';
 import { EmailService } from '@/services/email/EmailService';
 import { LaunchReadinessService } from '@/domain/launch/LaunchReadinessService';
+import { FinalLaunchReadinessService } from '@/domain/launch/FinalLaunchReadinessService';
 import { RBACService } from '@/domain/auth/RBACService';
 import { PublicationReadinessService } from '@/domain/catalog/PublicationReadinessService';
 import { PaymentConfigurationService } from '@/domain/payments/PaymentConfigurationService';
@@ -75,6 +76,17 @@ export async function getAdminDashboardAction(role: RoleName = 'SUPER_ADMIN', lo
     }
   }
 
+  let launchDecision: 'READY_TO_LAUNCH' | 'LAUNCH_BLOCKED' = 'LAUNCH_BLOCKED';
+  if (AdminAccess.can(role, 'launch')) {
+    try {
+      const finalReport = await FinalLaunchReadinessService.evaluate();
+      launchDecision = finalReport.decision;
+    } catch {
+      launchDecision = 'LAUNCH_BLOCKED';
+    }
+  }
+  const productionCleared = launchDecision === 'READY_TO_LAUNCH';
+
   const generatedAt = new Date().toISOString();
   const notifications = AdminNotificationCenter.build({
     generatedAt,
@@ -85,12 +97,13 @@ export async function getAdminDashboardAction(role: RoleName = 'SUPER_ADMIN', lo
     translationPending: catalogue.translationPending,
     paymentsAwaiting: payments.awaiting,
     lowStock: inventory.lowStock,
-    productionPaused: PRODUCTION_CONTROL_STATE === 'PAUSED',
+    productionPaused: !productionCleared,
   }).map((item) => ({ ...item, read: AdminNotificationCenter.isRead(item.id) }));
 
   return {
     success: true as const,
-    productionState: PRODUCTION_CONTROL_STATE,
+    productionState: productionCleared ? 'APPROVED' : PRODUCTION_CONTROL_STATE,
+    launchDecision,
     catalogue,
     ordersAvailable,
     ordersError,

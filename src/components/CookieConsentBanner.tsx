@@ -207,13 +207,16 @@ export default function CookieConsentBanner() {
           )}
         </div>
 
-        <div className="text-[10px] text-neutral-500 flex items-center justify-between pt-1 border-t border-neutral-800">
+        <div className="text-[10px] text-neutral-500 flex items-center justify-between gap-3 pt-1 border-t border-neutral-800">
           <span>Optional categories are not required to use the site.</span>
-          {LegalGovernanceService.active('cookies', 'en') ? (
-            <Link href={`/${locale}/legal/cookies`} className="underline hover:text-neutral-300">Cookie policy</Link>
-          ) : (
-            <span>Cookie policy is not published.</span>
-          )}
+          <span className="flex items-center gap-3 shrink-0">
+            <Link href={`/${locale}/privacy`} className="underline hover:text-neutral-300">Privacy</Link>
+            {LegalGovernanceService.active('cookies', 'en') ? (
+              <Link href={`/${locale}/legal/cookies`} className="underline hover:text-neutral-300">Cookie policy</Link>
+            ) : (
+              <span>Cookie policy is not published.</span>
+            )}
+          </span>
         </div>
       </div>
     </aside>

@@ -58,13 +58,18 @@ export default function AdminDashboard() {
 
   const catalogue = data.catalogue;
   const base = `/${locale}/admin`;
+  const productionCleared = data.launchDecision === 'READY_TO_LAUNCH';
 
   return (
     <div className="space-y-8">
-      <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-        <p className="text-[11px] font-bold uppercase tracking-wider text-amber-800">Production</p>
-        <p className="font-serif text-3xl text-amber-950">{data.productionState}</p>
-        <p className="mt-1 text-sm text-amber-900">Launch control has not been cleared. Open blockers stay listed on the launch page.</p>
+      <section className={`rounded-2xl border p-5 ${productionCleared ? 'border-emerald-200 bg-emerald-50' : 'border-amber-200 bg-amber-50'}`}>
+        <p className={`text-[11px] font-bold uppercase tracking-wider ${productionCleared ? 'text-emerald-800' : 'text-amber-800'}`}>Production</p>
+        <p className={`font-serif text-3xl ${productionCleared ? 'text-emerald-950' : 'text-amber-950'}`}>{data.productionState}</p>
+        <p className={`mt-1 text-sm ${productionCleared ? 'text-emerald-900' : 'text-amber-900'}`}>
+          {productionCleared
+            ? 'Launch control is cleared. Operator approval is recorded. Audit Test Product stays unpublished.'
+            : 'Launch control has not been cleared. Open blockers stay listed on the launch page.'}
+        </p>
         <Link href={`${base}/system/launch`} className="mt-3 inline-block text-sm font-semibold underline">Open launch control</Link>
       </section>
 

@@ -203,6 +203,8 @@ export interface NormalizedVariant {
   stockLevel: number;
   stockStatus: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
   image: string;
+  /** Flavor-specific copy adapted from the reference shop for this variation. */
+  description?: string;
   provenance: string[];
 }
 

@@ -1,4 +1,4 @@
-import { redirect } from 'next/navigation';
+import { permanentRedirect } from 'next/navigation';
 import { LocaleCode } from '@/types';
 
 interface ProductsPageProps {
@@ -8,5 +8,5 @@ interface ProductsPageProps {
 export default async function ProductsPage({ params }: ProductsPageProps) {
   const resolvedParams = await params;
   const locale = resolvedParams.locale as LocaleCode;
-  redirect(`/${locale}/shop`);
+  permanentRedirect(`/${locale}/shop`);
 }

@@ -225,7 +225,8 @@ export class OrderCreationService {
     if (!PaymentConfigService.isPaymentMethodActive(paymentMethodCode)) {
       throw new Error(`Payment method "${paymentMethodCode}" is currently unavailable or inactive.`);
     }
-    if (PaymentConfigurationService.productionCheckoutRequired() && !PaymentConfigurationService.productionOptions().includes(paymentMethodCode)) {
+    const checkoutChoice = paymentMethodCode === 'SEPA_IBAN' || paymentMethodCode === 'CRYPTO_BTC';
+    if (PaymentConfigurationService.productionCheckoutRequired() && !checkoutChoice && !PaymentConfigurationService.productionOptions().includes(paymentMethodCode)) {
       throw new Error('This payment method is not available.');
     }
 
@@ -305,7 +306,9 @@ export class OrderCreationService {
     if (isPlaceholderCustomerPaymentDetail(visibleDetails.receivingAddress)) {
       visibleDetails.receivingAddress = '';
       visibleDetails.qrPayload = '';
-      paymentInstructions.instructions = 'A receiving address is not configured. Do not send funds until a verified address is published.';
+      if (!paymentInstructions.wallets?.some((wallet) => !isPlaceholderCustomerPaymentDetail(wallet.address))) {
+        paymentInstructions.instructions = 'A receiving address is not configured. Do not send funds until a verified address is published.';
+      }
     }
     if (paymentInstructions.wallets) {
       paymentInstructions.wallets = paymentInstructions.wallets.filter((wallet) => !isPlaceholderCustomerPaymentDetail(wallet.address));

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Search, ShoppingBag, Heart, Menu, X, Shield, User } from 'lucide-react';
 import AnnouncementBar from './AnnouncementBar';
@@ -10,7 +11,7 @@ import { useCommerce } from '../context/CommerceContext';
 import { getDictionary } from '../i18n';
 
 export default function Header() {
-  const { locale, cartCount, setIsCartOpen, wishlist } = useCommerce();
+  const { locale, cartCount, wishlist } = useCommerce();
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
@@ -18,11 +19,14 @@ export default function Header() {
 
   const navLinks = [
     { label: dict.navigation.shop, href: `/${locale}/shop` },
-    { label: 'Collections', href: `/${locale}/shop?category=bundles-collections` },
     { label: 'Chocolate Bars', href: `/${locale}/shop?category=artisan-chocolate-bars` },
     { label: 'Gummies', href: `/${locale}/shop?category=gummies` },
+    { label: 'Collections', href: `/${locale}/shop?category=bundles-collections` },
+    { label: dict.navigation.about, href: `/${locale}/about` },
+    { label: dict.navigation.faq, href: `/${locale}/faq` },
+    { label: 'Contact', href: `/${locale}/contact` },
     { label: 'Order Status', href: `/${locale}/orders/lookup` },
-    { label: 'Account', href: `/${locale}/account` },
+    { label: 'News', href: `/${locale}/news`, wide: true },
   ];
 
   return (
@@ -30,51 +34,51 @@ export default function Header() {
       <div className="sticky top-0 z-40">
       <AnnouncementBar />
 
-      <header className="bg-[#FBFBF9]/95 backdrop-blur-md border-b border-[#E5E3DD]">
+      <header className="glass-bar">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16 sm:h-20">
             {/* Left: Mobile Menu Toggle & Brand */}
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="lg:hidden p-2 text-[#121212] hover:text-[#4A5D4E] transition -ml-2"
+                className="lg:hidden -ml-2 p-2 text-[#121212] transition hover:text-[#4A5D4E] motion-safe:active:scale-95"
                 aria-label="Toggle navigation menu"
                 aria-expanded={isMobileMenuOpen}
               >
                 {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
               </button>
 
-              <Link href={`/${locale}`} className="flex items-center gap-2.5 group">
-                <div className="w-8 h-8 rounded bg-[#121212] text-[#FBFBF9] flex items-center justify-center font-serif text-sm tracking-wider font-bold group-hover:bg-[#4A5D4E] transition-colors">
-                  F
-                </div>
-                <div>
-                  <span className="font-serif text-base sm:text-lg tracking-wider font-bold text-[#121212] group-hover:text-[#4A5D4E] transition-colors">
-                    FUSION
-                  </span>
-                  <span className="text-[10px] tracking-widest uppercase ml-1.5 text-[#5C5852] font-sans font-medium">
-                    EU
-                  </span>
-                </div>
+              <Link href={`/${locale}`} className="flex items-center gap-2 group" aria-label="Fusion Mushroom Bars EU home">
+                <Image
+                  src="/images/brand/fusion-logo.png"
+                  alt="Fusion"
+                  width={1024}
+                  height={394}
+                  priority
+                  className="h-9 sm:h-11 w-auto"
+                />
+                <span className="text-[10px] tracking-widest uppercase text-[#5C5852] font-medium">EU</span>
               </Link>
             </div>
 
             {/* Center: Desktop Navigation Links (Unboxed, clean typography) */}
-            <nav className="hidden lg:flex items-center gap-8 text-[13px] font-medium text-[#5C5852]">
+            <nav className="hidden lg:flex items-center gap-4 xl:gap-7 text-[12px] xl:text-[13px] font-medium text-[#5C5852]">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`transition-colors py-1 relative ${
+                    className={`group transition-colors py-1 relative ${'wide' in link && link.wide ? 'hidden xl:inline' : ''} ${
                       isActive ? 'text-[#121212] font-semibold' : 'hover:text-[#121212]'
                     }`}
                   >
                     {link.label}
-                    {isActive && (
-                      <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-[#4A5D4E] rounded-full" />
-                    )}
+                    <span
+                      className={`absolute bottom-0 left-0 right-0 h-0.5 origin-left rounded-full bg-[#4A5D4E] motion-safe:transition-[scale] motion-safe:duration-200 ${
+                        isActive ? 'scale-x-100' : 'scale-x-0 motion-safe:group-hover:scale-x-100'
+                      }`}
+                    />
                   </Link>
                 );
               })}
@@ -85,7 +89,7 @@ export default function Header() {
               {/* Search — desktop only; mobile uses the bottom nav */}
               <button
                 onClick={() => setIsSearchOpen(true)}
-                className="hidden lg:inline-flex p-2 text-[#5C5852] hover:text-[#121212] transition"
+                className="hidden lg:inline-flex p-2 text-[#5C5852] hover:text-[#121212] transition motion-safe:active:scale-95"
                 aria-label="Search catalog"
               >
                 <Search className="w-5 h-5" />
@@ -94,7 +98,7 @@ export default function Header() {
               {/* Account — desktop only; mobile uses the bottom nav */}
               <Link
                 href={`/${locale}/account`}
-                className="hidden lg:inline-flex p-2 text-[#5C5852] hover:text-[#121212] transition"
+                className="hidden lg:inline-flex p-2 text-[#5C5852] hover:text-[#121212] transition motion-safe:active:scale-95"
                 aria-label="Customer Account Portal"
                 title="Customer Account"
               >
@@ -116,10 +120,10 @@ export default function Header() {
               </Link>
 
               {/* Cart — desktop only; mobile uses the bottom nav */}
-              <button
-                onClick={() => setIsCartOpen(true)}
-                className="hidden lg:flex items-center gap-2 px-3 py-2 text-[#121212] hover:text-[#4A5D4E] transition rounded-lg hover:bg-neutral-100"
-                aria-label={`Open shopping cart, ${cartCount} items`}
+              <Link
+                href={`/${locale}/cart`}
+                className="hidden lg:flex items-center gap-2 px-3 py-2 text-[#121212] hover:text-[#4A5D4E] transition rounded-lg hover:bg-neutral-100 motion-safe:active:scale-[0.98]"
+                aria-label={`Shopping bag, ${cartCount} items`}
               >
                 <div className="relative">
                   <ShoppingBag className="w-5 h-5" />
@@ -130,7 +134,7 @@ export default function Header() {
                   )}
                 </div>
                 <span className="text-xs font-semibold hidden md:inline">Bag</span>
-              </button>
+              </Link>
             </div>
           </div>
         </div>

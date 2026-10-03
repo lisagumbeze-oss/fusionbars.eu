@@ -17,7 +17,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { createOrderAction } from '@/actions/orders';
-import { listCustomerPaymentMethodsAction, submitPaymentProofAction } from '@/actions/payments';
+import { listCustomerPaymentMethodsAction, listCheckoutCryptoWalletsAction, submitPaymentProofAction } from '@/actions/payments';
 import { CountryRegistry } from '@/domain/countries/CountryRegistry';
 import { ShippingService } from '@/domain/shipping/ShippingService';
 import {
@@ -49,6 +49,7 @@ export default function CheckoutPage() {
   const [shippingMethodCode, setShippingMethodCode] = useState<'STANDARD' | 'EXPRESS'>('STANDARD');
   const [paymentMethodCode, setPaymentMethodCode] = useState<'SEPA_IBAN' | 'CRYPTO_BTC'>('CRYPTO_BTC');
   const [customerMethods, setCustomerMethods] = useState<string[] | null>(null);
+  const [cryptoWalletsPreview, setCryptoWalletsPreview] = useState<Array<{ symbol: string; name: string; network: string; address: string; amount?: string; qrDataUrl?: string }>>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
@@ -83,6 +84,18 @@ export default function CheckoutPage() {
       setPaymentMethodCode('CRYPTO_BTC');
     }
   }, [bankTransferAvailable, paymentMethodCode]);
+
+  useEffect(() => {
+    if (!isCryptocurrencyPayment(paymentMethodCode)) return;
+    let cancelled = false;
+    const merchandise = Math.max(0, subtotal);
+    listCheckoutCryptoWalletsAction(merchandise || 100, currency === 'GBP' ? 'GBP' : 'EUR').then((result) => {
+      if (!cancelled) setCryptoWalletsPreview(result.wallets);
+    }).catch(() => {
+      if (!cancelled) setCryptoWalletsPreview([]);
+    });
+    return () => { cancelled = true; };
+  }, [paymentMethodCode, subtotal, currency]);
 
   const cryptoDiscount = isCryptocurrencyPayment(paymentMethodCode)
     ? calculateCryptoPaymentDiscount(subtotal)
@@ -445,7 +458,7 @@ export default function CheckoutPage() {
         </div>
       )}
 
-      <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+      <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-10">
         {/* Left: Input Sections */}
         <div className="lg:col-span-7 space-y-8">
           {/* 1. Customer Information */}
@@ -716,15 +729,37 @@ export default function CheckoutPage() {
                   </span>
                 </div>
                 <p className="text-[#5C5852] mt-2 pl-6">
-                  Pay with cryptocurrency and save 10% on the merchandise subtotal. Wallet addresses are shown after you confirm the order.
+                  Pay with Bitcoin, Ethereum, or Bitcoin Cash and save 10% on the merchandise subtotal.
                 </p>
+                {paymentMethodCode === 'CRYPTO_BTC' && (
+                  <ul className="mt-4 space-y-3">
+                    {cryptoWalletsPreview.length === 0 ? (
+                      <li className="text-[#5C5852]">Bitcoin, Ethereum, and Bitcoin Cash QR codes appear when their wallets are configured.</li>
+                    ) : cryptoWalletsPreview.map((wallet) => (
+                      <li key={wallet.symbol} className="rounded-xl border border-[#E5E3DD] bg-white p-3">
+                        <div className="flex flex-col sm:flex-row gap-3">
+                          {wallet.qrDataUrl ? (
+                            <img src={wallet.qrDataUrl} alt={`${wallet.name} payment QR code`} className="w-36 h-36 rounded-lg border border-[#E5E3DD] bg-white" />
+                          ) : null}
+                          <div className="min-w-0 space-y-1">
+                            <p className="text-sm font-semibold text-[#121212]">{wallet.name}</p>
+                            <p className="text-[11px] text-[#5C5852]">{wallet.network}</p>
+                            {wallet.amount ? <p className="font-mono text-sm font-bold text-[#121212]">{wallet.amount} {wallet.symbol}</p> : null}
+                            <code className="block text-xs font-mono text-[#121212] break-all">{wallet.address}</code>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </label>}
             </div>
           </div>
         </div>
 
         {/* Right: Order Summary Sidebar */}
-        <div className="lg:col-span-5 lg:sticky lg:top-32 lg:self-start">
+        <div className="lg:col-span-5">
+          <div className="lg:sticky lg:top-28 lg:z-20 lg:max-h-[calc(100vh-8rem)] lg:overflow-y-auto">
           <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 space-y-5 shadow-xs">
             <h3 className="font-serif text-base font-bold text-[#121212] border-b border-[#E5E3DD] pb-3">
               Order Review ({cart.length} Item{cart.length > 1 ? 's' : ''})
@@ -756,10 +791,6 @@ export default function CheckoutPage() {
                 </div>
               )}
               <div className="flex justify-between">
-                <span>Tax/VAT</span>
-                <span className="font-mono text-[#121212]">TAX_CONFIGURATION_REQUIRED</span>
-              </div>
-              <div className="flex justify-between">
                 <span>European Shipping ({shippingMethodCode})</span>
                 <span className="font-mono text-[#121212]">
                   {dynamicShippingCost === 0 ? <strong className="text-[#4A5D4E]">FREE</strong> : formatMoney(dynamicShippingCost)}
@@ -776,7 +807,7 @@ export default function CheckoutPage() {
                 <ShieldCheck className="w-4 h-4 text-[#4A5D4E]" />
                 <span>Zero Trust Architecture</span>
               </div>
-              <p>The server recalculates price, discount, tax, and shipping before the order is saved. Tax treatment is TAX_CONFIGURATION_REQUIRED, so this total is not a tax-settled amount. No published terms are available to accept. No card data is stored.</p>
+              <p>The server recalculates price, discount, and shipping before the order is saved. No card data is stored.</p>
             </div>
 
             <button
@@ -793,6 +824,7 @@ export default function CheckoutPage() {
                 </>
               )}
             </button>
+          </div>
           </div>
         </div>
       </form>

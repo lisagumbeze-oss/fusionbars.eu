@@ -1,5 +1,5 @@
 import { PRODUCTION_CONTROL_STATE } from '@/domain/admin/production-state';
-import { GBP_LAUNCH_MODE, type LaunchControlState } from '@/domain/launch/launch-policy';
+import { type LaunchControlState } from '@/domain/launch/launch-policy';
 import { FUSION_EU_INITIAL_LAUNCH_POLICY, type LaunchWaiver } from '@/domain/launch/initial-launch-policy';
 import { DNS_OPERATOR_GUIDANCE, paymentProofUploadChoice } from '@/domain/launch/operator-configuration';
 import { ProductionInfrastructureService } from '@/domain/infrastructure/ProductionInfrastructureService';
@@ -109,7 +109,7 @@ export class FinalLaunchReadinessService {
     gates.push(gate('Tax', 'VAT', tax.status === 'CONFIGURED' ? 'PASS' : 'CONFIGURATION_REQUIRED', tax.status, tax.status !== 'CONFIGURED', 'Enter an approved jurisdiction, class, rate, and effective date. No rate was invented.'));
 
     gates.push(gate('Currency', 'EUR', 'WARNING', 'EUR checkout uses server prices. Launch products do not yet have approved commercial EUR prices.', true, 'Approve an EUR price for each product intended for launch.'));
-    gates.push(gate('Currency', 'GBP', 'DISABLED_FOR_LAUNCH', GBP_LAUNCH_MODE, false, 'GBP is not part of the first launch. No GBP price was invented.'));
+    gates.push(gate('Currency', 'GBP', 'READY', 'The announcement bar offers the British Pound switch beside Euro. Display uses the GBP amount already stored for each product.', false, 'No new GBP price was invented.'));
 
     const legal = LegalGovernanceService.launchBlockers().filter((item) => !item.startsWith('Production is'));
     gates.push(gate('Legal', 'Company info', legal.some((item) => item.includes('company')) ? 'NOT_CONFIGURED' : 'READY', legal.find((item) => item.includes('company')) || 'Company profile did not report a missing name.', legal.some((item) => item.includes('company')), 'Enter verified company facts. Do not invent them.'));

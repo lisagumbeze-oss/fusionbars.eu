@@ -49,6 +49,10 @@ function configuredStatus(statusName: string, detail: string): PaymentMethodStat
   return detail ? 'ACTIVE' : 'INACTIVE';
 }
 
+function checkoutChoiceStatus(statusName: string): PaymentMethodStatus {
+  return process.env[statusName] === 'INACTIVE' ? 'INACTIVE' : 'ACTIVE';
+}
+
 export class PaymentConfigService {
   private static forcedActive = new Set<string>();
 
@@ -63,7 +67,7 @@ export class PaymentConfigService {
       displayName: 'Bitcoin (BTC)',
       network: configuredDetail('CRYPTO_BTC_NETWORK'),
       receivingAddress: configuredDetail('CRYPTO_BTC_ADDRESS'),
-      status: configuredStatus('CRYPTO_BTC_STATUS', configuredDetail('CRYPTO_BTC_ADDRESS')),
+      status: checkoutChoiceStatus('CRYPTO_BTC_STATUS'),
       minimumAmount: 2000,
       confirmationPolicy: '',
     },
@@ -92,7 +96,7 @@ export class PaymentConfigService {
     bankName: configuredDetail('BANK_NAME'),
     iban: configuredDetail('BANK_IBAN'),
     bicSwift: configuredDetail('BANK_BIC_SWIFT'),
-    status: configuredStatus('BANK_STATUS', configuredDetail('BANK_IBAN') && configuredDetail('BANK_BIC_SWIFT') ? 'set' : ''),
+    status: checkoutChoiceStatus('BANK_STATUS'),
   };
 
   /**
@@ -168,7 +172,7 @@ export class PaymentConfigService {
   static getPublicPaymentOptions(): PublicPaymentOption[] {
     const options: PublicPaymentOption[] = [];
 
-    if (this.bankConfig.status === 'ACTIVE' && !isPlaceholderCustomerPaymentDetail(this.bankConfig.iban) && !isPlaceholderCustomerPaymentDetail(this.bankConfig.bicSwift)) {
+    if (this.bankConfig.status === 'ACTIVE') {
       options.push({
         code: 'SEPA_IBAN',
         name: 'Bank Transfer (SEPA / IBAN)',
@@ -176,17 +180,12 @@ export class PaymentConfigService {
       });
     }
 
-    const activeCryptos = this.getActiveCryptoConfigs();
-    for (const c of activeCryptos) {
-      if (isPlaceholderCustomerPaymentDetail(c.receivingAddress)) continue;
+    if (this.cryptoConfigs.BTC.status === 'ACTIVE') {
       options.push({
-        code: `CRYPTO_${c.asset}`,
-        name: c.displayName,
+        code: 'CRYPTO_BTC',
+        name: 'Cryptocurrency',
         type: 'CRYPTOCURRENCY',
-        asset: c.asset,
-        network: c.network,
-        confirmationPolicy: c.confirmationPolicy,
-        minimumAmount: c.minimumAmount,
+        asset: 'BTC',
       });
     }
 
@@ -198,13 +197,8 @@ export class PaymentConfigService {
    */
   static isPaymentMethodActive(methodCode: string): boolean {
     if (this.forcedActive.has(methodCode)) return true;
-    if (methodCode === 'SEPA_IBAN') {
-      return this.bankConfig.status === 'ACTIVE'
-        && !isPlaceholderCustomerPaymentDetail(this.bankConfig.iban)
-        && !isPlaceholderCustomerPaymentDetail(this.bankConfig.bicSwift)
-        && !isPlaceholderCustomerPaymentDetail(this.bankConfig.accountHolder)
-        && !isPlaceholderCustomerPaymentDetail(this.bankConfig.bankName);
-    }
+    if (methodCode === 'SEPA_IBAN') return this.bankConfig.status === 'ACTIVE';
+    if (methodCode === 'CRYPTO_BTC') return this.cryptoConfigs.BTC.status === 'ACTIVE';
 
     if (methodCode.startsWith('CRYPTO_')) {
       const asset = methodCode.replace('CRYPTO_', '') as CryptoAsset;

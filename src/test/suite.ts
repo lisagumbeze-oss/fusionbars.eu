@@ -95,6 +95,8 @@ import { DestinationEngine } from '@/domain/shipping/DestinationEngine';
 import { FulfilmentRoutingService } from '@/domain/shipping/FulfilmentRoutingService';
 import sitemap from '@/app/sitemap';
 import { customerAbsoluteUrl, indexableUrl, indexingRobots, offerAvailability } from '@/lib/search-indexing';
+import { publicPageMetadata } from '@/lib/page-metadata';
+import { absoluteAssetUrl, articleJsonLd, breadcrumbList, isoDate } from '@/lib/structured-data';
 import rolloutState from '@/data/catalogue-rollout-state.json';
 import firstBatchState from '@/data/catalogue-first-batch-state.json';
 import specialistExecution from '@/data/catalogue-specialist-review-state.json';
@@ -1400,8 +1402,12 @@ export class DomainTestSuite {
     // ----------------------------------------------------
     await run('Payment Configuration Protected', 'Public payment options must never expose bank accounts, IBANs, BICs, or crypto addresses', () => {
       const publicOptions = PaymentConfigService.getPublicPaymentOptions();
-      if (publicOptions.some((option) => option.code === 'SEPA_IBAN')) {
-        throw new Error('A placeholder bank account was offered to customers');
+      const serialized = JSON.stringify(publicOptions);
+      if (!publicOptions.some((option) => option.code === 'SEPA_IBAN') || !publicOptions.some((option) => option.code === 'CRYPTO_BTC')) {
+        throw new Error('The checkout payment choices were removed');
+      }
+      if (/bc1[a-z0-9]|0x[a-f0-9]{40}|NL00TEST|receivingAddress|bicSwift/i.test(serialized)) {
+        throw new Error('Public payment options exposed an account or wallet');
       }
 
       for (const opt of publicOptions) {
@@ -6335,7 +6341,7 @@ export class DomainTestSuite {
 
     await run('Final Launch Gate', 'Activation stays paused until every mandatory gate is actually satisfied', async () => {
       if (PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Production control state changed');
-      if (GBP_LAUNCH_MODE !== 'DISABLED_FOR_LAUNCH') throw new Error('GBP launch mode is ambiguous');
+      if (GBP_LAUNCH_MODE !== 'ENABLED') throw new Error('GBP launch mode is ambiguous');
       const audit = PublicationReadinessService.evaluateCurrent('audit-test-product');
       if (audit.readiness !== 'DO_NOT_PUBLISH') throw new Error('Audit Test Product changed');
       const beforeBatch = JSON.stringify(firstBatchState);
@@ -6736,6 +6742,27 @@ export class DomainTestSuite {
       let hostHeaderUrl = false;
       try { customerAbsoluteUrl('http://localhost:3000/en'); hostHeaderUrl = true; } catch { hostHeaderUrl = false; }
       if (hostHeaderUrl || urls.some((url) => /localhost|http:\/\/|\/admin|\/cart|\/checkout|\/account|audit-test-product/.test(url))) throw new Error('A private or non-production URL entered the sitemap');
+
+      const shop = await publicPageMetadata({ locale: 'en', path: '/en/shop', title: 'Shop', description: 'Catalogue' });
+      if (shop.alternates?.canonical !== 'https://fusionbars.eu/en/shop') throw new Error('Shop canonical left the English document');
+      const searchResults = await publicPageMetadata({
+        locale: 'en',
+        path: '/en/shop',
+        title: 'Shop',
+        description: 'Catalogue',
+        robots: { index: false, follow: true },
+      });
+      const searchRobots = searchResults.robots;
+      if (!searchRobots || typeof searchRobots === 'string' || searchRobots.index !== false || searchRobots.follow !== true) {
+        throw new Error('A shop search document stayed indexable');
+      }
+      if (absoluteAssetUrl('/images/products/bar.jpg') !== 'https://fusionbars.eu/images/products/bar.jpg') throw new Error('A relative asset was not absolutised');
+      if (absoluteAssetUrl('https://cdn.example/bar.jpg') !== 'https://cdn.example/bar.jpg') throw new Error('An absolute asset was rewritten');
+      if (isoDate('3 October 2026') !== '2026-10-03') throw new Error('A news date did not become an ISO date');
+      const crumbs = breadcrumbList([{ name: 'Home', path: '/en' }, { name: 'Shop', path: '/en/shop' }]) as { itemListElement: Array<{ item: string }> };
+      if (crumbs.itemListElement[1]?.item !== 'https://fusionbars.eu/en/shop') throw new Error('Breadcrumb URL was not canonical');
+      const article = articleJsonLd({ title: 'Note', summary: 'Summary', date: '3 October 2026', slug: 'note' }) as { datePublished?: string; mainEntityOfPage?: string };
+      if (article.datePublished !== '2026-10-03' || article.mainEntityOfPage !== 'https://fusionbars.eu/en/news/note') throw new Error('Article schema left the English news URL');
     });
 
     await run('Production Email DNS And Delivery', 'Provider evidence is required before email can leave review', async () => {
@@ -6887,7 +6914,10 @@ export class DomainTestSuite {
         if (ibanFormat('DE89370400440532013000') !== 'FORMAT_VALID' || bicFormat('COBADEFFXXX') !== 'FORMAT_VALID') throw new Error('A structurally valid account string was rejected');
         if (receivingAddressFormat('USDT', '', 'T123') !== 'NOT_CONFIGURED') throw new Error('USDT was given a network without configuration');
         PaymentConfigurationService.forceCustomerModeForTests('production');
-        if (PaymentConfigurationService.customerMethods().methods.length !== 0) throw new Error('Inactive payment methods were offered to production customers');
+        const offered = PaymentConfigurationService.customerMethods();
+        const offeredCodes = offered.methods.map((method) => method.code);
+        if (!offeredCodes.includes('SEPA_IBAN') || !offeredCodes.includes('CRYPTO_BTC')) throw new Error('The storefront payment choices were hidden');
+        if (/bc1[a-z0-9]|0x[a-f0-9]{40}|NL00TEST/.test(JSON.stringify(offered))) throw new Error('Production checkout exposed a wallet or test account');
         PaymentConfigurationService.forceCustomerModeForTests(null);
 
         PaymentConfigService.replaceBankForTests({ accountHolder: 'Example Holder', bankName: 'Example Bank', iban: 'DE89370400440532013000', bicSwift: 'COBADEFFXXX', status: 'ACTIVE' });
@@ -7019,7 +7049,7 @@ export class DomainTestSuite {
       PublicationReadinessService.resetForTests();
       const beforeBatch = JSON.stringify(firstBatchState);
       const beforeSpecialist = JSON.stringify(specialistExecution);
-      if (PRODUCTION_CONTROL_STATE !== 'PAUSED' || GBP_LAUNCH_MODE !== 'DISABLED_FOR_LAUNCH') throw new Error('Launch preparation changed production or GBP policy');
+      if (PRODUCTION_CONTROL_STATE !== 'PAUSED' || GBP_LAUNCH_MODE !== 'ENABLED') throw new Error('Launch preparation changed production or GBP policy');
       const live = LaunchCatalogueService.report();
       if (live.catalogue.selected !== 0 || live.catalogue.published !== 0 || live.catalogue.ready !== 0) throw new Error('A saved product was selected, published, or marked ready');
       if (live.launchSet.localePolicy || live.launchSet.intendedCountries.length !== 0) throw new Error('A launch locale or destination policy was assumed');

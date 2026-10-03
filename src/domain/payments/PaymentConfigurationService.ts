@@ -102,15 +102,13 @@ export class PaymentConfigurationService {
   }
 
   static customerMethods(): { mode: 'production' | 'development'; methods: Array<{ code: string; name: string }> } {
-    if (this.productionCheckoutRequired()) {
-      return {
-        mode: 'production',
-        methods: this.productionOptions().map((code) => ({ code, name: code === 'SEPA_IBAN' ? 'Bank Transfer (SEPA / IBAN)' : code.replace('CRYPTO_', '') })),
-      };
-    }
+    const methods = PaymentConfigService.getPublicPaymentOptions()
+      .filter((option) => option.code === 'SEPA_IBAN' || option.code === 'CRYPTO_BTC')
+      .filter((option) => this.overlay(option.code) !== 'DISABLED')
+      .map((option) => ({ code: option.code, name: option.name }));
     return {
-      mode: 'development',
-      methods: PaymentConfigService.getPublicPaymentOptions().map((option) => ({ code: option.code, name: option.name })),
+      mode: this.productionCheckoutRequired() ? 'production' : 'development',
+      methods,
     };
   }
 

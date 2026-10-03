@@ -18,7 +18,9 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   const dict = getDictionary(locale);
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState<string>(product.primaryImage);
+  const [activeImage, setActiveImage] = useState<string>(
+    product.variants[0]?.image || product.primaryImage,
+  );
   const [isAdded, setIsAdded] = useState(false);
 
   const selectedVariant: NormalizedVariant = product.variants[selectedVariantIndex] || product.variants[0];
@@ -51,7 +53,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
       {/* Left: Gallery Column */}
-      <div className="lg:col-span-6 space-y-4">
+      <div className="motion-rise lg:col-span-6 space-y-4">
         {/* Main Display Image */}
         <div className="relative aspect-square bg-white rounded-2xl border border-[#E5E3DD] overflow-hidden p-8 flex items-center justify-center shadow-xs">
           <Image
@@ -60,7 +62,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             fill
             priority
             sizes="(max-width: 1024px) 100vw, 50vw"
-            className="object-contain p-4 hover:scale-105 transition-transform duration-500"
+            className="object-contain p-4 motion-safe:hover:scale-105 motion-safe:transition-transform motion-safe:duration-500"
             referrerPolicy="no-referrer"
           />
 
@@ -94,6 +96,16 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             ))}
           </div>
         )}
+
+        <div className="space-y-3 pt-2">
+          <p className="text-sm text-[#5C5852] leading-relaxed font-normal">
+            {product.headline}
+          </p>
+          <p className="text-sm text-[#5C5852] leading-relaxed">{product.description}</p>
+          {selectedVariant.description && selectedVariant.description !== product.description && (
+            <p className="text-sm text-[#5C5852] leading-relaxed">{selectedVariant.description}</p>
+          )}
+        </div>
       </div>
 
       {/* Right: Product Merchandising Column */}
@@ -109,11 +121,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <h1 className="font-serif text-3xl sm:text-4xl font-bold text-[#121212] tracking-tight">
             {product.name}
           </h1>
-
-          <p className="text-sm text-[#5C5852] mt-2 leading-relaxed font-normal">
-            {product.headline}
-          </p>
-          <p className="text-sm text-[#5C5852] mt-3 leading-relaxed">{product.description}</p>
         </div>
 
         {/* Price & Stock Display */}
@@ -210,7 +217,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           <button
             onClick={handleAddToCart}
             disabled={selectedVariant.stockStatus === 'OUT_OF_STOCK'}
-            className={`flex-1 py-3.5 px-6 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer shadow-sm ${
+            className={`flex-1 py-3.5 px-6 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer shadow-sm motion-safe:active:scale-[0.98] ${
               isAdded
                 ? 'bg-emerald-600 text-white'
                 : selectedVariant.stockStatus === 'OUT_OF_STOCK'
