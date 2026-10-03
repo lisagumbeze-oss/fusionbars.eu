@@ -351,8 +351,8 @@ export default function LaunchControlCenterPage() {
 
       <section className="rounded-2xl border border-[#E5E3DD] bg-white p-6 space-y-3">
         <h2 className="font-serif text-xl font-bold text-[#121212]">Final launch gate</h2>
-        <p className="text-sm text-[#5C5852]">Production control is PAUSED. The staging checklist below is not inspected and is not a launch approval.</p>
-        <p className="font-mono text-sm font-bold text-[#121212]">{finalDecision || 'LAUNCH_BLOCKED'}</p>
+        <p className="text-sm text-[#5C5852]">{finalDecision === 'READY_TO_LAUNCH' ? 'The operator approved the remaining gates on 2026-10-03. Missing bank, tax, legal, and catalogue facts were not created. Audit Test Product stays unpublished.' : 'Production control is PAUSED. The staging checklist below is not inspected and is not a launch approval.'}</p>
+        <p className="font-mono text-sm font-bold text-[#121212]">{finalDecision || 'CHECKING'}</p>
         {errorMsg ? <p className="text-sm text-rose-800" role="alert">{errorMsg}</p> : null}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 min-w-0">
           {(['READY', 'REQUIRED_CONFIGURATION', 'WAIVED'] as const).map((bucket) => (
@@ -407,7 +407,7 @@ export default function LaunchControlCenterPage() {
         ) : null}
         {finalDecision === 'READY_TO_LAUNCH' ? (
           <div className="space-y-3">
-            <p className="text-sm text-[#121212]">Production launch readiness verified. All mandatory production gates have passed. Activating production will make the configured storefront, payment methods, customer workflows, email delivery, and approved catalogue available according to the current production configuration.</p>
+            <p className="text-sm text-[#121212]">The operator approved the remaining gates. Confirming activation records production as active for this session. It does not publish Audit Test Product or create missing bank, tax, or legal details.</p>
             <input value={confirmation} onChange={(event) => setConfirmation(event.target.value)} className="w-full border border-[#E5E3DD] rounded-lg px-3 py-2 text-sm" aria-label="Confirm Production Activation" placeholder="Confirm Production Activation" />
             <button
               type="button"
@@ -429,36 +429,36 @@ export default function LaunchControlCenterPage() {
       </section>
 
       {/* Primary Environment Gate Banner */}
-      <div className="rounded-2xl p-6 border shadow-xs bg-[#FFF5F5] border-rose-200">
+      <div className={`rounded-2xl p-6 border shadow-xs ${finalDecision === 'READY_TO_LAUNCH' ? 'bg-[#F3F7F4] border-[#C9D7CC]' : 'bg-[#FFF5F5] border-rose-200'}`}>
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 min-w-0">
             <div className="flex items-center gap-4 min-w-0">
-            <div className="w-12 h-12 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0">
+            <div className={`w-12 h-12 rounded-xl text-white flex items-center justify-center shrink-0 ${finalDecision === 'READY_TO_LAUNCH' ? 'bg-[#4A5D4E]' : 'bg-rose-600'}`}>
               <ShieldAlert className="w-7 h-7" />
             </div>
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <span className="font-mono text-xs uppercase font-extrabold tracking-wider px-2 py-0.5 rounded bg-rose-200 text-rose-900">
+                <span className={`font-mono text-xs uppercase font-extrabold tracking-wider px-2 py-0.5 rounded ${finalDecision === 'READY_TO_LAUNCH' ? 'bg-[#E3EBE5] text-[#243028]' : 'bg-rose-200 text-rose-900'}`}>
                   Target: Vercel Production
                 </span>
                 <span className="font-mono text-xs font-semibold text-[#5C5852]">
-                  Mode: {report?.environmentMode || 'development'}
+                  Mode: {report?.environmentMode || 'not loaded'}
                 </span>
               </div>
-              <h2 className="font-serif text-xl sm:text-2xl font-extrabold text-rose-950 mt-1">
-                PRODUCTION STATUS: BLOCKED
+              <h2 className={`font-serif text-xl sm:text-2xl font-extrabold mt-1 ${finalDecision === 'READY_TO_LAUNCH' ? 'text-[#1C2A22]' : 'text-rose-950'}`}>
+                {finalDecision === 'READY_TO_LAUNCH' ? 'PRODUCTION STATUS: APPROVED' : 'PRODUCTION STATUS: BLOCKED'}
               </h2>
-              <p className="text-xs text-rose-800 mt-0.5 max-w-2xl leading-relaxed">
-                Production deployment is gated by design. Real credentials (PostgreSQL pooler, cold-storage crypto wallets, corporate bank coordinates, DNS records, and legal entity disclosures) must be supplied prior to live deployment.
+              <p className={`text-xs mt-0.5 max-w-2xl leading-relaxed ${finalDecision === 'READY_TO_LAUNCH' ? 'text-[#3E4A42]' : 'text-rose-800'}`}>
+                {finalDecision === 'READY_TO_LAUNCH' ? 'The operator approved every remaining gate. Confirm production activation to proceed. This approval does not publish the audit product or fill in missing business details.' : 'Production deployment is gated by design. Real credentials must be supplied, or the operator must approve the remaining gates, before live deployment.'}
               </p>
             </div>
           </div>
 
-          <div className="text-right sm:border-l sm:border-rose-200 sm:pl-6 shrink-0">
-            <div className="text-xs text-rose-700 font-bold uppercase tracking-wider">Mandatory Blockers</div>
-            <div className="text-3xl font-extrabold text-rose-950">
-              {report?.summary.mandatoryBlockedCount ?? 0}
+          <div className={`text-right sm:border-l sm:pl-6 shrink-0 ${finalDecision === 'READY_TO_LAUNCH' ? 'sm:border-[#C9D7CC]' : 'sm:border-rose-200'}`}>
+            <div className={`text-xs font-bold uppercase tracking-wider ${finalDecision === 'READY_TO_LAUNCH' ? 'text-[#3E4A42]' : 'text-rose-700'}`}>Mandatory Blockers</div>
+            <div className={`text-3xl font-extrabold ${finalDecision === 'READY_TO_LAUNCH' ? 'text-[#1C2A22]' : 'text-rose-950'}`}>
+              {launchGates.filter((item) => item.blocking).length}
             </div>
-            <div className="text-[11px] text-rose-600 mt-0.5">out of {report?.summary.totalRequirements ?? 15} subsystems</div>
+            <div className={`text-[11px] mt-0.5 ${finalDecision === 'READY_TO_LAUNCH' ? 'text-[#3E4A42]' : 'text-rose-600'}`}>out of {launchGates.length} gates</div>
           </div>
         </div>
       </div>

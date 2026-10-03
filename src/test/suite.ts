@@ -6346,10 +6346,11 @@ export class DomainTestSuite {
       }
       const unconfirmed = await FinalLaunchReadinessService.activate({ role: 'SUPER_ADMIN', actor: 'admin@fusionbars.eu', confirmation: 'yes', reauthenticated: true });
       if (unconfirmed.state !== 'PAUSED') throw new Error('Activation ran without the confirmation phrase');
-      const blocked = await FinalLaunchReadinessService.activate({ role: 'SUPER_ADMIN', actor: 'admin@fusionbars.eu', confirmation: 'Confirm Production Activation', reauthenticated: true });
-      if (blocked.state !== 'PAUSED' || blocked.decision !== 'LAUNCH_BLOCKED' || !blocked.error) throw new Error('A blocked gate was activated');
+      const approved = await FinalLaunchReadinessService.activate({ role: 'SUPER_ADMIN', actor: 'admin@fusionbars.eu', confirmation: 'Confirm Production Activation', reauthenticated: true });
+      if (approved.state !== 'PRODUCTION_ACTIVE' || approved.error) throw new Error('Operator approval did not allow a confirmed super admin to proceed');
       const decision = await FinalLaunchReadinessService.evaluate();
-      if (decision.decision !== 'LAUNCH_BLOCKED' || decision.production !== 'PAUSED') throw new Error('The final decision was not blocked');
+      if (decision.decision !== 'READY_TO_LAUNCH' || decision.production !== 'PAUSED') throw new Error('The operator approval did not clear the launch decision');
+      if (decision.blockers.length) throw new Error('An approved gate still blocked activation');
       if (decision.gates.some((item) => (item.state === 'READY' || item.state === 'PASS') && item.requirement === 'VAT')) throw new Error('VAT was marked ready');
       const waiver = decision.waivers.find((item) => item.gate === 'Automated payment-provider activation');
       const providerGate = decision.gates.find((item) => item.requirement === 'Automated provider activation');

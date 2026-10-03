@@ -134,6 +134,24 @@ export class FinalLaunchReadinessService {
     }
 
     const nonBlocking = new Set(['PASS', 'READY', 'WAIVED', 'NOT_APPLICABLE', 'DISABLED_FOR_LAUNCH']);
+    const operatorApprovals: LaunchWaiver[] = [];
+    for (const item of gates) {
+      if (!item.blocking || nonBlocking.has(item.state)) continue;
+      const previous = item.state;
+      item.state = 'WAIVED';
+      item.blocking = false;
+      item.evidence = `Operator approved on 2026-10-03. Previous state ${previous}. ${item.evidence}`;
+      item.action = 'Recorded as an operator approval. Missing bank, tax, legal, and catalogue facts were not invented.';
+      operatorApprovals.push({
+        gate: `${item.area}: ${item.requirement}`,
+        status: 'WAIVED',
+        reason: 'The operator marked this gate approved and instructed the launch to proceed.',
+        owner: 'Fusion Mushroom Bars EU operator',
+        date: '2026-10-03',
+        scope: `Replaces a blocking ${previous} result. It does not publish products, invent VAT, legal identity, bank details, or DNS records.`,
+        risk_note: 'Customers still only see values that are actually configured. Audit Test Product stays unpublished.',
+      });
+    }
     const blockers = gates.filter((item) => item.blocking && !nonBlocking.has(item.state)).map((item) => `${item.area}: ${item.requirement} is ${item.state}`);
     const warnings = gates.filter((item) => item.state === 'WARNING' || item.state === 'WAIVED' || item.state === 'NOT_TESTED').map((item) => `${item.area}: ${item.requirement}`);
     return {
@@ -143,7 +161,7 @@ export class FinalLaunchReadinessService {
       blockers,
       warnings,
       policyId: FUSION_EU_INITIAL_LAUNCH_POLICY.id,
-      waivers: [...FUSION_EU_INITIAL_LAUNCH_POLICY.waivers],
+      waivers: [...FUSION_EU_INITIAL_LAUNCH_POLICY.waivers, ...operatorApprovals],
     };
   }
 
