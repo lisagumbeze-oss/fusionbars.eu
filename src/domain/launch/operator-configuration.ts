@@ -39,7 +39,7 @@ export const OPERATOR_CONFIGURATION_CHECKLIST: OperatorChecklistItem[] = [
   { group: 'Infrastructure', item: 'Email provider credential', gate: 'Provider', fields: ['EMAIL_PROVIDER', 'EMAIL_PROVIDER_KEY'] },
   { group: 'Infrastructure', item: 'DNS records', gate: 'SPF', fields: ['SPF', 'DKIM', 'DMARC'] },
   { group: 'Payments', item: 'Verified bank details', gate: 'Manual payment instructions', fields: ['BANK_ACCOUNT_HOLDER', 'BANK_NAME', 'BANK_IBAN', 'BANK_BIC_SWIFT', 'BANK_REFERENCE_FORMAT', 'BANK_PAYMENT_INSTRUCTIONS'] },
-  { group: 'Payments', item: 'Verified crypto wallet, if cryptocurrency stays enabled', gate: 'Manual payment instructions', fields: ['CRYPTO_BTC_ADDRESS', 'CRYPTO_BTC_NETWORK', 'CRYPTO_PAYMENT_INSTRUCTIONS'] },
+  { group: 'Payments', item: 'Verified crypto wallet, if cryptocurrency stays enabled', gate: 'Manual payment instructions', fields: ['CRYPTO_BTC_ADDRESS', 'CRYPTO_BTC_NETWORK', 'CRYPTO_ETH_ADDRESS', 'CRYPTO_ETH_NETWORK', 'CRYPTO_USDT_ADDRESS', 'CRYPTO_USDT_NETWORK', 'CRYPTO_BCH_ADDRESS', 'CRYPTO_BCH_NETWORK', 'CRYPTO_PAYMENT_INSTRUCTIONS'] },
   { group: 'Payments', item: 'Payment proof upload choice', gate: 'Payment proof upload', fields: ['PAYMENT_PROOF_UPLOAD'] },
   { group: 'Tax', item: 'Approved VAT rules', gate: 'VAT', fields: ['jurisdiction', 'tax class', 'rate', 'effective date', 'shipping tax treatment'] },
   { group: 'Legal', item: 'Legal identity', gate: 'Company info', fields: ['legal_company_name', 'registration_number', 'vat_number', 'registered_address', 'jurisdiction'] },

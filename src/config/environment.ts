@@ -175,7 +175,7 @@ export class EnvironmentService {
         provider: storageProvider,
         endpoint: process.env.STORAGE_ENDPOINT,
         bucket: process.env.STORAGE_BUCKET,
-        region: process.env.STORAGE_REGION || 'eu-central-1',
+        region: process.env.STORAGE_REGION || '',
         accessKey: process.env.STORAGE_ACCESS_KEY,
         secretKey: process.env.STORAGE_SECRET_KEY,
       },
@@ -195,18 +195,18 @@ export class EnvironmentService {
         crypto: {
           btc: {
             address: btcAddress,
-            network: process.env.CRYPTO_BTC_NETWORK || 'Bitcoin Mainnet',
+            network: process.env.CRYPTO_BTC_NETWORK || '',
             active: Boolean(btcAddress && btcAddress.trim().length > 0),
           },
           usdt: {
             address: usdtAddress,
-            network: process.env.CRYPTO_USDT_NETWORK || 'Ethereum (ERC-20)',
-            active: false, // Default inactive until signed off
+            network: process.env.CRYPTO_USDT_NETWORK || '',
+            active: Boolean(usdtAddress && usdtAddress.trim().length > 0),
           },
           eth: {
             address: ethAddress,
-            network: process.env.CRYPTO_ETH_NETWORK || 'Ethereum Mainnet',
-            active: false, // Default inactive until signed off
+            network: process.env.CRYPTO_ETH_NETWORK || '',
+            active: Boolean(ethAddress && ethAddress.trim().length > 0),
           },
         },
       },

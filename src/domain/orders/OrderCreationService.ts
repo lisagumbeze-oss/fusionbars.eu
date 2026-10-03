@@ -457,7 +457,7 @@ export class OrderCreationService {
       void dispatchEmailSafely('crypto_order_confirmation', () =>
         EmailService.sendCryptoOrderConfirmation(dbOrder, {
           cryptoName: paymentNotificationDetails.cryptoName || 'Bitcoin',
-          network: paymentNotificationDetails.network || 'Bitcoin Mainnet',
+          network: paymentNotificationDetails.network || '',
           receivingAddress: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.receivingAddress) ? '' : paymentNotificationDetails.receivingAddress || '',
           wallets: (paymentInstructions.wallets ?? []).map((wallet) => ({
             name: wallet.name,

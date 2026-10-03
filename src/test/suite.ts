@@ -6360,7 +6360,17 @@ export class DomainTestSuite {
       const backupDimensions = BackupReadinessService.dimensions();
       if (Object.values(backupDimensions).some((value) => value === 'YES')) throw new Error('A backup dimension was marked configured without evidence');
       if (OPERATOR_CONFIGURATION_CHECKLIST.some((item) => /NL00|IBAN[0-9]|bc1q/i.test(item.fields.join(' ')))) throw new Error('The operator checklist contained a payment credential');
-      if ((await getCheckoutCryptoWallets({ amountMinor: 2000, currency: 'EUR' })).length !== 0) throw new Error('Unconfigured checkout wallets were offered');
+      const cryptoEnv = ['CRYPTO_BTC_ADDRESS', 'CRYPTO_BTC_NETWORK', 'CRYPTO_ETH_ADDRESS', 'CRYPTO_ETH_NETWORK', 'CRYPTO_USDT_ADDRESS', 'CRYPTO_USDT_NETWORK', 'CRYPTO_BCH_ADDRESS', 'CRYPTO_BCH_NETWORK'] as const;
+      const savedCrypto = Object.fromEntries(cryptoEnv.map((name) => [name, process.env[name]]));
+      for (const name of cryptoEnv) delete process.env[name];
+      try {
+        if ((await getCheckoutCryptoWallets({ amountMinor: 2000, currency: 'EUR' })).length !== 0) throw new Error('Unconfigured checkout wallets were offered');
+      } finally {
+        for (const name of cryptoEnv) {
+          if (savedCrypto[name] === undefined) delete process.env[name];
+          else process.env[name] = savedCrypto[name];
+        }
+      }
       const paused = FinalLaunchReadinessService.pause({ role: 'SUPER_ADMIN', actor: 'admin@fusionbars.eu', confirmation: 'PAUSE PRODUCTION' });
       if (paused.state !== 'PAUSED' || PRODUCTION_CONTROL_STATE !== 'PAUSED') throw new Error('Pause did not keep production paused');
       if (JSON.stringify(firstBatchState) !== beforeBatch) throw new Error('The launch gate changed the pilot file');

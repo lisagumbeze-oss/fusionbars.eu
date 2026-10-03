@@ -20,6 +20,7 @@ export interface CheckoutCryptoWallet {
 const WALLET_ENV: Array<{ symbol: string; name: string; networkEnv: string; addressEnv: string }> = [
   { symbol: 'BTC', name: 'Bitcoin', networkEnv: 'CRYPTO_BTC_NETWORK', addressEnv: 'CRYPTO_BTC_ADDRESS' },
   { symbol: 'ETH', name: 'Ethereum', networkEnv: 'CRYPTO_ETH_NETWORK', addressEnv: 'CRYPTO_ETH_ADDRESS' },
+  { symbol: 'USDT', name: 'Tether', networkEnv: 'CRYPTO_USDT_NETWORK', addressEnv: 'CRYPTO_USDT_ADDRESS' },
   { symbol: 'BCH', name: 'Bitcoin Cash', networkEnv: 'CRYPTO_BCH_NETWORK', addressEnv: 'CRYPTO_BCH_ADDRESS' },
 ];
 
