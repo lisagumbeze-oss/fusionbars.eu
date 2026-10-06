@@ -221,7 +221,11 @@ export async function updateOrderStatusAdminAction(input: {
       validated.newStatus,
       validated.actorRole,
       validated.actorId,
-      validated.note
+      validated.note,
+      {
+        trackingNumber: input.trackingNumber?.trim(),
+        carrierName: input.carrierName?.trim(),
+      }
     );
 
     const { dispatchOrderStatusEmail } = await import('@/services/email/order-notifications');
@@ -236,7 +240,7 @@ export async function updateOrderStatusAdminAction(input: {
       entityId: order.id,
       actorRole: validated.actorRole,
       actorId: validated.actorId,
-      metadata: JSON.stringify({ from: order.status, to: validated.newStatus, note: validated.note }),
+      metadata: JSON.stringify({ from: previousStatus, to: validated.newStatus, note: validated.note }),
     });
 
     return {

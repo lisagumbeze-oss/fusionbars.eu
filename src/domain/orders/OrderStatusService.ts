@@ -58,13 +58,6 @@ export class OrderStatusService {
   static canRolePerformTransition(context: TransitionContext): { allowed: boolean; reason?: string } {
     const { fromStatus, toStatus, userRole } = context;
 
-    if (!this.isTransitionAllowed(fromStatus, toStatus)) {
-      return {
-        allowed: false,
-        reason: `Illegal state transition from ${fromStatus} to ${toStatus}.`,
-      };
-    }
-
     // Cancellation check
     if (toStatus === 'CANCELLED' && !this.canOrderBeCancelled(fromStatus)) {
       return {
@@ -81,6 +74,19 @@ export class OrderStatusService {
       };
     }
 
+    // The operations desk is Super Admin and may advance a saved order
+    // straight to the status selected in the admin form.
+    if (userRole === 'SUPER_ADMIN') {
+      return { allowed: true };
+    }
+
+    if (!this.isTransitionAllowed(fromStatus, toStatus)) {
+      return {
+        allowed: false,
+        reason: `Illegal state transition from ${fromStatus} to ${toStatus}.`,
+      };
+    }
+
     // Customer can only submit payment proof
     if (userRole === 'CUSTOMER') {
       if (fromStatus === 'PENDING_PAYMENT' && toStatus === 'PAYMENT_SUBMITTED') {
@@ -94,11 +100,6 @@ export class OrderStatusService {
 
     // System can transition automatically (e.g. timeout cancellation)
     if (userRole === 'SYSTEM') {
-      return { allowed: true };
-    }
-
-    // Super Admin has full governance
-    if (userRole === 'SUPER_ADMIN') {
       return { allowed: true };
     }
 

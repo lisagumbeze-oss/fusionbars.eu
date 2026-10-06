@@ -140,80 +140,169 @@ function asHub(value: string | null): DbOrder['shippingOriginHub'] {
   return 'NL';
 }
 
+const orderInclude = {
+  items: { include: { variant: { select: { productId: true } } } },
+  shippingAddress: true,
+  shippingMethod: true,
+  payments: { include: { paymentMethod: true }, orderBy: { createdAt: 'desc' as const } },
+  statusHistory: { orderBy: { createdAt: 'asc' as const } },
+} satisfies Prisma.OrderInclude;
+
+type StoredOrder = Prisma.OrderGetPayload<{ include: typeof orderInclude }>;
+
+function toOrder(row: StoredOrder): DbOrder {
+  const payment = row.payments[0];
+  const methodCode = row.shippingMethod.code === 'EXPRESS' ? 'EXPRESS' : 'STANDARD';
+  return {
+    id: row.id,
+    orderNumber: row.orderNumber,
+    lookupToken: row.lookupToken || '',
+    customerId: row.customerId,
+    guestEmail: row.guestEmail || '',
+    guestPhone: row.guestPhone,
+    currency: row.currency === 'GBP' ? 'GBP' : 'EUR',
+    subtotalAmount: row.subtotalAmount,
+    discountAmount: row.discountAmount,
+    shippingAmount: row.shippingAmount,
+    totalAmount: row.totalAmount,
+    status: row.status,
+    shippingOriginHub: asHub(row.shippingOriginHub),
+    shippingMethodCode: methodCode,
+    shippingAddress: {
+      firstName: row.shippingAddress.firstName,
+      lastName: row.shippingAddress.lastName,
+      streetAddress: row.shippingAddress.streetAddress,
+      houseNumber: row.shippingAddress.houseNumber || undefined,
+      city: row.shippingAddress.city,
+      postalCode: row.shippingAddress.postalCode,
+      countryCode: row.shippingAddress.countryCode,
+      phone: row.shippingAddress.phone || undefined,
+    },
+    items: row.items.map((item) => ({
+      id: item.id,
+      variantId: item.variantId,
+      productId: item.variant.productId,
+      sku: item.sku,
+      productName: item.productName,
+      variantName: item.variantName,
+      unitPrice: item.unitPrice,
+      quantity: item.quantity,
+      lineTotal: item.lineTotal,
+    })),
+    paymentMethodCode: payment?.paymentMethod.code || 'CRYPTO_BTC',
+    paymentReference: payment?.paymentReference || row.paymentReference,
+    proofFileUrl: payment?.proofFileUrl,
+    paymentVerifiedAt: payment?.verifiedAt?.toISOString() || null,
+    discreetPackaging: row.discreetPackaging,
+    trackingNumber: row.trackingNumber,
+    carrierName: row.carrierName,
+    customerNotes: row.customerNotes,
+    internalNotes: row.internalNotes,
+    statusHistory: row.statusHistory.map((entry) => ({
+      id: entry.id,
+      fromStatus: entry.fromStatus,
+      toStatus: entry.toStatus,
+      actorRole: 'SYSTEM',
+      actorId: entry.changedBy,
+      note: entry.note || undefined,
+      createdAt: entry.createdAt.toISOString(),
+    })),
+    createdAt: row.createdAt.toISOString(),
+    updatedAt: row.updatedAt.toISOString(),
+  };
+}
+
+async function settleStock(
+  tx: Prisma.TransactionClient,
+  hub: string,
+  items: Array<{ variantId: string; quantity: number }>,
+  mode: 'commit' | 'release',
+) {
+  const location = await tx.inventoryLocation.findUnique({ where: { code: hub } });
+  if (!location) return;
+  for (const item of items) {
+    if (mode === 'release') {
+      await tx.$executeRaw`
+        UPDATE "Inventory"
+        SET "quantityReserved" = GREATEST("quantityReserved" - ${item.quantity}, 0)
+        WHERE "variantId" = ${item.variantId}
+          AND "locationId" = ${location.id}
+      `;
+    } else {
+      await tx.$executeRaw`
+        UPDATE "Inventory"
+        SET "quantityOnHand" = GREATEST("quantityOnHand" - ${item.quantity}, 0),
+            "quantityReserved" = GREATEST("quantityReserved" - ${item.quantity}, 0)
+        WHERE "variantId" = ${item.variantId}
+          AND "locationId" = ${location.id}
+      `;
+    }
+  }
+}
+
 export class OrderDatabasePersistence {
   static async list(): Promise<DbOrder[]> {
     const rows = await database.order.findMany({
       orderBy: { createdAt: 'desc' },
       take: 200,
-      include: {
-        items: { include: { variant: { select: { productId: true } } } },
-        shippingAddress: true,
-        shippingMethod: true,
-        payments: { include: { paymentMethod: true }, orderBy: { createdAt: 'desc' } },
-        statusHistory: { orderBy: { createdAt: 'asc' } },
+      include: orderInclude,
+    });
+    return rows.map(toOrder);
+  }
+
+  static async find(identifier: string): Promise<DbOrder | null> {
+    const row = await database.order.findFirst({
+      where: {
+        OR: [
+          { id: identifier },
+          { orderNumber: identifier },
+          { lookupToken: identifier },
+        ],
       },
+      include: orderInclude,
     });
-    return rows.map((row) => {
-      const payment = row.payments[0];
-      const methodCode = row.shippingMethod.code === 'EXPRESS' ? 'EXPRESS' : 'STANDARD';
-      return {
-        id: row.id,
-        orderNumber: row.orderNumber,
-        lookupToken: row.lookupToken || '',
-        customerId: row.customerId,
-        guestEmail: row.guestEmail || '',
-        guestPhone: row.guestPhone,
-        currency: row.currency === 'GBP' ? 'GBP' : 'EUR',
-        subtotalAmount: row.subtotalAmount,
-        discountAmount: row.discountAmount,
-        shippingAmount: row.shippingAmount,
-        totalAmount: row.totalAmount,
-        status: row.status,
-        shippingOriginHub: asHub(row.shippingOriginHub),
-        shippingMethodCode: methodCode,
-        shippingAddress: {
-          firstName: row.shippingAddress.firstName,
-          lastName: row.shippingAddress.lastName,
-          streetAddress: row.shippingAddress.streetAddress,
-          houseNumber: row.shippingAddress.houseNumber || undefined,
-          city: row.shippingAddress.city,
-          postalCode: row.shippingAddress.postalCode,
-          countryCode: row.shippingAddress.countryCode,
-          phone: row.shippingAddress.phone || undefined,
+    return row ? toOrder(row) : null;
+  }
+
+  static async recordStatus(input: {
+    orderId: string;
+    status: DbOrder['status'];
+    fromStatus: DbOrder['status'];
+    hub: string;
+    items: Array<{ variantId: string; quantity: number }>;
+    trackingNumber?: string | null;
+    carrierName?: string | null;
+    note?: string;
+    changedBy: string;
+  }): Promise<'SAVED' | 'MISSING'> {
+    const existing = await database.order.findUnique({ where: { id: input.orderId }, select: { id: true } });
+    if (!existing) return 'MISSING';
+
+    const stillReserved = ['DRAFT', 'PENDING_PAYMENT', 'PAYMENT_SUBMITTED', 'PAYMENT_VERIFIED'].includes(input.fromStatus);
+    const fulfilling = ['PROCESSING', 'SHIPPED', 'DELIVERED'].includes(input.status);
+    const releasing = input.status === 'CANCELLED' && ['DRAFT', 'PENDING_PAYMENT', 'PAYMENT_SUBMITTED'].includes(input.fromStatus);
+    const stockMode = releasing ? 'release' : fulfilling && stillReserved ? 'commit' : null;
+
+    await database.$transaction(async (tx) => {
+      await tx.order.update({
+        where: { id: input.orderId },
+        data: {
+          status: input.status,
+          ...(input.trackingNumber !== undefined ? { trackingNumber: input.trackingNumber } : {}),
+          ...(input.carrierName !== undefined ? { carrierName: input.carrierName } : {}),
+          statusHistory: {
+            create: {
+              fromStatus: input.fromStatus,
+              toStatus: input.status,
+              note: input.note || null,
+              changedBy: input.changedBy || 'SYSTEM',
+            },
+          },
         },
-        items: row.items.map((item) => ({
-          id: item.id,
-          variantId: item.variantId,
-          productId: item.variant.productId,
-          sku: item.sku,
-          productName: item.productName,
-          variantName: item.variantName,
-          unitPrice: item.unitPrice,
-          quantity: item.quantity,
-          lineTotal: item.lineTotal,
-        })),
-        paymentMethodCode: payment?.paymentMethod.code || 'CRYPTO_BTC',
-        paymentReference: payment?.paymentReference || row.paymentReference,
-        proofFileUrl: payment?.proofFileUrl,
-        paymentVerifiedAt: payment?.verifiedAt?.toISOString() || null,
-        discreetPackaging: row.discreetPackaging,
-        trackingNumber: row.trackingNumber,
-        carrierName: row.carrierName,
-        customerNotes: row.customerNotes,
-        internalNotes: row.internalNotes,
-        statusHistory: row.statusHistory.map((entry) => ({
-          id: entry.id,
-          fromStatus: entry.fromStatus,
-          toStatus: entry.toStatus,
-          actorRole: 'SYSTEM',
-          actorId: entry.changedBy,
-          note: entry.note || undefined,
-          createdAt: entry.createdAt.toISOString(),
-        })),
-        createdAt: row.createdAt.toISOString(),
-        updatedAt: row.updatedAt.toISOString(),
-      };
-    });
+      });
+      if (stockMode) await settleStock(tx, input.hub, input.items, stockMode);
+    }, { maxWait: 30000, timeout: 60000 });
+    return 'SAVED';
   }
 
   static async persist(order: DbOrder): Promise<'PERSISTED'> {

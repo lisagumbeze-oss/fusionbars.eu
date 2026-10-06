@@ -753,7 +753,15 @@ export class CommerceRepository {
   }
 
   static async findOrderByIdOrNumber(identifier: string): Promise<DbOrder | null> {
-    return store.orders.get(identifier) || null;
+    const cached = store.orders.get(identifier);
+    if (cached) return cached;
+    if (process.env.NODE_ENV !== 'production') return null;
+    const stored = await OrderDatabasePersistence.find(identifier);
+    if (!stored) return null;
+    store.orders.set(stored.id, stored);
+    if (stored.orderNumber) store.orders.set(stored.orderNumber, stored);
+    if (stored.lookupToken) store.orders.set(stored.lookupToken, stored);
+    return stored;
   }
 
   static async findOrderByLookupToken(token: string): Promise<DbOrder | null> {
@@ -803,12 +811,15 @@ export class CommerceRepository {
     newStatus: OrderStatus,
     actorRole: string,
     actorId: string,
-    note?: string
+    note?: string,
+    shipment?: { trackingNumber?: string; carrierName?: string }
   ): Promise<DbOrder | null> {
     const order = await this.findOrderByIdOrNumber(orderId);
     if (!order) return null;
 
     const fromStatus = order.status;
+    if (shipment?.trackingNumber) order.trackingNumber = shipment.trackingNumber;
+    if (shipment?.carrierName) order.carrierName = shipment.carrierName;
     order.status = newStatus;
     order.updatedAt = new Date().toISOString();
 
@@ -846,6 +857,20 @@ export class CommerceRepository {
     store.orders.set(order.id, order);
     store.orders.set(order.orderNumber, order);
     store.orders.set(order.lookupToken, order);
+
+    if (process.env.NODE_ENV === 'production') {
+      await OrderDatabasePersistence.recordStatus({
+        orderId: order.id,
+        status: newStatus,
+        fromStatus,
+        hub: order.shippingOriginHub,
+        items: order.items.map((item) => ({ variantId: item.variantId, quantity: item.quantity })),
+        trackingNumber: order.trackingNumber,
+        carrierName: order.carrierName,
+        note,
+        changedBy: actorId,
+      });
+    }
 
     return order;
   }
