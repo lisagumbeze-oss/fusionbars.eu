@@ -46,6 +46,37 @@ function itemsHtmlBlock(
   return `<ul style="margin:12px 0 0;padding-left:20px;">${rows}</ul>`;
 }
 
+type OrderFacts = {
+  statusLabel?: string;
+  totalAmount?: MinorUnits;
+  currency?: CurrencyCode;
+  items?: EmailRenderContext['items'];
+};
+
+function orderFacts(context: OrderFacts): { text: string; html: string } {
+  const lines: string[] = [];
+  const rows: string[] = [];
+  if (context.statusLabel) {
+    lines.push(`Status: ${context.statusLabel}`);
+    rows.push(renderDetailRow('Status', context.statusLabel));
+  }
+  if (context.totalAmount != null && context.currency) {
+    const formatted = MoneyEngine.format(context.totalAmount, context.currency);
+    lines.push(`Total: ${formatted}`);
+    rows.push(renderDetailRow('Total', formatted));
+  }
+  const items = context.items || [];
+  const currency = context.currency || 'EUR';
+  const itemText = items.length ? `\nItems:\n${itemsTextBlock(items, currency)}` : '';
+  const itemHtml = items.length
+    ? `<p style="font-size:14px;color:#5C5852;margin:16px 0 8px;"><strong>Items</strong></p>${itemsHtmlBlock(items, currency)}`
+    : '';
+  return {
+    text: `${lines.join('\n')}${itemText}`.trim(),
+    html: `${rows.length ? renderAccentPanel('Order details', rows.join('')) : ''}${itemHtml}`,
+  };
+}
+
 export class EmailTemplates {
   public static readonly SENDER_SUPPORT = 'Fusion Mushroom Bars EU <sales@fusionbars.eu>';
   public static readonly SENDER_ORDERS = 'Fusion EU Orders <sales@fusionbars.eu>';
@@ -274,9 +305,10 @@ Support: ${context.supportEmail}
     customerName: string;
     orderNumber: string;
     supportEmail: string;
-  }): { subject: string; text: string; html: string } {
+  } & OrderFacts): { subject: string; text: string; html: string } {
+    const facts = orderFacts(context);
     const subject = `Payment Verified: ${context.orderNumber}`;
-    const text = `Hello ${context.customerName}, payment for ${context.orderNumber} is verified. Your order is entering fulfilment. Support: ${context.supportEmail}`;
+    const text = `Hello ${context.customerName}, payment for ${context.orderNumber} is verified. Your order is entering fulfilment.\n\n${facts.text}\n\nSupport: ${context.supportEmail}`;
     const html = renderEmailShell({
       title: subject,
       supportEmail: context.supportEmail,
@@ -285,6 +317,7 @@ Support: ${context.supportEmail}
         <p>Dear ${escapeHtml(context.customerName)},</p>
         <p>Payment for order <strong>${escapeHtml(context.orderNumber)}</strong> has been confirmed.</p>
         <p>Your order is now being prepared for discreet European dispatch.</p>
+        ${facts.html}
       `,
     });
     return { subject, text, html };
@@ -297,19 +330,20 @@ Support: ${context.supportEmail}
     carrierName?: string | null;
     hubCode?: string;
     supportEmail: string;
-  }): { subject: string; text: string; html: string } {
+  } & OrderFacts): { subject: string; text: string; html: string } {
     const hasTracking = Boolean(context.trackingNumber && context.trackingNumber.trim().length > 0);
     const subject = `Your order has shipped: ${context.orderNumber}`;
     const trackingText = hasTracking
       ? `Shipment reference: ${context.trackingNumber}${context.carrierName ? `\nCourier: ${context.carrierName}` : ''}`
       : 'In transit via European priority logistics in plain, unmarked packaging.';
 
+    const facts = orderFacts(context);
     const text = `
 Hello ${context.customerName},
 
 Order ${context.orderNumber} has shipped.
 ${trackingText}
-
+${facts.text ? `\n${facts.text}\n` : ''}
 Support: ${context.supportEmail}
 `.trim();
 
@@ -328,6 +362,7 @@ Support: ${context.supportEmail}
         <p>Dear ${escapeHtml(context.customerName)},</p>
         <p>Order <strong>${escapeHtml(context.orderNumber)}</strong> has left our European facility.</p>
         ${renderAccentPanel('Shipment update', panelContent)}
+        ${facts.html}
       `,
     });
     return { subject, text, html };
@@ -337,9 +372,10 @@ Support: ${context.supportEmail}
     customerName: string;
     orderNumber: string;
     supportEmail: string;
-  }): { subject: string; text: string; html: string } {
+  } & OrderFacts): { subject: string; text: string; html: string } {
+    const facts = orderFacts(context);
     const subject = `Delivered: Order ${context.orderNumber}`;
-    const text = `Hello ${context.customerName}, order ${context.orderNumber} has been delivered. Thank you for choosing Fusion Mushroom Bars EU. Support: ${context.supportEmail}`;
+    const text = `Hello ${context.customerName}, order ${context.orderNumber} has been delivered. Thank you for choosing Fusion Mushroom Bars EU.\n\n${facts.text}\n\nSupport: ${context.supportEmail}`;
     const html = renderEmailShell({
       title: subject,
       supportEmail: context.supportEmail,
@@ -347,6 +383,7 @@ Support: ${context.supportEmail}
         ${renderHeading('Delivery complete', 'success')}
         <p>Dear ${escapeHtml(context.customerName)},</p>
         <p>Your delivery for order <strong>${escapeHtml(context.orderNumber)}</strong> is complete.</p>
+        ${facts.html}
         <p>Thank you for choosing Fusion Mushroom Bars EU.</p>
       `,
     });
@@ -358,9 +395,10 @@ Support: ${context.supportEmail}
     orderNumber: string;
     reason: string;
     supportEmail: string;
-  }): { subject: string; text: string; html: string } {
+  } & OrderFacts): { subject: string; text: string; html: string } {
+    const facts = orderFacts(context);
     const subject = `Order Cancelled: ${context.orderNumber}`;
-    const text = `Hello ${context.customerName}, order ${context.orderNumber} was cancelled. Reason: ${context.reason}. Support: ${context.supportEmail}`;
+    const text = `Hello ${context.customerName}, order ${context.orderNumber} was cancelled. Reason: ${context.reason}.\n\n${facts.text}\n\nSupport: ${context.supportEmail}`;
     const html = renderEmailShell({
       title: subject,
       supportEmail: context.supportEmail,
@@ -369,6 +407,7 @@ Support: ${context.supportEmail}
         <p>Dear ${escapeHtml(context.customerName)},</p>
         <p>Order <strong>${escapeHtml(context.orderNumber)}</strong> has been cancelled.</p>
         ${renderAccentPanel('Reason', renderDetailRow('Details', context.reason))}
+        ${facts.html}
       `,
     });
     return { subject, text, html };
@@ -420,12 +459,13 @@ Support: ${context.supportEmail}
     reason?: string;
     orderStatusUrl: string;
     supportEmail: string;
-  }): { subject: string; text: string; html: string } {
+  } & OrderFacts): { subject: string; text: string; html: string } {
     const subject = `Payment Verification Update: ${context.orderNumber}`;
+    const facts = orderFacts(context);
     const text = `
 Hello ${context.customerName},
 We could not verify payment for ${context.orderNumber}.
-${context.reason ? `Reason: ${context.reason}\n` : ''}
+${context.reason ? `Reason: ${context.reason}\n` : ''}${facts.text ? `${facts.text}\n` : ''}
 Review: ${context.orderStatusUrl}
 Support: ${context.supportEmail}
 `.trim();
@@ -437,6 +477,7 @@ Support: ${context.supportEmail}
         <p>Dear ${escapeHtml(context.customerName)},</p>
         <p>We could not reconcile the payment for order <strong>${escapeHtml(context.orderNumber)}</strong>.</p>
         ${context.reason ? renderAccentPanel('Note', renderDetailRow('Details', context.reason)) : ''}
+        ${facts.html}
         ${renderPrimaryButton('Review order status', context.orderStatusUrl)}
       `,
     });
@@ -448,9 +489,10 @@ Support: ${context.supportEmail}
     orderNumber: string;
     orderStatusUrl: string;
     supportEmail: string;
-  }): { subject: string; text: string; html: string } {
+  } & OrderFacts): { subject: string; text: string; html: string } {
+    const facts = orderFacts(context);
     const subject = `Order ${context.orderNumber} is being prepared`;
-    const text = `Hello ${context.customerName}, order ${context.orderNumber} is in preparation. Status: ${context.orderStatusUrl}. Support: ${context.supportEmail}`;
+    const text = `Hello ${context.customerName}, order ${context.orderNumber} is in preparation. Status: ${context.orderStatusUrl}.\n\n${facts.text}\n\nSupport: ${context.supportEmail}`;
     const html = renderEmailShell({
       title: subject,
       supportEmail: context.supportEmail,
@@ -458,6 +500,7 @@ Support: ${context.supportEmail}
         ${renderHeading('Order in preparation')}
         <p>Dear ${escapeHtml(context.customerName)},</p>
         <p>Order <strong>${escapeHtml(context.orderNumber)}</strong> is being assembled and packed discreetly.</p>
+        ${facts.html}
         ${renderPrimaryButton('Check order status', context.orderStatusUrl)}
       `,
     });
@@ -470,9 +513,10 @@ Support: ${context.supportEmail}
     refundAmountFormatted: string;
     reason?: string;
     supportEmail: string;
-  }): { subject: string; text: string; html: string } {
+  } & OrderFacts): { subject: string; text: string; html: string } {
+    const facts = orderFacts(context);
     const subject = `Refund Processed: ${context.orderNumber}`;
-    const text = `Hello ${context.customerName}, refund ${context.refundAmountFormatted} for ${context.orderNumber}.${context.reason ? ` Reason: ${context.reason}` : ''} Support: ${context.supportEmail}`;
+    const text = `Hello ${context.customerName}, refund ${context.refundAmountFormatted} for ${context.orderNumber}.${context.reason ? ` Reason: ${context.reason}` : ''}\n\n${facts.text}\n\nSupport: ${context.supportEmail}`;
     const html = renderEmailShell({
       title: subject,
       supportEmail: context.supportEmail,
@@ -481,6 +525,7 @@ Support: ${context.supportEmail}
         <p>Dear ${escapeHtml(context.customerName)},</p>
         <p>A refund of <strong>${escapeHtml(context.refundAmountFormatted)}</strong> was processed for order <strong>${escapeHtml(context.orderNumber)}</strong>.</p>
         ${context.reason ? renderAccentPanel('Details', renderDetailRow('Reason', context.reason)) : ''}
+        ${facts.html}
         <p style="font-size:13px;color:#5C5852;">Funds typically appear within 2–5 business days depending on your bank.</p>
       `,
     });

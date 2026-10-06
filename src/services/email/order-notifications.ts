@@ -8,21 +8,28 @@ async function sendOnce(
   status: OrderStatus,
   template: string,
   send: () => Promise<{ success: boolean; messageId?: string; error?: string }>
-): Promise<void> {
+): Promise<{ sent: boolean; error?: string }> {
   const recipient = (order.guestEmail || '').trim();
   const eventId = `${order.orderNumber}:${status}:${template}`;
   if (!recipient || EmailDeliveryLedger.isSuppressed(recipient)) {
     EmailDeliveryLedger.claim(eventId, { template, recipient: recipient || 'missing', provider: 'suppressed', orderNumber: order.orderNumber });
-    EmailDeliveryLedger.complete(eventId, { success: false, error: 'Recipient is not eligible for this email.' });
-    return;
+    const error = recipient ? 'The customer address cannot receive email.' : 'The order has no customer email.';
+    EmailDeliveryLedger.complete(eventId, { success: false, error });
+    return { sent: false, error };
   }
   if (!EmailDeliveryLedger.claim(eventId, { template, recipient, provider: EmailService.getProvider().name, orderNumber: order.orderNumber })) {
-    return;
+    return { sent: true };
   }
   try {
-    EmailDeliveryLedger.complete(eventId, await send());
+    const result = await send();
+    EmailDeliveryLedger.complete(eventId, result);
+    return result.success
+      ? { sent: true }
+      : { sent: false, error: result.error || 'The customer email was not accepted.' };
   } catch (error) {
-    EmailDeliveryLedger.complete(eventId, { success: false, error: error instanceof Error ? error.message : 'Email send failed' });
+    const message = error instanceof Error ? error.message : 'Email send failed';
+    EmailDeliveryLedger.complete(eventId, { success: false, error: message });
+    return { sent: false, error: message };
   }
 }
 
@@ -30,34 +37,27 @@ export async function dispatchOrderStatusEmail(
   order: DbOrder,
   newStatus: OrderStatus,
   options?: { reason?: string; locale?: string; previousStatus?: OrderStatus }
-): Promise<void> {
+): Promise<{ sent: boolean; error?: string }> {
   const locale = options?.locale || 'en';
   const reason = options?.reason;
 
   switch (newStatus) {
     case 'PAYMENT_VERIFIED':
-      await sendOnce(order, newStatus, 'payment-verified', () => EmailService.sendPaymentVerified(order));
-      break;
+      return sendOnce(order, newStatus, 'payment-verified', () => EmailService.sendPaymentVerified(order));
     case 'PROCESSING':
-      await sendOnce(order, newStatus, 'order-processing', () => EmailService.sendOrderProcessing(order, locale));
-      break;
+      return sendOnce(order, newStatus, 'order-processing', () => EmailService.sendOrderProcessing(order, locale));
     case 'SHIPPED':
-      await sendOnce(order, newStatus, 'order-shipped', () => EmailService.sendOrderShipped(order));
-      break;
+      return sendOnce(order, newStatus, 'order-shipped', () => EmailService.sendOrderShipped(order));
     case 'DELIVERED':
-      await sendOnce(order, newStatus, 'order-delivered', () => EmailService.sendOrderDelivered(order));
-      break;
+      return sendOnce(order, newStatus, 'order-delivered', () => EmailService.sendOrderDelivered(order));
     case 'CANCELLED':
       if (options?.previousStatus === 'PAYMENT_SUBMITTED') {
-        await sendOnce(order, newStatus, 'payment-rejected', () => EmailService.sendPaymentRejected(order, reason, locale));
-      } else {
-        await sendOnce(order, newStatus, 'order-cancelled', () => EmailService.sendOrderCancelled(order, reason));
+        return sendOnce(order, newStatus, 'payment-rejected', () => EmailService.sendPaymentRejected(order, reason, locale));
       }
-      break;
+      return sendOnce(order, newStatus, 'order-cancelled', () => EmailService.sendOrderCancelled(order, reason));
     case 'REFUNDED':
-      await sendOnce(order, newStatus, 'order-refunded', () => EmailService.sendOrderRefunded(order, reason));
-      break;
+      return sendOnce(order, newStatus, 'order-refunded', () => EmailService.sendOrderRefunded(order, reason));
     default:
-      break;
+      return { sent: false, error: 'This status does not send a customer email.' };
   }
 }

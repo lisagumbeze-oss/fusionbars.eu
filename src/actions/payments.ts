@@ -228,7 +228,7 @@ export async function verifyPaymentStatusAction(input: VerifyPaymentInput) {
       notes || `Payment audited and confirmed by ${actorRole}`
     );
 
-    await dispatchOrderStatusEmail(order, targetStatus, {
+    const email = await dispatchOrderStatusEmail(order, targetStatus, {
       previousStatus,
       reason: notes,
     });
@@ -239,12 +239,15 @@ export async function verifyPaymentStatusAction(input: VerifyPaymentInput) {
       entityId: order.id,
       actorRole,
       actorId,
-      metadata: JSON.stringify({ verifiedTo: targetStatus, note: notes }),
+      metadata: JSON.stringify({ verifiedTo: targetStatus, note: notes, emailSent: email.sent }),
     });
 
+    const marked = `Order ${order.orderNumber} successfully marked as ${targetStatus}.`;
     return {
       success: true,
-      message: `Order ${order.orderNumber} successfully marked as ${targetStatus}.`,
+      message: email.sent
+        ? `${marked} The customer was emailed the updated order details.`
+        : `${marked} The customer email was not sent. ${email.error || ''}`.trim(),
       orderId: order.id,
       newStatus: targetStatus,
     };

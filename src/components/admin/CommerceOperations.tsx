@@ -157,7 +157,7 @@ export function CommerceOperations({ initialTab = 'orders' }: { initialTab?: 'or
       if (!res.success) {
         alert(res.error || 'Transition failed');
       } else {
-        alert(`Order successfully transitioned to ${targetStatus}`);
+        alert(res.message || `Order successfully transitioned to ${targetStatus}`);
         setSelectedOrder(null);
         setTransitionNote('');
         setTrackingNumberInput('');

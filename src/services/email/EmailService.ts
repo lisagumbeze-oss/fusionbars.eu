@@ -129,6 +129,16 @@ export class EmailService {
     };
   }
 
+  private static statusFacts(order: DbOrder, statusLabel: string) {
+    const ctx = this.buildRenderContext(order);
+    return {
+      statusLabel,
+      totalAmount: ctx.totalAmount,
+      currency: ctx.currency,
+      items: ctx.items,
+    };
+  }
+
   private static recipientForOrder(order: DbOrder): string {
     return (order.guestEmail || '').trim();
   }
@@ -140,7 +150,7 @@ export class EmailService {
       return { success: false, error: 'Recipient is not valid.' };
     }
     if (this.provider.name === 'mock') {
-      if (purpose === 'desk' && process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV !== 'preview') {
+      if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV !== 'preview') {
         return { success: false, error: 'Production email is not configured.' };
       }
     } else {
@@ -277,6 +287,7 @@ export class EmailService {
       orderNumber: order.orderNumber,
       customerName: ctx.customerName,
       supportEmail: this.defaultReplyTo,
+      ...this.statusFacts(order, 'Payment verified'),
     });
 
     return this.deliver({
@@ -298,6 +309,7 @@ export class EmailService {
       reason,
       orderStatusUrl: this.orderStatusUrl(order.orderNumber, locale),
       supportEmail: this.defaultReplyTo,
+      ...this.statusFacts(order, 'Payment not verified'),
     });
 
     return this.deliver({
@@ -318,6 +330,7 @@ export class EmailService {
       customerName: ctx.customerName,
       orderStatusUrl: this.orderStatusUrl(order.orderNumber, locale),
       supportEmail: this.defaultReplyTo,
+      ...this.statusFacts(order, 'Being prepared'),
     });
 
     return this.deliver({
@@ -339,6 +352,7 @@ export class EmailService {
       trackingNumber: order.trackingNumber,
       carrierName: order.carrierName,
       supportEmail: this.defaultReplyTo,
+      ...this.statusFacts(order, 'Shipped'),
     });
 
     return this.deliver({
@@ -358,6 +372,7 @@ export class EmailService {
       orderNumber: order.orderNumber,
       customerName: ctx.customerName,
       supportEmail: this.defaultReplyTo,
+      ...this.statusFacts(order, 'Delivered'),
     });
 
     return this.deliver({
@@ -378,6 +393,7 @@ export class EmailService {
       customerName: ctx.customerName,
       reason: reason || 'Order cancelled by customer or operations',
       supportEmail: this.defaultReplyTo,
+      ...this.statusFacts(order, 'Cancelled'),
     });
 
     return this.deliver({
@@ -400,6 +416,7 @@ export class EmailService {
       refundAmountFormatted,
       reason,
       supportEmail: this.defaultReplyTo,
+      ...this.statusFacts(order, 'Refunded'),
     });
 
     return this.deliver({

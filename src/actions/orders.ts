@@ -228,8 +228,9 @@ export async function updateOrderStatusAdminAction(input: {
       }
     );
 
+    const mailed = updated || order;
     const { dispatchOrderStatusEmail } = await import('@/services/email/order-notifications');
-    await dispatchOrderStatusEmail(order, validated.newStatus, {
+    const email = await dispatchOrderStatusEmail(mailed, validated.newStatus, {
       previousStatus,
       reason: validated.note,
     });
@@ -240,13 +241,16 @@ export async function updateOrderStatusAdminAction(input: {
       entityId: order.id,
       actorRole: validated.actorRole,
       actorId: validated.actorId,
-      metadata: JSON.stringify({ from: previousStatus, to: validated.newStatus, note: validated.note }),
+      metadata: JSON.stringify({ from: previousStatus, to: validated.newStatus, note: validated.note, emailSent: email.sent }),
     });
 
+    const transition = `Order transitioned from ${previousStatus} to ${validated.newStatus}.`;
     return {
       success: true,
       order: updated,
-      message: `Order transitioned from ${order.status} to ${validated.newStatus}.`,
+      message: email.sent
+        ? `${transition} The customer was emailed the updated order details.`
+        : `${transition} The customer email was not sent. ${email.error || ''}`.trim(),
     };
   } catch (error: any) {
     return { success: false, error: error.message || 'Status transition failed' };
