@@ -8,6 +8,7 @@ import { NormalizedProduct, NormalizedVariant } from '../../scripts/consolidate-
 import { useCommerce } from '../context/CommerceContext';
 import { getDictionary } from '../i18n';
 import { applyCryptoDiscountCopy, calculateCryptoPaymentDiscount } from '../domain/payments/CryptoPaymentDiscount';
+import WhatsAppLink from './WhatsAppLink';
 
 interface ProductCardProps {
   product: NormalizedProduct;
@@ -149,28 +150,34 @@ export default function ProductCard({ product }: ProductCardProps) {
             </p>
           </div>
 
-          <button
-            onClick={handleQuickAdd}
-            disabled={selectedVariant.stockStatus === 'OUT_OF_STOCK'}
-            className={`w-full sm:w-auto justify-center px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer motion-safe:active:scale-[0.98] ${
-              isAdded
-                ? 'bg-emerald-600 text-white'
-                : selectedVariant.stockStatus === 'OUT_OF_STOCK'
-                ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
-                : 'bg-[#4A5D4E] hover:bg-[#3B4A3E] text-white'
-            }`}
-            aria-label={`Add ${product.name} to cart`}
-          >
-            {isAdded ? (
-              <>
-                <Check className="w-3.5 h-3.5" /> Added
-              </>
-            ) : (
-              <>
-                <ShoppingBag className="w-3.5 h-3.5" /> Add
-              </>
-            )}
-          </button>
+          <div className="flex w-full items-center gap-2 sm:w-auto">
+            <button
+              onClick={handleQuickAdd}
+              disabled={selectedVariant.stockStatus === 'OUT_OF_STOCK'}
+              className={`min-w-0 flex-1 justify-center px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition cursor-pointer motion-safe:active:scale-[0.98] sm:flex-none ${
+                isAdded
+                  ? 'bg-emerald-600 text-white'
+                  : selectedVariant.stockStatus === 'OUT_OF_STOCK'
+                  ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                  : 'bg-[#4A5D4E] hover:bg-[#3B4A3E] text-white'
+              }`}
+              aria-label={`Add ${product.name} to cart`}
+            >
+              {isAdded ? (
+                <>
+                  <Check className="w-3.5 h-3.5" /> Added
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-3.5 h-3.5" /> Add
+                </>
+              )}
+            </button>
+            <WhatsAppLink
+              message={`Hello, I have a question about ${product.name}.`}
+              className="h-8 w-8 shrink-0 rounded-lg border border-[#25D366]/40"
+            />
+          </div>
         </div>
       </div>
     </div>

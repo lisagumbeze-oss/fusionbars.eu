@@ -6,6 +6,7 @@ import { useParams } from 'next/navigation';
 import { Mail, Clock, ShieldCheck, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 import { LocaleCode } from '@/types';
 import { submitContactInquiryAction } from '@/actions/contact';
+import WhatsAppLink from '@/components/WhatsAppLink';
 import { AdminOverrides } from '@/domain/admin/AdminOverrides';
 
 export default function ContactDesk() {
@@ -188,6 +189,7 @@ export default function ContactDesk() {
             >
               {supportEmail}
             </a>
+            <WhatsAppLink className="h-10 w-10 rounded-full border border-[#25D366]/40" />
           </div>
 
           <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 space-y-4 shadow-xs">

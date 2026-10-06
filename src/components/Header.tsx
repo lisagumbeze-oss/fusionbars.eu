@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { Search, ShoppingBag, Heart, Menu, X, Shield, User } from 'lucide-react';
+import WhatsAppLink from './WhatsAppLink';
 import AnnouncementBar from './AnnouncementBar';
 import SearchModal from './SearchModal';
 import { useCommerce } from '../context/CommerceContext';
@@ -86,6 +87,7 @@ export default function Header() {
 
             {/* Right: Actions */}
             <div className="flex items-center gap-2 sm:gap-4 text-[#121212]">
+              <WhatsAppLink className="p-2" />
               {/* Search — desktop only; mobile uses the bottom nav */}
               <button
                 onClick={() => setIsSearchOpen(true)}

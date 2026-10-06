@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Mail, Shield, Check, ArrowRight } from 'lucide-react';
+import { Shield, Check, ArrowRight } from 'lucide-react';
+import WhatsAppLink from './WhatsAppLink';
 import { useCommerce } from '../context/CommerceContext';
 import { getDictionary } from '../i18n';
 import { AdminOverrides } from '@/domain/admin/AdminOverrides';
@@ -101,8 +102,9 @@ export default function Footer() {
           <p className="text-neutral-400 leading-relaxed max-w-sm">
             {dict.common.tagline}. Europe&apos;s premier botanical confection atelier, harmonizing single-origin Belgian couverture chocolate with verified functional mycology. {applyCryptoDiscountCopy(dict.payment.cryptoDiscountBody)}
           </p>
-          <div className="text-neutral-500 space-y-1">
+          <div className="flex items-center gap-3 text-neutral-500">
             <p>Support: <a href={`mailto:${supportEmail}`} className="text-neutral-300 hover:underline">{supportEmail}</a></p>
+            <WhatsAppLink className="p-1" />
           </div>
         </div>
 

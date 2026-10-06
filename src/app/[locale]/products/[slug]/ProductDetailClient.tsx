@@ -6,6 +6,7 @@ import { Heart, ShoppingBag, Check, ShieldCheck, Truck, Clock, Sparkles, Plus, M
 import { NormalizedProduct, NormalizedVariant } from '@/types';
 import { useCommerce } from '@/context/CommerceContext';
 import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
+import WhatsAppLink from '@/components/WhatsAppLink';
 import { getDictionary } from '@/i18n';
 import { applyCryptoDiscountCopy, calculateCryptoPaymentDiscount } from '@/domain/payments/CryptoPaymentDiscount';
 
@@ -192,7 +193,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
         )}
 
         {/* Quantity and Add to Cart Section */}
-        <div className="flex items-center gap-4 pt-4 border-t border-[#E5E3DD]">
+        <div className="flex flex-col gap-3 border-t border-[#E5E3DD] pt-4 sm:flex-row sm:items-center">
           <div className="flex items-center border border-[#E5E3DD] rounded-lg bg-white overflow-hidden shrink-0">
             <button
               onClick={() => setQuantity(Math.max(1, quantity - 1))}
@@ -214,27 +215,34 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             </button>
           </div>
 
-          <button
-            onClick={handleAddToCart}
-            disabled={selectedVariant.stockStatus === 'OUT_OF_STOCK'}
-            className={`flex-1 py-3.5 px-6 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer shadow-sm motion-safe:active:scale-[0.98] ${
-              isAdded
-                ? 'bg-emerald-600 text-white'
-                : selectedVariant.stockStatus === 'OUT_OF_STOCK'
-                ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
-                : 'bg-[#4A5D4E] hover:bg-[#3B4A3E] text-white'
-            }`}
-          >
-            {isAdded ? (
-              <>
-                <Check className="w-4 h-4" /> Added to Shopping Bag
-              </>
-            ) : (
-              <>
-                <ShoppingBag className="w-4 h-4" /> Add to Bag &bull; {formatMoney(unitPrice * quantity)}
-              </>
-            )}
-          </button>
+          <div className="flex min-w-0 flex-1 items-center gap-2">
+            <button
+              onClick={handleAddToCart}
+              disabled={selectedVariant.stockStatus === 'OUT_OF_STOCK'}
+              className={`flex-1 py-3.5 px-6 rounded-lg text-xs font-semibold flex items-center justify-center gap-2 transition cursor-pointer shadow-sm motion-safe:active:scale-[0.98] ${
+                isAdded
+                  ? 'bg-emerald-600 text-white'
+                  : selectedVariant.stockStatus === 'OUT_OF_STOCK'
+                  ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                  : 'bg-[#4A5D4E] hover:bg-[#3B4A3E] text-white'
+              }`}
+            >
+              {isAdded ? (
+                <>
+                  <Check className="w-4 h-4" /> Added to Shopping Bag
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-4 h-4" /> Add to Bag &bull; {formatMoney(unitPrice * quantity)}
+                </>
+              )}
+            </button>
+            <WhatsAppLink
+              variant="button"
+              message={`Hello, I have a question about ${product.name} (${selectedVariant.flavor}).`}
+              className="shrink-0"
+            />
+          </div>
         </div>
 
         {/* Quick European Shipping Indicator */}
