@@ -1,5 +1,7 @@
 'use server';
 
+export const maxDuration = 60;
+
 import { cookies } from 'next/headers';
 import { createOrderSchema, guestOrderLookupSchema, orderStatusTransitionSchema } from '../validation/schemas';
 import { OrderCreationService } from '../domain/orders/OrderCreationService';

@@ -456,10 +456,9 @@ const store = new CommerceStore();
 
 let isDbAvailable: boolean | null = null;
 async function checkDb(): Promise<boolean> {
-  if (isDbAvailable !== null) return isDbAvailable;
+  if (isDbAvailable === true) return true;
   // If in sandbox development environment with default localhost:5432, avoid timeout log
   if (process.env.DATABASE_URL?.includes('localhost:5432')) {
-    isDbAvailable = false;
     return false;
   }
   try {
@@ -467,7 +466,6 @@ async function checkDb(): Promise<boolean> {
     isDbAvailable = true;
     return true;
   } catch {
-    isDbAvailable = false;
     return false;
   }
 }

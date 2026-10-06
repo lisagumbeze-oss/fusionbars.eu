@@ -19,9 +19,20 @@ function withPrismaPoolerParams(url: string): string {
   return url.includes('?') ? `${url}&${query}` : `${url}?${query}`;
 }
 
+function withMinimumParam(url: string, key: string, minimum: number): string {
+  if (!url) return url;
+  const [base, query = ''] = url.split('?');
+  const params = new URLSearchParams(query);
+  const current = Number(params.get(key));
+  if (!params.has(key) || !Number.isFinite(current) || current < minimum) {
+    params.set(key, String(minimum));
+  }
+  const next = params.toString();
+  return next ? `${base}?${next}` : base;
+}
+
 function withConnectTimeout(url: string): string {
-  if (!url || url.includes('connect_timeout=')) return url;
-  return `${url}${url.includes('?') ? '&' : '?'}connect_timeout=30`;
+  return withMinimumParam(withMinimumParam(url, 'connect_timeout', 30), 'pool_timeout', 30);
 }
 
 export function resolveDatabaseUrls() {
