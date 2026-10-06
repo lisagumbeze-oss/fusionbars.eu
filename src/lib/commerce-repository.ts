@@ -778,17 +778,24 @@ export class CommerceRepository {
   }
 
   static async getAllOrders(): Promise<DbOrder[]> {
-    const list: DbOrder[] = [];
-    const seen = new Set<string>();
+    const byId = new Map<string, DbOrder>();
 
-    for (const ord of store.orders.values()) {
-      if (!seen.has(ord.id)) {
-        seen.add(ord.id);
-        list.push(ord);
+    if (process.env.NODE_ENV === 'production') {
+      try {
+        for (const order of await OrderDatabasePersistence.list()) {
+          byId.set(order.id, order);
+        }
+      } catch (error) {
+        console.error('[CommerceRepository] stored orders could not be loaded:', error);
       }
     }
 
-    return list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    for (const ord of store.orders.values()) {
+      if (process.env.NODE_ENV === 'production' && ord.id.startsWith('ord_sample_')) continue;
+      if (!byId.has(ord.id)) byId.set(ord.id, ord);
+    }
+
+    return [...byId.values()].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }
 
   static async updateOrderStatus(

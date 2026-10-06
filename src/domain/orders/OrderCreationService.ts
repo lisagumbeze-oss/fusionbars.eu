@@ -429,36 +429,37 @@ export class OrderCreationService {
         ? 'Bank Transfer (SEPA / IBAN)'
         : paymentMethodCode.replace('CRYPTO_', 'Cryptocurrency ');
 
-    if (paymentMethodCode === 'SEPA_IBAN') {
-      void dispatchEmailSafely('sepa_order_confirmation', () =>
-        EmailService.sendSepaOrderConfirmation(dbOrder, {
-          iban: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.iban) ? '' : paymentNotificationDetails.iban || '',
-          bic: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.bic) ? '' : paymentNotificationDetails.bic || '',
-          accountHolder: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.accountHolder) ? '' : paymentNotificationDetails.accountHolder || '',
-          bankName: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.bankName) ? '' : paymentNotificationDetails.bankName || '',
-          reference: orderNumber,
-        })
-      );
-    } else {
-      void dispatchEmailSafely('crypto_order_confirmation', () =>
-        EmailService.sendCryptoOrderConfirmation(dbOrder, {
-          cryptoName: paymentNotificationDetails.cryptoName || 'Bitcoin',
-          network: paymentNotificationDetails.network || '',
-          receivingAddress: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.receivingAddress) ? '' : paymentNotificationDetails.receivingAddress || '',
-          wallets: (paymentInstructions.wallets ?? []).map((wallet) => ({
-            name: wallet.name,
-            symbol: wallet.symbol,
-            network: wallet.network,
-            address: wallet.address,
-            amount: wallet.amount,
-          })),
-        })
-      );
-    }
+    const customerMail = paymentMethodCode === 'SEPA_IBAN'
+      ? dispatchEmailSafely('sepa_order_confirmation', () =>
+          EmailService.sendSepaOrderConfirmation(dbOrder, {
+            iban: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.iban) ? '' : paymentNotificationDetails.iban || '',
+            bic: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.bic) ? '' : paymentNotificationDetails.bic || '',
+            accountHolder: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.accountHolder) ? '' : paymentNotificationDetails.accountHolder || '',
+            bankName: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.bankName) ? '' : paymentNotificationDetails.bankName || '',
+            reference: orderNumber,
+          })
+        )
+      : dispatchEmailSafely('crypto_order_confirmation', () =>
+          EmailService.sendCryptoOrderConfirmation(dbOrder, {
+            cryptoName: paymentNotificationDetails.cryptoName || 'Bitcoin',
+            network: paymentNotificationDetails.network || '',
+            receivingAddress: isPlaceholderCustomerPaymentDetail(paymentNotificationDetails.receivingAddress) ? '' : paymentNotificationDetails.receivingAddress || '',
+            wallets: (paymentInstructions.wallets ?? []).map((wallet) => ({
+              name: wallet.name,
+              symbol: wallet.symbol,
+              network: wallet.network,
+              address: wallet.address,
+              amount: wallet.amount,
+            })),
+          })
+        );
 
-    void dispatchEmailSafely('admin_order_alert', () =>
-      EmailService.sendAdminOrderAlert(dbOrder, paymentMethodLabel)
-    );
+    await Promise.all([
+      customerMail,
+      dispatchEmailSafely('admin_order_alert', () =>
+        EmailService.sendAdminOrderAlert(dbOrder, paymentMethodLabel)
+      ),
+    ]);
 
     CommerceRepository.logAudit({
       action: 'ORDER_CREATED',

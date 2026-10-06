@@ -135,7 +135,87 @@ async function claimStock(tx: Prisma.TransactionClient, variantId: string, locat
   if (Number(updated) !== 1) throw new Error('INSUFFICIENT_STOCK');
 }
 
+function asHub(value: string | null): DbOrder['shippingOriginHub'] {
+  if (value === 'NL' || value === 'DE' || value === 'ES' || value === 'FR') return value;
+  return 'NL';
+}
+
 export class OrderDatabasePersistence {
+  static async list(): Promise<DbOrder[]> {
+    const rows = await database.order.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+      include: {
+        items: { include: { variant: { select: { productId: true } } } },
+        shippingAddress: true,
+        shippingMethod: true,
+        payments: { include: { paymentMethod: true }, orderBy: { createdAt: 'desc' } },
+        statusHistory: { orderBy: { createdAt: 'asc' } },
+      },
+    });
+    return rows.map((row) => {
+      const payment = row.payments[0];
+      const methodCode = row.shippingMethod.code === 'EXPRESS' ? 'EXPRESS' : 'STANDARD';
+      return {
+        id: row.id,
+        orderNumber: row.orderNumber,
+        lookupToken: row.lookupToken || '',
+        customerId: row.customerId,
+        guestEmail: row.guestEmail || '',
+        guestPhone: row.guestPhone,
+        currency: row.currency === 'GBP' ? 'GBP' : 'EUR',
+        subtotalAmount: row.subtotalAmount,
+        discountAmount: row.discountAmount,
+        shippingAmount: row.shippingAmount,
+        totalAmount: row.totalAmount,
+        status: row.status,
+        shippingOriginHub: asHub(row.shippingOriginHub),
+        shippingMethodCode: methodCode,
+        shippingAddress: {
+          firstName: row.shippingAddress.firstName,
+          lastName: row.shippingAddress.lastName,
+          streetAddress: row.shippingAddress.streetAddress,
+          houseNumber: row.shippingAddress.houseNumber || undefined,
+          city: row.shippingAddress.city,
+          postalCode: row.shippingAddress.postalCode,
+          countryCode: row.shippingAddress.countryCode,
+          phone: row.shippingAddress.phone || undefined,
+        },
+        items: row.items.map((item) => ({
+          id: item.id,
+          variantId: item.variantId,
+          productId: item.variant.productId,
+          sku: item.sku,
+          productName: item.productName,
+          variantName: item.variantName,
+          unitPrice: item.unitPrice,
+          quantity: item.quantity,
+          lineTotal: item.lineTotal,
+        })),
+        paymentMethodCode: payment?.paymentMethod.code || 'CRYPTO_BTC',
+        paymentReference: payment?.paymentReference || row.paymentReference,
+        proofFileUrl: payment?.proofFileUrl,
+        paymentVerifiedAt: payment?.verifiedAt?.toISOString() || null,
+        discreetPackaging: row.discreetPackaging,
+        trackingNumber: row.trackingNumber,
+        carrierName: row.carrierName,
+        customerNotes: row.customerNotes,
+        internalNotes: row.internalNotes,
+        statusHistory: row.statusHistory.map((entry) => ({
+          id: entry.id,
+          fromStatus: entry.fromStatus,
+          toStatus: entry.toStatus,
+          actorRole: 'SYSTEM',
+          actorId: entry.changedBy,
+          note: entry.note || undefined,
+          createdAt: entry.createdAt.toISOString(),
+        })),
+        createdAt: row.createdAt.toISOString(),
+        updatedAt: row.updatedAt.toISOString(),
+      };
+    });
+  }
+
   static async persist(order: DbOrder): Promise<'PERSISTED'> {
     const existing = await database.order.findUnique({ where: { id: order.id } });
     if (existing) return 'PERSISTED';

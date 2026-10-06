@@ -16,6 +16,16 @@ import {
 import { DbOrder } from '@/lib/commerce-repository';
 import { CountryRegistry } from '@/domain/countries/CountryRegistry';
 
+function readEnv(name: string): string {
+  const raw = process.env[name];
+  if (typeof raw !== 'string') return '';
+  let value = raw.trim();
+  if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+    value = value.slice(1, -1).trim();
+  }
+  return value;
+}
+
 export class EmailService {
   private static provider: ITransactionalEmailProvider = new MockEmailProvider();
   private static defaultFrom: string = 'Fusion Mushroom Bars EU <sales@fusionbars.eu>';
@@ -23,6 +33,7 @@ export class EmailService {
   private static opsInbox: string = 'sales@fusionbars.eu';
   private static baseUrl: string = 'https://fusionbars.eu';
   private static initialized = false;
+  private static providerPinned = false;
 
   static resolveProviderName(input: { vercelEnv?: string; configured?: string }): string {
     if (input.vercelEnv === 'preview') return 'mock';
@@ -38,16 +49,16 @@ export class EmailService {
     baseUrl?: string;
   }): void {
     const providerName = this.resolveProviderName({
-      vercelEnv: process.env.VERCEL_ENV,
-      configured: config?.providerName || process.env.EMAIL_PROVIDER || 'mock',
-    });
-    const apiKey = providerName === 'mock' ? '' : (config?.apiKey || process.env.EMAIL_PROVIDER_KEY || '');
+      vercelEnv: readEnv('VERCEL_ENV'),
+      configured: config?.providerName || readEnv('EMAIL_PROVIDER') || 'mock',
+    }).toLowerCase();
+    const apiKey = providerName === 'mock' ? '' : (config?.apiKey || readEnv('EMAIL_PROVIDER_KEY'));
     this.defaultFrom =
       config?.from ||
-      process.env.EMAIL_FROM ||
+      readEnv('EMAIL_FROM') ||
       'Fusion Mushroom Bars EU <sales@fusionbars.eu>';
-    this.defaultReplyTo = config?.replyTo || process.env.EMAIL_REPLY_TO || 'sales@fusionbars.eu';
-    this.opsInbox = config?.opsInbox || process.env.EMAIL_OPS_INBOX || this.defaultReplyTo;
+    this.defaultReplyTo = config?.replyTo || readEnv('EMAIL_REPLY_TO') || 'sales@fusionbars.eu';
+    this.opsInbox = config?.opsInbox || readEnv('EMAIL_OPS_INBOX') || this.defaultReplyTo;
     this.baseUrl = 'https://fusionbars.eu';
 
     if (providerName === 'resend' && apiKey) {
@@ -61,10 +72,14 @@ export class EmailService {
       this.provider = new MockEmailProvider();
     }
     this.initialized = true;
+    this.providerPinned = false;
   }
 
   private static ensureReady(): void {
-    if (!this.initialized) {
+    const configured = readEnv('EMAIL_PROVIDER').toLowerCase();
+    const apiKey = readEnv('EMAIL_PROVIDER_KEY');
+    const storedProviderIsStale = !this.providerPinned && this.provider.name === 'mock' && configured === 'resend' && apiKey.length >= 16;
+    if (!this.initialized || storedProviderIsStale) {
       this.initializeFromConfig();
     }
   }
@@ -72,6 +87,7 @@ export class EmailService {
   static setProvider(provider: ITransactionalEmailProvider): void {
     this.provider = provider;
     this.initialized = true;
+    this.providerPinned = true;
   }
 
   static getProvider(): ITransactionalEmailProvider {
