@@ -37,7 +37,7 @@ export async function submitContactInquiryAction(rawInput: unknown) {
       const reasons = [result.customer, result.ops]
         .filter((item) => !item.success)
         .map((item) => item.error || 'The email was not accepted.');
-      const unconfigured = reasons.some((reason) => reason === 'Production email is not configured.');
+      const unconfigured = reasons.some((reason) => reason.startsWith('Production email is not configured'));
       return {
         success: false,
         error: unconfigured
@@ -64,7 +64,7 @@ export async function subscribeNewsletterAction(rawInput: unknown) {
 
     const result = await EmailService.sendNewsletterConfirmation(email, validated.locale);
     if (!result.subscriber.success || !result.ops.success) {
-      const unconfigured = result.subscriber.error === 'Production email is not configured.' || result.ops.error === 'Production email is not configured.';
+      const unconfigured = [result.subscriber.error, result.ops.error].some((reason) => reason?.startsWith('Production email is not configured'));
       return {
         success: false,
         error: unconfigured

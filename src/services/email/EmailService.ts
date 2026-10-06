@@ -17,13 +17,40 @@ import { DbOrder } from '@/lib/commerce-repository';
 import { CountryRegistry } from '@/domain/countries/CountryRegistry';
 
 function readEnv(name: string): string {
-  const raw = process.env[name];
-  if (typeof raw !== 'string') return '';
+  const raw = firstEnvValue(name);
+  if (!raw) return '';
   let value = raw.trim();
   if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
     value = value.slice(1, -1).trim();
   }
   return value;
+}
+
+function firstEnvValue(name: string): string {
+  const dynamic = process.env[name];
+  if (typeof dynamic === 'string' && dynamic.trim()) return dynamic;
+  const known: Record<string, string | undefined> = {
+    EMAIL_PROVIDER: process.env.EMAIL_PROVIDER,
+    EMAIL_PROVIDER_KEY: process.env.EMAIL_PROVIDER_KEY,
+    RESEND_API_KEY: process.env.RESEND_API_KEY,
+    EMAIL_FROM: process.env.EMAIL_FROM,
+    EMAIL_REPLY_TO: process.env.EMAIL_REPLY_TO,
+    EMAIL_OPS_INBOX: process.env.EMAIL_OPS_INBOX,
+    VERCEL_ENV: process.env.VERCEL_ENV,
+  };
+  return known[name] || '';
+}
+
+function usableResendKey(): string {
+  const key = readEnv('EMAIL_PROVIDER_KEY') || readEnv('RESEND_API_KEY');
+  if (key.length < 16 || /mock|placeholder|test_only/i.test(key)) return '';
+  return key;
+}
+
+function providerNameFromEnv(): string {
+  const named = readEnv('EMAIL_PROVIDER').toLowerCase();
+  if (process.env.NODE_ENV === 'production' && usableResendKey() && (named === '' || named === 'mock')) return 'resend';
+  return named || 'mock';
 }
 
 export class EmailService {
@@ -48,11 +75,17 @@ export class EmailService {
     opsInbox?: string;
     baseUrl?: string;
   }): void {
+    const namedProvider = (config?.providerName || providerNameFromEnv()).toLowerCase();
+    const resendKey = usableResendKey();
     const providerName = this.resolveProviderName({
       vercelEnv: readEnv('VERCEL_ENV'),
-      configured: config?.providerName || readEnv('EMAIL_PROVIDER') || 'mock',
+      configured: namedProvider || 'mock',
     }).toLowerCase();
-    const apiKey = providerName === 'mock' ? '' : (config?.apiKey || readEnv('EMAIL_PROVIDER_KEY'));
+    const apiKey = providerName === 'resend'
+      ? (config?.apiKey || resendKey)
+      : providerName === 'mock'
+        ? ''
+        : (config?.apiKey || readEnv('EMAIL_PROVIDER_KEY'));
     this.defaultFrom =
       config?.from ||
       readEnv('EMAIL_FROM') ||
@@ -67,7 +100,7 @@ export class EmailService {
       this.provider = new PostmarkEmailProvider(apiKey, this.defaultFrom);
     } else {
       if (process.env.NODE_ENV === 'production' && providerName === 'resend' && !apiKey) {
-        console.error('[EmailService] EMAIL_PROVIDER_KEY is missing in production; falling back to mock provider.');
+        console.error('[EmailService] No Resend key in production; falling back to mock provider.');
       }
       this.provider = new MockEmailProvider();
     }
@@ -76,9 +109,13 @@ export class EmailService {
   }
 
   private static ensureReady(): void {
-    const configured = readEnv('EMAIL_PROVIDER').toLowerCase();
-    const apiKey = readEnv('EMAIL_PROVIDER_KEY');
-    const storedProviderIsStale = !this.providerPinned && this.provider.name === 'mock' && configured === 'resend' && apiKey.length >= 16;
+    if (this.providerPinned) return;
+    const key = usableResendKey();
+    const wantsResend = this.resolveProviderName({
+      vercelEnv: readEnv('VERCEL_ENV'),
+      configured: providerNameFromEnv(),
+    }).toLowerCase() === 'resend';
+    const storedProviderIsStale = this.provider.name === 'mock' && wantsResend && key.length >= 16;
     if (!this.initialized || storedProviderIsStale) {
       this.initializeFromConfig();
     }
@@ -151,7 +188,10 @@ export class EmailService {
     }
     if (this.provider.name === 'mock') {
       if (process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV !== 'preview') {
-        return { success: false, error: 'Production email is not configured.' };
+        return {
+          success: false,
+          error: 'Production email is not configured. Add EMAIL_PROVIDER=resend and EMAIL_PROVIDER_KEY, or RESEND_API_KEY, on the Production environment and redeploy.',
+        };
       }
     } else {
       const fromHeader = options.from || this.defaultFrom;
