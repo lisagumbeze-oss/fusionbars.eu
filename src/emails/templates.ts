@@ -556,9 +556,11 @@ Support: ${context.supportEmail}
     customerName: string;
     subjectCategory: string;
     supportEmail: string;
+    message?: string;
   }): { subject: string; text: string; html: string } {
     const subject = 'We received your inquiry — Fusion Mushroom Bars EU';
-    const text = `Hello ${context.customerName}, we received your ${context.subjectCategory} inquiry. Our desk responds within 24 business hours. Support: ${context.supportEmail}`;
+    const messageText = context.message?.trim() ? `\n\nYour message:\n${context.message.trim()}` : '';
+    const text = `Hello ${context.customerName}, we received your ${context.subjectCategory} inquiry. Our desk responds within 24 business hours.${messageText}\n\nSupport: ${context.supportEmail}`;
     const html = renderEmailShell({
       title: subject,
       supportEmail: context.supportEmail,
@@ -566,6 +568,7 @@ Support: ${context.supportEmail}
         ${renderHeading('Inquiry received')}
         <p>Dear ${escapeHtml(context.customerName)},</p>
         <p>Thank you for contacting European operations. We received your message regarding <strong>${escapeHtml(context.subjectCategory)}</strong>.</p>
+        ${context.message?.trim() ? renderAccentPanel('Your message', `<p style="margin:0;white-space:pre-wrap;">${escapeHtml(context.message.trim())}</p>`) : ''}
         <p>Our member support desk will review your inquiry within <strong>24 business hours</strong>.</p>
       `,
     });

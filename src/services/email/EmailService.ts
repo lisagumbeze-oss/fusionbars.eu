@@ -154,7 +154,9 @@ export class EmailService {
         return { success: false, error: 'Production email is not configured.' };
       }
     } else {
-      if (!EmailProductionReadinessService.sender().matchesCanonical) {
+      const fromHeader = options.from || this.defaultFrom;
+      const fromEmail = (fromHeader.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/i)?.[0] || '').toLowerCase();
+      if (fromEmail !== 'sales@fusionbars.eu') {
         return { success: false, error: 'Sender is not the production sender.' };
       }
       if (EmailProductionReadinessService.state() === 'DISABLED') {
@@ -503,6 +505,7 @@ export class EmailService {
       customerName: input.name,
       subjectCategory: input.subjectCategory,
       supportEmail: this.defaultReplyTo,
+      message: input.message,
     });
     const opsRendered = EmailTemplates.renderContactInquiryOpsAlert({
       customerName: input.name,
@@ -512,25 +515,26 @@ export class EmailService {
       locale: input.locale,
     });
 
-    const customer = await this.deliver({
-      to: input.email,
-      from: this.defaultFrom,
-      replyTo: this.defaultReplyTo,
-      subject: customerRendered.subject,
-      html: customerRendered.html,
-      text: customerRendered.text,
-      tags: [{ name: 'template', value: 'contact-confirmation' }],
-    }, 'desk');
-
-    const ops = await this.deliver({
-      to: this.opsInbox,
-      from: this.defaultFrom,
-      replyTo: input.email,
-      subject: opsRendered.subject,
-      html: opsRendered.html,
-      text: opsRendered.text,
-      tags: [{ name: 'template', value: 'contact-ops-alert' }],
-    }, 'desk');
+    const [customer, ops] = await Promise.all([
+      this.deliver({
+        to: input.email,
+        from: this.defaultFrom,
+        replyTo: this.defaultReplyTo,
+        subject: customerRendered.subject,
+        html: customerRendered.html,
+        text: customerRendered.text,
+        tags: [{ name: 'template', value: 'contact-confirmation' }],
+      }, 'desk'),
+      this.deliver({
+        to: this.opsInbox,
+        from: this.defaultFrom,
+        replyTo: input.email,
+        subject: opsRendered.subject,
+        html: opsRendered.html,
+        text: opsRendered.text,
+        tags: [{ name: 'template', value: 'contact-ops-alert' }],
+      }, 'desk'),
+    ]);
 
     if (!customer.success) {
       console.error('[EmailService] contact confirmation failed:', customer.error);

@@ -18,6 +18,7 @@ export default function ContactDesk() {
   const [subject, setSubject] = useState('Order / Consignment Status');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [submittedMessage, setSubmittedMessage] = useState('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
@@ -26,22 +27,28 @@ export default function ContactDesk() {
     setErrorMsg(null);
     setSubmitting(true);
 
-    const result = await submitContactInquiryAction({
-      name,
-      email,
-      subjectCategory: subject,
-      message,
-      locale,
-    });
+    try {
+      const result = await submitContactInquiryAction({
+        name,
+        email,
+        subjectCategory: subject,
+        message,
+        locale,
+      });
 
-    if (!result.success) {
-      setErrorMsg(result.error || 'Failed to send inquiry.');
+      if (!result?.success) {
+        setErrorMsg(result?.error || 'Failed to send inquiry.');
+        setSubmitting(false);
+        return;
+      }
+
+      setSubmittedMessage(result.message || 'Your message was sent. A confirmation is on its way to you and to sales@fusionbars.eu.');
+      setSubmitted(true);
+    } catch (error: unknown) {
+      setErrorMsg(error instanceof Error ? error.message : 'The message was not sent. You can email sales@fusionbars.eu directly.');
+    } finally {
       setSubmitting(false);
-      return;
     }
-
-    setSubmitted(true);
-    setSubmitting(false);
   };
 
   return (
@@ -63,17 +70,19 @@ export default function ContactDesk() {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-10 items-start">
         <div className="md:col-span-7 bg-white rounded-2xl border border-[#E5E3DD] p-6 sm:p-8 space-y-6 shadow-xs">
           {submitted ? (
-            <div className="py-10 text-center space-y-4">
+            <div role="status" className="py-10 text-center space-y-4">
               <div className="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center mx-auto">
                 <CheckCircle2 className="w-6 h-6" />
               </div>
-              <h2 className="font-serif text-xl font-bold text-[#121212]">Inquiry Dispatched</h2>
-              <p className="text-xs text-[#5C5852] max-w-sm mx-auto leading-relaxed">
-                Thank you for contacting European operations. Our member support desk will review your inquiry within 24 business hours.
+              <h2 className="font-serif text-xl font-bold text-[#121212]">Message sent</h2>
+              <p className="text-sm text-[#121212] max-w-sm mx-auto leading-relaxed">
+                {submittedMessage}
               </p>
               <button
+                type="button"
                 onClick={() => {
                   setSubmitted(false);
+                  setSubmittedMessage('');
                   setMessage('');
                 }}
                 className="text-xs text-[#4A5D4E] font-semibold hover:underline cursor-pointer"
@@ -138,6 +147,7 @@ export default function ContactDesk() {
                 <textarea
                   id="contact-message"
                   required
+                  minLength={10}
                   rows={5}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
@@ -147,8 +157,8 @@ export default function ContactDesk() {
               </div>
 
               {errorMsg && (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
+                <div role="alert" className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-sm flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
                   <span>{errorMsg}</span>
                 </div>
               )}

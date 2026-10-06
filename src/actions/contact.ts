@@ -34,16 +34,22 @@ export async function submitContactInquiryAction(rawInput: unknown) {
     });
 
     if (!result.customer.success || !result.ops.success) {
-      const unconfigured = result.customer.error === 'Production email is not configured.' || result.ops.error === 'Production email is not configured.';
+      const reasons = [result.customer, result.ops]
+        .filter((item) => !item.success)
+        .map((item) => item.error || 'The email was not accepted.');
+      const unconfigured = reasons.some((reason) => reason === 'Production email is not configured.');
       return {
         success: false,
         error: unconfigured
           ? 'The message was not sent. Production email is not configured. You can email sales@fusionbars.eu directly.'
-          : 'The message was not delivered. You can email sales@fusionbars.eu directly.',
+          : reasons.join(' '),
       };
     }
 
-    return { success: true, message: 'Inquiry received. A confirmation was sent to you and to the support desk.' };
+    return {
+      success: true,
+      message: `Your message was sent. A confirmation is on its way to ${validated.email.trim().toLowerCase()} and to sales@fusionbars.eu.`,
+    };
   } catch (error: any) {
     return { success: false, error: error.message || 'Contact submission failed.' };
   }

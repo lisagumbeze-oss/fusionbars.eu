@@ -98,7 +98,19 @@ export class ResendEmailProvider implements ITransactionalEmailProvider {
       });
 
       if (!response.ok) {
-        const error = `Resend HTTP ${response.status}`;
+        const body = await response.text();
+        let detail = '';
+        try {
+          const parsed = JSON.parse(body) as { message?: string; error?: string };
+          detail = typeof parsed.message === 'string' ? parsed.message : typeof parsed.error === 'string' ? parsed.error : '';
+        } catch {
+          detail = '';
+        }
+        if (/re_[A-Za-z0-9]/.test(detail)) detail = '';
+        detail = detail.replace(/\s+/g, ' ').trim().slice(0, 180);
+        const error = detail
+          ? `Resend could not send the email: ${detail}`
+          : `Resend could not send the email (HTTP ${response.status}).`;
         recordDelivery({
           to: options.to,
           subject: options.subject,
