@@ -32,7 +32,7 @@ import {
   isCryptocurrencyPayment,
 } from '@/domain/payments/CryptoPaymentDiscount';
 import { MoneyEngine } from '@/lib/money';
-import { PricingEngine } from '@/domain/commercial/PricingEngine';
+import { CommercialConfigurationService } from '@/domain/commercial/CommercialConfigurationService';
 import { CommerceRepository, DbOrder } from '@/lib/commerce-repository';
 import { GuestOrderService } from './GuestOrderService';
 import { OrderService } from './OrderService';
@@ -374,34 +374,22 @@ export class OrderCreationService {
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
-    const commercial = PricingEngine.finalize({
-      subtotal: dbOrder.subtotalAmount,
-      discountAmount: dbOrder.discountAmount,
-      shippingAmount: dbOrder.shippingAmount,
-      currency,
-      destinationCountry,
-      at: dbOrder.createdAt,
-    });
-    const shippingTax = DestinationEngine.shippingTax(destinationCountry, dbOrder.shippingAmount);
-    if ((process.env.VERCEL_ENV === 'production' || process.env.NODE_ENV === 'production') && (commercial.taxStatus === 'TAX_CONFIGURATION_REQUIRED' || shippingTax.status === 'TAX_CONFIGURATION_REQUIRED')) {
-      throw new Error('TAX_CONFIGURATION_REQUIRED');
-    }
     dbOrder.commercialSnapshot = {
       currency,
       subtotal: dbOrder.subtotalAmount,
       discount: dbOrder.discountAmount,
-      taxableAmount: commercial.taxableAmount,
-      taxAmount: commercial.taxAmount,
-      taxTreatment: commercial.taxTreatment,
-      taxClass: commercial.taxClass,
-      taxRateBps: commercial.taxRateBps,
+      taxableAmount: null,
+      taxAmount: 0,
+      taxTreatment: 'NOT_APPLICABLE',
+      taxClass: 'NOT_APPLICABLE',
+      taxRateBps: null,
       shipping: dbOrder.shippingAmount,
       total: dbOrder.totalAmount,
       pricingVersion: 'CATALOGUE_UNAPPROVED',
-      configurationVersion: commercial.configurationVersion,
+      configurationVersion: CommercialConfigurationService.get().version,
       destinationCountry,
-      shippingTaxAmount: shippingTax.taxMinor,
-      shippingTaxStatus: shippingTax.status,
+      shippingTaxAmount: 0,
+      shippingTaxStatus: 'NOT_APPLICABLE',
       capturedAt: dbOrder.createdAt,
     };
     dbOrder.shippingSnapshot = {
@@ -409,7 +397,7 @@ export class OrderCreationService {
       method: shippingMethodCode,
       price: dbOrder.shippingAmount,
       currency,
-      taxTreatment: 'NOT_CONFIGURED',
+      taxTreatment: 'NOT_APPLICABLE',
       hub: chosenHub,
       configurationVersion: DestinationEngine.get().version,
       eligibility: 'NOT_CONFIGURED',
