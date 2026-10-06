@@ -57,7 +57,7 @@ export default async function PrivacyPage({ params }: PrivacyPageProps) {
             Checkout asks for the details required to ship the order. Your email is used for order and payment messages, and for support if you write to us about that order. A phone number, when you provide one, can be passed to the courier so they can contact you about the delivery.
           </p>
           <p>
-            The newsletter field stores an email address only when you submit it. Joining that list does not mean a marketing email has been sent. Newsletter delivery is not active until it is switched on.
+            The newsletter field stores an email address only when you submit it. That submission sends a confirmation to the address you entered and to the support desk.
           </p>
         </section>
 

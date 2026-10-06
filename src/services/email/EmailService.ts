@@ -117,18 +117,22 @@ export class EmailService {
     return (order.guestEmail || '').trim();
   }
 
-  private static async deliver(options: SendEmailOptions, purpose: 'transactional' | 'controlled' = 'transactional'): Promise<SendEmailResult> {
+  private static async deliver(options: SendEmailOptions, purpose: 'transactional' | 'controlled' | 'desk' = 'transactional'): Promise<SendEmailResult> {
     this.ensureReady();
     const recipient = options.to?.trim() || '';
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(recipient) || /[\r\n,]/.test(recipient)) {
       return { success: false, error: 'Recipient is not valid.' };
     }
-    if (this.provider.name !== 'mock') {
+    if (this.provider.name === 'mock') {
+      if (purpose === 'desk' && process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV !== 'preview') {
+        return { success: false, error: 'Production email is not configured.' };
+      }
+    } else {
       if (!EmailProductionReadinessService.sender().matchesCanonical) {
         return { success: false, error: 'Sender is not the production sender.' };
       }
-      if (purpose === 'transactional' && EmailProductionReadinessService.state() !== 'ACTIVE') {
-        return { success: false, error: 'Production email is not active.' };
+      if (EmailProductionReadinessService.state() === 'DISABLED') {
+        return { success: false, error: 'Production email is disabled.' };
       }
       if (purpose === 'controlled' && !EmailProductionReadinessService.controlledTestPermitted()) {
         return { success: false, error: 'Controlled production email is not permitted until the provider and DNS checks pass.' };
@@ -483,7 +487,7 @@ export class EmailService {
       html: customerRendered.html,
       text: customerRendered.text,
       tags: [{ name: 'template', value: 'contact-confirmation' }],
-    });
+    }, 'desk');
 
     const ops = await this.deliver({
       to: this.opsInbox,
@@ -493,7 +497,7 @@ export class EmailService {
       html: opsRendered.html,
       text: opsRendered.text,
       tags: [{ name: 'template', value: 'contact-ops-alert' }],
-    });
+    }, 'desk');
 
     if (!customer.success) {
       console.error('[EmailService] contact confirmation failed:', customer.error);
@@ -521,7 +525,7 @@ export class EmailService {
       html: rendered.html,
       text: rendered.text,
       tags: [{ name: 'template', value: 'newsletter-confirmation' }],
-    });
+    }, 'desk');
     const ops = await this.deliver({
       to: this.opsInbox,
       from: this.defaultFrom,
@@ -530,7 +534,7 @@ export class EmailService {
       html: opsRendered.html,
       text: opsRendered.text,
       tags: [{ name: 'template', value: 'newsletter-ops-alert' }],
-    });
+    }, 'desk');
 
     if (!subscriber.success) console.error('[EmailService] newsletter confirmation failed:', subscriber.error);
     if (!ops.success) console.error('[EmailService] newsletter ops alert failed:', ops.error);

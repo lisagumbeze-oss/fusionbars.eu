@@ -23,7 +23,6 @@ import { InventoryService } from '@/domain/inventory/InventoryService';
 import { BankTransferPaymentService, CryptoPaymentService, PaymentInstructions } from '@/domain/payments/PaymentService';
 import { PaymentConfigService, CryptoAsset } from '@/domain/payments/PaymentConfig';
 import { isPlaceholderCustomerPaymentDetail } from '@/domain/payments/payment-format';
-import { PaymentConfigurationService } from '@/domain/payments/PaymentConfigurationService';
 import { getCheckoutCryptoWallets } from '@/domain/payments/CheckoutCryptoWallets';
 import {
   cryptoDiscountPercent,
@@ -224,10 +223,6 @@ export class OrderCreationService {
     // STEP 12: Prepare Payment Instructions
     if (!PaymentConfigService.isPaymentMethodActive(paymentMethodCode)) {
       throw new Error(`Payment method "${paymentMethodCode}" is currently unavailable or inactive.`);
-    }
-    const checkoutChoice = paymentMethodCode === 'SEPA_IBAN' || paymentMethodCode === 'CRYPTO_BTC';
-    if (PaymentConfigurationService.productionCheckoutRequired() && !checkoutChoice && !PaymentConfigurationService.productionOptions().includes(paymentMethodCode)) {
-      throw new Error('This payment method is not available.');
     }
 
     let paymentInstructions: PaymentInstructions;

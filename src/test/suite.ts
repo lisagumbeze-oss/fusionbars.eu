@@ -6874,8 +6874,20 @@ export class DomainTestSuite {
         };
         EmailService.setProvider(blockedProvider);
         EmailProductionReadinessService.resetForTests();
-        const blocked = await EmailService.sendOrderShipped(order);
-        if (blocked.success) throw new Error('Ordinary production email was sent before activation');
+        const shipped = await EmailService.sendOrderShipped(order);
+        if (!shipped.success) throw new Error('A configured order email stayed locked before activation');
+        EmailProductionReadinessService.disable({ role: 'SUPER_ADMIN', actor: 'ops@fusionbars.eu', rationale: 'Fixture lock' });
+        const locked = await EmailService.sendOrderShipped(order);
+        if (locked.success) throw new Error('Order email was sent while email is disabled');
+        EmailProductionReadinessService.resetForTests();
+        const inquiry = await EmailService.sendContactInquiryEmails({
+          name: 'Ada',
+          email: 'ship@example.com',
+          subjectCategory: 'Order',
+          message: 'Where is the parcel today?',
+          locale: 'en',
+        });
+        if (!inquiry.customer.success || !inquiry.ops.success) throw new Error('A configured contact inquiry stayed blocked before activation');
         const injected = await EmailService.sendTestProbe({ recipientEmail: 'buyer@example.com\nBcc: evil@example.com', initiatedBy: 'ops@fusionbars.eu' });
         if (injected.success) throw new Error('Header injection was accepted');
         if (EmailService.resolveProviderName({ vercelEnv: 'preview', configured: 'resend' }) !== 'mock') throw new Error('Preview reused the production email provider');

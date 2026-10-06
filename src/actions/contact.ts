@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { RateLimiterService } from '@/lib/rate-limiter';
 import { PrivacyService } from '@/domain/privacy/PrivacyService';
 import { EmailService } from '@/services/email/EmailService';
-import { EmailProductionReadinessService } from '@/services/email/EmailProductionReadinessService';
 import { localeSchema } from '@/validation/schemas';
 
 const contactInquirySchema = z.object({
@@ -34,10 +33,13 @@ export async function submitContactInquiryAction(rawInput: unknown) {
       locale: validated.locale,
     });
 
-    if (!result.customer.success || !result.ops.success || EmailProductionReadinessService.state() !== 'ACTIVE') {
+    if (!result.customer.success || !result.ops.success) {
+      const unconfigured = result.customer.error === 'Production email is not configured.' || result.ops.error === 'Production email is not configured.';
       return {
         success: false,
-        error: 'The message was not confirmed as delivered. Production email is not active. You can email sales@fusionbars.eu directly.',
+        error: unconfigured
+          ? 'The message was not sent. Production email is not configured. You can email sales@fusionbars.eu directly.'
+          : 'The message was not delivered. You can email sales@fusionbars.eu directly.',
       };
     }
 
@@ -54,18 +56,14 @@ export async function subscribeNewsletterAction(rawInput: unknown) {
     const rateCheck = await RateLimiterService.enforce('newsletter_contact', email);
     if (!rateCheck.allowed) return { success: false, error: rateCheck.error };
 
-    if (EmailProductionReadinessService.state() !== 'ACTIVE') {
-      return {
-        success: false,
-        error: 'Newsletter delivery is not active. This did not confirm a marketing subscription email.',
-      };
-    }
-
     const result = await EmailService.sendNewsletterConfirmation(email, validated.locale);
     if (!result.subscriber.success || !result.ops.success) {
+      const unconfigured = result.subscriber.error === 'Production email is not configured.' || result.ops.error === 'Production email is not configured.';
       return {
         success: false,
-        error: 'The subscription could not be delivered. Please try again, or email sales@fusionbars.eu directly.',
+        error: unconfigured
+          ? 'Newsletter delivery is not configured. This did not confirm a marketing subscription email.'
+          : 'The subscription could not be delivered. Please try again, or email sales@fusionbars.eu directly.',
       };
     }
 
