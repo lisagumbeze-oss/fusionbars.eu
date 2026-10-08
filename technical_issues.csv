@@ -1,0 +1,8 @@
+Issue,Affected URL(s),Impact,Recommended Fix,Priority
+Category and sort URLs share the shop title and canonical,https://fusionbars.eu/en/shop,Medium,Keep one shop document. Do not give each filter its own title while the canonical stays /en/shop.,Medium
+Translated legal pages can be indexable while the sitemap lists English URLs only,https://fusionbars.eu/en/legal/*,Medium,Confirm whether approved translations should be indexed. If they should the sitemap must include them. If they should not the page robots must stay noindex.,Medium
+Search Console coverage and sitemap status are unchecked,https://fusionbars.eu/sitemap.xml,High,Open Indexing Pages and Sitemaps and record the result. Do not infer index counts from the repository.,High
+Generative AI inclusion and the Generative AI performance report are unchecked,https://fusionbars.eu,Medium,Open the Search Console setting and report. Code eligibility does not mean the pages are shown.,Medium
+Semrush country lists were counted and not exported,https://myfusionbar.com/ US 106; https://fusionbarsmushroom.com/ US 94; https://fusionmushroombarsofficial.com/ US 52; https://fusionchocolate.co.uk/ UK 102 and US 6,Low,Export those databases before treating the keyword file as complete for those countries.,Low
+Three Spain position numbers for fusion chocolates on fusionchocolate.co.uk were not readable,https://fusionchocolate.co.uk/,Low,Re-export that Spain table if those ranks are needed. Volume 40 and difficulty 23 were readable.,Low
+Local port 3000 was serving an older build during the 2026-10-08 check,http://127.0.0.1:3000/en,Low,Restart that process before using it to review the homepage shop notes. This is not a production URL.,Low

@@ -11,9 +11,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/shop',
     '/about',
     '/faq',
+    '/shipping',
+    '/refunds',
     '/contact',
     '/news',
     '/privacy',
+    '/terms',
+    '/report-scam',
     ...LegalGovernanceService.publicLinks().map((link) => link.href),
   ];
   const products = CatalogService.getPublicProducts();

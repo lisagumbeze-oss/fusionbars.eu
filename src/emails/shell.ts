@@ -48,6 +48,8 @@ export function renderEmailShell(options: EmailShellOptions): string {
           <tr>
             <td style="padding:20px 32px 28px;border-top:1px solid #E5E3DD;background-color:#FAF9F5;">
               <p style="margin:0 0 8px;font-size:12px;color:#5C5852;">All dispatches use plain, unbranded, odorless packaging for customer privacy.</p>
+              <p style="margin:0 0 8px;font-size:12px;color:#5C5852;">Avinguda Alcora 412, 12006 Castelló de la Plana, Castelló, Spain</p>
+              <p style="margin:0 0 8px;font-size:12px;color:#5C5852;">UK branch office: 519 Beverley Dr, Stoke-on-Trent ST2 0QB, UK</p>
               <p style="margin:0;font-size:12px;color:#5C5852;">Questions? <a href="mailto:${support}" style="color:#4A5D4E;font-weight:600;">${support}</a></p>
             </td>
           </tr>

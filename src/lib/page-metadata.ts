@@ -3,6 +3,13 @@ import { indexableUrl, indexingRobots } from '@/lib/search-indexing';
 
 const SITE_NAME = 'Fusion Mushroom Bars EU';
 
+export const OG_IMAGE = {
+  url: '/images/brand/og-image.png',
+  width: 512,
+  height: 512,
+  alt: 'Fusion',
+} as const;
+
 export function publicPageMetadata(input: {
   locale: string;
   path: string;
@@ -26,24 +33,22 @@ export function publicPageMetadata(input: {
       siteName: SITE_NAME,
       locale: 'en_EU',
       type: input.openGraphType ?? 'website',
-      ...(input.image
-        ? {
-            images: [
-              {
-                url: input.image.url,
-                alt: input.image.alt,
-                width: input.image.width,
-                height: input.image.height,
-              },
-            ],
-          }
-        : {}),
+      images: [
+        input.image
+          ? {
+              url: input.image.url,
+              alt: input.image.alt,
+              width: input.image.width,
+              height: input.image.height,
+            }
+          : OG_IMAGE,
+      ],
     },
     twitter: {
       card: 'summary_large_image',
       title: input.title,
       description: input.description,
-      ...(input.image ? { images: [input.image.url] } : {}),
+      images: [input.image?.url ?? OG_IMAGE.url],
     },
   };
 }

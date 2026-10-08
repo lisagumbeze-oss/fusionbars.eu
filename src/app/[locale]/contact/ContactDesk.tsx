@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { Mail, Clock, ShieldCheck, Send, CheckCircle2, AlertCircle } from 'lucide-react';
+import { Mail, Clock, MapPin, ShieldCheck, Send, CheckCircle2, AlertCircle } from 'lucide-react';
 import { LocaleCode } from '@/types';
 import { submitContactInquiryAction } from '@/actions/contact';
-import WhatsAppLink from '@/components/WhatsAppLink';
 import { AdminOverrides } from '@/domain/admin/AdminOverrides';
+import { STORE_ADDRESS, UK_BRANCH_OFFICE } from '@/lib/store-address';
 
 export default function ContactDesk() {
   const params = useParams();
@@ -178,6 +178,30 @@ export default function ContactDesk() {
         <div className="md:col-span-5 space-y-6">
           <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 space-y-4 shadow-xs">
             <h2 className="font-serif text-base font-bold text-[#121212] flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-[#4A5D4E]" /> Addresses
+            </h2>
+            <div className="space-y-4">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5C5852]">Store</p>
+                <address className="mt-1 text-sm text-[#121212] leading-relaxed not-italic">
+                  {STORE_ADDRESS.lines.map((line) => (
+                    <span key={line} className="block">{line}</span>
+                  ))}
+                </address>
+              </div>
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-wider text-[#5C5852]">{UK_BRANCH_OFFICE.label}</p>
+                <address className="mt-1 text-sm text-[#121212] leading-relaxed not-italic">
+                  {UK_BRANCH_OFFICE.lines.map((line) => (
+                    <span key={line} className="block">{line}</span>
+                  ))}
+                </address>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 space-y-4 shadow-xs">
+            <h2 className="font-serif text-base font-bold text-[#121212] flex items-center gap-2">
               <Mail className="w-4 h-4 text-[#4A5D4E]" /> Electronic Mail
             </h2>
             <p className="text-xs text-[#5C5852] leading-relaxed">
@@ -189,7 +213,6 @@ export default function ContactDesk() {
             >
               {supportEmail}
             </a>
-            <WhatsAppLink className="h-10 w-10 rounded-full border border-[#25D366]/40" />
           </div>
 
           <div className="bg-white rounded-2xl border border-[#E5E3DD] p-6 space-y-4 shadow-xs">

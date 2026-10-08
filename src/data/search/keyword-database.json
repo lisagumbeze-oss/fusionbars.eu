@@ -1,0 +1,1881 @@
+{
+  "property": "sc-domain:fusionbars.eu",
+  "notes": "Two sources stay separate. google_search_console rows are fusionbars.eu. semrush rows are estimated desktop rankings for the reference sites https://fusionbarsshop.com/, https://myfusionbar.com/, https://fusionbarsmushroom.com/, https://fusionmushroombarsofficial.com/, and https://fusionchocolate.co.uk/. They are not this site's rankings, clicks, or impressions. Volume and keyword difficulty are Semrush estimates. A query stays unassigned until a real page on fusionbars.eu covers it.",
+  "reports": [
+    {
+      "source": "google_search_console",
+      "site": "https://fusionbars.eu",
+      "searchType": "web",
+      "window": "3 months",
+      "capturedOn": "2026-10-08",
+      "lastUpdateLabel": "27 hours ago",
+      "totals": {
+        "clicks": 0,
+        "impressions": 5,
+        "ctr": 0,
+        "averagePosition": 25
+      },
+      "listedQueryImpressions": 3,
+      "unlistedImpressions": 2
+    }
+  ],
+  "referenceReports": [
+    {
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "report": "organic_rankings",
+      "device": "desktop",
+      "capturedOn": "2026-10-08",
+      "databases": [
+        {
+          "country": "US",
+          "databaseDate": "2026-10-07",
+          "positions": 4,
+          "estimatedTraffic": 0
+        },
+        {
+          "country": "DE",
+          "databaseDate": "2026-10-07",
+          "positions": 1,
+          "estimatedTraffic": 0
+        },
+        {
+          "country": "ES",
+          "databaseDate": "2026-10-07",
+          "positions": 2,
+          "estimatedTraffic": 0
+        },
+        {
+          "country": "AU",
+          "databaseDate": "2026-10-08",
+          "positions": 1,
+          "estimatedTraffic": 0
+        },
+        {
+          "country": "IN",
+          "databaseDate": "2026-10-07",
+          "positions": 2,
+          "estimatedTraffic": 0
+        },
+        {
+          "country": "DK",
+          "databaseDate": "2026-10-07",
+          "positions": 1,
+          "estimatedTraffic": 0
+        },
+        {
+          "country": "KW",
+          "databaseDate": "2026-10-07",
+          "positions": 1,
+          "estimatedTraffic": 0
+        }
+      ]
+    },
+    {
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "report": "organic_rankings",
+      "device": "desktop",
+      "capturedOn": "2026-10-08",
+      "databases": [
+        {
+          "country": "US",
+          "databaseDate": "2026-10-07",
+          "positions": 106,
+          "rowsExported": false
+        },
+        {
+          "country": "ES",
+          "databaseDate": "2026-10-07",
+          "positions": 9,
+          "estimatedTraffic": 11,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "IT",
+          "databaseDate": "2026-10-07",
+          "positions": 5,
+          "estimatedTraffic": 7,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "AU",
+          "databaseDate": "2026-10-08",
+          "positions": 4,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "DE",
+          "databaseDate": "2026-10-07",
+          "positions": 3,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "FR",
+          "databaseDate": "2026-10-07",
+          "positions": 3,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "IN",
+          "databaseDate": "2026-10-07",
+          "positions": 2,
+          "estimatedTraffic": 1,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "DK",
+          "databaseDate": "2026-10-07",
+          "positions": 1,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "MT",
+          "databaseDate": "2026-10-07",
+          "positions": 1,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "TR",
+          "databaseDate": "2026-10-07",
+          "positions": 1,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "PH",
+          "databaseDate": "2026-10-07",
+          "positions": 1,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        }
+      ]
+    },
+    {
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "report": "organic_rankings",
+      "device": "desktop",
+      "capturedOn": "2026-10-08",
+      "databases": [
+        {
+          "country": "US",
+          "databaseDate": "2026-10-07",
+          "positions": 94,
+          "rowsExported": false
+        },
+        {
+          "country": "ES",
+          "databaseDate": "2026-10-07",
+          "positions": 8,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "IT",
+          "databaseDate": "2026-10-07",
+          "positions": 8,
+          "estimatedTraffic": 1,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "AU",
+          "databaseDate": "2026-10-08",
+          "positions": 2,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "DE",
+          "databaseDate": "2026-10-07",
+          "positions": 2,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "PH",
+          "databaseDate": "2026-10-08",
+          "positions": 2,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        }
+      ]
+    },
+    {
+      "source": "semrush",
+      "site": "https://fusionmushroombarsofficial.com/",
+      "report": "organic_rankings",
+      "device": "desktop",
+      "capturedOn": "2026-10-08",
+      "databases": [
+        {
+          "country": "US",
+          "databaseDate": "2026-10-08",
+          "positions": 52,
+          "rowsExported": false
+        },
+        {
+          "country": "AU",
+          "databaseDate": "2026-10-08",
+          "positions": 1,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "ES",
+          "databaseDate": "2026-10-07",
+          "positions": 1,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "IT",
+          "databaseDate": "2026-10-07",
+          "positions": 1,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "PH",
+          "databaseDate": "2026-10-08",
+          "positions": 1,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        }
+      ]
+    },
+    {
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "report": "organic_rankings",
+      "device": "desktop",
+      "capturedOn": "2026-10-08",
+      "databases": [
+        {
+          "country": "UK",
+          "positions": 102,
+          "rowsExported": false
+        },
+        {
+          "country": "US",
+          "positions": 6,
+          "rowsExported": false
+        },
+        {
+          "country": "ES",
+          "databaseDate": "2026-10-07",
+          "positions": 5,
+          "estimatedTraffic": 4,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "IT",
+          "databaseDate": null,
+          "positions": 2,
+          "estimatedTraffic": 3,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "TR",
+          "databaseDate": null,
+          "positions": 3,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        },
+        {
+          "country": "RU",
+          "databaseDate": "2026-10-07",
+          "positions": 2,
+          "estimatedTraffic": 0,
+          "estimatedTrafficCostUsd": 0
+        }
+      ]
+    }
+  ],
+  "keywords": [
+    {
+      "query": "artisan schokolade",
+      "language": "de",
+      "source": "google_search_console",
+      "site": "https://fusionbars.eu",
+      "searchType": "web",
+      "window": "3 months",
+      "capturedOn": "2026-10-08",
+      "clicks": 0,
+      "impressions": 1,
+      "assignedUrl": null
+    },
+    {
+      "query": "artisan chocolate",
+      "language": "en",
+      "source": "google_search_console",
+      "site": "https://fusionbars.eu",
+      "searchType": "web",
+      "window": "3 months",
+      "capturedOn": "2026-10-08",
+      "clicks": 0,
+      "impressions": 1,
+      "assignedUrl": "https://fusionbars.eu/en/news/the-chocolate"
+    },
+    {
+      "query": "craft chocolate bars",
+      "language": "en",
+      "source": "google_search_console",
+      "site": "https://fusionbars.eu",
+      "searchType": "web",
+      "window": "3 months",
+      "capturedOn": "2026-10-08",
+      "clicks": 0,
+      "impressions": 1,
+      "assignedUrl": "https://fusionbars.eu/en/news/the-chocolate"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "US",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 21,
+      "serpFeatureCount": 4,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-08-31",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "chocolate fusion",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "US",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 55,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 390,
+      "keywordDifficulty": 35,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-09-02",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "mushroom bar",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "US",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 85,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 90,
+      "keywordDifficulty": 24,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-09-14",
+      "note": "Semrush listed this query twice for the US homepage.",
+      "assignedUrl": "https://fusionbars.eu/en/news/chocolate-and-botanicals"
+    },
+    {
+      "query": "mushroom bar",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "US",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 89,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 90,
+      "keywordDifficulty": 24,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-09-14",
+      "note": "Second US row for the same query.",
+      "assignedUrl": "https://fusionbars.eu/en/news/chocolate-and-botanicals"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "DE",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "commercial"
+      ],
+      "position": 65,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 140,
+      "keywordDifficulty": 10,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-08-29",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 15,
+      "serpFeatureCount": 3,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion chocolates",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 89,
+      "serpFeatureCount": 9,
+      "estimatedTraffic": 0,
+      "volume": 40,
+      "keywordDifficulty": 23,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-08-24",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "AU",
+      "device": "desktop",
+      "databaseDate": "2026-10-08",
+      "intent": [
+        "informational",
+        "transactional"
+      ],
+      "position": 60,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 22,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-09-07",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "IN",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "commercial"
+      ],
+      "position": 81,
+      "serpFeatureCount": 7,
+      "estimatedTraffic": 0,
+      "volume": 880,
+      "keywordDifficulty": 31,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-09-27",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "chocolate fusion",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "IN",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 61,
+      "serpFeatureCount": 8,
+      "estimatedTraffic": 0,
+      "volume": 210,
+      "keywordDifficulty": 15,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-09-15",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "disco chocolate bar",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "DK",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 81,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 30,
+      "keywordDifficulty": 9,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-09-08",
+      "assignedUrl": null
+    },
+    {
+      "query": "magic chocolate",
+      "source": "semrush",
+      "site": "https://fusionbarsshop.com/",
+      "country": "KW",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational",
+        "navigational"
+      ],
+      "position": 59,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 30,
+      "keywordDifficulty": 20,
+      "rankingUrl": "https://fusionbarsshop.com/",
+      "rowUpdated": "2026-08-10",
+      "assignedUrl": null
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 4,
+      "serpFeatureCount": 3,
+      "estimatedTraffic": 11,
+      "estimatedTrafficShare": 100,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 21,
+      "serpFeatureCount": 3,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://myfusionbar.com/shop/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 28,
+      "serpFeatureCount": 3,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://myfusionbar.com/product-category/fusion-chocolate-bars/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 43,
+      "serpFeatureCount": 3,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://myfusionbar.com/brand/fusion/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 50,
+      "serpFeatureCount": 3,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://myfusionbar.com/category/fusion-chocolate-bars/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 56,
+      "serpFeatureCount": 3,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://myfusionbar.com/shop/page/3/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion chocolate",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 73,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 50,
+      "keywordDifficulty": 21,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-08-29",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion chocolates",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 28,
+      "serpFeatureCount": 9,
+      "estimatedTraffic": 0,
+      "volume": 40,
+      "keywordDifficulty": 23,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-08-24",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "mushrooms bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 72,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 50,
+      "keywordDifficulty": 28,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-10-02",
+      "assignedUrl": "https://fusionbars.eu/en/news/chocolate-and-botanicals"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 5,
+      "serpFeatureCount": 4,
+      "estimatedTraffic": 7,
+      "estimatedTrafficShare": 100,
+      "volume": 260,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-08-31",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "chocolate fusion",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 54,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 390,
+      "keywordDifficulty": 35,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-02",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "bar mushroom",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 85,
+      "serpFeatureCount": 4,
+      "estimatedTraffic": 0,
+      "volume": 90,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-11",
+      "assignedUrl": "https://fusionbars.eu/en/news/chocolate-and-botanicals"
+    },
+    {
+      "query": "mushroom bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 86,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 90,
+      "keywordDifficulty": 24,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-14",
+      "note": "Semrush listed this query twice for the IT homepage.",
+      "assignedUrl": "https://fusionbars.eu/en/news/chocolate-and-botanicals"
+    },
+    {
+      "query": "mushroom bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 90,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 90,
+      "keywordDifficulty": 24,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-14",
+      "note": "Second IT row for the same query.",
+      "assignedUrl": "https://fusionbars.eu/en/news/chocolate-and-botanicals"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "AU",
+      "device": "desktop",
+      "databaseDate": "2026-10-08",
+      "intent": [
+        "informational",
+        "transactional"
+      ],
+      "position": 21,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 22,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-07",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "bar mushroom",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "AU",
+      "device": "desktop",
+      "databaseDate": "2026-10-08",
+      "intent": [
+        "informational"
+      ],
+      "position": 66,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 50,
+      "keywordDifficulty": 28,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-26",
+      "assignedUrl": "https://fusionbars.eu/en/news/chocolate-and-botanicals"
+    },
+    {
+      "query": "fuse bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "AU",
+      "device": "desktop",
+      "databaseDate": "2026-10-08",
+      "intent": [
+        "informational",
+        "transactional"
+      ],
+      "position": 90,
+      "serpFeatureCount": 9,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 29,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-21",
+      "assignedUrl": null
+    },
+    {
+      "query": "mushroom bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "AU",
+      "device": "desktop",
+      "databaseDate": "2026-10-08",
+      "intent": [
+        "informational"
+      ],
+      "position": 59,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 90,
+      "keywordDifficulty": 29,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-06",
+      "assignedUrl": "https://fusionbars.eu/en/news/chocolate-and-botanicals"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "DE",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "commercial"
+      ],
+      "position": 58,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 140,
+      "keywordDifficulty": 10,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-08-29",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "bar mushroom",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "DE",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 93,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 110,
+      "keywordDifficulty": 11,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-08-19",
+      "assignedUrl": "https://fusionbars.eu/en/news/chocolate-and-botanicals"
+    },
+    {
+      "query": "mushroom bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "DE",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 89,
+      "serpFeatureCount": 3,
+      "estimatedTraffic": 0,
+      "volume": 110,
+      "keywordDifficulty": 13,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-08-19",
+      "assignedUrl": "https://fusionbars.eu/en/news/chocolate-and-botanicals"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "FR",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "navigational"
+      ],
+      "position": 59,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 70,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-08-27",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion barre",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "FR",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational",
+        "transactional"
+      ],
+      "position": 61,
+      "serpFeatureCount": 4,
+      "estimatedTraffic": 0,
+      "volume": 70,
+      "keywordDifficulty": 6,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-08-14",
+      "assignedUrl": null
+    },
+    {
+      "query": "mushroom bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "FR",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational",
+        "transactional"
+      ],
+      "position": 92,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 70,
+      "keywordDifficulty": 16,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-14",
+      "assignedUrl": "https://fusionbars.eu/en/news/chocolate-and-botanicals"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "IN",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "commercial"
+      ],
+      "position": 17,
+      "serpFeatureCount": 7,
+      "estimatedTraffic": 1,
+      "estimatedTrafficShare": 100,
+      "volume": 880,
+      "keywordDifficulty": 31,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-27",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "chocolate fusion",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "IN",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 62,
+      "serpFeatureCount": 8,
+      "estimatedTraffic": 0,
+      "volume": 210,
+      "keywordDifficulty": 15,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-15",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "disco chocolate bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "DK",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 82,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 30,
+      "keywordDifficulty": 9,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-08",
+      "assignedUrl": null
+    },
+    {
+      "query": "molecular fusion",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "MT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "navigational"
+      ],
+      "position": 80,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 110,
+      "keywordDifficulty": 30,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-08-07",
+      "assignedUrl": null
+    },
+    {
+      "query": "chocolate fusion",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "TR",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 48,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 210,
+      "keywordDifficulty": 23,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://myfusionbar.com/",
+      "country": "PH",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "commercial"
+      ],
+      "position": 42,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 50,
+      "keywordDifficulty": 30,
+      "rankingUrl": "https://myfusionbar.com/",
+      "rowUpdated": "2026-09-02",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 16,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://fusionbarsmushroom.com/",
+      "rowUpdated": "2026-08-13",
+      "note": "Filed as ES because this 8-row table uses the Spain volume and difficulty already seen for fusion bars, 170 and 5. The Italy badge is also 8.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 24,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://fusionbarsmushroom.com/product-category/fusion-shroom-bars/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 36,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/fusion-bars-milk-chocolate/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 48,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://fusionbarsmushroom.com/shop/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 53,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/fusion-10-bars-boutique-box/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 63,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/fusion-bars-emms/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 67,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://fusionbarsmushroom.com/product-tag/fusion-shroom-chocolate-bars/",
+      "rowUpdated": "2026-08-13",
+      "note": "Same tag URL listed twice.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 72,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://fusionbarsmushroom.com/product-tag/fusion-shroom-chocolate-bars/",
+      "rowUpdated": "2026-08-13",
+      "note": "Second row for the same tag URL.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 9,
+      "estimatedTraffic": 1,
+      "estimatedTrafficShare": 100,
+      "volume": 260,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://fusionbarsmushroom.com/",
+      "rowUpdated": "2026-08-31",
+      "note": "Filed as IT because this 8-row table uses volume 260 and difficulty 27, which is not the Spain figure of 170 and 5. The Spain badge is also 8.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 16,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/ferrero-rocher-fusion-bar/",
+      "rowUpdated": "2026-08-31",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 22,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://fusionbarsmushroom.com/shop/",
+      "rowUpdated": "2026-08-31",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 25,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/fusion-10-bars-boutique-box/",
+      "rowUpdated": "2026-08-31",
+      "note": "Same product URL listed twice.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 34,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/fusion-10-bars-boutique-box/",
+      "rowUpdated": "2026-08-31",
+      "note": "Second row for the same product URL.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 39,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/fusion-bars-emms/",
+      "rowUpdated": "2026-08-31",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 43,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/fusion-bars-twix/",
+      "rowUpdated": "2026-08-31",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 44,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/fusion-bars-mocha/",
+      "rowUpdated": "2026-08-31",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "AU",
+      "device": "desktop",
+      "databaseDate": "2026-10-08",
+      "intent": [
+        "informational",
+        "transactional"
+      ],
+      "position": 38,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 22,
+      "rankingUrl": "https://fusionbarsmushroom.com/",
+      "rowUpdated": "2026-09-07",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "AU",
+      "device": "desktop",
+      "databaseDate": "2026-10-08",
+      "intent": [
+        "informational",
+        "transactional"
+      ],
+      "position": 52,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 22,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/fusion-10-bars-boutique-box/",
+      "rowUpdated": "2026-09-07",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "DE",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "commercial"
+      ],
+      "position": 38,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 140,
+      "keywordDifficulty": 10,
+      "rankingUrl": "https://fusionbarsmushroom.com/",
+      "rowUpdated": "2026-08-29",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "DE",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "commercial"
+      ],
+      "position": 51,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 140,
+      "keywordDifficulty": 10,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/fusion-10-bars-boutique-box/",
+      "rowUpdated": "2026-08-29",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "PH",
+      "device": "desktop",
+      "databaseDate": "2026-10-08",
+      "intent": [
+        "commercial"
+      ],
+      "position": 14,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 50,
+      "keywordDifficulty": 30,
+      "rankingUrl": "https://fusionbarsmushroom.com/",
+      "rowUpdated": "2026-09-02",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://fusionbarsmushroom.com/",
+      "country": "PH",
+      "device": "desktop",
+      "databaseDate": "2026-10-08",
+      "intent": [
+        "commercial"
+      ],
+      "position": 43,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 50,
+      "keywordDifficulty": 30,
+      "rankingUrl": "https://fusionbarsmushroom.com/product/fusion-10-bars-boutique-box/",
+      "rowUpdated": "2026-09-02",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://fusionmushroombarsofficial.com/",
+      "country": "AU",
+      "device": "desktop",
+      "databaseDate": "2026-10-08",
+      "intent": [
+        "informational",
+        "transactional"
+      ],
+      "position": 40,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 22,
+      "rankingUrl": "https://fusionmushroombarsofficial.com/",
+      "rowUpdated": "2026-09-07",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionmushroombarsofficial.com/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 17,
+      "serpFeatureCount": 3,
+      "estimatedTraffic": 0,
+      "volume": 170,
+      "keywordDifficulty": 5,
+      "rankingUrl": "https://fusionmushroombarsofficial.com/",
+      "rowUpdated": "2026-08-13",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bars",
+      "source": "semrush",
+      "site": "https://fusionmushroombarsofficial.com/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 10,
+      "serpFeatureCount": 4,
+      "estimatedTraffic": 0,
+      "volume": 260,
+      "keywordDifficulty": 27,
+      "rankingUrl": "https://fusionmushroombarsofficial.com/",
+      "rowUpdated": "2026-08-31",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion bar",
+      "source": "semrush",
+      "site": "https://fusionmushroombarsofficial.com/",
+      "country": "PH",
+      "device": "desktop",
+      "databaseDate": "2026-10-08",
+      "intent": [
+        "commercial"
+      ],
+      "position": 23,
+      "serpFeatureCount": 5,
+      "estimatedTraffic": 0,
+      "volume": 50,
+      "keywordDifficulty": 30,
+      "rankingUrl": "https://fusionmushroombarsofficial.com/",
+      "rowUpdated": "2026-09-02",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion chocolates",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": null,
+      "serpFeatureCount": 9,
+      "estimatedTraffic": 1,
+      "estimatedTrafficShare": 25,
+      "volume": 40,
+      "keywordDifficulty": 23,
+      "rankingUrl": "https://fusionchocolate.co.uk/",
+      "rowUpdated": "2026-08-24",
+      "note": "Position cell shows a SERP feature icon. The rank number is not readable in the screenshot.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion chocolates",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 4,
+      "serpFeatureCount": 9,
+      "estimatedTraffic": 1,
+      "estimatedTrafficShare": 25,
+      "volume": 40,
+      "keywordDifficulty": 23,
+      "rankingUrl": "https://fusionchocolate.co.uk/",
+      "rowUpdated": "2026-08-24",
+      "note": "Second Spain row for the apex URL.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion chocolates",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": null,
+      "serpFeatureCount": 9,
+      "estimatedTraffic": 1,
+      "estimatedTrafficShare": 25,
+      "volume": 40,
+      "keywordDifficulty": 23,
+      "rankingUrl": "https://www.fusionchocolate.co.uk/",
+      "rowUpdated": "2026-08-24",
+      "note": "Position cell shows a homepage SERP icon. The rank number is not readable. This is the www host, separate from the apex row.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion chocolates",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": null,
+      "serpFeatureCount": 9,
+      "estimatedTraffic": 1,
+      "estimatedTrafficShare": 25,
+      "volume": 40,
+      "keywordDifficulty": 23,
+      "rankingUrl": "https://www.fusionchocolate.co.uk/",
+      "rowUpdated": "2026-08-24",
+      "note": "Second Spain row for the www host. Position number is not readable.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "fusion chocolate",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "ES",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 15,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 50,
+      "keywordDifficulty": 21,
+      "rankingUrl": "https://fusionchocolate.co.uk/shop/",
+      "rowUpdated": "2026-08-29",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "chocolate fusion",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": null,
+      "intent": [
+        "informational"
+      ],
+      "position": 5,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 3,
+      "estimatedTrafficShare": 100,
+      "volume": 390,
+      "keywordDifficulty": 35,
+      "rankingUrl": "https://fusionchocolate.co.uk/shop/",
+      "rowUpdated": "2026-09-02",
+      "note": "Semrush date control reads n/a.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "chocolate fusion",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "IT",
+      "device": "desktop",
+      "databaseDate": null,
+      "intent": [
+        "informational"
+      ],
+      "position": 18,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 390,
+      "keywordDifficulty": 35,
+      "rankingUrl": "https://fusionchocolate.co.uk/",
+      "rowUpdated": "2026-09-02",
+      "note": "Semrush date control reads n/a.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "chocolate fusion",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "TR",
+      "device": "desktop",
+      "databaseDate": null,
+      "intent": [
+        "informational"
+      ],
+      "position": 19,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 210,
+      "keywordDifficulty": 23,
+      "rankingUrl": "https://fusionchocolate.co.uk/",
+      "rowUpdated": "2026-08-13",
+      "note": "Semrush date control reads n/a.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "chocolate fusion",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "TR",
+      "device": "desktop",
+      "databaseDate": null,
+      "intent": [
+        "informational"
+      ],
+      "position": 47,
+      "serpFeatureCount": 6,
+      "estimatedTraffic": 0,
+      "volume": 210,
+      "keywordDifficulty": 23,
+      "rankingUrl": "https://fusionchocolate.co.uk/pick-and-mix-menu/",
+      "rowUpdated": "2026-08-13",
+      "note": "Semrush date control reads n/a.",
+      "assignedUrl": "https://fusionbars.eu/en/news/fusion-chocolate-bar"
+    },
+    {
+      "query": "artisan chocolate",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "TR",
+      "device": "desktop",
+      "databaseDate": null,
+      "intent": [
+        "transactional"
+      ],
+      "position": 22,
+      "serpFeatureCount": 7,
+      "estimatedTraffic": 0,
+      "volume": 110,
+      "keywordDifficulty": 14,
+      "rankingUrl": "https://fusionchocolate.co.uk/",
+      "rowUpdated": "2026-08-25",
+      "note": "Semrush date control reads n/a.",
+      "assignedUrl": "https://fusionbars.eu/en/news/the-chocolate"
+    },
+    {
+      "query": "luxury chocolate box",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "RU",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 24,
+      "serpFeatureCount": 4,
+      "estimatedTraffic": 0,
+      "volume": 70,
+      "keywordDifficulty": 18,
+      "rankingUrl": "https://fusionchocolate.co.uk/product-category/luxury-chocolate-boxes/",
+      "rowUpdated": "2026-09-07",
+      "note": "Same category URL listed twice.",
+      "assignedUrl": null
+    },
+    {
+      "query": "luxury chocolate box",
+      "source": "semrush",
+      "site": "https://fusionchocolate.co.uk/",
+      "country": "RU",
+      "device": "desktop",
+      "databaseDate": "2026-10-07",
+      "intent": [
+        "informational"
+      ],
+      "position": 27,
+      "serpFeatureCount": 4,
+      "estimatedTraffic": 0,
+      "volume": 70,
+      "keywordDifficulty": 18,
+      "rankingUrl": "https://fusionchocolate.co.uk/product-category/luxury-chocolate-boxes/",
+      "rowUpdated": "2026-09-07",
+      "note": "Second Russia row for the same category URL.",
+      "assignedUrl": null
+    }
+  ]
+}

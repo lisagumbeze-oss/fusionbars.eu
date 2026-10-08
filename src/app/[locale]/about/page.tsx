@@ -7,6 +7,7 @@ import { LocaleCode } from '@/types';
 import JsonLd from '@/components/seo/JsonLd';
 import { publicPageMetadata } from '@/lib/page-metadata';
 import { breadcrumbList } from '@/lib/structured-data';
+import { STORE_ADDRESS_LINE, UK_BRANCH_OFFICE_LINE } from '@/lib/store-address';
 
 interface AboutPageProps {
   params: Promise<{ locale: string }> | { locale: string };
@@ -97,8 +98,8 @@ export default async function AboutPage({ params }: AboutPageProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center">
           <div className="lg:col-span-5 relative aspect-4/3 rounded-2xl bg-white border border-[#E5E3DD] overflow-hidden">
             <Image
-              src="/images/products/reference/fusion-bars-display-cases.jpg"
-              alt="Fusion chocolate bars in Heath, Cap'n Crunch, and Ferrero sleeves, with display cases"
+              src="/images/campaign/fusion-bars-outdoors.png"
+              alt="Fusion chocolate bars outdoors on the grass"
               fill
               className="object-cover"
               sizes="(min-width: 1024px) 40vw, 100vw"
@@ -143,7 +144,7 @@ export default async function AboutPage({ params }: AboutPageProps) {
               </li>
               <li className="flex gap-3">
                 <MapPin className="w-4 h-4 mt-0.5 text-[#88A48D] shrink-0" aria-hidden="true" />
-                <span>Dispatch from temperature-controlled hubs in the Netherlands, Spain, Germany, and France.</span>
+                <span>The store is at {STORE_ADDRESS_LINE}. The UK branch office is at {UK_BRANCH_OFFICE_LINE}. Parcels leave temperature-controlled hubs in the Netherlands, Spain, Germany, and France.</span>
               </li>
               <li className="flex gap-3">
                 <Mail className="w-4 h-4 mt-0.5 text-[#88A48D] shrink-0" aria-hidden="true" />

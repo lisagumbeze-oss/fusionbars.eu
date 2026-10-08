@@ -10,9 +10,13 @@ Fusion Mushroom Bars EU sells confectionery. Product pages are the published des
 - https://fusionbars.eu/en/shop : Catalogue
 - https://fusionbars.eu/en/about : How the bars are made and where parcels leave
 - https://fusionbars.eu/en/faq : Ordering, payment, and dispatch
+- https://fusionbars.eu/en/shipping : Shipping, delivery, and returns
+- https://fusionbars.eu/en/refunds : Refunds, returns, and exchanges
 - https://fusionbars.eu/en/contact : European support desk
 - https://fusionbars.eu/en/news : Store notes
 - https://fusionbars.eu/en/privacy : Privacy notice
+- https://fusionbars.eu/en/terms : Terms for orders, payment, dispatch, and returns
+- https://fusionbars.eu/en/report-scam : How to confirm this shop and report an impersonating site
 
 ## Catalogue
 Product URLs use https://fusionbars.eu/en/products/{slug}. English is the indexable language. Other locale URLs canonicalise to the English page.
@@ -24,3 +28,5 @@ Product URLs use https://fusionbars.eu/en/products/{slug}. English is the indexa
 - Standard shipping is free once merchandise reaches €300, or £260 in pounds.
 - Parcels leave from hubs in the Netherlands, Spain, Germany, and France.
 - Support: sales@fusionbars.eu
+- Store address: Avinguda Alcora 412, 12006 Castelló de la Plana, Castelló, Spain
+- UK branch office: 519 Beverley Dr, Stoke-on-Trent ST2 0QB, UK

@@ -1,4 +1,5 @@
 import { SITE_ORIGIN, indexableUrl } from '@/lib/search-indexing';
+import { STORE_ADDRESS, UK_BRANCH_OFFICE } from '@/lib/store-address';
 
 export const SITE_NAME = 'Fusion Mushroom Bars EU';
 
@@ -41,6 +42,23 @@ export function siteGraphJsonLd() {
         url: SITE_ORIGIN,
         email: 'sales@fusionbars.eu',
         logo: absoluteAssetUrl('/images/brand/fusion-logo.jpg'),
+        address: [
+          {
+            '@type': 'PostalAddress',
+            streetAddress: STORE_ADDRESS.street,
+            postalCode: STORE_ADDRESS.postalCode,
+            addressLocality: STORE_ADDRESS.city,
+            addressRegion: STORE_ADDRESS.region,
+            addressCountry: STORE_ADDRESS.countryCode,
+          },
+          {
+            '@type': 'PostalAddress',
+            streetAddress: UK_BRANCH_OFFICE.street,
+            postalCode: UK_BRANCH_OFFICE.postalCode,
+            addressLocality: UK_BRANCH_OFFICE.city,
+            addressCountry: UK_BRANCH_OFFICE.countryCode,
+          },
+        ],
         areaServed: 'Europe',
       },
       {

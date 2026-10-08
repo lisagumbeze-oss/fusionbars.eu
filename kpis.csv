@@ -1,0 +1,11 @@
+Metric,Baseline,Target,Data Source,Timeline
+Organic clicks,0,unspecified,Google Search Console web report 3 months captured 2026-10-08,Ongoing
+Organic impressions,5,unspecified,Google Search Console web report 3 months captured 2026-10-08,Ongoing
+Average position,25,unspecified,Google Search Console web report 3 months captured 2026-10-08. Report-level only. Not a rank for any one query.,Ongoing
+Click-through rate,0%,unspecified,Google Search Console web report 3 months captured 2026-10-08,Ongoing
+Indexed page count,unspecified,unspecified,Google Search Console Pages report. Not opened in this pass.,Week 1
+Sitemap acceptance,unspecified,unspecified,Google Search Console Sitemaps for https://fusionbars.eu/sitemap.xml,Week 1
+Core Web Vitals,unspecified,unspecified,Google Search Console Experience report. Not measured from the repository.,Month 1
+Organic sessions,unspecified,unspecified,GA4. No export is in the project.,Month 1
+Referring domains,unspecified,unspecified,No backlink export.,Month 2
+Generative AI impressions,unspecified,unspecified,Search Console Generative AI performance report. Not opened in this pass.,Month 1

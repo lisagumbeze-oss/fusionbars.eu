@@ -47,7 +47,11 @@ export default function NewsShell({
             <ul className="mt-4 space-y-2 text-sm text-[#5C5852]">
               <li><Link href={`/${locale}/about`} className="hover:text-[#121212]">About</Link></li>
               <li><Link href={`/${locale}/faq`} className="hover:text-[#121212]">FAQs</Link></li>
+              <li><Link href={`/${locale}/shipping`} className="hover:text-[#121212]">Shipping & returns</Link></li>
+              <li><Link href={`/${locale}/refunds`} className="hover:text-[#121212]">Refund policy</Link></li>
               <li><Link href={`/${locale}/contact`} className="hover:text-[#121212]">Contact</Link></li>
+              <li><Link href={`/${locale}/terms`} className="hover:text-[#121212]">Terms</Link></li>
+              <li><Link href={`/${locale}/report-scam`} className="hover:text-[#121212]">Report a scam site</Link></li>
               <li><Link href={`/${locale}/orders/lookup`} className="hover:text-[#121212]">Order status</Link></li>
               <li><Link href={`/${locale}/news`} className="hover:text-[#121212]">All news</Link></li>
             </ul>

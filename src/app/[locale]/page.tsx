@@ -32,7 +32,35 @@ export default async function HomePage({ params }: HomePageProps) {
 
   const categories = CatalogService.getCategories();
   const featuredProducts = CatalogService.getFeaturedProducts();
-  const allProducts = CatalogService.getProducts();
+  const loadedSections = [
+    { eyebrow: 'Chocolate', title: 'Artisan Chocolate Bars', short: 'Chocolate', slug: 'artisan-chocolate-bars' },
+    { eyebrow: 'Gummies', title: 'Fruit Pectin Gummies', short: 'Gummies', slug: 'gummies' },
+    { eyebrow: 'Boxes', title: 'Curator Boxes', short: 'Boxes', slug: 'bundles-collections' },
+    { eyebrow: 'Wholesale', title: 'Wholesale Stacks', short: 'Wholesale', slug: 'wholesale' },
+    { eyebrow: 'Vaporizers', title: 'Botanical Vaporizers', short: 'Vaporizers', slug: 'botanical-vaporizers' },
+    { eyebrow: 'Capsules', title: 'Microdose Capsules', short: 'Capsules', slug: 'capsules' },
+  ]
+    .map((section) => ({
+      ...section,
+      href: `/${locale}/shop?category=${section.slug}`,
+      products: CatalogService.getPublicProducts({ categorySlug: section.slug }).slice(0, 4),
+    }))
+    .filter((section) => section.products.length > 0);
+
+  const groupedSections = loadedSections.filter((section) => section.products.length > 1);
+  const singleSections = loadedSections.filter((section) => section.products.length === 1);
+  const productSections = singleSections.length > 1
+    ? [
+        ...groupedSections,
+        {
+          eyebrow: 'Also in the range',
+          title: singleSections.map((section) => section.short).join(', ').replace(/, ([^,]+)$/, ' & $1'),
+          slug: 'also-in-the-range',
+          href: `/${locale}/shop`,
+          products: singleSections.flatMap((section) => section.products),
+        },
+      ]
+    : loadedSections;
 
   return (
     <div className="space-y-16 sm:space-y-24 pb-16">
@@ -94,33 +122,47 @@ export default async function HomePage({ params }: HomePageProps) {
             </div>
 
             {/* Right Column: full-bleed hero photograph */}
-            <div className="motion-rise motion-delay-2 relative min-h-[22rem] sm:min-h-[28rem] lg:min-h-[36rem]">
+            <div className="motion-rise motion-delay-2 relative min-h-[22rem] sm:min-h-[28rem] lg:min-h-[36rem] bg-[#121212]">
               <Image
-                src="/images/products/reference/fusion-bars-display-cases.jpg"
-                alt="Fusion chocolate bars in Heath, Cap'n Crunch, and Ferrero sleeves, with display cases"
+                src="/images/campaign/fusion-bars-splash.png"
+                alt="Fusion milk chocolate, almond crush, matcha, and fruity cereal bars above a splash of chocolate"
                 fill
                 priority
-                className="object-cover"
+                className="object-contain"
                 sizes="(min-width: 1024px) 50vw, 100vw"
               />
               <div
                 aria-hidden="true"
                 className="pointer-events-none absolute inset-y-0 left-0 hidden w-28 bg-gradient-to-r from-[#FBFBF9] to-transparent lg:block"
               />
-
-              <div className="glass-panel absolute top-4 right-4 rounded-xl p-3 text-left sm:top-6 sm:right-6">
-                <span className="text-[10px] text-[#5C5852] uppercase tracking-wider block font-bold">Standard Weight</span>
-                <strong className="text-sm font-bold text-[#121212] font-mono">6g Net Infusion</strong>
-                <span className="text-[11px] text-[#4A5D4E] block mt-0.5 font-medium">12 Scored Confection Pieces</span>
-              </div>
-
-              <div className="glass-panel absolute bottom-4 left-4 rounded-xl p-3 text-left sm:bottom-6 sm:left-6">
-                <span className="text-[10px] text-[#5C5852] uppercase tracking-wider block font-bold">Couverture Cacao</span>
-                <strong className="text-sm font-bold text-[#121212]">54% Dark Chocolate</strong>
-                <span className="text-[11px] text-[#5C5852] block mt-0.5">Origin: Brussels &bull; Barcelona</span>
-              </div>
             </div>
         </div>
+      </section>
+
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-labelledby="shop-notes">
+        <h2 id="shop-notes" className="font-serif text-2xl sm:text-3xl font-bold text-[#121212]">Shop notes</h2>
+        <ul className="mt-4 flex flex-col gap-3 text-sm sm:flex-row sm:flex-wrap sm:gap-x-8">
+          <li>
+            <Link href={`/${locale}/news/fusion-chocolate-bar`} className="font-semibold text-[#4A5D4E] hover:underline">
+              Fusion chocolate bars
+            </Link>
+          </li>
+          <li>
+            <Link href={`/${locale}/news/the-chocolate`} className="font-semibold text-[#4A5D4E] hover:underline">
+              Artisan chocolate
+            </Link>
+          </li>
+          <li>
+            <Link href={`/${locale}/news/chocolate-and-botanicals`} className="font-semibold text-[#4A5D4E] hover:underline">
+              Mushroom bars
+            </Link>
+          </li>
+          <li>
+            <Link href={`/${locale}/shop`} className="font-semibold text-[#4A5D4E] hover:underline">
+              European artisan collection
+            </Link>
+          </li>
+        </ul>
       </section>
 
       {/* 2. SHOP BY CATEGORY SECTION */}
@@ -139,7 +181,7 @@ export default async function HomePage({ params }: HomePageProps) {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {categories.map((cat) => (
             <Link
               key={cat.slug}
@@ -151,7 +193,7 @@ export default async function HomePage({ params }: HomePageProps) {
                   src={cat.image}
                   alt={cat.name}
                   fill
-                  sizes="(max-width: 640px) 50vw, 20vw"
+                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                   className="object-contain p-3 motion-safe:group-hover:scale-105 motion-safe:transition-transform motion-safe:duration-300"
                   referrerPolicy="no-referrer"
                 />
@@ -188,13 +230,36 @@ export default async function HomePage({ params }: HomePageProps) {
         </div>
       </section>
 
+      {productSections.map((section) => (
+        <section key={section.slug} className="motion-reveal max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
+            <div>
+              <span className="text-xs uppercase font-bold text-[#4A5D4E] tracking-wider">{section.eyebrow}</span>
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#121212] mt-1">{section.title}</h2>
+            </div>
+            <Link
+              href={section.href}
+              className="text-xs font-semibold text-[#4A5D4E] hover:text-[#3B4A3E] flex items-center gap-1 group"
+            >
+              <span>View all</span>
+              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {section.products.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      ))}
+
       {/* 4. BRAND / QUALITY / BOTANICAL HARVEST STORY */}
       <section className="motion-reveal relative border-y border-[#E5E3DD] bg-white">
         <div className="grid grid-cols-1 lg:grid-cols-2">
           <div className="relative min-h-72 sm:min-h-96 lg:min-h-[34rem]">
             <Image
-              src="/images/products/reference/fusion-bars-display-cases.jpg"
-              alt="Fusion chocolate bars in Heath, Cap'n Crunch, and Ferrero sleeves, with display cases"
+              src="/images/campaign/fusion-bars-range.png"
+              alt="Stacked Fusion chocolate bars, with a lemon blueberry bar held in front"
               fill
               className="object-cover"
               sizes="(min-width: 1024px) 50vw, 100vw"

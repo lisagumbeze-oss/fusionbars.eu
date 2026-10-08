@@ -46,7 +46,7 @@ const FAQS = [
   {
     question: 'How do you ship my order?',
     answer:
-      'Parcels leave from temperature-controlled hubs in the Netherlands, Spain, Germany, and France. The outer carton is plain and unmarked, with a generic sender and no botanical marks. Checkout offers Standard Discreet Courier, and Express Priority Courier where that address allows it. Standard shipping is free once the merchandise reaches €300, or £260 when prices are shown in pounds. The methods for your address appear at checkout.',
+      'Parcels leave from temperature-controlled hubs in the Netherlands, Spain, Germany, and France. The outer carton is plain and unmarked, with a generic sender and no botanical marks. Checkout offers Standard Discreet Courier, and Express Priority Courier where that address allows it. Standard shipping is free once the merchandise reaches €300, or £260 when prices are shown in pounds. The methods for your address appear at checkout. The longer note is on the Shipping & delivery page.',
   },
   {
     question: 'Can you guarantee the quality of the products?',
@@ -56,12 +56,17 @@ const FAQS = [
   {
     question: 'Is buying on this site safe?',
     answer:
-      'Checkout runs on this site. Payment is bank transfer or cryptocurrency. Card numbers are not collected or stored. Use the support address below if an order or payment needs to be checked.',
+      'Checkout runs on this site, fusionbars.eu. Payment is bank transfer or cryptocurrency. Card numbers are not collected or stored. Use the support address below if an order or payment needs to be checked. A site using the Fusion name with another address is a different shop. How to confirm this store, and how to report an impersonating site, is on the Report a scam site page.',
   },
   {
     question: 'How do I place an order?',
     answer:
       'Add a product to your bag, open the bag, and continue to checkout. Enter the delivery address, then choose a payment method. Bank transfer is offered when the merchandise total is at least €100, or £100 in pounds. Cryptocurrency is Bitcoin, Ethereum, or Bitcoin Cash, and it takes 10% off the merchandise subtotal. Shipping is not discounted. After the order is saved, look it up on the Order Status page with the order number.',
+  },
+  {
+    question: 'Can I return or exchange an order?',
+    answer:
+      'Write within 7 days of delivery if a product arrives damaged, defective, or incorrect. Wait for approval before sending anything back. Opened chocolate bars and gummies cannot be returned once the seal is broken, unless you opened it to check damage. An approved refund is processed within 5–7 business days, by bank transfer or in the cryptocurrency used for the order. Shipping charges are not refunded. The full note is on the Refund policy page.',
   },
   {
     question: 'Where do you ship?',
@@ -129,7 +134,8 @@ export default async function FaqPage({ params }: FaqPageProps) {
                 <Mail className="w-3.5 h-3.5" aria-hidden="true" />
                 {supportEmail}
               </a>
-              , or open the support desk.
+              , or open the support desk. Dispatch and returns are on{' '}
+              <Link href={`/${locale}/shipping`} className="text-[#121212] underline underline-offset-2">Shipping & delivery</Link>.
             </p>
           </div>
           <Link

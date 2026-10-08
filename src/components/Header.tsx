@@ -23,11 +23,16 @@ export default function Header() {
     { label: 'Chocolate Bars', href: `/${locale}/shop?category=artisan-chocolate-bars` },
     { label: 'Gummies', href: `/${locale}/shop?category=gummies` },
     { label: 'Collections', href: `/${locale}/shop?category=bundles-collections` },
+    { label: 'Wholesale', href: `/${locale}/shop?category=wholesale` },
     { label: dict.navigation.about, href: `/${locale}/about` },
     { label: dict.navigation.faq, href: `/${locale}/faq` },
+    { label: 'Shipping', href: `/${locale}/shipping` },
+    { label: 'Refunds', href: `/${locale}/refunds`, wide: true },
     { label: 'Contact', href: `/${locale}/contact` },
     { label: 'Order Status', href: `/${locale}/orders/lookup` },
     { label: 'News', href: `/${locale}/news`, wide: true },
+    { label: 'Report a scam', href: `/${locale}/report-scam`, wide: true },
+    { label: 'Terms', href: `/${locale}/terms`, wide: true },
   ];
 
   return (

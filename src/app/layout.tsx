@@ -4,6 +4,7 @@ import Script from 'next/script';
 import './globals.css';
 import ScrollToTop from '@/components/ScrollToTop';
 import { INDEXABLE_LOCALE } from '@/lib/search-indexing';
+import { OG_IMAGE } from '@/lib/page-metadata';
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -25,21 +26,14 @@ export const metadata: Metadata = {
     siteName: 'Fusion Mushroom Bars EU',
     locale: 'en_EU',
     type: 'website',
-    images: [
-      {
-        url: 'https://fusionbars.eu/images/brand/fusion-logo.jpg',
-        width: 1024,
-        height: 394,
-        alt: 'Fusion',
-      },
-    ],
+    images: [OG_IMAGE],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Fusion Mushroom Bars EU | European Botanical Confections',
     description:
       'Gourmet Belgian chocolate bars, fruit pectin gummies, and collector boxes with discreet European courier delivery.',
-    images: ['https://fusionbars.eu/images/brand/fusion-logo.jpg'],
+    images: [OG_IMAGE.url],
   },
 };
 

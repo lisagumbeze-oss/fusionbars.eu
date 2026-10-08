@@ -24,7 +24,7 @@ export const NEWS_POSTS: NewsPost[] = [
       {
         heading: 'A confection first',
         paragraphs: [
-          'A Fusion bar in this store is Belgian chocolate with the botanicals named on that product page. Flavour, snap, and finish are the standard. The bar is sold as a confection, in the same way the gummies and the curator boxes are.',
+          'A Fusion bar in this store is Belgian chocolate with the botanicals named on that product page. Mushroom bars here are that same confection, not a second product. Flavour, snap, and finish are the standard. The bar is sold as a confection, in the same way the gummies and the curator boxes are.',
           'The public description of a flavour is the text on its product page, after catalogue review. This journal does not add a second description, and it does not invent an ingredient that the product page does not list.',
         ],
       },
@@ -202,7 +202,7 @@ export const NEWS_POSTS: NewsPost[] = [
       {
         heading: 'The bar in this shop',
         paragraphs: [
-          'A Fusion chocolate bar here is built on Belgian couverture and cocoa butter. The flavour sits at the centre of the product page: the name, the photograph of that sleeve, and the text that passed review.',
+          'A Fusion chocolate bar here is built on Belgian couverture and cocoa butter. Fusion chocolate bars are this confection, including a search that says fusion bar, fusion bars, fusion chocolates, or chocolate fusion. The flavour sits at the centre of the product page: the name, the photograph of that sleeve, and the text that passed review.',
           'The public list includes dessert-style flavours and the display the shop shows of Heath, Cap’n Crunch, and Ferrero sleeves. Each of those is its own flavour page. A group photograph is a picture of the range. It is not the recipe of every bar in the case.',
         ],
       },
@@ -299,7 +299,7 @@ export const NEWS_POSTS: NewsPost[] = [
       {
         heading: 'The base',
         paragraphs: [
-          'The bar starts with chocolate. The shop states Belgian couverture and cocoa butter, without palm oil or synthetic stabilisers. That is the culinary standard published for the range.',
+          'The bar starts with chocolate. The shop states Belgian couverture and cocoa butter, without palm oil or synthetic stabilisers. That chocolate is artisan chocolate, the craft chocolate bars sold in the European collection. That is the culinary standard published for the range.',
           'Flavour is then the sleeve: almond, birthday cake, toffee, hazelnut praline, cereal styles, and the other names on the public list. The taste is the reason the flavour exists. A medical reason to eat chocolate is not published here.',
         ],
       },

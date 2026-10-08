@@ -11,6 +11,7 @@ import { AdminOverrides } from '@/domain/admin/AdminOverrides';
 import { applyCryptoDiscountCopy } from '@/domain/payments/CryptoPaymentDiscount';
 import { subscribeNewsletterAction } from '@/actions/contact';
 import { LegalGovernanceService } from '@/domain/legal/LegalGovernanceService';
+import { STORE_ADDRESS_LINE, UK_BRANCH_OFFICE_LINE } from '@/lib/store-address';
 
 export default function Footer() {
   const { locale } = useCommerce();
@@ -102,9 +103,17 @@ export default function Footer() {
           <p className="text-neutral-400 leading-relaxed max-w-sm">
             {dict.common.tagline}. Europe&apos;s premier botanical confection atelier, harmonizing single-origin Belgian couverture chocolate with verified functional mycology. {applyCryptoDiscountCopy(dict.payment.cryptoDiscountBody)}
           </p>
-          <div className="flex items-center gap-3 text-neutral-500">
-            <p>Support: <a href={`mailto:${supportEmail}`} className="text-neutral-300 hover:underline">{supportEmail}</a></p>
-            <WhatsAppLink className="p-1" />
+          <div className="space-y-2 text-neutral-500">
+            <p>
+              <address className="not-italic text-neutral-300 space-y-1">
+                <span className="block">{STORE_ADDRESS_LINE}</span>
+                <span className="block">UK branch office: {UK_BRANCH_OFFICE_LINE}</span>
+              </address>
+            </p>
+            <div className="flex items-center gap-3">
+              <p>Support: <a href={`mailto:${supportEmail}`} className="text-neutral-300 hover:underline">{supportEmail}</a></p>
+              <WhatsAppLink className="p-1" />
+            </div>
           </div>
         </div>
 
@@ -116,6 +125,7 @@ export default function Footer() {
             <li><Link href={`/${locale}/shop?category=artisan-chocolate-bars`} className="hover:text-white transition">Artisan Chocolate Bars (6g)</Link></li>
             <li><Link href={`/${locale}/shop?category=gummies`} className="hover:text-white transition">Fruit Pectin Gummies (4g)</Link></li>
             <li><Link href={`/${locale}/shop?category=bundles-collections`} className="hover:text-white transition">Boutique Curated Boxes</Link></li>
+            <li><Link href={`/${locale}/shop?category=wholesale`} className="hover:text-white transition">Wholesale Packs</Link></li>
             <li><Link href={`/${locale}/shop?category=botanical-vaporizers`} className="hover:text-white transition">Botanical Vaporizers (2ml)</Link></li>
             <li><Link href={`/${locale}/shop?category=capsules`} className="hover:text-white transition">Microdose Capsules (30ct)</Link></li>
             <li><Link href={`/${locale}/cart`} className="hover:text-white transition">Shopping bag</Link></li>
@@ -128,11 +138,15 @@ export default function Footer() {
           <ul className="space-y-2 text-neutral-400">
             <li><Link href={`/${locale}/about`} className="hover:text-white transition">About</Link></li>
             <li><Link href={`/${locale}/faq`} className="hover:text-white transition">FAQs</Link></li>
+            <li><Link href={`/${locale}/shipping`} className="hover:text-white transition">Shipping & returns</Link></li>
+            <li><Link href={`/${locale}/refunds`} className="hover:text-white transition">Refund policy</Link></li>
             <li><Link href={`/${locale}/contact`} className="hover:text-white transition">Contact</Link></li>
             <li><Link href={`/${locale}/orders/lookup`} className="hover:text-white transition">Order status</Link></li>
             <li><Link href={`/${locale}/account`} className="hover:text-white transition">Account</Link></li>
             <li><Link href={`/${locale}/news`} className="hover:text-white transition">News</Link></li>
             <li><Link href={`/${locale}/privacy`} className="hover:text-white transition">Privacy</Link></li>
+            <li><Link href={`/${locale}/terms`} className="hover:text-white transition">Terms</Link></li>
+            <li><Link href={`/${locale}/report-scam`} className="hover:text-white transition">Report a scam site</Link></li>
             {LegalGovernanceService.publicLinks().map((link) => (
               <li key={link.type}><Link href={`/${locale}${link.href}`} className="hover:text-white transition">{link.type}</Link></li>
             ))}
