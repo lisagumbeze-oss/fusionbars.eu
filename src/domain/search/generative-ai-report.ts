@@ -1,6 +1,3 @@
-import { existsSync, readFileSync } from 'node:fs';
-import path from 'node:path';
-
 export const GENERATIVE_AI_EXPORT_PATH = 'src/data/search/generative-ai-performance.csv';
 
 export interface GenerativeAiMeasurement {
@@ -58,15 +55,16 @@ export function parseGenerativeAiChartCsv(csv: string): { impressions: number; r
   return { impressions, rows };
 }
 
-export function generativeAiImpressions(csvPath = path.resolve(GENERATIVE_AI_EXPORT_PATH)): GenerativeAiMeasurement {
-  if (!existsSync(csvPath)) {
-    return {
-      impressions: 'unspecified',
-      status: 'not_exported',
-      reason: 'The Generative AI performance report is exported from Search Console in the browser. The Search Analytics API has no generative AI type, and no chart CSV is stored in this repository.',
-    };
-  }
-  const parsed = parseGenerativeAiChartCsv(readFileSync(csvPath, 'utf8'));
+const NOT_EXPORTED: GenerativeAiMeasurement = {
+  impressions: 'unspecified',
+  status: 'not_exported',
+  reason: 'The Generative AI performance report is exported from Search Console in the browser. The Search Analytics API has no generative AI type, and no chart CSV is stored in this repository.',
+};
+
+/** Sums a chart export. Pass no text when the file has not been saved. This module does not read the disk. */
+export function generativeAiImpressions(csv?: string | null): GenerativeAiMeasurement {
+  if (csv == null || csv.trim() === '') return NOT_EXPORTED;
+  const parsed = parseGenerativeAiChartCsv(csv);
   return {
     impressions: parsed.impressions,
     status: 'parsed',

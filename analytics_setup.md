@@ -7,7 +7,7 @@ Connection status in this repository is **unspecified** for GA4 and for Search C
 1. Confirm the property is `sc-domain:fusionbars.eu` or the `https://fusionbars.eu` URL prefix. Record which one is verified.
 2. Open Sitemaps and submit `https://fusionbars.eu/sitemap.xml` if it is not already listed. Record discovered URL count and any errors.
 3. Open Pages. Record how many English catalogue URLs are indexed, and whether `/en`, `/en/shop`, product URLs, and `/en/news` are indexed.
-4. Open Performance, then the Generative AI report for Search. Export the chart. Save that file as `src/data/search/generative-ai-performance.csv` with an impressions column. `generativeAiImpressions()` sums those rows. The Search Analytics API cannot return this report. A missing file means the impression count is unspecified. An empty report in the interface is not proof the property was excluded.
+4. Open Performance, then the Generative AI report for Search. Export the chart. Save that file as `src/data/search/generative-ai-performance.csv` with an impressions column. `loadGenerativeAiImpressions()` reads that file on the server and sums the rows. The Search Analytics API cannot return this report. A missing file means the impression count is unspecified. An empty report in the interface is not proof the property was excluded.
 5. Confirm the property is included in generative AI features. Meeting crawl and snippet conditions does not mean a page will be shown.
 
 ## GA4
