@@ -19,7 +19,7 @@ export default function NewsShell({
         <div className="lg:col-span-8 min-w-0">{children}</div>
         <aside className="lg:col-span-4 lg:sticky lg:top-28 space-y-8" aria-label="Journal sidebar">
           <section className="rounded-2xl border border-[#E5E3DD] bg-white p-6">
-            <h2 className="text-[11px] font-bold uppercase tracking-wider text-[#4A5D4E]">Recent posts</h2>
+            <h2 className="text-[11px] font-bold uppercase tracking-wider text-[#4A5D4E]">Which notes were published recently?</h2>
             <ul className="mt-4 space-y-4">
               {recent.map((post) => (
                 <li key={post.slug}>
@@ -33,7 +33,7 @@ export default function NewsShell({
           </section>
 
           <section className="rounded-2xl border border-[#E5E3DD] bg-[#FBFBF9] p-6">
-            <h2 className="text-[11px] font-bold uppercase tracking-wider text-[#4A5D4E]">In the shop</h2>
+            <h2 className="text-[11px] font-bold uppercase tracking-wider text-[#4A5D4E]">Where is this in the shop?</h2>
             <ul className="mt-4 space-y-2 text-sm text-[#5C5852]">
               <li><Link href={`/${locale}/shop?category=artisan-chocolate-bars`} className="hover:text-[#121212]">Chocolate bars</Link></li>
               <li><Link href={`/${locale}/shop?category=gummies`} className="hover:text-[#121212]">Gummies</Link></li>
@@ -43,7 +43,7 @@ export default function NewsShell({
           </section>
 
           <section className="rounded-2xl border border-[#E5E3DD] bg-white p-6">
-            <h2 className="text-[11px] font-bold uppercase tracking-wider text-[#4A5D4E]">Also on this site</h2>
+            <h2 className="text-[11px] font-bold uppercase tracking-wider text-[#4A5D4E]">Where else can I read?</h2>
             <ul className="mt-4 space-y-2 text-sm text-[#5C5852]">
               <li><Link href={`/${locale}/about`} className="hover:text-[#121212]">About</Link></li>
               <li><Link href={`/${locale}/faq`} className="hover:text-[#121212]">FAQs</Link></li>

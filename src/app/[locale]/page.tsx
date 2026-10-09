@@ -10,6 +10,7 @@ import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
 import JsonLd from '@/components/seo/JsonLd';
 import { publicPageMetadata } from '@/lib/page-metadata';
 import { siteGraphJsonLd } from '@/lib/structured-data';
+import QuickAnswer from '@/components/seo/QuickAnswer';
 
 interface HomePageProps {
   params: Promise<{ locale: string }> | { locale: string };
@@ -22,9 +23,32 @@ export async function generateMetadata({ params }: HomePageProps): Promise<Metad
     path: `/${resolved.locale}`,
     title: 'Fusion Mushroom Bars EU | European Artisan Botanical Confections',
     description:
-      'Official European storefront for Fusion Mushroom Bars. Gourmet Belgian couverture chocolate bars, fruit pectin gummies, and curator boxes. Temperature-controlled discreet European dispatch from NL, ES, DE, FR.',
+      'Official European storefront for Fusion Mushroom Bars. How to buy Fusion Bars in the Netherlands, Germany, Italy, France, Spain, and the United Kingdom, with euro prices and discreet dispatch from NL, ES, DE, and FR.',
   });
 }
+
+const BUYING_QUESTIONS = [
+  {
+    question: 'How to buy artisan chocolate in Spain',
+    answer:
+      'Open the shop, choose the flavour under Artisan Chocolate Bars, and check out with a Spanish address. Spain is packed from the Spain hub. Bank transfer is offered from €100 of merchandise. Bitcoin, Ethereum, and Bitcoin Cash take 10% off the merchandise only. Shipping is not discounted.',
+  },
+  {
+    question: 'Where can I buy a mushroom bar in Germany?',
+    answer:
+      'On this shop. A mushroom bar here is the Fusion chocolate bar. A German address is packed from the Germany hub, which also covers Austria, Switzerland, and several central European addresses. If a flavour cannot go to that address, checkout says so before you pay.',
+  },
+  {
+    question: 'How much for a Fusion chocolate bar in Italy?',
+    answer:
+      'A single Fusion chocolate bar is €20, or £17.50 when the announcement bar is set to pounds. The euro price is the same for an Italian address. Standard delivery is €15, express is €20, and standard delivery is free once the merchandise reaches €300. Italy is packed from the France hub. Checkout shows the shipping figure for the address you enter.',
+  },
+  {
+    question: 'How much for craft chocolate bars in Belgium?',
+    answer:
+      'Craft chocolate bars in this shop are the Fusion bars, at €20 each. A Belgian address ships from the Netherlands hub. The bag total is those bar prices plus the shipping method you choose, unless the merchandise reaches €300 and standard delivery is free.',
+  },
+] as const;
 
 export default async function HomePage({ params }: HomePageProps) {
   const resolvedParams = await params;
@@ -65,6 +89,17 @@ export default async function HomePage({ params }: HomePageProps) {
   return (
     <div className="space-y-16 sm:space-y-24 pb-16">
       <JsonLd data={siteGraphJsonLd()} />
+      <JsonLd
+        data={{
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: BUYING_QUESTIONS.map((item) => ({
+            '@type': 'Question',
+            name: item.question,
+            acceptedAnswer: { '@type': 'Answer', text: item.answer },
+          })),
+        }}
+      />
       {/* 1. HERO SECTION (Editorial, Sophisticated, European) */}
       <section className="relative overflow-hidden border-b border-[#E5E3DD]">
         <div aria-hidden="true" className="hero-mesh pointer-events-none absolute inset-0" />
@@ -139,8 +174,14 @@ export default async function HomePage({ params }: HomePageProps) {
         </div>
       </section>
 
+      <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+        <QuickAnswer className="rounded-2xl border border-[#E5E3DD] bg-white px-5 py-4">
+          Fusion Mushroom Bars EU is the European shop for Fusion chocolate bars, fruit pectin gummies, and curator boxes. A single bar stated on this page is €20, or £17.50 when pounds are shown. Parcels leave hubs in the Netherlands, Spain, Germany, and France. The bar is a confection, and the flavour text is the product page.
+        </QuickAnswer>
+      </section>
+
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-labelledby="shop-notes">
-        <h2 id="shop-notes" className="font-serif text-2xl sm:text-3xl font-bold text-[#121212]">Shop notes</h2>
+        <h2 id="shop-notes" className="font-serif text-2xl sm:text-3xl font-bold text-[#121212]">What should I read first?</h2>
         <ul className="mt-4 flex flex-col gap-3 text-sm sm:flex-row sm:flex-wrap sm:gap-x-8">
           <li>
             <Link href={`/${locale}/news/fusion-chocolate-bar`} className="font-semibold text-[#4A5D4E] hover:underline">
@@ -163,6 +204,9 @@ export default async function HomePage({ params }: HomePageProps) {
             </Link>
           </li>
         </ul>
+        <p className="mt-4 max-w-2xl text-sm text-[#5C5852] leading-relaxed">
+          How to buy Fusion Bars in the Netherlands is the same path as the rest of Europe: open the shop, add the bar, and check out with a Dutch address. That order is packed at the Netherlands hub.
+        </p>
       </section>
 
       {/* 2. SHOP BY CATEGORY SECTION */}
@@ -170,7 +214,7 @@ export default async function HomePage({ params }: HomePageProps) {
         <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-8 gap-4">
           <div>
             <span className="text-xs uppercase font-bold text-[#4A5D4E] tracking-wider">Curated Taxonomy</span>
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#121212] mt-1">Shop by Collection</h2>
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#121212] mt-1">Which collection do you want?</h2>
           </div>
           <Link
             href={`/${locale}/shop`}
@@ -275,6 +319,9 @@ export default async function HomePage({ params }: HomePageProps) {
               <p className="text-sm text-[#5C5852] leading-relaxed">
                 Fusion Mushroom Bars EU was established to provide the European market with an uncompromising benchmark of purity, culinary luxury, and botanical precision. Unlike legacy grey-market imports, every confection we distribute is crafted under European Good Manufacturing Practices (GMP) and ISO 17025 laboratory verification.
               </p>
+              <p className="text-sm text-[#5C5852] leading-relaxed">
+                Where can I buy Fusion Bars in the United Kingdom is this store. A UK address is accepted at checkout and packed from the France hub, in the same plain carton used for an address inside the EU.
+              </p>
 
               <div className="grid grid-cols-1 gap-4 pt-2 text-xs sm:grid-cols-2">
                 <div className="rounded-xl border border-[#E5E3DD] bg-[#FBFBF9] p-4">
@@ -303,6 +350,9 @@ export default async function HomePage({ params }: HomePageProps) {
             <p className="text-sm text-neutral-400 leading-relaxed">
               Curated for collective tasting clubs, hospitality, and connoisseurs. Every multi-bar box is individually foil-sealed and packed into insulated archival presentation boxes with complimentary European express courier dispatch.
             </p>
+            <p className="text-sm text-neutral-400 leading-relaxed">
+              How much for Fusion Bars in Ireland starts at €20 for a single chocolate bar. The 10-bar tasting box linked here is €150, or £128 when prices are shown in pounds.
+            </p>
             <div className="pt-2 flex flex-wrap gap-4 text-xs font-semibold">
               <Link
                 href={`/${locale}/shop?category=bundles-collections`}
@@ -329,7 +379,7 @@ export default async function HomePage({ params }: HomePageProps) {
             Temperature-Guarded European Dispatch
           </h2>
           <p className="text-xs text-[#5C5852] mt-2 leading-relaxed">
-            All orders are processed through optimal domestic courier routes originating from our four European logistics centers.
+            All orders are processed through optimal domestic courier routes originating from our four European logistics centers. Where can I buy a mushroom bar in Austria is this shop. An Austrian address is packed from the Germany hub.
           </p>
         </div>
 
@@ -357,11 +407,31 @@ export default async function HomePage({ params }: HomePageProps) {
         </div>
       </section>
 
+      <section className="motion-reveal max-w-4xl mx-auto px-4 sm:px-6 lg:px-8" aria-labelledby="buying-europe">
+        <div className="text-center mb-10">
+          <span className="text-xs uppercase font-bold text-[#4A5D4E] tracking-wider">Ordering</span>
+          <h2 id="buying-europe" className="font-serif text-2xl sm:text-3xl font-bold text-[#121212] mt-1">
+            How do I buy Fusion Bars in Europe?
+          </h2>
+          <p className="text-xs text-[#5C5852] mt-2 leading-relaxed max-w-xl mx-auto">
+            The shop is the place to order. The euro price does not change with the country. Checkout confirms the address.
+          </p>
+        </div>
+        <div className="divide-y divide-[#E5E3DD] bg-white rounded-2xl border border-[#E5E3DD] p-6 sm:p-8 space-y-4 text-xs">
+          {BUYING_QUESTIONS.map((item) => (
+            <div key={item.question} className="pt-3 first:pt-0">
+              <h3 className="font-bold text-sm text-[#121212] mb-1">{item.question}</h3>
+              <p className="text-[#5C5852] leading-relaxed">{item.answer}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* 7. FREQUENTLY ASKED QUESTIONS */}
       <section className="motion-reveal max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-10">
           <span className="text-xs uppercase font-bold text-[#4A5D4E] tracking-wider">Client Inquiries</span>
-          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#121212] mt-1">Frequently Asked Questions</h2>
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold text-[#121212] mt-1">What do customers ask?</h2>
         </div>
 
         <div className="divide-y divide-[#E5E3DD] bg-white rounded-2xl border border-[#E5E3DD] p-6 sm:p-8 space-y-4 text-xs">

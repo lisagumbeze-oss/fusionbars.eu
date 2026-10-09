@@ -6,6 +6,7 @@ import { LocaleCode } from '@/types';
 import JsonLd from '@/components/seo/JsonLd';
 import { publicPageMetadata } from '@/lib/page-metadata';
 import { breadcrumbList } from '@/lib/structured-data';
+import QuickAnswer from '@/components/seo/QuickAnswer';
 
 interface FaqPageProps {
   params: Promise<{ locale: string }> | { locale: string };
@@ -18,7 +19,7 @@ export async function generateMetadata({ params }: FaqPageProps): Promise<Metada
     path: `/${resolved.locale}/faq`,
     title: 'FAQs | Fusion Mushroom Bars EU',
     description:
-      'Answers for Fusion Mushroom Bars EU: what the bars are, how to order, bank transfer and cryptocurrency, and discreet European dispatch.',
+      'How to buy Fusion Bars in the United Kingdom, where to buy fusion chocolate in Austria, what a mushroom bar costs in Portugal, and how European dispatch works.',
   });
 }
 
@@ -73,6 +74,31 @@ const FAQS = [
     answer:
       'The store is set up for European addresses, including the EU, the United Kingdom, and the other European destinations shown at checkout. The United States, Canada, and other countries outside that list are not offered. A product can still be unavailable for a particular address. Checkout says so instead of completing the delivery.',
   },
+  {
+    question: 'How to buy Fusion Bars in the United Kingdom',
+    answer:
+      'Add the product in the shop, open the bag, and continue to checkout with a UK address. The United Kingdom is one of the European destinations this store accepts, and the parcel leaves the France hub. Bank transfer is offered from €100, or £100 when prices are shown in pounds. Cryptocurrency takes 10% off the merchandise subtotal. Shipping is not discounted.',
+  },
+  {
+    question: 'Where can I buy fusion chocolate in Austria?',
+    answer:
+      'Fusion chocolate is sold on this site. An Austrian address is served from the Germany hub. The flavour, the photograph, and the price are on the product page. Checkout confirms that the address can take the order.',
+  },
+  {
+    question: 'How much for a mushroom bar in Portugal?',
+    answer:
+      'A mushroom bar is the Fusion chocolate bar, priced at €20, or £17.50 when the announcement bar shows pounds. A Portuguese address is packed from the Spain hub. Standard shipping is €15 and express is €20. Standard shipping is free from €300 of merchandise, or £260 in pounds.',
+  },
+  {
+    question: 'Can I order Fusion Bars to Sweden?',
+    answer:
+      'Yes, when checkout accepts the address. Sweden is served from the Netherlands hub, with the same plain packaging and the same euro prices as the rest of the European list. A single bar is €20.',
+  },
+  {
+    question: 'Do you ship artisan chocolate to Switzerland?',
+    answer:
+      'An address in Switzerland is routed through the Germany hub when the product can be delivered there. Artisan chocolate on this store is the Fusion bar range. Checkout is the confirmation. This page does not override a message that the destination or the product is unavailable.',
+  },
 ] as const;
 
 export default async function FaqPage({ params }: FaqPageProps) {
@@ -104,13 +130,16 @@ export default async function FaqPage({ params }: FaqPageProps) {
             Frequently asked questions
           </h1>
           <p className="mt-5 text-sm sm:text-base text-[#5C5852] leading-relaxed max-w-xl">
-            Practical answers for the European store: the products, how an order is placed, and how a parcel leaves the hub.
+            Practical answers for the European store: how to buy, where an order can go, what a bar costs, and how a parcel leaves the hub.
           </p>
+          <QuickAnswer className="mt-6 rounded-2xl border border-[#E5E3DD] bg-white px-5 py-4">
+            Fusion Bars are chocolate bars, fruit pectin gummies, and curator boxes from this European shop. A stated single bar is €20. Eat it as chocolate. Parcels leave the Netherlands, Spain, Germany, or France. The shop does not replace a supplement and does not give medical advice.
+          </QuickAnswer>
         </div>
       </section>
 
       <section className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12" aria-labelledby="faq-list">
-        <h2 id="faq-list" className="sr-only">Questions</h2>
+        <h2 id="faq-list" className="sr-only">What are the questions?</h2>
         <div className="divide-y divide-[#E5E3DD] border-y border-[#E5E3DD]">
           {FAQS.map((item) => (
             <details key={item.question} className="group py-5">

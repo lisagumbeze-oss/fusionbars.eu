@@ -144,6 +144,10 @@ export default function Footer() {
             <li><Link href={`/${locale}/orders/lookup`} className="hover:text-white transition">Order status</Link></li>
             <li><Link href={`/${locale}/account`} className="hover:text-white transition">Account</Link></li>
             <li><Link href={`/${locale}/news`} className="hover:text-white transition">News</Link></li>
+            <li><Link href={`/${locale}/glossary`} className="hover:text-white transition">Glossary</Link></li>
+            <li><Link href={`/${locale}/compare`} className="hover:text-white transition">Compare the range</Link></li>
+            <li><Link href={`/${locale}/figures`} className="hover:text-white transition">Shop figures</Link></li>
+            <li><Link href={`/${locale}/reviews`} className="hover:text-white transition">Customer ratings</Link></li>
             <li><Link href={`/${locale}/privacy`} className="hover:text-white transition">Privacy</Link></li>
             <li><Link href={`/${locale}/terms`} className="hover:text-white transition">Terms</Link></li>
             <li><Link href={`/${locale}/report-scam`} className="hover:text-white transition">Report a scam site</Link></li>

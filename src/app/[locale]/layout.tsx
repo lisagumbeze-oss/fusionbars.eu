@@ -8,6 +8,7 @@ import { CommerceProvider } from '@/context/CommerceContext';
 import { AdminOverrides } from '@/domain/admin/AdminOverrides';
 import { ensureAdminOverridesLoaded } from '@/domain/admin/AdminOverrideStore';
 import SiteChrome from '@/components/site/SiteChrome';
+import PageLinkIndex from '@/components/site/PageLinkIndex';
 import { indexingRobots, indexableUrl, isPrivateStorePath, localeFromPath } from '@/lib/search-indexing';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -42,10 +43,16 @@ export default async function LocaleLayout({ children, params }: LocaleLayoutPro
 
   ensureAdminOverridesLoaded();
   const operations = AdminOverrides.settingsSaved() ? AdminOverrides.settings() : null;
+  const headerList = await headers();
+  const pathname = headerList.get('x-pathname') || '';
+  const showPageLinks = !pathname.includes('/admin');
 
   return (
     <CommerceProvider initialLocale={locale} operations={operations}>
-      <SiteChrome>{children}</SiteChrome>
+      <SiteChrome>
+        {children}
+        {showPageLinks && <PageLinkIndex locale={locale} currentPath={pathname} />}
+      </SiteChrome>
     </CommerceProvider>
   );
 }

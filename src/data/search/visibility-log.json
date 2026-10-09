@@ -1,0 +1,33 @@
+{
+  "property": "https://fusionbars.eu",
+  "notes": "AI citation rate stays unspecified until ChatGPT, Perplexity, Google AI Overviews, Bing Copilot, or Claude is checked and the result is written here. A web result for another Fusion shop is not a mention of this store and is not an outreach target.",
+  "checks": [
+    {
+      "capturedOn": "2026-10-09",
+      "channel": "web",
+      "queries": [
+        "\"fusionbars.eu\"",
+        "\"Fusion Mushroom Bars EU\""
+      ],
+      "exactMentions": [],
+      "otherFusionDomainsSeen": [
+        "https://myfusionbar.com/",
+        "https://fusionmushroombars.us/",
+        "https://fusionmushroombars.com/",
+        "https://fusionbarsmushroom.com/faqs/",
+        "https://fusionchocolatebars.com/faq/",
+        "https://psychedelicstore-eu.com/product/where-can-i-buy-fusion-mushroom-chocolate-bars-online-europe/"
+      ],
+      "aiEngines": {
+        "chatgpt": "unspecified",
+        "perplexity": "unspecified",
+        "googleAiOverviews": "unspecified",
+        "bingCopilot": "unspecified",
+        "claude": "unspecified"
+      },
+      "citationRate": "unspecified",
+      "emailsSent": 0,
+      "note": "No result named fusionbars.eu or Fusion Mushroom Bars EU. The other domains are different shops. No email was sent."
+    }
+  ]
+}

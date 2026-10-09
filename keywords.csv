@@ -1,34 +1,34 @@
 Keyword,Country,Monthly Search Volume,Difficulty,Intent,Current Rank,Assigned Page,Priority,Source
-artisan chocolate,,unspecified,unspecified,unspecified,,https://fusionbars.eu/en/news/the-chocolate,Medium,google_search_console
-artisan chocolate,TR,110,14,transactional,,https://fusionbars.eu/en/news/the-chocolate,Medium,semrush
-craft chocolate bars,,unspecified,unspecified,unspecified,,https://fusionbars.eu/en/news/the-chocolate,Medium,google_search_console
-artisan schokolade,,unspecified,unspecified,unspecified,,,Low,google_search_console
+artisan schokolade,unspecified,unspecified,unspecified,unspecified,,,Low,google_search_console
+artisan chocolate,unspecified,unspecified,unspecified,unspecified,,https://fusionbars.eu/en/news/the-chocolate,Medium,google_search_console
+craft chocolate bars,unspecified,unspecified,unspecified,unspecified,,https://fusionbars.eu/en/news/the-chocolate,Medium,google_search_console
 fusion bars,US,260,27,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-fusion bars,ES,170,5,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-fusion bars,IT,260,27,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-fusion bar,DE,140,10,commercial,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-fusion bar,AU,260,22,informational|transactional,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-fusion bar,IN,880,31,commercial,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-fusion bar,FR,70,27,navigational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-fusion bar,PH,50,30,commercial,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-fusion chocolate,ES,50,21,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-fusion chocolates,ES,40,23,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
 chocolate fusion,US,390,35,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-chocolate fusion,IN,210,15,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-chocolate fusion,IT,390,35,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
-chocolate fusion,TR,210,23,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
 mushroom bar,US,90,24,informational,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
-mushroom bar,IT,90,24,informational,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
-mushroom bar,AU,90,29,informational,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
-mushroom bar,DE,110,13,informational,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
-mushroom bar,FR,70,16,informational|transactional,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
+fusion bar,DE,140,10,commercial,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
+fusion bars,ES,170,5,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
+fusion chocolates,ES,40,23,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
+fusion bar,AU,260,22,informational+transactional,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
+fusion bar,IN,880,31,commercial,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
+chocolate fusion,IN,210,15,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
+disco chocolate bar,DK,30,9,informational,,,Low,semrush
+magic chocolate,KW,30,20,informational+navigational,,,Low,semrush
+fusion chocolate,ES,50,21,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
 mushrooms bar,ES,50,28,informational,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
+fusion bars,IT,260,27,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
+chocolate fusion,IT,390,35,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
 bar mushroom,IT,90,5,informational,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
+mushroom bar,IT,90,24,informational,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
 bar mushroom,AU,50,28,informational,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
+fuse bar,AU,260,29,informational+transactional,,,Low,semrush
+mushroom bar,AU,90,29,informational,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
 bar mushroom,DE,110,11,informational,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
-disco chocolate bar,DK,30,9,informational,,,,Low,semrush
-fuse bar,AU,260,29,informational|transactional,,,,Low,semrush
-fusion barre,FR,70,6,informational|transactional,,,,Low,semrush
-magic chocolate,KW,30,20,informational|navigational,,,,Low,semrush
-molecular fusion,MT,110,30,navigational,,,,Low,semrush
-luxury chocolate box,RU,70,18,informational,,,,Low,semrush
+mushroom bar,DE,110,13,informational,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
+fusion bar,FR,70,27,navigational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
+fusion barre,FR,70,6,informational+transactional,,,Low,semrush
+mushroom bar,FR,70,16,informational+transactional,,https://fusionbars.eu/en/news/chocolate-and-botanicals,Medium,semrush
+molecular fusion,MT,110,30,navigational,,,Low,semrush
+chocolate fusion,TR,210,23,informational,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
+fusion bar,PH,50,30,commercial,,https://fusionbars.eu/en/news/fusion-chocolate-bar,High,semrush
+artisan chocolate,TR,110,14,transactional,,https://fusionbars.eu/en/news/the-chocolate,Medium,semrush
+luxury chocolate box,RU,70,18,informational,,,Low,semrush

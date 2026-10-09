@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import { LegalDocType, LegalGovernanceService, LegalLocale } from '@/domain/legal/LegalGovernanceService';
-import { INDEXABLE_LOCALE, SITE_ORIGIN } from '@/lib/search-indexing';
+import { INDEXABLE_LOCALE, indexableUrl, indexingRobots } from '@/lib/search-indexing';
 
 const SLUGS: LegalDocType[] = ['terms', 'privacy', 'cookies', 'refunds', 'shipping', 'payment', 'imprint'];
 const LEGAL_LOCALES: LegalLocale[] = ['en', 'de', 'fr', 'es', 'it', 'nl'];
@@ -11,15 +11,13 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   const { locale, slug } = await params;
   const type = slug as LegalDocType;
   const requested = LEGAL_LOCALES.includes(locale as LegalLocale) ? locale as LegalLocale : INDEXABLE_LOCALE;
+  const path = `/${requested}/legal/${type}`;
   const document = SLUGS.includes(type) ? LegalGovernanceService.active(type, requested) : null;
-  const translated = Boolean(document && !document.fallback);
   return {
     title: document?.title || 'Legal document',
-    robots: translated ? { index: true, follow: true } : { index: false, follow: false },
+    robots: SLUGS.includes(type) ? indexingRobots(requested, path) : { index: false, follow: false },
     alternates: {
-      canonical: translated
-        ? `${SITE_ORIGIN}/${requested}/legal/${type}`
-        : `${SITE_ORIGIN}/${INDEXABLE_LOCALE}/legal/${type}`,
+      canonical: indexableUrl(SLUGS.includes(type) ? path : `/${INDEXABLE_LOCALE}/legal/terms`),
     },
   };
 }

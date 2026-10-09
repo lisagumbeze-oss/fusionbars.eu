@@ -14,6 +14,10 @@ Fusion Mushroom Bars EU sells confectionery. Product pages are the published des
 - https://fusionbars.eu/en/refunds : Refunds, returns, and exchanges
 - https://fusionbars.eu/en/contact : European support desk
 - https://fusionbars.eu/en/news : Store notes
+- https://fusionbars.eu/en/glossary : Words this shop uses
+- https://fusionbars.eu/en/compare : Bar, gummy, and curator box
+- https://fusionbars.eu/en/figures : Prices and thresholds published on the store
+- https://fusionbars.eu/en/reviews : Customer star ratings are not published
 - https://fusionbars.eu/en/privacy : Privacy notice
 - https://fusionbars.eu/en/terms : Terms for orders, payment, dispatch, and returns
 - https://fusionbars.eu/en/report-scam : How to confirm this shop and report an impersonating site
@@ -23,6 +27,8 @@ Product URLs use https://fusionbars.eu/en/products/{slug}. English is the indexa
 
 ## Commercial facts published on the store
 - Currency display is euro, with a pound display option.
+- A single Fusion chocolate bar is €20, or £17.50 when pounds are shown. The 10-bar tasting box is €150, or £128 in pounds.
+- Buying questions for European countries — how to buy, where to buy, and what a bar costs in the Netherlands, the United Kingdom, Germany, Italy, France, Spain, and neighbouring countries — are answered on the homepage, FAQ, shipping page, about page, and news notes.
 - Bank transfer is offered from €100, or £100 when prices are shown in pounds.
 - Bitcoin, Ethereum, and Bitcoin Cash take 10% off the merchandise subtotal. Shipping is not discounted.
 - Standard shipping is free once merchandise reaches €300, or £260 in pounds.
@@ -30,3 +36,6 @@ Product URLs use https://fusionbars.eu/en/products/{slug}. English is the indexa
 - Support: sales@fusionbars.eu
 - Store address: Avinguda Alcora 412, 12006 Castelló de la Plana, Castelló, Spain
 - UK branch office: 519 Beverley Dr, Stoke-on-Trent ST2 0QB, UK
+- Shop notes are written by the shop desk. No named author or social profile is on file.
+- The glossary links Wikipedia and Wikidata for chocolate, couverture chocolate, cocoa butter, and ISO/IEC 17025. The brand has no Wikidata item.
+- No Google Business Profile URL is on file. Map links only search the printed addresses.

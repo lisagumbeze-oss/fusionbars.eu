@@ -40,7 +40,7 @@ export default async function NewsPage({ params }: NewsPageProps) {
           </nav>
           <h1 className="mt-8 font-serif text-4xl sm:text-5xl font-bold tracking-tight text-[#121212]">News</h1>
           <p className="mt-5 max-w-2xl text-sm sm:text-base text-[#5C5852] leading-relaxed">
-            Notes for the European store: the bars, the gummies, how a parcel leaves, and how to read a product page.
+            Notes for the European store: the bars, the gummies, how a parcel leaves, and how to buy Fusion Bars in the Netherlands, Germany, Italy, France, Spain, and the United Kingdom.
           </p>
         </div>
       </header>

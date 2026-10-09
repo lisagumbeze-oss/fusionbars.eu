@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: ShippingPageProps): Promise<M
     path: `/${resolved.locale}/shipping`,
     title: 'Shipping & Returns | Fusion Mushroom Bars EU',
     description:
-      'How Fusion Mushroom Bars EU packs and dispatches orders from the Netherlands, Spain, Germany, and France, and how to ask about a damaged or incomplete parcel.',
+      'Where to buy Fusion Bars in the Netherlands, how to buy a mushroom bar in Italy, and what delivery to Germany costs. Parcels leave the Netherlands, Spain, Germany, and France.',
   });
 }
 
@@ -102,6 +102,22 @@ export default async function ShippingPage({ params }: ShippingPageProps) {
           </p>
           <p>
             A refund is issued only after payment has been confirmed. An order that is still waiting for a bank transfer or a cryptocurrency payment is not refunded, because those funds have not been confirmed.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="font-serif text-2xl font-bold text-[#121212]">Buying questions</h2>
+          <h3 className="font-serif text-xl font-bold text-[#121212]">Where can I buy Fusion Bars in the Netherlands?</h3>
+          <p>
+            On this site. A Dutch address is packed at the Netherlands hub, which also covers Belgium, Luxembourg, and the Nordic countries on the European list. The bar price is the euro price on the product page. A single Fusion chocolate bar is €20.
+          </p>
+          <h3 className="font-serif text-xl font-bold text-[#121212]">How to buy a mushroom bar in Italy</h3>
+          <p>
+            Choose the bar in the shop and check out with an Italian address. A mushroom bar here is the Fusion chocolate bar. Italy is packed from the France hub, together with France, Ireland, and the United Kingdom.
+          </p>
+          <h3 className="font-serif text-xl font-bold text-[#121212]">How much for Fusion Bars delivered to Germany?</h3>
+          <p>
+            The bar price stays €20. Delivery to Germany is the shipping method checkout shows for that address: €15 standard or €20 express, with free standard shipping from €300 of merchandise. Express is not included in that threshold. A German address leaves the Germany hub.
           </p>
         </section>
 

@@ -95,8 +95,12 @@ import { DestinationEngine } from '@/domain/shipping/DestinationEngine';
 import { FulfilmentRoutingService } from '@/domain/shipping/FulfilmentRoutingService';
 import sitemap from '@/app/sitemap';
 import { customerAbsoluteUrl, indexableUrl, indexingRobots, offerAvailability } from '@/lib/search-indexing';
+import { KEYWORD_LINKS, OUTBOUND_REFERENCES, pageLinkIndex } from '@/lib/page-link-index';
+import { buildMentionOutreach, latestVisibilityCheck, outreachBlockedReason } from '@/domain/search/visibility-monitor';
+import { generativeAiImpressions, parseGenerativeAiChartCsv } from '@/domain/search/generative-ai-report';
 import { publicPageMetadata } from '@/lib/page-metadata';
-import { absoluteAssetUrl, articleJsonLd, breadcrumbList, isoDate } from '@/lib/structured-data';
+import { BRAND_ENCYCLOPEDIA, CUSTOMER_RATINGS, GOOGLE_BUSINESS_PROFILE, SHOP_DESK, SUBJECT_ENTITIES } from '@/domain/content/public-trust';
+import { absoluteAssetUrl, articleJsonLd, breadcrumbList, isoDate, siteGraphJsonLd } from '@/lib/structured-data';
 import rolloutState from '@/data/catalogue-rollout-state.json';
 import firstBatchState from '@/data/catalogue-first-batch-state.json';
 import specialistExecution from '@/data/catalogue-specialist-review-state.json';
@@ -6728,14 +6732,26 @@ export class DomainTestSuite {
     await run('Search indexing', 'English catalogue URLs are the only sitemap documents', async () => {
       const urls = (await sitemap()).map((entry) => entry.url);
       if (urls.length === 0) throw new Error('Sitemap was empty');
-      if (urls.some((url) => /\/(de|fr|es|it|nl)(\/|$)/.test(url))) throw new Error(`A non-English locale was submitted: ${urls.find((url) => /\/(de|fr|es|it|nl)(\/|$)/.test(url))}`);
+      const translatedLegal = /^https:\/\/fusionbars\.eu\/(de|fr|es|it|nl)\/(privacy|terms|shipping|refunds|legal\/(terms|privacy|cookies|refunds|shipping|payment|imprint))$/;
+      const nonEnglish = urls.filter((url) => /\/(de|fr|es|it|nl)(\/|$)/.test(url));
+      if (nonEnglish.some((url) => !translatedLegal.test(url))) throw new Error(`A non-English catalogue URL was submitted: ${nonEnglish.find((url) => !translatedLegal.test(url))}`);
+      for (const locale of ['de', 'fr', 'es', 'it', 'nl']) {
+        for (const path of ['privacy', 'terms', 'shipping', 'refunds']) {
+          if (!urls.includes(`https://fusionbars.eu/${locale}/${path}`)) throw new Error(`Translated legal page missing from the sitemap: /${locale}/${path}`);
+        }
+      }
       if (urls.some((url) => url.includes('?category=') || url.includes('?search='))) throw new Error('A shop filter was submitted as its own document');
-      if (!urls.every((url) => url.startsWith('https://fusionbars.eu/en'))) throw new Error('A sitemap URL was outside the English document set');
+      if (urls.some((url) => !url.startsWith('https://fusionbars.eu/'))) throw new Error('A sitemap URL left the canonical host');
       if (!urls.includes('https://fusionbars.eu/en') || !urls.includes('https://fusionbars.eu/en/shop')) throw new Error('Home or shop was missing');
+      for (const path of ['/en/glossary', '/en/compare', '/en/figures', '/en/reviews']) {
+        if (!urls.includes(`https://fusionbars.eu${path}`)) throw new Error(`A guide page was missing from the sitemap: ${path}`);
+      }
       if (!urls.some((url) => url.startsWith('https://fusionbars.eu/en/products/'))) throw new Error('Published products were missing');
       if (indexableUrl('/de/products/fusion-artisan-mushroom-chocolate-bar') !== 'https://fusionbars.eu/en/products/fusion-artisan-mushroom-chocolate-bar') throw new Error('A translated URL did not canonicalise to English');
       if (indexableUrl('/en/shop') !== 'https://fusionbars.eu/en/shop') throw new Error('The English shop URL changed');
       if (indexingRobots('de', '/de/shop').index || !indexingRobots('en', '/en/shop').index) throw new Error('Locale index rules were reversed');
+      if (!indexingRobots('de', '/de/privacy').index || indexableUrl('/de/privacy') !== 'https://fusionbars.eu/de/privacy') throw new Error('A translated legal page was kept out of the index');
+      if (indexingRobots('de', '/de/legal/terms').index) throw new Error('An unpublished legal translation was marked indexable');
       if (indexingRobots('en', '/en/admin').index || indexingRobots('en', '/en/cart').follow) throw new Error('A private route stayed indexable');
       if (offerAvailability('OUT_OF_STOCK') !== 'https://schema.org/OutOfStock' || offerAvailability('LOW_STOCK') !== 'https://schema.org/LimitedAvailability' || offerAvailability('IN_STOCK') !== 'https://schema.org/InStock') throw new Error('Offer availability did not follow stock');
       if (customerAbsoluteUrl('/en/orders/lookup') !== 'https://fusionbars.eu/en/orders/lookup') throw new Error('An order link left the canonical host');
@@ -6761,8 +6777,60 @@ export class DomainTestSuite {
       if (isoDate('3 October 2026') !== '2026-10-03') throw new Error('A news date did not become an ISO date');
       const crumbs = breadcrumbList([{ name: 'Home', path: '/en' }, { name: 'Shop', path: '/en/shop' }]) as { itemListElement: Array<{ item: string }> };
       if (crumbs.itemListElement[1]?.item !== 'https://fusionbars.eu/en/shop') throw new Error('Breadcrumb URL was not canonical');
-      const article = articleJsonLd({ title: 'Note', summary: 'Summary', date: '3 October 2026', slug: 'note' }) as { datePublished?: string; mainEntityOfPage?: string };
+      const article = articleJsonLd({ title: 'Note', summary: 'Summary', date: '3 October 2026', slug: 'note' }) as { datePublished?: string; mainEntityOfPage?: string; author?: { '@type'?: string; url?: string } };
       if (article.datePublished !== '2026-10-03' || article.mainEntityOfPage !== 'https://fusionbars.eu/en/news/note') throw new Error('Article schema left the English news URL');
+      if (article.author?.['@type'] !== 'Organization' || article.author.url !== 'https://fusionbars.eu/en/about#shop-desk') throw new Error('The shop desk was replaced with another author');
+      if (CUSTOMER_RATINGS.published || CUSTOMER_RATINGS.ratingValue !== null || CUSTOMER_RATINGS.reviewCount !== null) throw new Error('A customer star rating was published without a review record');
+      if (GOOGLE_BUSINESS_PROFILE.profileUrl || BRAND_ENCYCLOPEDIA.wikipedia || BRAND_ENCYCLOPEDIA.wikidata) throw new Error('A missing profile or brand encyclopedia entry was filled in');
+      if (!SHOP_DESK.bio.includes('No named author')) throw new Error('The shop desk bio invented a person');
+      for (const entity of SUBJECT_ENTITIES) {
+        if (!entity.wikipedia.startsWith('https://en.wikipedia.org/wiki/') || !entity.wikidata.startsWith('https://www.wikidata.org/wiki/Q')) {
+          throw new Error(`An encyclopedia link was not a Wikipedia or Wikidata subject: ${entity.name}`);
+        }
+      }
+      const graph = JSON.stringify(siteGraphJsonLd());
+      if (graph.includes('AggregateRating') || graph.includes('sameAs') || !graph.includes('maps/search')) throw new Error('Organization schema added a rating or a profile that is not on file');
+
+      const links = pageLinkIndex('en', '/en/shop');
+      const internal = [...links.keywords, ...links.store, ...links.journal, ...links.products];
+      if (links.outbound.length !== 3 || links.outbound.some((link) => !link.href.startsWith('https://') || link.href.includes('fusionbars.eu'))) {
+        throw new Error('Each page index must cite exactly three external references');
+      }
+      if (internal.length <= links.outbound.length) throw new Error('Internal links were not the larger set');
+      if (links.store.some((link) => link.href === '/en/shop')) throw new Error('The current page was linked to itself');
+      const labels = KEYWORD_LINKS.map((link) => link.label.toLowerCase());
+      for (const phrase of ['artisan chocolate', 'craft chocolate bars', 'fusion bars', 'fusion bar', 'fusion chocolate', 'fusion chocolates', 'chocolate fusion', 'mushroom bars', 'mushroom bar', 'mushrooms bar', 'bar mushroom']) {
+        if (!labels.includes(phrase)) throw new Error(`Assigned keyword missing from the link index: ${phrase}`);
+      }
+      for (const phrase of ['artisan schokolade', 'disco chocolate bar', 'magic chocolate', 'fuse bar', 'fusion barre', 'molecular fusion', 'luxury chocolate box']) {
+        if (labels.includes(phrase)) throw new Error(`An unassigned keyword was used as an anchor: ${phrase}`);
+      }
+      if (OUTBOUND_REFERENCES.length !== 3) throw new Error('Outbound reference count changed');
+
+      const visibility = latestVisibilityCheck();
+      if (visibility.capturedOn !== '2026-10-09' || visibility.exactMentions.length !== 0 || visibility.emailsSent !== 0) {
+        throw new Error('The visibility check was rewritten without a new captured result');
+      }
+      if (visibility.citationRate !== 'unspecified') throw new Error('An AI citation rate was invented');
+      if (!outreachBlockedReason()) throw new Error('Outreach was open without a verified mention');
+      let drafted = false;
+      try {
+        buildMentionOutreach({
+          contactEmail: 'contact@myfusionbar.com',
+          contactName: 'Editor',
+          sourceTitle: 'Another shop',
+          sourceUrl: 'https://myfusionbar.com/',
+          targetUrl: 'https://fusionbars.eu/en',
+        });
+        drafted = true;
+      } catch {
+        drafted = false;
+      }
+      if (drafted) throw new Error('A different Fusion shop was accepted as a mention of this store');
+      const parsed = parseGenerativeAiChartCsv('Date,Impressions\n2026-05-18,2\n2026-05-19,3\n');
+      if (parsed.impressions !== 5 || parsed.rows !== 2) throw new Error('A Generative AI chart export did not sum');
+      const live = generativeAiImpressions();
+      if (live.status !== 'not_exported' || live.impressions !== 'unspecified') throw new Error('A missing Generative AI export was treated as a measurement');
     });
 
     await run('Production Email DNS And Delivery', 'Provider evidence is required before email can leave review', async () => {

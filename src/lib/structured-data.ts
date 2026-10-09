@@ -1,3 +1,4 @@
+import { GOOGLE_BUSINESS_PROFILE, mapsSearchUrl } from '@/domain/content/public-trust';
 import { SITE_ORIGIN, indexableUrl } from '@/lib/search-indexing';
 import { STORE_ADDRESS, UK_BRANCH_OFFICE } from '@/lib/store-address';
 
@@ -60,6 +61,7 @@ export function siteGraphJsonLd() {
           },
         ],
         areaServed: 'Europe',
+        hasMap: GOOGLE_BUSINESS_PROFILE.places.map((place) => mapsSearchUrl(place.query)),
       },
       {
         '@type': 'WebSite',
@@ -82,7 +84,12 @@ export function articleJsonLd(post: { title: string; summary: string; date: stri
     description: post.summary,
     ...(published ? { datePublished: published, dateModified: published } : {}),
     inLanguage: 'en',
-    author: { '@type': 'Organization', name: SITE_NAME, url: SITE_ORIGIN },
+    author: {
+      '@type': 'Organization',
+      '@id': `${SITE_ORIGIN}/#organization`,
+      name: SITE_NAME,
+      url: `${indexableUrl('/en/about')}#shop-desk`,
+    },
     publisher: { '@id': `${SITE_ORIGIN}/#organization` },
     mainEntityOfPage: indexableUrl(`/en/news/${post.slug}`),
   };

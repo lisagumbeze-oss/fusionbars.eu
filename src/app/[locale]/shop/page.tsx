@@ -11,6 +11,7 @@ import CryptoDiscountNotice from '@/components/CryptoDiscountNotice';
 import JsonLd from '@/components/seo/JsonLd';
 import { publicPageMetadata } from '@/lib/page-metadata';
 import { breadcrumbList } from '@/lib/structured-data';
+import QuickAnswer from '@/components/seo/QuickAnswer';
 
 interface ShopPageProps {
   params: Promise<{ locale: string }> | { locale: string };
@@ -80,7 +81,7 @@ export default async function ShopPage({ params, searchParams }: ShopPageProps) 
             <p className="text-xs sm:text-sm text-[#5C5852] mt-1.5 max-w-2xl leading-relaxed">
               {activeCategory
                 ? activeCategory.description
-                : 'Single-origin Belgian chocolate bars, fruit pectin gummies, botanical vaporizers, and curated tasting boxes. Handcrafted in Europe and dispatched from NL, ES, DE, and FR.'}
+                : 'Single-origin Belgian chocolate bars, fruit pectin gummies, botanical vaporizers, and curated tasting boxes. How to buy Fusion Bars in Belgium is this catalogue: choose a bar, then check out with a Belgian address. Belgium is packed from the Netherlands hub.'}
             </p>
           </div>
 
@@ -88,6 +89,9 @@ export default async function ShopPage({ params, searchParams }: ShopPageProps) 
             Showing {products.length} product{products.length === 1 ? '' : 's'}
           </span>
         </div>
+        <QuickAnswer className="mt-6 max-w-3xl rounded-2xl border border-[#E5E3DD] bg-white px-5 py-4">
+          The shop lists the public Fusion range: artisan chocolate bars, fruit pectin gummies, curator boxes, and the other published formats. The price on the card is the stored euro amount, with a pound amount when one is stored. A filter does not create a second catalogue. The product page is the description that passed review.
+        </QuickAnswer>
       </div>
 
       <ShopFilters

@@ -64,7 +64,7 @@ export default function ContactDesk() {
           European Customer Support &amp; Inquiries
         </h1>
         <p className="text-xs sm:text-sm text-[#5C5852] max-w-2xl leading-relaxed">
-          Direct communication desk for order reconciliations, collective allocations, and botanical batch specifications.
+          Direct communication desk for order reconciliations, collective allocations, and botanical batch specifications. Where can I buy Fusion Bars in Ireland is this shop. Write here if the question is about an order, a flavour, or a delivery to Ireland or another European address checkout accepts.
         </p>
       </div>
 

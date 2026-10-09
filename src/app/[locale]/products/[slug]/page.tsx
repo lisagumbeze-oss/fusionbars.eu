@@ -10,6 +10,7 @@ import type { Metadata } from 'next';
 import { INDEXABLE_LOCALE, indexableUrl, indexingRobots, offerAvailability } from '@/lib/search-indexing';
 import JsonLd from '@/components/seo/JsonLd';
 import { absoluteAssetUrl, breadcrumbList } from '@/lib/structured-data';
+import { journalLinksForCategory } from '@/lib/page-link-index';
 
 interface ProductDetailPageProps {
   params: Promise<{ locale: string; slug: string }> | { locale: string; slug: string };
@@ -153,6 +154,19 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
               </div>
             )}
           </div>
+        </section>
+
+        <section className="pt-10 border-t border-[#E5E3DD]" aria-labelledby="product-journal">
+          <h2 id="product-journal" className="font-serif text-2xl font-bold text-[#121212]">In the journal</h2>
+          <ul className="mt-4 flex flex-col gap-3 text-sm sm:flex-row sm:flex-wrap sm:gap-x-8">
+            {journalLinksForCategory(product.categorySlug).map((link) => (
+              <li key={`${link.path}:${link.label}`}>
+                <Link href={`/${locale}${link.path}`} className="font-semibold text-[#4A5D4E] hover:underline">
+                  {link.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </section>
 
         {/* Related Products Carousel / Grid */}

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Search, ShoppingBag, Heart, Menu, X, Shield, User } from 'lucide-react';
+import { Search, ShoppingBag, Heart, Menu, X, Shield, User, ChevronDown } from 'lucide-react';
 import WhatsAppLink from './WhatsAppLink';
 import AnnouncementBar from './AnnouncementBar';
 import SearchModal from './SearchModal';
@@ -18,22 +18,53 @@ export default function Header() {
   const pathname = usePathname();
   const dict = getDictionary(locale);
 
-  const navLinks = [
-    { label: dict.navigation.shop, href: `/${locale}/shop` },
-    { label: 'Chocolate Bars', href: `/${locale}/shop?category=artisan-chocolate-bars` },
-    { label: 'Gummies', href: `/${locale}/shop?category=gummies` },
-    { label: 'Collections', href: `/${locale}/shop?category=bundles-collections` },
-    { label: 'Wholesale', href: `/${locale}/shop?category=wholesale` },
-    { label: dict.navigation.about, href: `/${locale}/about` },
-    { label: dict.navigation.faq, href: `/${locale}/faq` },
-    { label: 'Shipping', href: `/${locale}/shipping` },
-    { label: 'Refunds', href: `/${locale}/refunds`, wide: true },
-    { label: 'Contact', href: `/${locale}/contact` },
-    { label: 'Order Status', href: `/${locale}/orders/lookup` },
-    { label: 'News', href: `/${locale}/news`, wide: true },
-    { label: 'Report a scam', href: `/${locale}/report-scam`, wide: true },
-    { label: 'Terms', href: `/${locale}/terms`, wide: true },
+  const homeHref = `/${locale}`;
+  const isHome = pathname === homeHref || pathname === `${homeHref}/`;
+
+  const navGroups = [
+    {
+      label: dict.bottomBar.shop,
+      items: [
+        { label: 'All products', href: `/${locale}/shop` },
+        { label: 'Chocolate Bars', href: `/${locale}/shop?category=artisan-chocolate-bars` },
+        { label: 'Gummies', href: `/${locale}/shop?category=gummies` },
+        { label: 'Collections', href: `/${locale}/shop?category=bundles-collections` },
+        { label: 'Wholesale', href: `/${locale}/shop?category=wholesale` },
+      ],
+    },
+    {
+      label: dict.navigation.about,
+      items: [
+        { label: dict.navigation.about, href: `/${locale}/about` },
+        { label: 'News', href: `/${locale}/news` },
+        { label: 'Glossary', href: `/${locale}/glossary` },
+        { label: 'Compare', href: `/${locale}/compare` },
+        { label: 'Shop figures', href: `/${locale}/figures` },
+        { label: 'Customer ratings', href: `/${locale}/reviews` },
+      ],
+    },
+    {
+      label: 'Support',
+      items: [
+        { label: 'Contact', href: `/${locale}/contact` },
+        { label: dict.navigation.faq, href: `/${locale}/faq` },
+        { label: 'Shipping', href: `/${locale}/shipping` },
+        { label: 'Refunds', href: `/${locale}/refunds` },
+        { label: 'Order Status', href: `/${locale}/orders/lookup` },
+        { label: 'Report a scam', href: `/${locale}/report-scam` },
+        { label: 'Terms', href: `/${locale}/terms` },
+      ],
+    },
   ];
+
+  const itemPath = (href: string) => href.split('?')[0].replace(/\/$/, '');
+
+  const isGroupActive = (items: { href: string }[]) =>
+    items.some((item) => {
+      const path = itemPath(item.href);
+      if (pathname === path || pathname.startsWith(`${path}/`)) return true;
+      return path.endsWith('/shop') && pathname.startsWith(`/${locale}/products`);
+    });
 
   return (
     <>
@@ -67,25 +98,56 @@ export default function Header() {
               </Link>
             </div>
 
-            {/* Center: Desktop Navigation Links (Unboxed, clean typography) */}
-            <nav className="hidden lg:flex items-center gap-4 xl:gap-7 text-[12px] xl:text-[13px] font-medium text-[#5C5852]">
-              {navLinks.map((link) => {
-                const isActive = pathname === link.href;
+            <nav className="hidden lg:flex items-center gap-5 xl:gap-8 text-[12px] xl:text-[13px] font-medium text-[#5C5852]" aria-label="Primary">
+              <Link
+                href={homeHref}
+                className={`group relative py-1 transition-colors ${isHome ? 'text-[#121212] font-semibold' : 'hover:text-[#121212]'}`}
+              >
+                {dict.bottomBar.home}
+                <span
+                  className={`absolute bottom-0 left-0 right-0 h-0.5 origin-left rounded-full bg-[#4A5D4E] motion-safe:transition-[scale] motion-safe:duration-200 ${
+                    isHome ? 'scale-x-100' : 'scale-x-0 motion-safe:group-hover:scale-x-100'
+                  }`}
+                />
+              </Link>
+              {navGroups.map((group) => {
+                const active = isGroupActive(group.items);
                 return (
-                  <Link
-                    key={link.href}
-                    href={link.href}
-                    className={`group transition-colors py-1 relative ${'wide' in link && link.wide ? 'hidden xl:inline' : ''} ${
-                      isActive ? 'text-[#121212] font-semibold' : 'hover:text-[#121212]'
-                    }`}
-                  >
-                    {link.label}
-                    <span
-                      className={`absolute bottom-0 left-0 right-0 h-0.5 origin-left rounded-full bg-[#4A5D4E] motion-safe:transition-[scale] motion-safe:duration-200 ${
-                        isActive ? 'scale-x-100' : 'scale-x-0 motion-safe:group-hover:scale-x-100'
+                  <div key={group.label} className="relative group/menu">
+                    <button
+                      type="button"
+                      className={`relative inline-flex items-center gap-1 py-1 transition-colors ${
+                        active ? 'text-[#121212] font-semibold' : 'hover:text-[#121212]'
                       }`}
-                    />
-                  </Link>
+                      aria-haspopup="true"
+                    >
+                      {group.label}
+                      <ChevronDown className="h-3.5 w-3.5 opacity-70 motion-safe:transition-transform motion-safe:duration-200 motion-safe:group-hover/menu:rotate-180 motion-safe:group-focus-within/menu:rotate-180" />
+                      <span
+                        className={`absolute bottom-0 left-0 right-0 h-0.5 origin-left rounded-full bg-[#4A5D4E] motion-safe:transition-[scale] motion-safe:duration-200 ${
+                          active ? 'scale-x-100' : 'scale-x-0 motion-safe:group-hover/menu:scale-x-100'
+                        }`}
+                      />
+                    </button>
+                    <div className="absolute left-0 top-full z-50 hidden pt-2 group-hover/menu:block group-focus-within/menu:block">
+                      <div className="min-w-52 rounded-xl border border-[#E5E3DD] bg-[#FBFBF9] py-2 shadow-[0_12px_40px_rgba(18,18,18,0.08)]">
+                        {group.items.map((item) => {
+                          const itemActive = !item.href.includes('?') && pathname === itemPath(item.href);
+                          return (
+                            <Link
+                              key={item.href}
+                              href={item.href}
+                              className={`block px-4 py-2 text-[13px] transition-colors hover:bg-[#F0F4F1] hover:text-[#121212] ${
+                                itemActive ? 'font-semibold text-[#121212]' : 'text-[#5C5852]'
+                              }`}
+                            >
+                              {item.label}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
                 );
               })}
             </nav>
@@ -149,16 +211,28 @@ export default function Header() {
         {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
           <div className="lg:hidden border-t border-[#E5E3DD] bg-[#FBFBF9] px-4 pt-3 pb-6 space-y-3 animate-fadeIn">
-            <nav className="flex flex-col space-y-2 text-sm font-medium text-[#121212]">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="py-2 px-3 rounded hover:bg-[#F0F4F1] transition"
-                >
-                  {link.label}
-                </Link>
+            <nav className="flex flex-col space-y-4 text-sm font-medium text-[#121212]">
+              <Link
+                href={homeHref}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="py-2 px-3 rounded hover:bg-[#F0F4F1] transition"
+              >
+                {dict.bottomBar.home}
+              </Link>
+              {navGroups.map((group) => (
+                <div key={group.label} className="space-y-1">
+                  <p className="px-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-[#5C5852]">{group.label}</p>
+                  {group.items.map((item) => (
+                    <Link
+                      key={item.href}
+                      href={item.href}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="block py-2 px-3 rounded hover:bg-[#F0F4F1] transition"
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </div>
               ))}
               <div className="pt-2 border-t border-[#E5E3DD]">
                 <Link
